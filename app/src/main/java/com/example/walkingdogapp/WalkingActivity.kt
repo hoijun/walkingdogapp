@@ -1,20 +1,24 @@
 package com.example.walkingdogapp
 
 import android.app.ActivityManager
+import android.content.ContentValues
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PointF
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -30,6 +34,12 @@ import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
+import java.io.ByteArrayOutputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -44,7 +54,15 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var trackingCamera : CameraUpdate
 
     private val cameraPermission = arrayOf(android.Manifest.permission.CAMERA)
-    private val camera_Code = 98
+    private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES)
+    } else {
+        arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    }
+    private val cameraCode = 98
+    private val storageCode = 99
+
+    private lateinit var bitmap: Bitmap
 
     // 뒤로 가기
     private val BackPressCallback = object : OnBackPressedCallback(true) {
@@ -54,12 +72,31 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private val getResultCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if(it.resultCode == RESULT_OK && it.data != null) {
+            val extras = it.data!!.extras
+            bitmap = extras!!.get("data") as Bitmap
+            try {
+                saveFile(RandomFileName())
+            } catch (e: Exception) {
+                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    fun RandomFileName(): String {
+        return SimpleDateFormat(
+            "yyyyMMddHHmmss",
+            Locale.getDefault()
+        ).format(System.currentTimeMillis())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityWalkingBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
         // 보류
         walkViewModel = ViewModelProvider(this).get(LocateInfoViewModel::class.java)
         walkViewModel.getLastLocation()
@@ -92,7 +129,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             Log.d("current coord", this.isTracking.toString())
         }
-        
+
         // 버튼 이벤트 설정
         binding.apply {
             btnBack.setOnClickListener {
@@ -197,15 +234,19 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun startTracking() {
-        val serviceIntent = Intent(this, WalkingService::class.java)
-        serviceIntent.action = Constant.ACTION_START_Walking_Tracking
-        startService(serviceIntent)
+        if (isWalkingServiceRunning()) {
+            val serviceIntent = Intent(this, WalkingService::class.java)
+            serviceIntent.action = Constant.ACTION_START_Walking_Tracking
+            startService(serviceIntent)
+        }
     }
 
     private fun stopTracking() {
-        val serviceIntent = Intent(this, WalkingService::class.java)
-        serviceIntent.action = Constant.ACTION_STOP_Walking_Tracking
-        startService(serviceIntent)
+        if (isWalkingServiceRunning()) {
+            val serviceIntent = Intent(this, WalkingService::class.java)
+            serviceIntent.action = Constant.ACTION_STOP_Walking_Tracking
+            startService(serviceIntent)
+        }
     }
 
     private fun goHome() {
@@ -215,20 +256,60 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun startCamera() {
-        if(checkPermission(cameraPermission)) {
+        if(checkPermission(cameraPermission, cameraCode) && checkPermission(storegePermission, storageCode)) {
             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(cameraIntent, camera_Code)
+            getResultCamera.launch(cameraIntent)
         }
     }
 
-    private fun checkPermission(permissions : Array<out String>) : Boolean{
+    private fun saveFile(fileName: String) {
+        val values = ContentValues()
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            values.put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+        val contentResolver = contentResolver
+        val item = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+
+        try {
+            val pdf = item?.let { contentResolver.openFileDescriptor(it, "w", null) } ?: return
+            val strToByte = bitmapToByteArray(bitmap);
+            val fos = FileOutputStream(pdf.fileDescriptor)
+            fos.write(strToByte)
+            fos.close()
+
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                values.clear();
+                values.put(
+                    MediaStore.Images.Media.IS_PENDING,
+                    0);
+                contentResolver.update(item, values, null, null);
+            }
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun bitmapToByteArray(`$bitmap`: Bitmap): ByteArray? {
+        val stream = ByteArrayOutputStream()
+        `$bitmap`.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        return stream.toByteArray()
+    }
+
+    private fun checkPermission(permissions : Array<out String>, code: Int) : Boolean{
         for (permission in permissions) {
             if (ContextCompat.checkSelfPermission(
                     this,
                     permission
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
-                ActivityCompat.requestPermissions(this, permissions, camera_Code)
+                ActivityCompat.requestPermissions(this, permissions, code)
                 return false
             }
         }
@@ -241,7 +322,30 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         grantResults: IntArray
     ) {
         when (requestCode) {
-            camera_Code -> {
+            storageCode -> {
+                if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    val builder = AlertDialog.Builder(this)
+                    builder.setTitle("사진 저장을 위해 권한을 \n허용으로 해주세요!")
+                    val listener = DialogInterface.OnClickListener { _, ans ->
+                        when (ans) {
+                            DialogInterface.BUTTON_POSITIVE -> {
+                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                intent.flags = FLAG_ACTIVITY_NEW_TASK
+                                intent.data = Uri.fromParts("package", packageName, null)
+                                startActivity(intent)
+                            }
+                        }
+                    }
+                    builder.setPositiveButton("네", listener)
+                    builder.setNegativeButton("아니오", null)
+                    builder.show()
+                } else {
+                    if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                        startCamera()
+                    }
+                }
+            }
+            cameraCode -> {
                 if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                     val builder = AlertDialog.Builder(this)
                     builder.setTitle("촬영을 위해 권한을 \n허용으로 해주세요!")

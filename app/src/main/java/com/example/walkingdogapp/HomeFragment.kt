@@ -1,7 +1,6 @@
 package com.example.walkingdogapp
 
 import android.Manifest
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -32,8 +31,6 @@ class HomeFragment : Fragment() {
         ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.POST_NOTIFICATIONS), 999)
     }
 
-
-    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -49,8 +46,15 @@ class HomeFragment : Fragment() {
 
         // 산책 시작
         binding.btnWalk.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 val builder = AlertDialog.Builder(requireContext())
                 builder.setTitle("산책을 위해 위치 권한을 \n항상 허용으로 해주세요!")
                 val listener = DialogInterface.OnClickListener { _, ans ->
@@ -58,7 +62,8 @@ class HomeFragment : Fragment() {
                         DialogInterface.BUTTON_POSITIVE -> {
                             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            intent.data = Uri.fromParts("package", requireContext().packageName, null)
+                            intent.data =
+                                Uri.fromParts("package", requireContext().packageName, null)
                             startActivity(intent)
                         }
                     }
@@ -68,32 +73,37 @@ class HomeFragment : Fragment() {
                 builder.show()
                 return@setOnClickListener
             }
-            if (ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                )
-                == PackageManager.PERMISSION_GRANTED
-            ) {
-                val intent = Intent(requireContext(), WalkingActivity::class.java)
-                startActivity(intent)
-            } else {
-                val builder = AlertDialog.Builder(requireContext())
-                builder.setTitle("산책을 하기 위해 위치 권한을 \n항상 허용으로 해주세요!")
-                val listener = DialogInterface.OnClickListener { _, ans ->
-                    when (ans) {
-                        DialogInterface.BUTTON_POSITIVE -> {
-                            ActivityCompat.requestPermissions(
-                                requireActivity(),
-                                arrayOf(
-                                    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                                ), 998
-                            )
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                if (ContextCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                    )
+                    == PackageManager.PERMISSION_GRANTED
+                ) {
+                    val intent = Intent(requireContext(), WalkingActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    val builder = AlertDialog.Builder(requireContext())
+                    builder.setTitle("산책을 하기 위해 위치 권한을 \n항상 허용으로 해주세요!")
+                    val listener = DialogInterface.OnClickListener { _, ans ->
+                        when (ans) {
+                            DialogInterface.BUTTON_POSITIVE -> {
+                                ActivityCompat.requestPermissions(
+                                    requireActivity(),
+                                    arrayOf(
+                                        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                                    ), 998
+                                )
+                            }
                         }
                     }
+                    builder.setPositiveButton("네", listener)
+                    builder.setNegativeButton("아니오", null)
+                    builder.show()
                 }
-                builder.setPositiveButton("네", listener)
-                builder.setNegativeButton("아니오", null)
-                builder.show()
+            } else {
+                val intent = Intent(requireContext(), WalkingActivity::class.java)
+                startActivity(intent)
             }
         }
         return binding.root

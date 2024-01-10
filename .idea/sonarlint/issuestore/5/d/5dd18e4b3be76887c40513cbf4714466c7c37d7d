@@ -1,6 +1,8 @@
 
-9kotlin:S1128"Remove this unused import.(´Ùí8½ÎÆ×Î1
-Hkotlin:S1874ª"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8§¯ÌÕÎ1
-Ckotlin:S1874Ü"#Deprecated code should not be used.(Èà¬ö8§¯ÌÕÎ1
-Nkotlin:S1066«".Merge this "if" statement with the nested one.(•³â8©¯ÌÕÎ1
-Kkotlin:S6518@",Replace function call with indexed accessor.(´†·€8ª¯ÌÕÎ1
+mkotlin:S117«"NRename this parameter to match the regular expression ^`?[_a-z][a-zA-Z0-9]*`?$(¤òÜÊ8Ú™´©Ï1
+Bkotlin:S1874N"#Deprecated code should not be used.(ÑÖ8ê™´©Ï1
+Hkotlin:S1874Ï"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8ê™´©Ï1
+rkotlin:S3776¿"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8ë™´©Ï1
+Nkotlin:S1066Ğ".Merge this "if" statement with the nested one.(•³â8î™´©Ï1
+Kkotlin:S6518e",Replace function call with indexed accessor.(´†·€8ğ™´©Ï1
+Kkotlin:S6518N",Replace function call with indexed accessor.(ÑÖ8ğ™´©Ï1
