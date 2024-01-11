@@ -62,8 +62,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private val cameraCode = 98
     private val storageCode = 99
 
-    private lateinit var bitmap: Bitmap
-
     // 뒤로 가기
     private val BackPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -72,12 +70,13 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private val getResultCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if(it.resultCode == RESULT_OK && it.data != null) {
-            val extras = it.data!!.extras
-            bitmap = extras!!.get("data") as Bitmap
+    private val getResultCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { image ->
+        if(image.resultCode == RESULT_OK && image.data != null) {
             try {
-                saveFile(RandomFileName())
+                if (image.data?.extras?.get("data") != null) {
+                    val img = image.data?.extras?.get("data") as Bitmap
+                    saveFile(RandomFileName(), "image/jpeg", img)
+                }
             } catch (e: Exception) {
                 Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
             }
@@ -262,44 +261,34 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun saveFile(fileName: String) {
-        val values = ContentValues()
-        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+    private fun saveFile(fileName: String, mimeType: String, bitmap: Bitmap) {
+        val cv = ContentValues()
+        cv.put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+        cv.put(MediaStore.Images.Media.MIME_TYPE, mimeType)
+        // cv.put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM OR Pictures/털뭉치")
 
-        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-            values.put(MediaStore.Images.Media.IS_PENDING, 1)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            cv.put(MediaStore.Images.Media.IS_PENDING, 1)
         }
-        val contentResolver = contentResolver
-        val item = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
 
-        try {
-            val pdf = item?.let { contentResolver.openFileDescriptor(it, "w", null) } ?: return
-            val strToByte = bitmapToByteArray(bitmap);
-            val fos = FileOutputStream(pdf.fileDescriptor)
-            fos.write(strToByte)
-            fos.close()
+        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv)
 
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                values.clear();
-                values.put(
-                    MediaStore.Images.Media.IS_PENDING,
-                    0);
-                contentResolver.update(item, values, null, null);
+        if (uri != null) {
+            val scriptor = contentResolver.openFileDescriptor(uri, "w")
+
+            if (scriptor != null) {
+                val fos = FileOutputStream(scriptor.fileDescriptor)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+                fos.close()
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    cv.put(MediaStore.Images.Media.IS_PENDING, 0)
+                    contentResolver.update(uri, cv, null, null)
+                    cv.clear()
+                }
             }
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+            scriptor?.close()
         }
-    }
-
-    private fun bitmapToByteArray(`$bitmap`: Bitmap): ByteArray? {
-        val stream = ByteArrayOutputStream()
-        `$bitmap`.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-        return stream.toByteArray()
     }
 
     private fun checkPermission(permissions : Array<out String>, code: Int) : Boolean{

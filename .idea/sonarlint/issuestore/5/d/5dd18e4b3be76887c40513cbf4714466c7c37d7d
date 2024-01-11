@@ -1,8 +1,11 @@
 
-mkotlin:S117«"NRename this parameter to match the regular expression ^`?[_a-z][a-zA-Z0-9]*`?$(¤òÜÊ8Ú™´©Ï1
-Bkotlin:S1874N"#Deprecated code should not be used.(ÑÖ8ê™´©Ï1
-Hkotlin:S1874Ï"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8ê™´©Ï1
-rkotlin:S3776¿"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8ë™´©Ï1
-Nkotlin:S1066Ğ".Merge this "if" statement with the nested one.(•³â8î™´©Ï1
-Kkotlin:S6518e",Replace function call with indexed accessor.(´†·€8ğ™´©Ï1
-Kkotlin:S6518N",Replace function call with indexed accessor.(ÑÖ8ğ™´©Ï1
+>kotlin:S125Œ"Remove this commented out code.(Ç¹ş8é¨öÌÏ1
+9kotlin:S1128%"Remove this unused import.(äÓßã8øÿØÉÏ1
+9kotlin:S1128&"Remove this unused import.(şÜæä8øÿØÉÏ1
+>kotlin:S1128("Remove this unused import.(ˆîáüÿÿÿÿ8øÿØÉÏ1
+Gkotlin:S1874L"#Deprecated code should not be used.(Ÿ¨¯ıÿÿÿÿ8àÜÛÉÏ1
+Gkotlin:S1874M"#Deprecated code should not be used.(Ìù¯»ûÿÿÿÿ8¹ñÛÉÏ1
+Hkotlin:S1874Î"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8üÿØÉÏ1
+rkotlin:S3776´"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8ıÿØÉÏ1
+Nkotlin:S1066Ï".Merge this "if" statement with the nested one.(•³â8‚€ÙÉÏ1
+Kkotlin:S6518d",Replace function call with indexed accessor.(´†·€8…€ÙÉÏ1
