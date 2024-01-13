@@ -1,11 +1,6 @@
 
->kotlin:S125Œ"Remove this commented out code.(Ç¹ş8é¨öÌÏ1
-9kotlin:S1128%"Remove this unused import.(äÓßã8øÿØÉÏ1
-9kotlin:S1128&"Remove this unused import.(şÜæä8øÿØÉÏ1
->kotlin:S1128("Remove this unused import.(ˆîáüÿÿÿÿ8øÿØÉÏ1
-Gkotlin:S1874L"#Deprecated code should not be used.(Ÿ¨¯ıÿÿÿÿ8àÜÛÉÏ1
-Gkotlin:S1874M"#Deprecated code should not be used.(Ìù¯»ûÿÿÿÿ8¹ñÛÉÏ1
-Hkotlin:S1874Î"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8üÿØÉÏ1
-rkotlin:S3776´"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8ıÿØÉÏ1
-Nkotlin:S1066Ï".Merge this "if" statement with the nested one.(•³â8‚€ÙÉÏ1
-Kkotlin:S6518d",Replace function call with indexed accessor.(´†·€8…€ÙÉÏ1
+^kotlin:S899†":Do something with the "Boolean" value returned by "mkdir".(å‰ñ‰ùÿÿÿÿ8›®†Ğ1
+Hkotlin:S1874È"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8¶®†Ğ1
+rkotlin:S3776Â"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8·®†Ğ1
+Nkotlin:S1066É".Merge this "if" statement with the nested one.(•³â8»®†Ğ1
+Kkotlin:S6518^",Replace function call with indexed accessor.(´†·€8½®†Ğ1

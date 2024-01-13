@@ -1,28 +1,28 @@
 package com.example.walkingdogapp
 
 import android.app.ActivityManager
-import android.content.ContentValues
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PointF
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
 import com.naver.maps.geometry.LatLng
@@ -34,9 +34,7 @@ import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
-import java.io.ByteArrayOutputStream
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
+import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -62,6 +60,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private val cameraCode = 98
     private val storageCode = 99
 
+    private lateinit var uri : Uri
+    private lateinit var currentPhotoPath: String
+
     // 뒤로 가기
     private val BackPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -70,16 +71,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private val getResultCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { image ->
-        if(image.resultCode == RESULT_OK && image.data != null) {
-            try {
-                if (image.data?.extras?.get("data") != null) {
-                    val img = image.data?.extras?.get("data") as Bitmap
-                    saveFile(RandomFileName(), "image/jpeg", img)
-                }
-            } catch (e: Exception) {
-                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
-            }
+    private val getResultCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            galleryAddPic()
         }
     }
 
@@ -256,38 +250,58 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun startCamera() {
         if(checkPermission(cameraPermission, cameraCode) && checkPermission(storegePermission, storageCode)) {
-            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            getResultCamera.launch(cameraIntent)
+            takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
         }
     }
 
-    private fun saveFile(fileName: String, mimeType: String, bitmap: Bitmap) {
-        val cv = ContentValues()
-        cv.put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
-        cv.put(MediaStore.Images.Media.MIME_TYPE, mimeType)
-        // cv.put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM OR Pictures/털뭉치")
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            cv.put(MediaStore.Images.Media.IS_PENDING, 1)
+    private fun takePhoto(intent: Intent) {
+        val parentDir =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absoluteFile
+        val subDir = File(parentDir, "털뭉치")
+        if (!subDir.exists()) {
+            subDir.mkdir()
         }
+        val photoFile: File? = try {
+            createImageFile(subDir)
+        } catch (ex: IOException) {
+            // Error occurred while creating the File
+            ex.printStackTrace()
+            null
+        }
+        photoFile?.also {
+            uri = FileProvider.getUriForFile(
+                this,
+                "walkingdogapp.provider",
+                it
+            )
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+            getResultCamera.launch(intent)
+        }
+    }
 
-        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv)
+    @Throws(IOException::class)
+    private fun createImageFile(storageDir: File?): File {
+        // Create an image file name
+        val timeStamp: String = RandomFileName()
+        return File.createTempFile(
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpeg", /* suffix */
+            storageDir /* directory */
+        ).apply {
+            Log.i("syTest", "Created File AbsolutePath : $absolutePath")
+            currentPhotoPath = absolutePath
+            this.deleteOnExit()
+        }
+    }
 
-        if (uri != null) {
-            val scriptor = contentResolver.openFileDescriptor(uri, "w")
-
-            if (scriptor != null) {
-                val fos = FileOutputStream(scriptor.fileDescriptor)
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
-                fos.close()
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    cv.put(MediaStore.Images.Media.IS_PENDING, 0)
-                    contentResolver.update(uri, cv, null, null)
-                    cv.clear()
-                }
-            }
-            scriptor?.close()
+    private fun galleryAddPic() {
+        MediaScannerConnection.scanFile(
+            this,
+            arrayOf(currentPhotoPath),
+            null
+        ) { path, uri ->
+            Log.d("testsave", "Scanned file path: $path")
+            Log.d("testsave", "Scanned file URI: $uri")
         }
     }
 
