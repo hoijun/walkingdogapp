@@ -283,11 +283,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun createImageFile(storageDir: File?): File {
         // Create an image file name
         val timeStamp: String = RandomFileName()
-        return File.createTempFile(
-            "JPEG_${timeStamp}_", /* prefix */
-            ".jpeg", /* suffix */
-            storageDir /* directory */
-        ).apply {
+        val imageFileName = "munchi_$timeStamp.jpeg"
+        return File(storageDir, imageFileName)
+        .apply {
             Log.i("syTest", "Created File AbsolutePath : $absolutePath")
             currentPhotoPath = absolutePath
             this.deleteOnExit()
