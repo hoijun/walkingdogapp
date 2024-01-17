@@ -1,6 +1,8 @@
 
-^kotlin:S899†":Do something with the "Boolean" value returned by "mkdir".(å‰ñ‰ùÿÿÿÿ8Ú”Å†Ğ1
-Hkotlin:S1874È"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8ñ”Å†Ğ1
-rkotlin:S3776À"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8ò”Å†Ğ1
-Nkotlin:S1066É".Merge this "if" statement with the nested one.(•³â8õ”Å†Ğ1
-Kkotlin:S6518^",Replace function call with indexed accessor.(´†·€8ö”Å†Ğ1
+^kotlin:S899¿":Do something with the "Boolean" value returned by "mkdir".(å‰ñ‰ùÿÿÿÿ8“Öä°Ñ1
+<kotlin:S6310Ö"Avoid hardcoded dispatchers.(©ÒÕò8›Öä°Ñ1
+Hkotlin:S1874"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8¥œé°Ñ1
+qkotlin:S3776Õ"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(õ»Ëc8¥œé°Ñ1
+rkotlin:S3776€"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8¦œé°Ñ1
+Nkotlin:S1066‚".Merge this "if" statement with the nested one.(•³â8«œé°Ñ1
+Kkotlin:S6518`",Replace function call with indexed accessor.(´†·€8­œé°Ñ1

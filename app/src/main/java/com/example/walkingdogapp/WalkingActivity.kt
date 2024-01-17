@@ -24,6 +24,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
@@ -34,10 +35,16 @@ import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.Random
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -50,6 +57,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private var trackingMarker = Marker()
     private var trackingPath = PathOverlay()
     private lateinit var trackingCamera : CameraUpdate
+
+    private var animalMarkers = mutableListOf<Marker>()
 
     private val cameraPermission = arrayOf(android.Manifest.permission.CAMERA)
     private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -75,13 +84,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         if (it.resultCode == RESULT_OK) {
             galleryAddPic()
         }
-    }
-
-    fun RandomFileName(): String {
-        return SimpleDateFormat(
-            "yyyyMMddHHmmss",
-            Locale.getDefault()
-        ).format(System.currentTimeMillis())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -160,9 +162,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         trackingPath.width = 15
         trackingPath.color = Color.YELLOW
 
+        randomMarker()
+
         walkViewModel.currentCoord.observe(this) {
             val firstCamera = CameraUpdate.scrollAndZoomTo(LatLng(it.latitude, it.longitude),
-                17.0)
+                16.0)
             mynavermap.moveCamera(firstCamera)
             trackingMarker.position = LatLng(it.latitude, it.longitude)
             trackingMarker.map = mynavermap
@@ -178,6 +182,17 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 trackingCamera =
                     CameraUpdate.scrollTo(coordList.last()).animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
                 mynavermap.moveCamera(trackingCamera)
+
+                val markersToRemove = mutableListOf<Marker>()
+                for (marker in animalMarkers) {
+                    if (marker.position.distanceTo(coordList.last()) > 400) {
+                        Log.d("coor", "clear")
+                        marker.map = null
+                        markersToRemove.add(marker)
+                    }
+                }
+                animalMarkers.removeAll(markersToRemove)
+
                 if (coordList.size > 1) {
                     trackingPath.map = null
                     trackingPath.coords = coordList // 이동 경로 그림
@@ -193,6 +208,48 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             val seconds = it % 60
             binding.InfoTime.text = getString(R.string.totaltime, minutes, seconds)
         }
+    }
+
+    private fun randomMarker() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            while (isWalkingServiceRunning()) {
+                repeat(2) {
+                    if (coordList.isNotEmpty()) {
+                        val randomCoord = getRandomCoord(coordList.last(), 300)
+                        val animalMarker = Marker()
+                        animalMarker.icon = OverlayImage.fromResource(R.mipmap.ic_launcher_round)
+                        animalMarker.width = 100
+                        animalMarker.height = 100
+                        animalMarker.anchor = PointF(0.5f, 0.5f)
+                        animalMarker.setOnClickListener {
+                            if (coordList.last().distanceTo(animalMarker.position) < 5) {
+                                animalMarker.map = null
+                                animalMarkers.remove(animalMarker)
+                            }
+                            true
+                        }
+                        if (animalMarkers.size < 6) {
+                            animalMarker.position = randomCoord
+                            animalMarker.map = mynavermap
+                            animalMarkers.add(animalMarker)
+                        }
+                    }
+                }
+                delay(300000)
+            }
+        }
+    }
+
+    private fun getRandomCoord(currentCoord: LatLng ,rad : Int) : LatLng {
+        val random = Random()
+        val minDistance = 50
+        val randomDistance = (minDistance + (random.nextDouble() * (rad - minDistance))) / 111000
+        val randomBearing = random.nextDouble() * 360
+
+        val randomLat = currentCoord.latitude + randomDistance * sin(Math.toRadians(randomBearing))
+        val randomLong = currentCoord.longitude + randomDistance * cos(Math.toRadians(randomBearing))
+
+        return LatLng(randomLat, randomLong)
     }
 
     private fun isWalkingServiceRunning(): Boolean {
@@ -288,9 +345,16 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         .apply {
             Log.i("syTest", "Created File AbsolutePath : $absolutePath")
             currentPhotoPath = absolutePath
-            this.deleteOnExit()
         }
     }
+
+    fun RandomFileName(): String {
+        return SimpleDateFormat(
+            "yyyyMMddHHmmss",
+            Locale.getDefault()
+        ).format(System.currentTimeMillis())
+    }
+
 
     private fun galleryAddPic() {
         MediaScannerConnection.scanFile(
