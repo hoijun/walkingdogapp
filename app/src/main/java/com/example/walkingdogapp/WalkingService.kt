@@ -121,7 +121,6 @@ class WalkingService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    @SuppressLint("ObsoleteSdkInt")
     private fun startLocationService() {
         val channelId = "WalkingDogApp_Channel"
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -137,16 +136,14 @@ class WalkingService : Service() {
         builder.setOngoing(true)
         builder.priority = NotificationCompat.PRIORITY_DEFAULT
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (notificationManager.getNotificationChannel(channelId) == null) {
-                val notificationChannel = NotificationChannel(
-                    channelId,
-                    "Walking Service",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
-                notificationChannel.description = "This channel is used by walking service"
-                notificationManager.createNotificationChannel(notificationChannel)
-            }
+        if (notificationManager.getNotificationChannel(channelId) == null) {
+            val notificationChannel = NotificationChannel(
+                channelId,
+                "Walking Service",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationChannel.description = "This channel is used by walking service"
+            notificationManager.createNotificationChannel(notificationChannel)
         }
 
         if (ContextCompat.checkSelfPermission(this,
