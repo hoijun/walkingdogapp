@@ -115,10 +115,10 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             this.isTracking = it
             binding.apply {
                 if (isTracking) {
-                    textIsTracking.text = "산책 중지하기"
+                    textIsTracking.text = "산책중지"
                     btnStart.setImageResource(android.R.drawable.ic_media_pause)
                 } else {
-                    textIsTracking.text = "산책 시작하기"
+                    textIsTracking.text = "산책시작"
                     btnStart.setImageResource(android.R.drawable.ic_media_play)
                 }
             }
