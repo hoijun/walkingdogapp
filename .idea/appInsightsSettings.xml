@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.walkingdogapp" />
+                  <option name="mobileSdkAppId" value="1:791376952800:android:43c5b4c5a2bed0ef4a3f85" />
+                  <option name="projectId" value="walkingdogapp-d4629" />
+                  <option name="projectNumber" value="791376952800" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
