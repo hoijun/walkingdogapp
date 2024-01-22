@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "791376952800",
+    "project_id": "walkingdogapp-d4629",
+    "storage_bucket": "walkingdogapp-d4629.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:791376952800:android:43c5b4c5a2bed0ef4a3f85",
+        "android_client_info": {
+          "package_name": "com.example.walkingdogapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnzSGJI4nxmRVyBcJ8P-MBwVPl9LxFikQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

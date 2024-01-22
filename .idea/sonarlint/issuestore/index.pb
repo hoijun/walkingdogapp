@@ -34,3 +34,11 @@ Bapp/src/main/java/com/example/walkingdogapp/LocateInfoViewModel.kt,a\e\ae5d0b7
 	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
 m
 =app/src/main/java/com/example/walkingdogapp/MyPageFragment.kt,2\4\244a6ead9da467cffebc916ea6743ecf38e1e118
+l
+<app/src/main/java/com/example/walkingdogapp/LoginActivity.kt,4\8\480dd82f58d63f9395fbf112ef76b49b619550b1
+F
+app/proguard-rules.pro,9\e\9e08934d811afe28fbc77aaa3c0d747b94348db9
+H
+app/google-services.json,f\d\fd8d34b142d02ec743a8efefefd2c097961666e9
+C
+settings.gradle.kts,7\4\749edfcc96398253e5b3416184e95c46621da850

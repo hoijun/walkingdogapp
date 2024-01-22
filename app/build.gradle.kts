@@ -4,12 +4,14 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services") version "4.4.0" apply false
 }
 
 val properties = Properties().apply {
     load(FileInputStream("${rootDir}/local.properties"))
 }
 val navermapapiKey = properties["navermap_api_key"] ?: ""
+val kakaoapikey = properties["kakaologin_api_key"] ?: ""
 
 
 android {
@@ -29,6 +31,7 @@ android {
         }
 
         manifestPlaceholders["NaverMap_API_KEY"] = navermapapiKey as String
+        manifestPlaceholders["Kakao_API_KEY"]  = kakaoapikey as String
     }
 
     buildTypes {
@@ -77,4 +80,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("com.naver.maps:map-sdk:3.17.0")
+    implementation("androidx.activity:activity-ktx:1.8.2")
+    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.kakao.sdk:v2-user:2.19.0")
 }
