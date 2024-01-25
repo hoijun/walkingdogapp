@@ -4,7 +4,7 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.gms.google-services") version "4.4.0" apply false
+    id("com.google.gms.google-services")
 }
 
 val properties = Properties().apply {
@@ -12,6 +12,8 @@ val properties = Properties().apply {
 }
 val navermapapiKey = properties["navermap_api_key"] ?: ""
 val kakaoapikey = properties["kakaologin_api_key"] ?: ""
+val naverclientid = properties["naverlogin_clientid"] ?: ""
+val naverclientsecret = properties["naverlogin_clientsecret"] ?: ""
 
 
 android {
@@ -32,6 +34,9 @@ android {
 
         manifestPlaceholders["NaverMap_API_KEY"] = navermapapiKey as String
         manifestPlaceholders["Kakao_API_KEY"]  = kakaoapikey as String
+        buildConfigField("String", "Kakao_API_KEY", kakaoapikey)
+        buildConfigField("String", "Naver_ClientId", naverclientid as String)
+        buildConfigField("String", "Naver_ClientSecret", naverclientsecret as String)
     }
 
     buildTypes {
@@ -45,6 +50,12 @@ android {
         buildFeatures {
             viewBinding = true
             buildConfig = true
+        }
+        create("benchmark") {
+            initWith(buildTypes.getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
         }
     }
     compileOptions {
@@ -67,21 +78,35 @@ android {
 }
 
 dependencies {
-    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.android.gms:play-services-location:21.1.0")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+    implementation("com.google.firebase:firebase-database-ktx:20.3.0")
+    implementation("com.google.firebase:firebase-analytics-ktx:21.5.0")
+    implementation("com.google.firebase:firebase-auth:22.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
-    implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.legacy:legacy-support-core-utils:1.0.0")
+    implementation("androidx.browser:browser:1.7.0")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
-    implementation("de.hdodenhof:circleimageview:3.1.0")
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    implementation("com.naver.maps:map-sdk:3.17.0")
     implementation("androidx.activity:activity-ktx:1.8.2")
-    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
-    implementation("com.google.firebase:firebase-analytics")
+    implementation("androidx.test:monitor:1.6.1")
+    implementation("androidx.test.ext:junit-ktx:1.1.5")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("com.airbnb.android:lottie:6.3.0")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("com.kakao.sdk:v2-user:2.19.0")
+    implementation("com.naver.maps:map-sdk:3.17.0")
+    implementation(files("libs/oauth-5.9.0.aar"))
 }
