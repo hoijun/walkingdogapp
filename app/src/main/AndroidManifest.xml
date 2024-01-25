@@ -25,6 +25,7 @@
         android:required="false" />
 
     <application
+        android:name=".GlobalApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -34,18 +35,29 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WalkingDogApp"
         tools:targetApi="31">
+        <profileable
+            android:shell="true"
+            tools:targetApi="29" />
+
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="Kakao_API_KEY" />
+
         <activity
             android:name=".LoginActivity"
             android:exported="true"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-           <data android:host="oauth"
-                 android:scheme="kakao${Kakao_API_KEY}" />
+                <data
+                    android:host="oauth"
+                    android:scheme="kakao${Kakao_API_KEY}" />
             </intent-filter>
         </activity>
 
@@ -66,8 +78,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait"></activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"

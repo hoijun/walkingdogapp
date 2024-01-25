@@ -14,6 +14,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.walkingdogapp.databinding.ActivityMainBinding
+import com.kakao.sdk.user.UserApiClient
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
