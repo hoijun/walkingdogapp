@@ -1,11 +1,11 @@
 
-^kotlin:S899Ô":Do something with the "Boolean" value returned by "mkdir".(å‰ñ‰ùÿÿÿÿ8í»†ÕÕ1
-<kotlin:S6310Û"Avoid hardcoded dispatchers.(©ÒÕò8ø»†ÕÕ1
-Lkotlin:S1481c"(Remove this unused "uid" local variable.(™æš¤ûÿÿÿÿ8ŒœÕÕ1
-9kotlin:S1128"Remove this unused import.(”õÈÎ8–¼†ÕÕ1
-8kotlin:S1128"Remove this unused import.(«Á§i8–¼†ÕÕ1
-Hkotlin:S1874†"#Deprecated code should not be used.(å´¾”þÿÿÿÿ8š¼†ÕÕ1
-qkotlin:S3776Ú"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(õ»Ëc8›¼†ÕÕ1
-rkotlin:S3776•"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8œ¼†ÕÕ1
-Nkotlin:S1066‡".Merge this "if" statement with the nested one.(•³â8£¼†ÕÕ1
-Kkotlin:S6518f",Replace function call with indexed accessor.(´†·€8¥¼†ÕÕ1
+^kotlin:S899Õ":Do something with the "Boolean" value returned by "mkdir".(å‰ñ‰ùÿÿÿÿ8ùŠ¢ÖÕ1
+<kotlin:S6310Û"Avoid hardcoded dispatchers.(©ÒÕò8€‹¢ÖÕ1
+Lkotlin:S1481c"(Remove this unused "uid" local variable.(™æš¤ûÿÿÿÿ8Ž‹¢ÖÕ1
+9kotlin:S1128"Remove this unused import.(”õÈÎ8’‹¢ÖÕ1
+8kotlin:S1128"Remove this unused import.(«Á§i8’‹¢ÖÕ1
+Hkotlin:S1874‡"#Deprecated code should not be used.(å´¾”þÿÿÿÿ8•‹¢ÖÕ1
+qkotlin:S3776Ú"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(õ»Ëc8–‹¢ÖÕ1
+rkotlin:S3776–"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8–‹¢ÖÕ1
+Nkotlin:S1066ˆ".Merge this "if" statement with the nested one.(•³â8š‹¢ÖÕ1
+Kkotlin:S6518f",Replace function call with indexed accessor.(´†·€8œ‹¢ÖÕ1

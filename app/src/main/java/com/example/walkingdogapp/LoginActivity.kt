@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.example.walkingdogapp.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -20,12 +21,14 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
+import kotlin.system.exitProcess
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var loginInfo: android.content.SharedPreferences
     private val db = Firebase.database
+    private var backPressedTime : Long = 0
     private val kakaoLoginCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
         if (error != null) {
             Log.e(TAG, "로그인 실패 $error")
@@ -65,16 +68,29 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    private val callback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (System.currentTimeMillis() - backPressedTime < 2500) {
+                moveTaskToBack(true)
+                finishAndRemoveTask()
+                exitProcess(0)
+            }
+            Toast.makeText(this@LoginActivity, "한번 더 클릭 시 종료 됩니다.", Toast.LENGTH_SHORT).show()
+            backPressedTime = System.currentTimeMillis()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        this.onBackPressedDispatcher.addCallback(this, callback)
+
         auth = FirebaseAuth.getInstance()
+
         loginInfo = getSharedPreferences("setting", MODE_PRIVATE)
         val loginId = loginInfo.getString("id", null)
         val loginPassword = loginInfo.getString("password", null)
-
         if (loginId != null && loginPassword != null) {
             signinFirebase(loginId, loginPassword)
         }
@@ -193,6 +209,9 @@ class LoginActivity : AppCompatActivity() {
 
     private fun startMain() {
         val mainIntent = Intent(this, MainActivity::class.java)
+        mainIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_CLEAR_TASK or
+                Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(mainIntent)
     }
 }

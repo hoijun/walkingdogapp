@@ -217,6 +217,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun randomMarker() {
         lifecycleScope.launch(Dispatchers.Main) {
+            delay(10000)
             while (isWalkingServiceRunning()) {
                 repeat(2) {
                     if (coordList.isNotEmpty()) {
