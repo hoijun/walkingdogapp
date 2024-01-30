@@ -109,4 +109,5 @@ dependencies {
     implementation("com.kakao.sdk:v2-user:2.19.0")
     implementation("com.naver.maps:map-sdk:3.17.0")
     implementation(files("libs/oauth-5.9.0.aar"))
+    implementation("androidx.activity:activity:1.8.2")
 }

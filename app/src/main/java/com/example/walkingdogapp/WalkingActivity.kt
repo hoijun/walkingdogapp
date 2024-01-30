@@ -1,5 +1,6 @@
 package com.example.walkingdogapp
 
+import android.Manifest
 import android.app.ActivityManager
 import android.content.Context
 import android.content.DialogInterface
@@ -26,6 +27,8 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
@@ -51,6 +54,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityWalkingBinding
     private lateinit var mynavermap: NaverMap
     private lateinit var walkViewModel: LocateInfoViewModel
+    private lateinit var loginInfo: android.content.SharedPreferences
 
     private var coordList = mutableListOf<LatLng>()
     private var isTracking = false
@@ -60,11 +64,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var animalMarkers = mutableListOf<Marker>()
 
-    private val cameraPermission = arrayOf(android.Manifest.permission.CAMERA)
+    private val cameraPermission = arrayOf(Manifest.permission.CAMERA)
     private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES)
+        arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
     } else {
-        arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     }
     private val cameraCode = 98
     private val storageCode = 99
@@ -75,8 +79,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     // 뒤로 가기
     private val BackPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            stopWalkingService()
-            goHome()
+            selectStopWalk()
         }
     }
 
@@ -91,6 +94,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding = ActivityWalkingBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        loginInfo = getSharedPreferences("setting", MODE_PRIVATE)
+        val uid = loginInfo.getString("uid", null)
 
         // 보류
         walkViewModel = ViewModelProvider(this).get(LocateInfoViewModel::class.java)
@@ -128,8 +134,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         // 버튼 이벤트 설정
         binding.apply {
             btnBack.setOnClickListener {
-                stopWalkingService()
-                goHome()
+                selectStopWalk()
             }
 
             btnStart.setOnClickListener {
@@ -305,6 +310,22 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         finish()
     }
 
+    private fun selectStopWalk() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("산책 그만 할까요?")
+        val listener = DialogInterface.OnClickListener { _, ans ->
+            when (ans) {
+                DialogInterface.BUTTON_POSITIVE -> {
+                    stopWalkingService()
+                    goHome()
+                }
+            }
+        }
+        builder.setPositiveButton("네", listener)
+        builder.setNegativeButton("아니오", null)
+        builder.show()
+    }
+
     private fun startCamera() {
         if(checkPermission(cameraPermission, cameraCode) && checkPermission(storegePermission, storageCode)) {
             takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
@@ -405,7 +426,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     builder.setNegativeButton("아니오", null)
                     builder.show()
                 } else {
-                    if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                         startCamera()
                     }
                 }
