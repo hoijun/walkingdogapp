@@ -24,6 +24,7 @@ import com.navercorp.nid.profile.data.NidProfileResponse
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
+    private lateinit var loginInfo: android.content.SharedPreferences
     private val db = Firebase.database
     private val kakaoLoginCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
         if (error != null) {
@@ -50,6 +51,7 @@ class LoginActivity : AppCompatActivity() {
     }
     private val naverProfileCallback = object : NidProfileCallback<NidProfileResponse> {
         override fun onSuccess(result: NidProfileResponse) {
+            saveUser(result.profile?.email ?: "", result.profile?.id ?: "")
             signupFirebase(result.profile?.email ?: "", result.profile?.id ?: "")
             Log.d("sss", result.profile?.email + ", " + result.profile?.id)
         }
@@ -69,6 +71,13 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         auth = FirebaseAuth.getInstance()
+        loginInfo = getSharedPreferences("setting", MODE_PRIVATE)
+        val loginId = loginInfo.getString("id", null)
+        val loginPassword = loginInfo.getString("password", null)
+
+        if (loginId != null && loginPassword != null) {
+            signinFirebase(loginId, loginPassword)
+        }
 
         binding.apply {
             KakaoLogin.setOnClickListener {
@@ -104,12 +113,14 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+
     private fun loginApp(sns: String) {
         if (sns == "kakao") {
             UserApiClient.instance.me { user, error1 ->
                 if (error1 != null) {
                     Log.e(TAG, "사용자 정보 요청 실패", error1)
                 } else if (user != null) {
+                    saveUser(user.kakaoAccount?.email ?: "", user.id.toString())
                     signupFirebase(user.kakaoAccount?.email ?: "", user.id.toString())
                     Log.d("userinfo", user.id.toString() + " " + (user.kakaoAccount?.email ?: ""))
                 }
@@ -119,14 +130,37 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    private fun saveUser(email: String, password: String) {
+        val editor = loginInfo.edit()
+        editor.putString("id",email)
+        editor.putString("password",password)
+        editor.apply()
+    }
+
+    private fun saveUid(uid : String) {
+        val editor = loginInfo.edit()
+        editor.putString("uid",uid)
+        editor.apply()
+    }
+
     private fun signupFirebase(email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
             if (it.isSuccessful) {
                 Log.d(TAG, "로그인 성공")
                 val user = auth.currentUser?.uid
+                if (user != null) {
+                    saveUid(user)
+                }
                 val userRef = db.getReference("Users")
-                userRef.child("User").child("$user").child("email").setValue(email)
-                userRef.child("User").child("$user").child("name").setValue("unknown")
+                userRef.child("$user").child("email").setValue(email)
+                userRef.child("$user").child("name").setValue("unknown")
+                userRef.child("$user").child("total distance").setValue(0)
+                userRef.child("$user").child("total time").setValue(0)
+                userRef.child("$user").child("dog").child("name").setValue("unknown")
+                userRef.child("$user").child("dog").child("age").setValue(0)
+                userRef.child("$user").child("dog").child("gender").setValue("unknown")
+                userRef.child("$user").child("dog").child("weight").setValue(0)
+                userRef.child("$user").child("dog").child("breed").setValue("unknown")
                 startMain()
             } else {
                 if (it.exception is FirebaseAuthUserCollisionException) {
@@ -146,6 +180,9 @@ class LoginActivity : AppCompatActivity() {
                 task ->
             if (task.isSuccessful) {
                 //로그인 처리를 해주면 됨!
+                if (auth.currentUser?.uid != null) {
+                    saveUid(auth.currentUser?.uid!!)
+                }
                 startMain()
             } else {
                 // 오류가 난 경우!

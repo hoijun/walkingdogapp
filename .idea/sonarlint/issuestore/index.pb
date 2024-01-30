@@ -46,3 +46,5 @@ p
 @app/src/main/java/com/example/walkingdogapp/GlobalApplication.kt,c\3\c32b807c1562d8623ec14027b3d9c93b80435ffa
 A
 gradle.properties,2\a\2afbb999f001938c88fa43fc2ef52abf0f8213e4
+m
+=app/src/main/java/com/example/walkingdogapp/SplashActivity.kt,4\c\4cec9c8b506f719e84bceb2cf20ddc8cc1bff010
