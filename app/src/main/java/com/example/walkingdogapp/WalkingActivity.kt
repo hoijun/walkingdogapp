@@ -17,6 +17,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -27,7 +28,10 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
@@ -44,6 +48,8 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.Random
 import kotlin.math.cos
@@ -54,7 +60,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityWalkingBinding
     private lateinit var mynavermap: NaverMap
     private lateinit var walkViewModel: LocateInfoViewModel
-    private lateinit var loginInfo: android.content.SharedPreferences
+    private var db = FirebaseDatabase.getInstance()
+    val auth = FirebaseAuth.getInstance()
 
     private var coordList = mutableListOf<LatLng>()
     private var isTracking = false
@@ -94,9 +101,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding = ActivityWalkingBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        loginInfo = getSharedPreferences("setting", MODE_PRIVATE)
-        val uid = loginInfo.getString("uid", null)
 
         // 보류
         walkViewModel = ViewModelProvider(this).get(LocateInfoViewModel::class.java)
@@ -197,7 +201,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
                 animalMarkers.removeAll(markersToRemove)
-
                 if (coordList.size > 1) {
                     trackingPath.map = null
                     trackingPath.coords = coordList // 이동 경로 그림
@@ -307,6 +310,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun goHome() {
         val backIntent = Intent(this@WalkingActivity, MainActivity::class.java)
+        backIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(backIntent)
         finish()
     }
@@ -317,6 +322,12 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
+                    if (WalkingService.totalDistance < 500 || WalkingService.walkTime.value!! < 300) {
+                        Toast.makeText(this, "거리 또는 시간이 너무 부족해요!",Toast.LENGTH_SHORT).show()
+                    }
+                    else {
+                        saveWalkInfo(WalkingService.totalDistance, WalkingService.walkTime.value!!)
+                    }
                     stopWalkingService()
                     goHome()
                 }
@@ -325,6 +336,35 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         builder.setPositiveButton("네", listener)
         builder.setNegativeButton("아니오", null)
         builder.show()
+    }
+
+    // 거리 및 시간 저장, 날짜: 시간 별로 산책 기록 저장
+    private fun saveWalkInfo(distance: Float, time: Int) {
+        val uid = auth.currentUser?.uid
+        val userRef = db.getReference("Users").child("$uid")
+        userRef.addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val currentDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                val totalDistance =
+                    snapshot.child("total distance").getValue(Long::class.java)?.toFloat()
+                val totalTime =
+                    snapshot.child("total time").getValue(Long::class.java)?.toInt()
+                if (totalDistance != null) {
+                    userRef.child("total distance").setValue(totalDistance + distance)
+                }
+                if (totalTime != null) {
+                    Log.d("totalTime", WalkingService.walkTime.value!!.toString())
+                    userRef.child("total time").setValue(totalTime + time)
+                }
+                userRef.child("walk date").child(currentDate)
+                    .child("distance").setValue(distance)
+                userRef.child("walk date").child(currentDate)
+                    .child("time").setValue(time)
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@WalkingActivity, "산책 기록 저장 실패", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun startCamera() {

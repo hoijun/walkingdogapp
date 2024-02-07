@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.databinding.FragmentHomeBinding
+import com.google.firebase.auth.FirebaseAuth
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
@@ -36,12 +38,16 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater,container, false)
-        
         //MainActivity에서 업데이트한 좌표
         myViewModel.currentCoord.observe(viewLifecycleOwner) {
             myViewModel.getCurrentAddress {
                 binding.textLocation.text = it
             }
+        }
+
+        binding.btnRegister.setOnClickListener {
+            val settingIntent = Intent(requireContext(), SettingDogActivity::class.java)
+            startActivity(settingIntent)
         }
 
         // 산책 시작
