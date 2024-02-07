@@ -12,8 +12,10 @@ val properties = Properties().apply {
 }
 val navermapapiKey = properties["navermap_api_key"] ?: ""
 val kakaoapikey = properties["kakaologin_api_key"] ?: ""
+val kakaoredirecturi = properties["kakaologin_redirect_uri"] ?: ""
 val naverclientid = properties["naverlogin_clientid"] ?: ""
 val naverclientsecret = properties["naverlogin_clientsecret"] ?: ""
+
 
 
 android {
@@ -32,6 +34,7 @@ android {
             useSupportLibrary = true
         }
 
+        manifestPlaceholders["Kakao_Redirect_URI"] = kakaoredirecturi as String
         manifestPlaceholders["NaverMap_API_KEY"] = navermapapiKey as String
         manifestPlaceholders["Kakao_API_KEY"]  = kakaoapikey as String
         buildConfigField("String", "Kakao_API_KEY", kakaoapikey)
@@ -100,14 +103,14 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.8.2")
     implementation("androidx.test:monitor:1.6.1")
     implementation("androidx.test.ext:junit-ktx:1.1.5")
+    implementation("androidx.activity:activity-ktx:1.8.2")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("com.airbnb.android:lottie:6.3.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("com.kakao.sdk:v2-user:2.19.0")
     implementation("com.naver.maps:map-sdk:3.17.0")
     implementation(files("libs/oauth-5.9.0.aar"))
-    implementation("androidx.activity:activity:1.8.2")
 }

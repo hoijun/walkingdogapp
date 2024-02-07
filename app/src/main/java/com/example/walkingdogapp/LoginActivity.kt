@@ -169,14 +169,12 @@ class LoginActivity : AppCompatActivity() {
                 }
                 val userRef = db.getReference("Users")
                 userRef.child("$user").child("email").setValue(email)
-                userRef.child("$user").child("name").setValue("unknown")
+                userRef.child("$user").child("name").setValue("")
                 userRef.child("$user").child("total distance").setValue(0)
                 userRef.child("$user").child("total time").setValue(0)
-                userRef.child("$user").child("dog").child("name").setValue("unknown")
-                userRef.child("$user").child("dog").child("age").setValue(0)
-                userRef.child("$user").child("dog").child("gender").setValue("unknown")
-                userRef.child("$user").child("dog").child("weight").setValue(0)
-                userRef.child("$user").child("dog").child("breed").setValue("unknown")
+
+                val dogInfo = DogInfo()
+                userRef.child("$user").child("dog").setValue(dogInfo)
                 startMain()
             } else {
                 if (it.exception is FirebaseAuthUserCollisionException) {
