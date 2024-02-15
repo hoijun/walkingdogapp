@@ -61,7 +61,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mynavermap: NaverMap
     private lateinit var walkViewModel: LocateInfoViewModel
     private var db = FirebaseDatabase.getInstance()
-    val auth = FirebaseAuth.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     private var coordList = mutableListOf<LatLng>()
     private var isTracking = false

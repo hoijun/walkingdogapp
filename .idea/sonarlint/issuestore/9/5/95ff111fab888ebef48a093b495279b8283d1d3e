@@ -1,3 +1,5 @@
 
->kotlin:S1128"Remove this unused import.(ÊÒÅ­ùÿÿÿÿ8Ó¢è¨Ø1
-9kotlin:S1128"Remove this unused import.(´Ùí8Ô¢è¨Ø1
+[kotlin:S1172l"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ8ßÅÚòÚ1
+Pkotlin:S6518q",Replace function call with indexed accessor.(–ø¾Ñüÿÿÿÿ8öÅÚòÚ1
+Pkotlin:S6518q",Replace function call with indexed accessor.(–ø¾Ñüÿÿÿÿ8öÅÚòÚ1
+Pkotlin:S6518q",Replace function call with indexed accessor.(–ø¾Ñüÿÿÿÿ8öÅÚòÚ1

@@ -48,3 +48,11 @@ l
 <app/src/main/java/com/example/walkingdogapp/LoginActivity.kt,4\8\480dd82f58d63f9395fbf112ef76b49b619550b1
 f
 6app/src/main/java/com/example/walkingdogapp/DogInfo.kt,8\a\8adfca5b649a8f1e3423592ad48820bedd0c8791
+m
+=app/src/main/java/com/example/walkingdogapp/DoglistAdpater.kt,2\9\292786a3141daa71335a6585586d9091154d67da
+l
+<app/src/main/java/com/example/walkingdogapp/Doglistdialog.kt,0\6\068db79da9ae75ead0481ba5d80e6fa6654c5194
+l
+<app/src/main/java/com/example/walkingdogapp/DoglistDialog.kt,4\0\405f12a0b4bd0ec7cecaf3b7eb65177b243c689c
+m
+=app/src/main/java/com/example/walkingdogapp/WriteDogDialog.kt,d\f\df5f07053d92cdb3bfc885f795984be8bbd7559e
