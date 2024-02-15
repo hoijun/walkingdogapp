@@ -169,7 +169,6 @@ class LoginActivity : AppCompatActivity() {
                 }
                 val userRef = db.getReference("Users")
                 userRef.child("$user").child("email").setValue(email)
-                userRef.child("$user").child("name").setValue("")
                 userRef.child("$user").child("total distance").setValue(0)
                 userRef.child("$user").child("total time").setValue(0)
 
