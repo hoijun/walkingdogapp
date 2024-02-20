@@ -9,4 +9,4 @@
 - 산책 시 촬영한 사진을 지도에서 볼 수 있음.
 
 ## 개발 언어 
-   <img src="https://img.shields.io/badge/kotlin-7F52FF?style=flat&logo=kotlin&logoColor=white"/>	
+   <img src="https://img.shields.io/badge/kotlin-7F52FF?style=flat&logo=kotlin&logoColor=black"/>	
