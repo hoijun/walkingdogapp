@@ -1,5 +1,23 @@
 
->kotlin:S1128"Remove this unused import.(Ûœ€”úÿÿÿÿ8Şõ¸’Ó1
-Gkotlin:S1874v"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8Š¤İÒ1
-Mkotlin:S1066w".Merge this "if" statement with the nested one.(•³â8‹¤İÒ1
-Pkotlin:S65189",Replace function call with indexed accessor.(•—Ëúùÿÿÿÿ8Œ¤İÒ1
+Akotlin:S6310ª"Avoid hardcoded dispatchers.(¨¯üÿÿÿÿ8ÊÛè€Ü1
+Akotlin:S6310²"Avoid hardcoded dispatchers.(Ñûü£øÿÿÿÿ8ÊÛè€Ü1
+9kotlin:S1128"Remove this unused import.(ï›’8ÑÛè€Ü1
+>kotlin:S1128	"Remove this unused import.(Ô¼³úÿÿÿÿÿ8ÑÛè€Ü1
+9kotlin:S1128
+"Remove this unused import.( ¯–8ÑÛè€Ü1
+9kotlin:S1128"Remove this unused import.(©ó·¾8ÑÛè€Ü1
+9kotlin:S1128"Remove this unused import.(Üº¸¡8ÑÛè€Ü1
+>kotlin:S1128"Remove this unused import.(ÖÇØıÿÿÿÿ8ÑÛè€Ü1
+9kotlin:S1128"Remove this unused import.(™¢ı§8ÑÛè€Ü1
+>kotlin:S1128"Remove this unused import.(»«¦úøÿÿÿÿ8ÑÛè€Ü1
+8kotlin:S1128"Remove this unused import.(Ë›Ë78ÑÛè€Ü1
+>kotlin:S1128"Remove this unused import.(İáÛ¦ÿÿÿÿÿ8ÑÛè€Ü1
+>kotlin:S1128#"Remove this unused import.(æ¡ÿÀûÿÿÿÿ8ÑÛè€Ü1
+9kotlin:S1128$"Remove this unused import.(”õÈÎ8ÑÛè€Ü1
+8kotlin:S1128%"Remove this unused import.(«Á§i8ÑÛè€Ü1
+9kotlin:S1128-"Remove this unused import.(é×Üø8ÑÛè€Ü1
+9kotlin:S11281"Remove this unused import.(÷½Â¨8ÑÛè€Ü1
+8kotlin:S11282"Remove this unused import.(à²·i8ÑÛè€Ü1
+Hkotlin:S1874š"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8ÒÛè€Ü1
+Nkotlin:S1066›".Merge this "if" statement with the nested one.(•³â8ÕÛè€Ü1
+Pkotlin:S6518]",Replace function call with indexed accessor.(£¨ˆŸüÿÿÿÿ8ÕÛè€Ü1

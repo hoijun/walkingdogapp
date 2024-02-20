@@ -70,6 +70,7 @@
                 android:textColor="@color/black"
                 android:textSize="25sp"
                 android:textStyle="bold"
+                android:text="지역"
                 app:layout_constraintHeight_percent="0.15"
                 app:layout_constraintStart_toEndOf="@id/View1"
                 app:layout_constraintTop_toTopOf="parent"
@@ -102,8 +103,6 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:src="@drawable/ic_launcher_background"
-                app:civ_border_color="@color/black"
-                app:civ_border_overlay="true"
                 app:layout_constraintHeight_percent="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/View2"
@@ -133,6 +132,22 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.2" />
+
+            <TextView
+                android:id="@+id/dog_name"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textSize="35sp"
+                android:textStyle="bold"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/btn_register"
+                app:layout_constraintWidth_percent="0.5" />
 
             <TextView
                 android:id="@+id/msg_register"

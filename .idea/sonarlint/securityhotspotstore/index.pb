@@ -19,8 +19,6 @@ D
 app/build.gradle.kts,d\2\d2a4383452aad84a18429a5844d31330a012a9e6
 g
 7app/src/main/java/com/example/walkingdogapp/Constant.kt,f\d\fd2f786f164915ff724c972287c7beb1871be770
-r
-Bapp/src/main/java/com/example/walkingdogapp/LocateInfoViewModel.kt,a\e\ae5d0b7d39050121c3dc89743562b47134dfe2ed
 @
 local.properties,0\7\0712df971a99ac4d2fccb8e0fb19f377f3374cca
 >
@@ -56,3 +54,5 @@ l
 <app/src/main/java/com/example/walkingdogapp/DoglistDialog.kt,4\0\405f12a0b4bd0ec7cecaf3b7eb65177b243c689c
 m
 =app/src/main/java/com/example/walkingdogapp/WriteDogDialog.kt,d\f\df5f07053d92cdb3bfc885f795984be8bbd7559e
+p
+@app/src/main/java/com/example/walkingdogapp/userInfoViewModel.kt,3\0\3063c20ef67a7b46a35fb675460da004414a7ba2
