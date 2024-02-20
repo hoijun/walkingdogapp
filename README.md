@@ -8,3 +8,8 @@
 - 산책 시 캐릭터 아이콘을 획득하여 도감을 채워 나갈 수 있음. 
 - 산책 시 촬영한 사진을 지도에서 볼 수 있음.
 
+## 개발 언어 
+   <img src="https://img.shields.io/badge/kotlin-7F52FF?
+          style=flat	
+          &logo=kotlin	
+          &logoColor=white"/>	
