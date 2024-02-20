@@ -1,5 +1,7 @@
 
-[kotlin:S1172l"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ8ßÅÚòÚ1
-Pkotlin:S6518q",Replace function call with indexed accessor.(–ø¾Ñüÿÿÿÿ8öÅÚòÚ1
-Pkotlin:S6518q",Replace function call with indexed accessor.(–ø¾Ñüÿÿÿÿ8öÅÚòÚ1
-Pkotlin:S6518q",Replace function call with indexed accessor.(–ø¾Ñüÿÿÿÿ8öÅÚòÚ1
+[kotlin:S1172u"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ8æÂ±ÿÚ1
+Akotlin:S6310"Avoid hardcoded dispatchers.(¿ª¢íÿÿÿÿÿ8ëÂ±ÿÚ1
+<kotlin:S6310 "Avoid hardcoded dispatchers.(âùº¸8ëÂ±ÿÚ1
+Pkotlin:S6518z",Replace function call with indexed accessor.(–ø¾Ñüÿÿÿÿ8úÂ±ÿÚ1
+Pkotlin:S6518z",Replace function call with indexed accessor.(–ø¾Ñüÿÿÿÿ8úÂ±ÿÚ1
+Pkotlin:S6518z",Replace function call with indexed accessor.(–ø¾Ñüÿÿÿÿ8úÂ±ÿÚ1

@@ -7,468 +7,486 @@
     android:layout_height="match_parent"
     tools:context=".SettingDogActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/setting_top"
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/wait_image"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.055">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.6"
+        app:layout_constraintHeight_percent="0.6"
+        android:src="@drawable/waitimage"/>
 
-        <ImageView
-            android:id="@+id/btn_back"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/settingscreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/setting_top"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="5dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.055"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.1"
-            app:srcCompat="@android:drawable/ic_menu_revert" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/btn_back"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.1"
+                app:srcCompat="@android:drawable/ic_menu_revert" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/setting_middle"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.87"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/setting_top">
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/setting_image"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/setting_middle"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintHeight_percent="0.135"
-            app:layout_constraintWidth_percent="0.2"
-            android:src="@drawable/ic_launcher_background"/>
-
-        <View
-            android:id="@+id/view10"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.87"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.08"
-            app:layout_constraintHeight_percent="1"/>
+            app:layout_constraintTop_toBottomOf="@+id/setting_top">
 
-        <View
-            android:id="@+id/view11"
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/setting_image"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/ic_launcher_background"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.135"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <View
+                android:id="@+id/view10"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.08" />
+
+            <View
+                android:id="@+id/view11"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.025"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/setting_image"
+                app:layout_constraintWidth_percent="1" />
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="이름"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@+id/view10"
+                app:layout_constraintTop_toBottomOf="@id/view11"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <View
+                android:id="@+id/view12"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@id/name"
+                app:layout_constraintTop_toBottomOf="@id/view11"
+                app:layout_constraintWidth_percent="0.08" />
+
+            <TextView
+                android:id="@+id/edit_breed"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center|start"
+                android:hint="견종을 선택 해주세요"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@+id/view13"
+                app:layout_constraintTop_toBottomOf="@id/view12"
+                app:layout_constraintWidth_percent="0.4" />
+
+            <TextView
+                android:id="@+id/breed"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="견종"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@+id/view10"
+                app:layout_constraintTop_toBottomOf="@id/name"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <View
+                android:id="@+id/view13"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@id/name"
+                app:layout_constraintTop_toBottomOf="@id/view12"
+                app:layout_constraintWidth_percent="0.08" />
+
+            <EditText
+                android:id="@+id/edit_name"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@null"
+                android:gravity="center|start"
+                android:hint="이름을 입력 해주세요"
+                android:maxLength="10"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@+id/view12"
+                app:layout_constraintTop_toBottomOf="@id/view11"
+                app:layout_constraintWidth_percent="0.4" />
+
+            <TextView
+                android:id="@+id/gender"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="성별"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@+id/view10"
+                app:layout_constraintTop_toBottomOf="@id/breed"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <View
+                android:id="@+id/view14"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.01"
+                app:layout_constraintStart_toEndOf="@id/gender"
+                app:layout_constraintTop_toBottomOf="@id/view13"
+                app:layout_constraintWidth_percent="0.5" />
+
+            <View
+                android:id="@+id/view15"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@id/gender"
+                app:layout_constraintTop_toBottomOf="@id/view13"
+                app:layout_constraintWidth_percent="0.03" />
+
+            <Button
+                android:id="@+id/btn_dogismale"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="#ff888888"
+                android:gravity="center"
+                android:text="남"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.08"
+                app:layout_constraintStart_toEndOf="@+id/view15"
+                app:layout_constraintTop_toBottomOf="@id/view14"
+                app:layout_constraintWidth_percent="0.25" />
+
+            <Button
+                android:id="@+id/btn_dogisfemale"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="4dp"
+                android:background="#ff888888"
+                android:gravity="center"
+                android:text="여"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.08"
+                app:layout_constraintStart_toEndOf="@+id/btn_dogismale"
+                app:layout_constraintTop_toBottomOf="@id/view14"
+                app:layout_constraintWidth_percent="0.25" />
+
+            <TextView
+                android:id="@+id/birth"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="생년월일"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@+id/view10"
+                app:layout_constraintTop_toBottomOf="@id/gender"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <View
+                android:id="@+id/view16"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@id/birth"
+                app:layout_constraintTop_toBottomOf="@id/view15"
+                app:layout_constraintWidth_percent="0.08" />
+
+            <TextView
+                android:id="@+id/edit_birth"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center|start"
+                android:hint="날짜를 선택 해주세요"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@+id/view16"
+                app:layout_constraintTop_toBottomOf="@id/view15"
+                app:layout_constraintWidth_percent="0.4" />
+
+            <TextView
+                android:id="@+id/neutering"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="예방 접종"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@+id/view10"
+                app:layout_constraintTop_toBottomOf="@id/birth"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <View
+                android:id="@+id/view17"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.01"
+                app:layout_constraintStart_toEndOf="@id/neutering"
+                app:layout_constraintTop_toBottomOf="@id/view16"
+                app:layout_constraintWidth_percent="0.5" />
+
+            <View
+                android:id="@+id/view18"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@id/neutering"
+                app:layout_constraintTop_toBottomOf="@id/view16"
+                app:layout_constraintWidth_percent="0.03" />
+
+            <Button
+                android:id="@+id/btn_neuteryes"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="#ff888888"
+                android:gravity="center"
+                android:text="예"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.08"
+                app:layout_constraintStart_toEndOf="@+id/view18"
+                app:layout_constraintTop_toBottomOf="@id/view17"
+                app:layout_constraintWidth_percent="0.25" />
+
+            <Button
+                android:id="@+id/btn_neuterno"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="4dp"
+                android:background="#ff888888"
+                android:gravity="center"
+                android:text="아니요"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.08"
+                app:layout_constraintStart_toEndOf="@+id/btn_neuteryes"
+                app:layout_constraintTop_toBottomOf="@id/view17"
+                app:layout_constraintWidth_percent="0.25" />
+
+            <TextView
+                android:id="@+id/vaccination"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="중성화"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@+id/view10"
+                app:layout_constraintTop_toBottomOf="@id/neutering"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <View
+                android:id="@+id/view19"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.01"
+                app:layout_constraintStart_toEndOf="@id/neutering"
+                app:layout_constraintTop_toBottomOf="@id/view18"
+                app:layout_constraintWidth_percent="0.5" />
+
+            <View
+                android:id="@+id/view20"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@id/vaccination"
+                app:layout_constraintTop_toBottomOf="@id/view18"
+                app:layout_constraintWidth_percent="0.03" />
+
+            <Button
+                android:id="@+id/btn_vaccyes"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="#ff888888"
+                android:gravity="center"
+                android:text="예"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.08"
+                app:layout_constraintStart_toEndOf="@+id/view20"
+                app:layout_constraintTop_toBottomOf="@id/view19"
+                app:layout_constraintWidth_percent="0.25" />
+
+            <Button
+                android:id="@+id/btn_vaccno"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="4dp"
+                android:background="#ff888888"
+                android:gravity="center"
+                android:text="아니요"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.08"
+                app:layout_constraintStart_toEndOf="@+id/btn_neuteryes"
+                app:layout_constraintTop_toBottomOf="@id/view19"
+                app:layout_constraintWidth_percent="0.25" />
+
+            <TextView
+                android:id="@+id/weight"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="몸무게(kg)"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@+id/view10"
+                app:layout_constraintTop_toBottomOf="@id/vaccination"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <View
+                android:id="@+id/view21"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@id/weight"
+                app:layout_constraintTop_toBottomOf="@id/view20"
+                app:layout_constraintWidth_percent="0.08" />
+
+            <EditText
+                android:id="@+id/edit_weight"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@null"
+                android:digits="0123456789"
+                android:gravity="center|start"
+                android:hint="무게를 입력 해주세요"
+                android:inputType="number"
+                android:maxLength="2"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@+id/view21"
+                app:layout_constraintTop_toBottomOf="@id/view20"
+                app:layout_constraintWidth_percent="0.4" />
+
+
+            <TextView
+                android:id="@+id/feature"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="특징"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@+id/view10"
+                app:layout_constraintTop_toBottomOf="@id/weight"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <View
+                android:id="@+id/view22"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@id/feature"
+                app:layout_constraintTop_toBottomOf="@id/view21"
+                app:layout_constraintWidth_percent="0.08" />
+
+            <EditText
+                android:id="@+id/edit_feature"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@null"
+                android:gravity="center|start"
+                android:hint="특징를 입력 해주세요"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintHeight_percent="0.1"
+                app:layout_constraintStart_toEndOf="@+id/view22"
+                app:layout_constraintTop_toBottomOf="@id/view21"
+                app:layout_constraintWidth_percent="0.6" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/setting_image"
-            app:layout_constraintWidth_percent="1"
-            app:layout_constraintHeight_percent="0.025"/>
-
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:text="이름"
-            android:textSize="15sp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toEndOf="@+id/view10"
-            app:layout_constraintTop_toBottomOf="@id/view11"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintWidth_percent="0.2" />
-
-        <View
-            android:id="@+id/view12"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/view11"
-            app:layout_constraintStart_toEndOf="@id/name"
-            app:layout_constraintWidth_percent="0.08"
-            app:layout_constraintHeight_percent="0.1"/>
-
-        <TextView
-            android:id="@+id/edit_breed"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center|start"
-            android:hint="견종을 선택 해주세요"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintStart_toEndOf="@+id/view13"
-            app:layout_constraintTop_toBottomOf="@id/view12"
-            app:layout_constraintWidth_percent="0.4" />
-
-        <TextView
-            android:id="@+id/breed"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:text="견종"
-            android:textSize="15sp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toEndOf="@+id/view10"
-            app:layout_constraintTop_toBottomOf="@id/name"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintWidth_percent="0.2" />
-
-        <View
-            android:id="@+id/view13"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/view12"
-            app:layout_constraintStart_toEndOf="@id/name"
-            app:layout_constraintWidth_percent="0.08"
-            app:layout_constraintHeight_percent="0.1"/>
-
-        <EditText
-            android:id="@+id/edit_name"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@null"
-            android:gravity="center|start"
-            android:hint="이름을 입력 해주세요"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:maxLength="10"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintStart_toEndOf="@+id/view12"
-            app:layout_constraintTop_toBottomOf="@id/view11"
-            app:layout_constraintWidth_percent="0.4" />
-
-        <TextView
-            android:id="@+id/gender"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:text="성별"
-            android:textSize="15sp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toEndOf="@+id/view10"
-            app:layout_constraintTop_toBottomOf="@id/breed"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintWidth_percent="0.2" />
-
-        <View
-            android:id="@+id/view14"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/view13"
-            app:layout_constraintStart_toEndOf="@id/gender"
-            app:layout_constraintWidth_percent="0.5"
-            app:layout_constraintHeight_percent="0.01"/>
-
-        <View
-            android:id="@+id/view15"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/view13"
-            app:layout_constraintStart_toEndOf="@id/gender"
-            app:layout_constraintWidth_percent="0.03"
-            app:layout_constraintHeight_percent="0.1"/>
-
-        <Button
-            android:id="@+id/btn_dogismale"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:text="남"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:background="#ff888888"
-            app:layout_constraintStart_toEndOf="@+id/view15"
-            app:layout_constraintTop_toBottomOf="@id/view14"
-            app:layout_constraintHeight_percent="0.08"
-            app:layout_constraintWidth_percent="0.25" />
-
-        <Button
-            android:id="@+id/btn_dogisfemale"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:layout_marginStart="4dp"
-            android:text="여"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:background="#ff888888"
-            app:layout_constraintStart_toEndOf="@+id/btn_dogismale"
-            app:layout_constraintTop_toBottomOf="@id/view14"
-            app:layout_constraintHeight_percent="0.08"
-            app:layout_constraintWidth_percent="0.25" />
-
-        <TextView
-            android:id="@+id/birth"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:text="생년월일"
-            android:textSize="15sp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toEndOf="@+id/view10"
-            app:layout_constraintTop_toBottomOf="@id/gender"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintWidth_percent="0.2" />
-
-        <View
-            android:id="@+id/view16"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/view15"
-            app:layout_constraintStart_toEndOf="@id/birth"
-            app:layout_constraintWidth_percent="0.08"
-            app:layout_constraintHeight_percent="0.1"/>
-
-        <TextView
-            android:id="@+id/edit_birth"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center|start"
-            android:hint="날짜를 선택 해주세요"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintStart_toEndOf="@+id/view16"
-            app:layout_constraintTop_toBottomOf="@id/view15"
-            app:layout_constraintWidth_percent="0.4" />
-
-        <TextView
-            android:id="@+id/neutering"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:text="예방 접종"
-            android:textSize="15sp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toEndOf="@+id/view10"
-            app:layout_constraintTop_toBottomOf="@id/birth"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintWidth_percent="0.2" />
-
-        <View
-            android:id="@+id/view17"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/view16"
-            app:layout_constraintStart_toEndOf="@id/neutering"
-            app:layout_constraintWidth_percent="0.5"
-            app:layout_constraintHeight_percent="0.01"/>
-
-        <View
-            android:id="@+id/view18"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/view16"
-            app:layout_constraintStart_toEndOf="@id/neutering"
-            app:layout_constraintWidth_percent="0.03"
-            app:layout_constraintHeight_percent="0.1"/>
-
-        <Button
-            android:id="@+id/btn_neuteryes"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:text="예"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:background="#ff888888"
-            app:layout_constraintStart_toEndOf="@+id/view18"
-            app:layout_constraintTop_toBottomOf="@id/view17"
-            app:layout_constraintHeight_percent="0.08"
-            app:layout_constraintWidth_percent="0.25" />
-
-        <Button
-            android:id="@+id/btn_neuterno"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:layout_marginStart="4dp"
-            android:text="아니요"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:background="#ff888888"
-            app:layout_constraintStart_toEndOf="@+id/btn_neuteryes"
-            app:layout_constraintTop_toBottomOf="@id/view17"
-            app:layout_constraintHeight_percent="0.08"
-            app:layout_constraintWidth_percent="0.25" />
-
-        <TextView
-            android:id="@+id/vaccination"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:text="중성화"
-            android:textSize="15sp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toEndOf="@+id/view10"
-            app:layout_constraintTop_toBottomOf="@id/neutering"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintWidth_percent="0.2" />
-
-        <View
-            android:id="@+id/view19"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/view18"
-            app:layout_constraintStart_toEndOf="@id/neutering"
-            app:layout_constraintWidth_percent="0.5"
-            app:layout_constraintHeight_percent="0.01"/>
-
-        <View
-            android:id="@+id/view20"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/view18"
-            app:layout_constraintStart_toEndOf="@id/vaccination"
-            app:layout_constraintWidth_percent="0.03"
-            app:layout_constraintHeight_percent="0.1"/>
-
-        <Button
-            android:id="@+id/btn_vaccyes"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:text="예"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:background="#ff888888"
-            app:layout_constraintHeight_percent="0.08"
-            app:layout_constraintStart_toEndOf="@+id/view20"
-            app:layout_constraintTop_toBottomOf="@id/view19"
-            app:layout_constraintWidth_percent="0.25" />
-
-        <Button
-            android:id="@+id/btn_vaccno"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:layout_marginStart="4dp"
-            android:text="아니요"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:background="#ff888888"
-            app:layout_constraintStart_toEndOf="@+id/btn_neuteryes"
-            app:layout_constraintTop_toBottomOf="@id/view19"
-            app:layout_constraintHeight_percent="0.08"
-            app:layout_constraintWidth_percent="0.25" />
-
-        <TextView
-            android:id="@+id/weight"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:text="몸무게(kg)"
-            android:textSize="15sp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toEndOf="@+id/view10"
-            app:layout_constraintTop_toBottomOf="@id/vaccination"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintWidth_percent="0.2" />
-
-        <View
-            android:id="@+id/view21"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/view20"
-            app:layout_constraintStart_toEndOf="@id/weight"
-            app:layout_constraintWidth_percent="0.08"
-            app:layout_constraintHeight_percent="0.1"/>
-
-        <EditText
-            android:id="@+id/edit_weight"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:textSize="15sp"
-            android:gravity="center|start"
-            android:textStyle="bold"
-            android:inputType="number"
-            android:digits="0123456789"
-            android:maxLength="2"
-            android:background="@null"
-            android:hint="무게를 입력 해주세요"
-            app:layout_constraintStart_toEndOf="@+id/view21"
-            app:layout_constraintTop_toBottomOf="@id/view20"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintWidth_percent="0.4" />
-
-
-        <TextView
-            android:id="@+id/feature"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:text="특징"
-            android:textSize="15sp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toEndOf="@+id/view10"
-            app:layout_constraintTop_toBottomOf="@id/weight"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintWidth_percent="0.2" />
-
-        <View
-            android:id="@+id/view22"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/view21"
-            app:layout_constraintStart_toEndOf="@id/feature"
-            app:layout_constraintWidth_percent="0.08"
-            app:layout_constraintHeight_percent="0.1"/>
-
-        <EditText
-            android:id="@+id/edit_feature"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center|start"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:background="@null"
-            android:hint="특징를 입력 해주세요"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintStart_toEndOf="@+id/view22"
-            app:layout_constraintTop_toBottomOf="@id/view21"
-            app:layout_constraintWidth_percent="0.6" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/setting_middle"
-        app:layout_constraintHeight_percent="0.07" >
-
-        <Button
-            android:id="@+id/register_dog"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:text="등록"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.07"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            app:layout_constraintWidth_percent="0.3" />
+            app:layout_constraintTop_toBottomOf="@+id/setting_middle">
 
+            <Button
+                android:id="@+id/register_dog"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="등록"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                app:layout_constraintWidth_percent="0.3" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

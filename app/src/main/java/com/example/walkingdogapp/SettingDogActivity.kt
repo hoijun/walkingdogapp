@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.View
 import android.webkit.MimeTypeMap
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,11 +19,16 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.databinding.ActivitySettingDogBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 
 
@@ -41,6 +47,9 @@ class SettingDogActivity : AppCompatActivity() {
     }
 
     private val pickMedia = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            getExtension(uri)?.let { Log.d("extension", it) }
+        }
         if (uri != null && getExtension(uri) == "jpg") {
             imguri = uri
             Log.d("PhotoPickerAAA", "Selected URI: $uri")
@@ -139,12 +148,25 @@ class SettingDogActivity : AppCompatActivity() {
                     val listener = DialogInterface.OnClickListener { _, ans ->
                         when (ans) {
                             DialogInterface.BUTTON_POSITIVE -> {
-                                val user = auth.currentUser?.uid
+                                binding.settingscreen.visibility = View.INVISIBLE
+                                binding.waitImage.visibility = View.VISIBLE
+                                val uid = auth.currentUser?.uid
                                 val userRef = db.getReference("Users")
-                                val storgeRef = storage.getReference("$user")
-                                userRef.child("$user").child("dog").setValue(doginfo)
-                                storgeRef.child("images").child("profileimg").putFile(imguri)
-                                goHome()
+                                val storgeRef = storage.getReference("$uid")
+                                lifecycleScope.launch {
+                                    val doginfoJob = async(Dispatchers.IO) {
+                                        userRef.child("$uid").child("dog").setValue(doginfo).await()
+                                    }
+                                    val profileUriJob = async(Dispatchers.IO) {
+                                        storgeRef.child("images").child("profileimg")
+                                            .putFile(imguri).await()
+                                    }
+
+                                    doginfoJob.await()
+                                    profileUriJob.await()
+
+                                    goHome()
+                                }
                             }
                         }
                     }
@@ -192,11 +214,10 @@ class SettingDogActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun getExtension(uri : Uri) : String? {
+    private fun getExtension(uri: Uri): String? {
         val contentResolver = contentResolver
         val mimeTypeMap = MimeTypeMap.getSingleton()
-        var extension = mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri))
-        return extension
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri))
     }
     private fun checkPermission(permissions : Array<out String>, code: Int) : Boolean{
         for (permission in permissions) {

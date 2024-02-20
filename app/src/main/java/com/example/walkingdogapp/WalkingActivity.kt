@@ -59,7 +59,7 @@ import kotlin.math.sin
 class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityWalkingBinding
     private lateinit var mynavermap: NaverMap
-    private lateinit var walkViewModel: LocateInfoViewModel
+    private lateinit var walkViewModel: userInfoViewModel
     private var db = FirebaseDatabase.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
@@ -103,7 +103,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(binding.root)
 
         // 보류
-        walkViewModel = ViewModelProvider(this).get(LocateInfoViewModel::class.java)
+        walkViewModel = ViewModelProvider(this).get(userInfoViewModel::class.java)
         walkViewModel.getLastLocation()
 
         // 백그라운드 위치 서비스 시작
@@ -112,9 +112,16 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment: MapFragment = supportFragmentManager.findFragmentById(R.id.map_fragment) as MapFragment
         mapFragment.getMapAsync(this)
 
-        walkViewModel.currentCoord.observe(this) {
-            walkViewModel.getCurrentAddress { locateName ->
-                binding.textLocation.text = locateName
+        WalkingService.coordList.observe(this) {
+            if(coordList.isNotEmpty()) {
+                walkViewModel.getCurrentAddress(
+                    com.google.android.gms.maps.model.LatLng(
+                        coordList.last().latitude,
+                        coordList.last().longitude
+                    )
+                ) { locateName ->
+                    binding.textLocation.text = locateName
+                }
             }
         }
 

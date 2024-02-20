@@ -1,31 +1,67 @@
 package com.example.walkingdogapp
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
 import com.example.walkingdogapp.databinding.ActivityMainBinding
-import com.kakao.sdk.user.UserApiClient
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.net.URI
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlin.system.exitProcess
+import kotlin.system.measureTimeMillis
+import kotlin.time.measureTimedValue
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var mainviewmodel: LocateInfoViewModel
+    private lateinit var mainviewmodel: userInfoViewModel
     private val LOCATION_PERMISSION_REQUEST_CODE = 1000
     private val PERMISSIONS = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION,
     )
     private var backPressedTime : Long = 0
+
+    private val auth = FirebaseAuth.getInstance()
+    private val db = Firebase.database
+    private val storage = FirebaseStorage.getInstance()
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -54,7 +90,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(walkingIntent)
         }
         // 보류
-        mainviewmodel = ViewModelProvider(this).get(LocateInfoViewModel::class.java)
+        mainviewmodel = ViewModelProvider(this).get(userInfoViewModel::class.java)
 
         // 화면 전환
         binding.menuBn.run {
@@ -102,10 +138,10 @@ class MainActivity : AppCompatActivity() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d("권한 승인", "권한 승인됨")
                     mainviewmodel.getLastLocation()
-                    changeFragment(HomeFragment())
+                    getUserInfo()
                 } else {
                     Log.d("권한 거부", "권한 거부됨")
-                    changeFragment(HomeFragment())
+                    getUserInfo()
                 }
                 return
             }
@@ -124,5 +160,49 @@ class MainActivity : AppCompatActivity() {
             return false
         }
         return false
+    }
+
+    private fun getUserInfo() {
+        val uid = auth.currentUser?.uid
+        val userRef = db.getReference("Users").child("$uid")
+        val storgeRef = storage.getReference("$uid")
+        lifecycleScope.launch {
+            val dogDefferd = async(Dispatchers.IO) {
+                try {
+                    userRef.child("dog").get().await().getValue(DogInfo::class.java) ?: DogInfo()
+                } catch (e: Exception) {
+                    DogInfo()
+                }
+            }
+
+            val profileUriDeferred = async(Dispatchers.IO) {
+                try {
+                    storgeRef.child("images").child("profileimg").downloadUrl.await() ?: Uri.EMPTY
+                } catch (e: Exception) {
+                    Uri.EMPTY
+                }
+            }
+
+            val profileUri = profileUriDeferred.await()
+
+            val profileDrawable = suspendCoroutine { continuation ->
+                Glide.with(applicationContext).asDrawable().load(profileUri).into(object: CustomTarget<Drawable>() {
+                    override fun onResourceReady(
+                        resource: Drawable,
+                        transition: Transition<in Drawable>?
+                    ) {
+                        continuation.resume(resource)
+                    }
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        continuation.resume(ContextCompat.getDrawable(this@MainActivity, R.drawable.waitimage)!!)
+                    }
+                })}
+
+            val dog = dogDefferd.await()
+            mainviewmodel.saveDogName(dog.name)
+            mainviewmodel.saveImgDrawble(profileDrawable)
+
+            changeFragment(HomeFragment())
+        }
     }
 }

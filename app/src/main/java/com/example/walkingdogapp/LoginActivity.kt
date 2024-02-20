@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
@@ -163,17 +164,18 @@ class LoginActivity : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
             if (it.isSuccessful) {
                 Log.d(TAG, "로그인 성공")
-                val user = auth.currentUser?.uid
-                if (user != null) {
-                    saveUid(user)
+                val uid = auth.currentUser?.uid
+                if (uid != null) {
+                    saveUid(uid)
                 }
                 val userRef = db.getReference("Users")
-                userRef.child("$user").child("email").setValue(email)
-                userRef.child("$user").child("total distance").setValue(0)
-                userRef.child("$user").child("total time").setValue(0)
+                userRef.child("$uid").child("email").setValue(email)
+                userRef.child("$uid").child("total distance").setValue(0)
+                userRef.child("$uid").child("total time").setValue(0)
 
                 val dogInfo = DogInfo()
-                userRef.child("$user").child("dog").setValue(dogInfo)
+                userRef.child("$uid").child("dog").setValue(dogInfo)
+
                 startMain()
             } else {
                 if (it.exception is FirebaseAuthUserCollisionException) {
