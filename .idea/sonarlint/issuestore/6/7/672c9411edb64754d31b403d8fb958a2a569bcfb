@@ -1,23 +1,8 @@
 
-Akotlin:S6310ª"Avoid hardcoded dispatchers.(¨¯üÿÿÿÿ8ÊÛè€Ü1
-Akotlin:S6310²"Avoid hardcoded dispatchers.(Ñûü£øÿÿÿÿ8ÊÛè€Ü1
-9kotlin:S1128"Remove this unused import.(ï›’8ÑÛè€Ü1
->kotlin:S1128	"Remove this unused import.(Ô¼³úÿÿÿÿÿ8ÑÛè€Ü1
-9kotlin:S1128
-"Remove this unused import.( ¯–8ÑÛè€Ü1
-9kotlin:S1128"Remove this unused import.(©ó·¾8ÑÛè€Ü1
-9kotlin:S1128"Remove this unused import.(Üº¸¡8ÑÛè€Ü1
->kotlin:S1128"Remove this unused import.(ÖÇØıÿÿÿÿ8ÑÛè€Ü1
-9kotlin:S1128"Remove this unused import.(™¢ı§8ÑÛè€Ü1
->kotlin:S1128"Remove this unused import.(»«¦úøÿÿÿÿ8ÑÛè€Ü1
-8kotlin:S1128"Remove this unused import.(Ë›Ë78ÑÛè€Ü1
->kotlin:S1128"Remove this unused import.(İáÛ¦ÿÿÿÿÿ8ÑÛè€Ü1
->kotlin:S1128#"Remove this unused import.(æ¡ÿÀûÿÿÿÿ8ÑÛè€Ü1
-9kotlin:S1128$"Remove this unused import.(”õÈÎ8ÑÛè€Ü1
-8kotlin:S1128%"Remove this unused import.(«Á§i8ÑÛè€Ü1
-9kotlin:S1128-"Remove this unused import.(é×Üø8ÑÛè€Ü1
-9kotlin:S11281"Remove this unused import.(÷½Â¨8ÑÛè€Ü1
-8kotlin:S11282"Remove this unused import.(à²·i8ÑÛè€Ü1
-Hkotlin:S1874š"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8ÒÛè€Ü1
-Nkotlin:S1066›".Merge this "if" statement with the nested one.(•³â8ÕÛè€Ü1
-Pkotlin:S6518]",Replace function call with indexed accessor.(£¨ˆŸüÿÿÿÿ8ÕÛè€Ü1
+Akotlin:S6310"Avoid hardcoded dispatchers.(¨¯üÿÿÿÿ8¡„’¬Ş1
+<kotlin:S6310§"Avoid hardcoded dispatchers.(¬ÿĞ8¡„’¬Ş1
+Akotlin:S6310°"Avoid hardcoded dispatchers.(Ñûü£øÿÿÿÿ8¡„’¬Ş1
+Hkotlin:S1874"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8«„’¬Ş1
+wkotlin:S3776˜"RRefactor this method to reduce its Cognitive Complexity from 22 to the 15 allowed.(ùîÁûşÿÿÿÿ8«„’¬Ş1
+Nkotlin:S1066".Merge this "if" statement with the nested one.(•³â8®„’¬Ş1
+Pkotlin:S6518P",Replace function call with indexed accessor.(£¨ˆŸüÿÿÿÿ8¯„’¬Ş1

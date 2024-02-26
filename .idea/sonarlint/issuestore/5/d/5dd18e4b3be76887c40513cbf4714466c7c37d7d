@@ -1,8 +1,16 @@
 
-^kotlin:S899„":Do something with the "Boolean" value returned by "mkdir".(å‰ñ‰ùÿÿÿÿ8Ÿ³¼üÛ1
-<kotlin:S6310å"Avoid hardcoded dispatchers.(©ÒÕò8©³¼üÛ1
-Hkotlin:S1874‘"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8Â³¼üÛ1
-qkotlin:S3776ä"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(õ»Ëc8Â³¼üÛ1
-rkotlin:S3776Å"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8Ã³¼üÛ1
-Nkotlin:S1066’".Merge this "if" statement with the nested one.(•³â8È³¼üÛ1
-Kkotlin:S6518j",Replace function call with indexed accessor.(€ÖÄş8Ê³¼üÛ1
+^kotlin:S899²":Do something with the "Boolean" value returned by "mkdir".(å‰ñ‰ùÿÿÿÿ8»ğ ¬Ş1
+<kotlin:S6310İ"Avoid hardcoded dispatchers.(©ÒÕò8Äğ ¬Ş1
+<kotlin:S6310è"Avoid hardcoded dispatchers.(ä¹ÔÅ8Äğ ¬Ş1
+<kotlin:S6310ô"Avoid hardcoded dispatchers.(éÁï³8Äğ ¬Ş1
+Akotlin:S6310ÿ"Avoid hardcoded dispatchers.(Â÷ò“şÿÿÿÿ8Äğ ¬Ş1
+;kotlin:S6310ˆ"Avoid hardcoded dispatchers.(¹¡ \8Äğ ¬Ş1
+>kotlin:S1128/"Remove this unused import.(åËÒÎúÿÿÿÿ8Üğ ¬Ş1
+9kotlin:S11281"Remove this unused import.(º’8Üğ ¬Ş1
+Hkotlin:S1874‰"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8ßğ ¬Ş1
+qkotlin:S3776Ü"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(õ»Ëc8àğ ¬Ş1
+wkotlin:S3776Õ"RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(ˆà–Éıÿÿÿÿ8àğ ¬Ş1
+rkotlin:S3776ó"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8àğ ¬Ş1
+wkotlin:S3776Ú"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(Üıìªÿÿÿÿÿ8áğ ¬Ş1
+Nkotlin:S1066Š".Merge this "if" statement with the nested one.(•³â8æğ ¬Ş1
+Kkotlin:S6518o",Replace function call with indexed accessor.(€ÖÄş8èğ ¬Ş1

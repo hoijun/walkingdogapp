@@ -17,6 +17,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,8 +44,12 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -112,19 +117,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment: MapFragment = supportFragmentManager.findFragmentById(R.id.map_fragment) as MapFragment
         mapFragment.getMapAsync(this)
 
-        WalkingService.coordList.observe(this) {
-            if(coordList.isNotEmpty()) {
-                walkViewModel.getCurrentAddress(
-                    com.google.android.gms.maps.model.LatLng(
-                        coordList.last().latitude,
-                        coordList.last().longitude
-                    )
-                ) { locateName ->
-                    binding.textLocation.text = locateName
-                }
-            }
-        }
-
         this.onBackPressedDispatcher.addCallback(this, BackPressCallback)
 
         // 트래킹 모드 여부 확인 및 여부에 따른 버튼과 텍스트 변경
@@ -144,7 +136,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 버튼 이벤트 설정
         binding.apply {
-            btnBack.setOnClickListener {
+            imgPencil.setOnClickListener {
                 selectStopWalk()
             }
 
@@ -212,7 +204,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     trackingPath.map = null
                     trackingPath.coords = coordList // 이동 경로 그림
                     trackingPath.map = mynavermap
-                    binding.InfoDistance.text = getString(R.string.totaldistance,
+                    binding.InfoDistance.text = getString(R.string.distance,
                         WalkingService.totalDistance / 1000.0)
                 }
             }
@@ -221,7 +213,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         WalkingService.walkTime.observe(this) {
             val minutes = it / 60
             val seconds = it % 60
-            binding.InfoTime.text = getString(R.string.totaltime, minutes, seconds)
+            binding.InfoTime.text = getString(R.string.time, minutes, seconds)
         }
     }
 
@@ -348,28 +340,82 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     // 거리 및 시간 저장, 날짜: 시간 별로 산책 기록 저장
     private fun saveWalkInfo(distance: Float, time: Int) {
         val uid = auth.currentUser?.uid
-        val userRef = db.getReference("Users").child("$uid")
+        val userRef = db.getReference("Users").child("$uid").child("user")
+        val dogRef = db.getReference("Users").child("$uid").child("dog")
         userRef.addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val currentDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                val currentDate =
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
                 val totalDistance =
-                    snapshot.child("total distance").getValue(Long::class.java)?.toFloat()
+                    snapshot.child("totaldistance").getValue(Long::class.java)?.toFloat()
                 val totalTime =
-                    snapshot.child("total time").getValue(Long::class.java)?.toInt()
-                if (totalDistance != null) {
-                    userRef.child("total distance").setValue(totalDistance + distance)
+                    snapshot.child("totaltime").getValue(Long::class.java)?.toInt()
+
+                var error = false
+
+                binding.walkingscreen.visibility = View.INVISIBLE
+                binding.waitImage.visibility = View.VISIBLE
+
+                lifecycleScope.launch {
+                        val totaldistanceJob = async(Dispatchers.IO) {
+                            try {
+                                if (totalDistance != null) {
+                                    userRef.child("totaldistance")
+                                        .setValue(totalDistance + distance)
+                                        .await()
+                                }
+                            } catch (e: Exception) {
+                                error = true
+                            }
+                        }
+
+                        val totaltimeJob = async(Dispatchers.IO) {
+                            try {
+                                if (totalTime != null) {
+                                    Log.d("totalTime", WalkingService.walkTime.value!!.toString())
+                                    userRef.child("totaltime").setValue(totalTime + time).await()
+                                }
+                            } catch (e: Exception) {
+                                error = true
+                            }
+                        }
+
+                        val datedistanceJob = async(Dispatchers.IO) {
+                            try {
+                                dogRef.child("walkdates").child(currentDate)
+                                    .child("distance").setValue(distance).await()
+                            } catch (e: Exception) {
+                                error = true
+                            }
+                        }
+
+                        val datetimeJob = async(Dispatchers.IO) {
+                            try {
+                                dogRef.child("walkdates").child(currentDate)
+                                    .child("time").setValue(time).await()
+                            } catch (e: Exception) {
+                                error = true
+                            }
+                        }
+
+                        totaldistanceJob.await()
+                        totaltimeJob.await()
+                        datedistanceJob.await()
+                        datetimeJob.await()
+
+                        if (error) {
+                            Toast.makeText(this@WalkingActivity, "산책 기록 저장 실패", Toast.LENGTH_SHORT).show()
+                        }
+
+                        stopWalkingService()
+                        goHome()
+
                 }
-                if (totalTime != null) {
-                    Log.d("totalTime", WalkingService.walkTime.value!!.toString())
-                    userRef.child("total time").setValue(totalTime + time)
-                }
-                userRef.child("walk date").child(currentDate)
-                    .child("distance").setValue(distance)
-                userRef.child("walk date").child(currentDate)
-                    .child("time").setValue(time)
             }
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(this@WalkingActivity, "산책 기록 저장 실패", Toast.LENGTH_SHORT).show()
+                stopWalkingService()
+                goHome()
             }
         })
     }
