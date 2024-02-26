@@ -3,7 +3,6 @@ package com.example.walkingdogapp
 import android.Manifest
 import android.app.Application
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
@@ -24,7 +23,8 @@ import java.util.Locale
 
 class userInfoViewModel(application: Application) : AndroidViewModel(application) {
     private val _currentCoord = MutableLiveData<LatLng>()
-    private val _dogname = MutableLiveData<String>()
+    private val _doginfo = MutableLiveData<DogInfo>()
+    private val _userinfo = MutableLiveData<UserInfo>()
     private val _imguri = MutableLiveData<Uri>()
     private val _imgdrawable = MutableLiveData<Drawable>()
     private var fusedLocationProviderClient: FusedLocationProviderClient
@@ -34,14 +34,17 @@ class userInfoViewModel(application: Application) : AndroidViewModel(application
     val currentCoord: LiveData<LatLng>
         get() = _currentCoord
 
-    val dogname: LiveData<String>
-        get() = _dogname
-
     val imguri: LiveData<Uri>
         get() = _imguri
 
     val imgdrawble: LiveData<Drawable>
         get() = _imgdrawable
+
+    val doginfo: LiveData<DogInfo>
+        get() = _doginfo
+
+    val userinfo: LiveData<UserInfo>
+        get() = _userinfo
 
     init {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(applic)
@@ -51,16 +54,20 @@ class userInfoViewModel(application: Application) : AndroidViewModel(application
         _currentCoord.value = input
     }
 
-    fun saveDogName(name: String) {
-        _dogname.value = name
-    }
-
     fun saveImgUri(uri: Uri) {
         _imguri.value = uri
     }
 
     fun saveImgDrawble(drawable: Drawable) {
         _imgdrawable.value = drawable
+    }
+
+    fun savedogInfo(doginfo: DogInfo) {
+        _doginfo.value = doginfo
+    }
+
+    fun saveuserInfo(userInfo: UserInfo) {
+        _userinfo.value = userInfo
     }
 
     fun getLastLocation() {

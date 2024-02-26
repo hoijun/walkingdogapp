@@ -1,59 +1,101 @@
 package com.example.walkingdogapp
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import com.example.walkingdogapp.databinding.FragmentMyPageBinding
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [MyPageFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class MyPageFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var _binding: FragmentMyPageBinding? = null
+    private val binding get() = _binding!!
+    private val myViewModel: userInfoViewModel by activityViewModels()
+    private lateinit var userdogInfo: DogInfo
+    private lateinit var userInfo: UserInfo
+    private lateinit var mainactivity: MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+        mainactivity = activity as MainActivity
+        mainactivity.binding.menuBn.visibility = View.VISIBLE
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_my_page, container, false)
-    }
+    ): View {
+        _binding = FragmentMyPageBinding.inflate(inflater,container, false)
+        userdogInfo = myViewModel.doginfo.value ?: DogInfo()
+        userInfo = myViewModel.userinfo.value ?: UserInfo()
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MyPageFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            MyPageFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+        binding.apply {
+            btnSetting.setOnClickListener {
+
+            }
+
+            menuDogInfo.setOnClickListener {
+
+            }
+
+            modifydoginfo.setOnClickListener {
+                val settingdogIntent = Intent(requireContext(), SettingDogActivity::class.java)
+                startActivity(settingdogIntent)
+            }
+
+            modifyuserinfo.setOnClickListener {
+
+            }
+
+            managepictures.setOnClickListener {
+
+            }
+
+            menuWalkinfo.setOnClickListener {
+                mainactivity.changeFragment(WalkInfoFragment())
+            }
+
+            if(userInfo.name != "") {
+                menuUsername.text = "${userInfo.name} 님"
+            }
+
+            if(userdogInfo.name != ""){
+                menuDogname.text = userdogInfo.name
+                menuDogfeature.text = "${getAge(userdogInfo.birth)}살/ ${userdogInfo.weight}kg / ${userdogInfo.breed}"
+                if (myViewModel.imgdrawble.value != null) {
+                    menuDogimg.setImageDrawable(myViewModel.imgdrawble.value)
                 }
             }
+
+            menuDistance.text = getString(R.string.totaldistance, userInfo.totaldistance / 1000.0)
+            walkDistance.text = getString(R.string.totaldistance, userInfo.totaldistance / 1000.0)
+            walkCount.text = "${userdogInfo.dates.size}회"
+        }
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    private fun getAge(date: String): Int {
+        val currentDate = Calendar.getInstance()
+
+        val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+        val birthDate = dateFormat.parse(date)
+        val calBirthDate = Calendar.getInstance().apply { time = birthDate }
+
+        var age = currentDate.get(Calendar.YEAR) - calBirthDate.get(Calendar.YEAR)
+        if (currentDate.get(Calendar.DAY_OF_YEAR) < calBirthDate.get(Calendar.DAY_OF_YEAR)) {
+            age--
+        }
+        return age
     }
 }

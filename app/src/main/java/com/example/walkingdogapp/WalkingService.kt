@@ -61,7 +61,7 @@ class WalkingService : Service() {
                         // 위치 업데이트 간의 거리가 클 경우 업데이트 안함 및 이 상황이 2번일 경우는 통과
                         if (coordList.value!!.isNotEmpty() &&
                             coordList.value!!.last().distanceTo(pos) > 5f &&
-                            miscount < 2)
+                            miscount < 1)
                         {
                             miscount++
                             Log.d(
@@ -185,7 +185,6 @@ class WalkingService : Service() {
         isTracking.postValue(false)
         stopTimer()
         fusedLocationProviderClient.removeLocationUpdates(locationCallback) // 위치 업데이트 중단
-        Log.d("current coord", "Stop Tracking")
     }
 
     private fun stopLocationService() {

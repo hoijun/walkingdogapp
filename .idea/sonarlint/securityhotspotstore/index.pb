@@ -56,3 +56,13 @@ m
 =app/src/main/java/com/example/walkingdogapp/WriteDogDialog.kt,d\f\df5f07053d92cdb3bfc885f795984be8bbd7559e
 p
 @app/src/main/java/com/example/walkingdogapp/userInfoViewModel.kt,3\0\3063c20ef67a7b46a35fb675460da004414a7ba2
+o
+?app/src/main/java/com/example/walkingdogapp/WalkInfoFragment.kt,1\3\136e06cbd9447ab4c55e6b114cfb12f434347db1
+g
+7app/src/main/java/com/example/walkingdogapp/UserInfo.kt,7\7\77e209f3edb54510362fcf5780e2452c6019d0e7
+r
+Bapp/src/main/java/com/example/walkingdogapp/SettingUserActivity.kt,c\9\c96f367332f665185620a871a8f4d1ffed8b02ad
+j
+:app/src/main/java/com/example/walkingdogapp/UserInfo.kt.kt,4\a\4ace675a3f1a0c61e81adc1beb92c9192b9e1ddd
+g
+7app/src/main/java/com/example/walkingdogapp/DogInfos.kt,3\9\39af8f2448b16be1bf3d7e0802961c712f323cd8

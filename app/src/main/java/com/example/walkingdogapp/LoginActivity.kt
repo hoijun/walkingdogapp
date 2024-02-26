@@ -12,7 +12,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
@@ -169,9 +168,10 @@ class LoginActivity : AppCompatActivity() {
                     saveUid(uid)
                 }
                 val userRef = db.getReference("Users")
-                userRef.child("$uid").child("email").setValue(email)
-                userRef.child("$uid").child("total distance").setValue(0)
-                userRef.child("$uid").child("total time").setValue(0)
+
+                val userInfo = UserInfo()
+                userInfo.email = email
+                userRef.child("$uid").child("user").setValue(userInfo)
 
                 val dogInfo = DogInfo()
                 userRef.child("$uid").child("dog").setValue(dogInfo)

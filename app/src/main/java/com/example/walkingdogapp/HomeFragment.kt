@@ -136,15 +136,19 @@ class HomeFragment : Fragment() {
     }
 
     private fun setUserInfo() {
+        val userdoginfo = myViewModel.doginfo.value
         binding.apply {
-            if (myViewModel.dogname.value != "") {
-                msgRegister.visibility = View.INVISIBLE
-                btnRegister.visibility = View.INVISIBLE
-                dogName.text = myViewModel.dogname.value
-                dogName.visibility = View.VISIBLE
-            }
-            if (myViewModel.imgdrawble.value != null) {
-                imgDog.setImageDrawable(myViewModel.imgdrawble.value)
+            if (userdoginfo != null) {
+                if (userdoginfo.name != "") {
+                    msgRegister.visibility = View.INVISIBLE
+                    btnRegister.visibility = View.INVISIBLE
+                    dogName.text = userdoginfo.name
+                    dogName.visibility = View.VISIBLE
+
+                    if (myViewModel.imgdrawble.value != null) {
+                        imgDog.setImageDrawable(myViewModel.imgdrawble.value)
+                    }
+                }
             }
         }
     }
