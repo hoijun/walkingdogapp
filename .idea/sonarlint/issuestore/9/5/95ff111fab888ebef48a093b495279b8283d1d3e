@@ -1,12 +1,12 @@
 
-[kotlin:S1172x"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ8¯“ãÝÞ1
-Akotlin:S6310¤"Avoid hardcoded dispatchers.(¿ª¢íÿÿÿÿÿ8µ“ãÝÞ1
-<kotlin:S6310­"Avoid hardcoded dispatchers.(âùº¸8µ“ãÝÞ1
-vkotlin:S3776I"RRefactor this method to reduce its Cognitive Complexity from 42 to the 15 allowed.(¶Á»¬þÿÿÿÿ8Å“ãÝÞ1
-Lkotlin:S6518è",Replace function call with indexed accessor.(Õ«“ä8É“ãÝÞ1
-Lkotlin:S6518è",Replace function call with indexed accessor.(Õ«“ä8É“ãÝÞ1
-Qkotlin:S6518é",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8É“ãÝÞ1
-Qkotlin:S6518é",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8É“ãÝÞ1
-Qkotlin:S6518",Replace function call with indexed accessor.(–ø¾Ñüÿÿÿÿ8É“ãÝÞ1
-Qkotlin:S6518",Replace function call with indexed accessor.(–ø¾Ñüÿÿÿÿ8É“ãÝÞ1
-Qkotlin:S6518",Replace function call with indexed accessor.(–ø¾Ñüÿÿÿÿ8É“ãÝÞ1
+[kotlin:S1172x"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ8¿ÿÝÝß1
+Akotlin:S6310¦"Avoid hardcoded dispatchers.(¿ª¢íÿÿÿÿÿ8ÅÿÝÝß1
+<kotlin:S6310¯"Avoid hardcoded dispatchers.(âùº¸8ÅÿÝÝß1
+vkotlin:S3776I"RRefactor this method to reduce its Cognitive Complexity from 42 to the 15 allowed.(¶Á»¬þÿÿÿÿ8ÔÿÝÝß1
+Lkotlin:S6518ê",Replace function call with indexed accessor.(Õ«“ä8ØÿÝÝß1
+Lkotlin:S6518ê",Replace function call with indexed accessor.(Õ«“ä8ÙÿÝÝß1
+Qkotlin:S6518ë",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8ÙÿÝÝß1
+Qkotlin:S6518ë",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8ÙÿÝÝß1
+Qkotlin:S6518",Replace function call with indexed accessor.(“ôú…øÿÿÿÿ8ÙÿÝÝß1
+Qkotlin:S6518",Replace function call with indexed accessor.(“ôú…øÿÿÿÿ8ÙÿÝÝß1
+Qkotlin:S6518",Replace function call with indexed accessor.(“ôú…øÿÿÿÿ8ÙÿÝÝß1

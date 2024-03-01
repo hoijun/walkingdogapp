@@ -112,7 +112,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 보류
         walkViewModel = ViewModelProvider(this).get(userInfoViewModel::class.java)
-        walkViewModel.getLastLocation()
 
         // 백그라운드 위치 서비스 시작
         startWalkingService()
@@ -183,7 +182,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             mynavermap.moveCamera(firstCamera)
             trackingMarker.position = LatLng(it.latitude, it.longitude)
             trackingMarker.map = mynavermap
-        }
+        } // 현재 위치로 맵 이동
 
         // 위치 업데이트 이벤트
         WalkingService.coordList.observe(this) {
@@ -197,7 +196,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 mynavermap.moveCamera(trackingCamera)
 
                 val markersToRemove = mutableListOf<Marker>()
-                for (marker in animalMarkers) {
+                for (marker in animalMarkers) { // 마커 특정 거리 이상일 경우 제거
                     if (marker.position.distanceTo(coordList.last()) > 400) {
                         Log.d("coor", "clear")
                         marker.map = null
@@ -205,6 +204,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
                 animalMarkers.removeAll(markersToRemove)
+                
                 if (coordList.size > 1) {
                     trackingPath.map = null
                     trackingPath.coords = coordList // 이동 경로 그림
@@ -222,9 +222,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun randomMarker() {
+    private fun randomMarker() { // 마커 랜덤 표시
         lifecycleScope.launch(Dispatchers.Main) {
-            delay(10000)
+            delay(10000) // 10초 후에
             while (isWalkingServiceRunning()) {
                 repeat(2) {
                     if (coordList.isNotEmpty()) {
@@ -241,19 +241,19 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             }
                             true
                         }
-                        if (animalMarkers.size < 6) {
+                        if (animalMarkers.size < 6) { // 마커의 갯수 상한선
                             animalMarker.position = randomCoord
                             animalMarker.map = mynavermap
                             animalMarkers.add(animalMarker)
                         }
                     }
                 }
-                delay(300000)
+                delay(300000) // 5분 마다
             }
         }
     }
 
-    private fun getRandomCoord(currentCoord: LatLng ,rad : Int) : LatLng {
+    private fun getRandomCoord(currentCoord: LatLng ,rad : Int) : LatLng { // 랜덤 좌표
         val random = Random()
         val minDistance = 50
         val randomDistance = (minDistance + (random.nextDouble() * (rad - minDistance))) / 111000

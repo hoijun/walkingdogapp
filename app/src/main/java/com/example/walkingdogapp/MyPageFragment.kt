@@ -28,7 +28,6 @@ class MyPageFragment : Fragment() {
         mainactivity = activity as MainActivity
         mainactivity.binding.menuBn.visibility = View.VISIBLE
         MainActivity.preFragment = "Mypage"
-        Log.d("savepoint", MainActivity.preFragment.toString())
     }
 
     override fun onCreateView(

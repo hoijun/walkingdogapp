@@ -64,8 +64,9 @@ class SettingUserActivity : AppCompatActivity() {
                     userinfo.birth = birth
                     binding.editBirth.text = birth
                 }
-                DatePickerDialog(this@SettingUserActivity, dateCallback, cal.get(Calendar.YEAR), cal.get(
-                    Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+                val datepicker = DatePickerDialog(this@SettingUserActivity, dateCallback, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
+                datepicker.datePicker.maxDate = cal.timeInMillis
+                datepicker.show()
             }
 
             registerUser.setOnClickListener {

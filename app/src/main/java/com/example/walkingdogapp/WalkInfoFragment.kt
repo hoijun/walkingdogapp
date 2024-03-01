@@ -43,12 +43,14 @@ class WalkInfoFragment : Fragment() {
     ): View {
         _binding = FragmentWalkInfoBinding.inflate(inflater,container, false)
 
+        // 달력 커스텀
         val dayDecorator = DayDecorator(requireContext())
         val sundayDecorator = SundayDecorator()
         val saturdayDecorator = SaturdayDecorator()
         var selectedMonthDecorator = SelectedMonthDecorator(CalendarDay.today().month)
         val walkinfotoday = mutableListOf<Walkdate>()
 
+        // 산책 정보의 날짜 및 현재 날짜 산책 정보
         for (date: Walkdate in userdogInfo.dates) {
             val dayinfo = date.day.split("-")
             walkdates.add(CalendarDay.from(dayinfo[0].toInt(), dayinfo[1].toInt(), dayinfo[2].toInt()))
@@ -64,9 +66,9 @@ class WalkInfoFragment : Fragment() {
             adapter = WalkdateslistAdapater(walkinfotoday)
             walkinfoRecyclerview.adapter = adapter
 
-            walkcalendar.selectedDate = CalendarDay.today()
+            walkcalendar.selectedDate = CalendarDay.today() // 현재 날짜 표시
             walkcalendar.addDecorators(dayDecorator, walkDayDecorator, saturdayDecorator, sundayDecorator, selectedMonthDecorator)
-            walkcalendar.setTitleFormatter { day ->
+            walkcalendar.setTitleFormatter { day -> // 년 월 표시 변경
                 val inputText = day.date
                 val calendarHeaderElements = inputText.toString().split("-").toMutableList()
                 val calendarHeaderBuilder = StringBuilder()
@@ -78,11 +80,11 @@ class WalkInfoFragment : Fragment() {
                 calendarHeaderBuilder.toString()
             }
             walkcalendar.setWeekDayFormatter(ArrayWeekDayFormatter(resources.getTextArray(R.array.custom_weekdays)))
-            walkcalendar.state().edit().setMaximumDate(CalendarDay.today()).commit()
+            walkcalendar.state().edit().setMaximumDate(CalendarDay.today()).commit() // 최대 날짜 설정
 
-            walkcalendar.setOnDateChangedListener { widget, date, selected ->
+            walkcalendar.setOnDateChangedListener { widget, date, selected -> // 날짜 킅릭시
                 val walkinfoOfdate = mutableListOf<Walkdate>()
-                for (walkday: Walkdate in userdogInfo.dates) {
+                for (walkday: Walkdate in userdogInfo.dates) { // 선택한 날짜의 산책 정보
                     if(date.date.toString() == walkday.day) {
                         walkinfoOfdate.add(walkday)
                     }
@@ -91,20 +93,20 @@ class WalkInfoFragment : Fragment() {
                 adapter = WalkdateslistAdapater(walkinfoOfdate)
                 walkinfoRecyclerview.adapter = adapter
             }
-            walkcalendar.setOnMonthChangedListener { widget, date ->
+            walkcalendar.setOnMonthChangedListener { widget, date -> // 달 바꿀때
                 walkcalendar.removeDecorators()
-                walkcalendar.invalidateDecorators()
-                adapter = WalkdateslistAdapater(listOf())
+                walkcalendar.invalidateDecorators() // 데코 초기화
+                adapter = WalkdateslistAdapater(listOf()) // 빈 리사이클러 뷰
 
                 if (date.month == CalendarDay.today().month) {
-                    walkcalendar.selectedDate = CalendarDay.today()
+                    walkcalendar.selectedDate = CalendarDay.today() // 현재 달로 바꿀 때 마다 현재 날짜 표시
                 } else {
                     walkcalendar.selectedDate = null
                 }
 
-                selectedMonthDecorator = SelectedMonthDecorator(date.month)
+                selectedMonthDecorator = SelectedMonthDecorator(date.month) 
                 walkinfoRecyclerview.adapter = adapter
-                walkcalendar.addDecorators(dayDecorator, walkDayDecorator, saturdayDecorator, sundayDecorator, selectedMonthDecorator)
+                walkcalendar.addDecorators(dayDecorator, walkDayDecorator, saturdayDecorator, sundayDecorator, selectedMonthDecorator) //데코 설정
             }
 
             walkinfoRecyclerview.layoutManager = LinearLayoutManager(context)

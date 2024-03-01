@@ -1,5 +1,3 @@
 
->kotlin:S1128"Remove this unused import.(Ô¼³úÿÿÿÿÿ8‘Ï§Ü1
->kotlin:S1128"Remove this unused import.(ÓÁ‘æşÿÿÿÿ8Îã²…Ş1
-wkotlin:S101"TRename class "userInfoViewModel" to match the regular expression ^[A-Z][a-zA-Z0-9]*$(Á¸­ùÿÿÿÿ8’Ï§Ü1
-Gkotlin:S1874]"#Deprecated code should not be used.(Æé™Ûüÿÿÿÿ8“Ï§Ü1
+wkotlin:S101"TRename class "userInfoViewModel" to match the regular expression ^[A-Z][a-zA-Z0-9]*$(Á¸­ùÿÿÿÿ8’Ï§Ü1
+Gkotlin:S1874["#Deprecated code should not be used.(Æé™Ûüÿÿÿÿ8“Ï§Ü1
