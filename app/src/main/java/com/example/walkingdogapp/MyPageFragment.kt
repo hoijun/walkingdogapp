@@ -2,9 +2,11 @@ package com.example.walkingdogapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.databinding.FragmentMyPageBinding
@@ -25,6 +27,8 @@ class MyPageFragment : Fragment() {
         super.onCreate(savedInstanceState)
         mainactivity = activity as MainActivity
         mainactivity.binding.menuBn.visibility = View.VISIBLE
+        MainActivity.preFragment = "Mypage"
+        Log.d("savepoint", MainActivity.preFragment.toString())
     }
 
     override fun onCreateView(
@@ -41,7 +45,11 @@ class MyPageFragment : Fragment() {
             }
 
             menuDogInfo.setOnClickListener {
-
+                if(userdogInfo.name == "") {
+                    Toast.makeText(requireContext(), "먼저 강아지 정보를 설정해주세요!", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                mainactivity.changeFragment(DogInfoFragment())
             }
 
             modifydoginfo.setOnClickListener {
@@ -50,7 +58,8 @@ class MyPageFragment : Fragment() {
             }
 
             modifyuserinfo.setOnClickListener {
-
+                val settinguserIntent = Intent(requireContext(), SettingUserActivity::class.java)
+                startActivity(settinguserIntent)
             }
 
             managepictures.setOnClickListener {

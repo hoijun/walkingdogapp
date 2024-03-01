@@ -6,4 +6,14 @@
     <string name="distance">"거리: %1$3.2f"</string>
     <string name="totaldistance">%1$2.1f" km"</string>
     <string name="time">"시간": %1$02d:%2$02d</string>
+
+    <string-array name="custom_weekdays">
+        <item>월</item>
+        <item>화</item>
+        <item>수</item>
+        <item>목</item>
+        <item>금</item>
+        <item>토</item>
+        <item>일</item>
+    </string-array>
 </resources>

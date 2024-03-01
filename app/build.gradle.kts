@@ -116,4 +116,6 @@ dependencies {
     implementation("com.naver.maps:map-sdk:3.17.0")
     implementation(files("libs/oauth-5.9.0.aar"))
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
+    implementation("com.jakewharton.threetenabp:threetenabp:1.2.0")
 }

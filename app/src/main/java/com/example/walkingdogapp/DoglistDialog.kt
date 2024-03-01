@@ -31,7 +31,7 @@ class DoglistDialog(context: Context, private val callback: (String) -> Unit) : 
 
         val dialogRecyclerView = binding.dialogRecyclerView
         dialogRecyclerView.layoutManager = LinearLayoutManager(context)
-        val adapter= DoglistAdpater(dogs)
+        val adapter = DoglistAdpater(dogs)
         adapter.itemClickListener =
             DoglistAdpater.OnItemClickListener { name ->
                 if(name == "직접 입력") {

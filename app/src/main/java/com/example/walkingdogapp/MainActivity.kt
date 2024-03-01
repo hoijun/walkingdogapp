@@ -62,10 +62,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    companion object {
+        var preFragment = "Home"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        if(preFragment == "Mypage") {
+            binding.menuBn.selectedItemId = R.id.navigation_mypage
+        }
 
         // 위치 권한
         ActivityCompat.requestPermissions(this, PERMISSIONS, LOCATION_PERMISSION_REQUEST_CODE)
@@ -112,6 +120,7 @@ class MainActivity : AppCompatActivity() {
             .beginTransaction()
             .replace(binding.screenFl.id, fragment)
             .commit()
+        binding.menuBn.visibility = View.VISIBLE
     }
 
     override fun onRequestPermissionsResult(
@@ -188,9 +197,12 @@ class MainActivity : AppCompatActivity() {
                             val dates = mutableListOf<Walkdate>()
                             if (snapshot.exists()) {
                                 for (datedata in snapshot.children) {
+                                    val dateinfos = datedata.key.toString().split(" ")
                                     dates.add(
                                         Walkdate(
-                                            datedata.child("distance").getValue(Float::class.java)!!,
+                                            dateinfos[0], dateinfos[1], dateinfos[2],
+                                            datedata.child("distance")
+                                                .getValue(Float::class.java)!!,
                                             datedata.child("time").getValue(Int::class.java)!!
                                         )
                                     )
@@ -226,20 +238,28 @@ class MainActivity : AppCompatActivity() {
                             }
                         })
                 }
+
                 val dog = dogDefferd.await()
                 val user = userDefferd.await()
                 dog.dates = walkdateDeferred
                 mainviewmodel.savedogInfo(dog)
                 mainviewmodel.saveuserInfo(user)
+
                 if (profileDrawable != null) {
                     mainviewmodel.saveImgDrawble(profileDrawable)
                 }
 
-                binding.menuBn.visibility = View.VISIBLE
-                changeFragment(HomeFragment())
-
+                if (preFragment == "Mypage") {
+                    changeFragment(MyPageFragment())
+                } else {
+                    changeFragment(HomeFragment())
+                }
             } catch (e: Exception) {
-                changeFragment(HomeFragment())
+                if (preFragment == "Mypage") {
+                    changeFragment(MyPageFragment())
+                } else {
+                    changeFragment(HomeFragment())
+                }
             }
         }
     }
