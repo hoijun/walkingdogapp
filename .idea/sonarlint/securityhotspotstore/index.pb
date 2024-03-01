@@ -68,3 +68,5 @@ k
 ;app/src/main/java/com/example/walkingdogapp/CalendarDeco.kt,8\d\8dbfd9c0bf1a7bd372b53fcf6ba9d7218850fc0c
 t
 Dapp/src/main/java/com/example/walkingdogapp/WalkdateslistAdapater.kt,6\c\6c5af68d617e7cbb42dce34800ea55f3172e701a
+p
+@app/src/main/java/com/example/walkingdogapp/GlobalApplication.kt,c\3\c32b807c1562d8623ec14027b3d9c93b80435ffa

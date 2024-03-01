@@ -26,6 +26,7 @@ class DayDecorator(context: Context): DayViewDecorator {
     }
 }
 
+// 선택한 달 외의 날짜 표시
 class SelectedMonthDecorator(private val selectedMonth : Int): DayViewDecorator {
     override fun shouldDecorate(day: CalendarDay): Boolean {
         return day.month != selectedMonth
@@ -35,6 +36,8 @@ class SelectedMonthDecorator(private val selectedMonth : Int): DayViewDecorator 
     }
 }
 
+
+// 산책 날짜에 점 표시
 class WalkDayDecorator(private val walkdays : List<CalendarDay>): DayViewDecorator {
     override fun shouldDecorate(day: CalendarDay?): Boolean {
         return walkdays.contains(day)

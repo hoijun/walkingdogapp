@@ -58,7 +58,7 @@ class WalkingService : Service() {
                 for (location in locationResult.locations) {
                     if (location != null) {
                         val pos = LatLng(location.latitude, location.longitude)
-                        // 위치 업데이트 간의 거리가 클 경우 업데이트 안함 및 이 상황이 2번일 경우는 통과
+                        // 위치 업데이트 간의 거리가 클 경우 업데이트 안함 및 이 상황이 1번일 경우는 통과
                         if (coordList.value!!.isNotEmpty() &&
                             coordList.value!!.last().distanceTo(pos) > 5f &&
                             miscount < 1)
@@ -75,7 +75,7 @@ class WalkingService : Service() {
                             miscount = 0
                             Log.d("current coord", "$pos")
                         }
-                        if (coordList.value!!.size > 1) {
+                        if (coordList.value!!.size > 1) { // 거리 증가
                             totalDistance += coordList.value!!.last()
                                 .distanceTo(coordList.value!![coordList.value!!.size - 2]).toFloat()
                             Log.d("current coord", "distance: $totalDistance")

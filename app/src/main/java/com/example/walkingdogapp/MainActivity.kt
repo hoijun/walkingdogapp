@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    companion object {
+    companion object { // 다른 액티비티로 변경 시 어떤 프래그먼트에서 변경했는지 
         var preFragment = "Home"
     }
 
@@ -145,6 +145,7 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
+    // 산책이 진행 여부
     private fun isWalkingServiceRunning(): Boolean {
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         for (myService in activityManager.getRunningServices(Int.MAX_VALUE)) {
@@ -163,7 +164,7 @@ class MainActivity : AppCompatActivity() {
         val userRef = db.getReference("Users").child("$uid")
         val storgeRef = storage.getReference("$uid")
         lifecycleScope.launch {
-            try {
+            try { // 강아지 정보
                 val dogDefferd = async(Dispatchers.IO) {
                     try {
                         userRef.child("dog").get().await().getValue(DogInfo::class.java)
@@ -172,7 +173,7 @@ class MainActivity : AppCompatActivity() {
                         DogInfo()
                     }
                 }
-
+                // 유저 정보
                 val userDefferd = async(Dispatchers.IO) {
                     try {
                         userRef.child("user").get().await().getValue(UserInfo::class.java)
@@ -181,7 +182,7 @@ class MainActivity : AppCompatActivity() {
                         UserInfo()
                     }
                 }
-
+                // 강아지 프로필 사진
                 val profileUriDeferred = async(Dispatchers.IO) {
                     try {
                         storgeRef.child("images").child("profileimg").downloadUrl.await()
@@ -190,7 +191,7 @@ class MainActivity : AppCompatActivity() {
                         Uri.EMPTY
                     }
                 }
-
+                // 강아지 산책 정보
                 val walkdateDeferred = suspendCoroutine { continuation ->
                     userRef.child("dog").child("walkdates").addListenerForSingleValueEvent(object: ValueEventListener{
                         override fun onDataChange(snapshot: DataSnapshot) {
@@ -218,7 +219,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 val profileUri = profileUriDeferred.await()
-
+                // 강아지 프로필 사진 -> drawble 형태로 변경
                 val profileDrawable = suspendCoroutine { continuation ->
                     Glide.with(applicationContext).asDrawable().load(profileUri)
                         .into(object : CustomTarget<Drawable>() {

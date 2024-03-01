@@ -126,7 +126,9 @@ class SettingDogActivity : AppCompatActivity() {
                     doginfo.birth = birth
                     binding.editBirth.text = birth
                 }
-                DatePickerDialog(this@SettingDogActivity, dateCallback, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+                val datepicker = DatePickerDialog(this@SettingDogActivity, dateCallback, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
+                datepicker.datePicker.maxDate = cal.timeInMillis
+                datepicker.show()
             }
 
             settingImage.setOnClickListener {
@@ -160,7 +162,7 @@ class SettingDogActivity : AppCompatActivity() {
                                 val uid = auth.currentUser?.uid
                                 val userRef = db.getReference("Users")
                                 val storgeRef = storage.getReference("$uid")
-                                lifecycleScope.launch {
+                                lifecycleScope.launch { // 강아지 정보 등록
                                     val doginfoJob = async(Dispatchers.IO) {
                                         try {
                                             userRef.child("$uid").child("dog").setValue(doginfo)
@@ -254,11 +256,12 @@ class SettingDogActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun getExtension(uri: Uri): String? {
+    private fun getExtension(uri: Uri): String? { // 파일 확장자
         val contentResolver = contentResolver
         val mimeTypeMap = MimeTypeMap.getSingleton()
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri))
     }
+
     private fun checkPermission(permissions : Array<out String>, code: Int) : Boolean{
         for (permission in permissions) {
             if (ContextCompat.checkSelfPermission(

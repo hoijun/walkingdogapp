@@ -1,13 +1,13 @@
 
 [kotlin:S1172:"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ8ãèÎ´Þ1
-;kotlin:S6310\"Avoid hardcoded dispatchers.(–±Øå8èèÎ´Þ1
-;kotlin:S6310d"Avoid hardcoded dispatchers.(ÂÈ¨Õ8èèÎ´Þ1
-:kotlin:S6310l"Avoid hardcoded dispatchers.(—æ†8èèÎ´Þ1
+;kotlin:S6310]"Avoid hardcoded dispatchers.(–±Øå8èèÎ´Þ1
+;kotlin:S6310e"Avoid hardcoded dispatchers.(ÂÈ¨Õ8èèÎ´Þ1
+:kotlin:S6310m"Avoid hardcoded dispatchers.(—æ†8èèÎ´Þ1
 vkotlin:S3776%"RRefactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.(¶Á»¬þÿÿÿÿ8ðèÎ´Þ1
-Lkotlin:S6518‘",Replace function call with indexed accessor.(Õ«“ä8ôèÎ´Þ1
-Lkotlin:S6518‘",Replace function call with indexed accessor.(Õ«“ä8ôèÎ´Þ1
-Qkotlin:S6518’",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8ôèÎ´Þ1
-Qkotlin:S6518’",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8àµ‚ÛÞ1
-Pkotlin:S6518C",Replace function call with indexed accessor.(ˆ£•âûÿÿÿÿ8àµ‚ÛÞ1
-Pkotlin:S6518C",Replace function call with indexed accessor.(ˆ£•âûÿÿÿÿ8áµ‚ÛÞ1
-Kkotlin:S6518D",Replace function call with indexed accessor.(ÆéÑƒ8áµ‚ÛÞ1
+Lkotlin:S6518’",Replace function call with indexed accessor.(Õ«“ä8ôèÎ´Þ1
+Lkotlin:S6518’",Replace function call with indexed accessor.(Õ«“ä8ôèÎ´Þ1
+Qkotlin:S6518“",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8ôèÎ´Þ1
+Qkotlin:S6518“",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8àµ‚ÛÞ1
+Jkotlin:S6518C",Replace function call with indexed accessor.(°…Í~8”†ßÝß1
+Jkotlin:S6518C",Replace function call with indexed accessor.(°…Í~8”†ßÝß1
+Jkotlin:S6518C",Replace function call with indexed accessor.(°…Í~8”†ßÝß1

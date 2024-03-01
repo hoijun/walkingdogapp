@@ -70,6 +70,7 @@ class userInfoViewModel(application: Application) : AndroidViewModel(application
         _userinfo.value = userInfo
     }
 
+    // 현재 좌표
     fun getLastLocation() {
         if (ContextCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED

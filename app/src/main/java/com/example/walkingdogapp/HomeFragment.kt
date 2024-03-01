@@ -54,6 +54,7 @@ class HomeFragment : Fragment() {
         setUserInfo()
         MainActivity.preFragment = "Home"
 
+        // 좌표 -> 현재 위치 주소
         myViewModel.currentCoord.observe(viewLifecycleOwner) {
             myViewModel.getCurrentAddress(myViewModel.currentCoord.value!!) {
                 binding.textLocation.text = it
@@ -81,6 +82,7 @@ class HomeFragment : Fragment() {
                     val listener = DialogInterface.OnClickListener { _, ans ->
                         when (ans) {
                             DialogInterface.BUTTON_POSITIVE -> {
+                                // 권한 창으로 이동
                                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                 intent.data =
@@ -109,6 +111,7 @@ class HomeFragment : Fragment() {
                         val listener = DialogInterface.OnClickListener { _, ans ->
                             when (ans) {
                                 DialogInterface.BUTTON_POSITIVE -> {
+                                    // 권한 창으로 이동
                                     ActivityCompat.requestPermissions(
                                         requireActivity(),
                                         arrayOf(
@@ -140,13 +143,13 @@ class HomeFragment : Fragment() {
         val userdoginfo = myViewModel.doginfo.value
         binding.apply {
             if (userdoginfo != null) {
-                if (userdoginfo.name != "") {
+                if (userdoginfo.name != "") { // 강아지 정보를 입력 했으면
                     msgRegister.visibility = View.INVISIBLE
                     btnRegister.visibility = View.INVISIBLE
                     dogName.text = userdoginfo.name
                     dogName.visibility = View.VISIBLE
 
-                    if (myViewModel.imgdrawble.value != null) {
+                    if (myViewModel.imgdrawble.value != null) { // 강아지 사진을 등록 했으면
                         imgDog.setImageDrawable(myViewModel.imgdrawble.value)
                     }
                 }
