@@ -52,6 +52,7 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater,container, false)
 
         setUserInfo()
+        MainActivity.preFragment = "Home"
 
         myViewModel.currentCoord.observe(viewLifecycleOwner) {
             myViewModel.getCurrentAddress(myViewModel.currentCoord.value!!) {

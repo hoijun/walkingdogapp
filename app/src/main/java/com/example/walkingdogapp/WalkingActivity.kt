@@ -88,6 +88,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var uri : Uri
     private lateinit var currentPhotoPath: String
 
+    private var startTime = ""
+    private var endTime = ""
+
     // 뒤로 가기
     private val BackPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -113,6 +116,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 백그라운드 위치 서비스 시작
         startWalkingService()
+
+        startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
 
         val mapFragment: MapFragment = supportFragmentManager.findFragmentById(R.id.map_fragment) as MapFragment
         mapFragment.getMapAsync(this)
@@ -344,8 +349,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         val dogRef = db.getReference("Users").child("$uid").child("dog")
         userRef.addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val currentDate =
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                endTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
+                val walkDateinfo =
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " " + startTime + " " + endTime
                 val totalDistance =
                     snapshot.child("totaldistance").getValue(Long::class.java)?.toFloat()
                 val totalTime =
@@ -382,7 +388,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                         val datedistanceJob = async(Dispatchers.IO) {
                             try {
-                                dogRef.child("walkdates").child(currentDate)
+                                dogRef.child("walkdates").child(walkDateinfo)
                                     .child("distance").setValue(distance).await()
                             } catch (e: Exception) {
                                 error = true
@@ -391,7 +397,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                         val datetimeJob = async(Dispatchers.IO) {
                             try {
-                                dogRef.child("walkdates").child(currentDate)
+                                dogRef.child("walkdates").child(walkDateinfo)
                                     .child("time").setValue(time).await()
                             } catch (e: Exception) {
                                 error = true

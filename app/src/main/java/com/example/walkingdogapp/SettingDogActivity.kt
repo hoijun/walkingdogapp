@@ -13,6 +13,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.webkit.MimeTypeMap
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -29,7 +30,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 
 class SettingDogActivity : AppCompatActivity() {
@@ -38,11 +41,11 @@ class SettingDogActivity : AppCompatActivity() {
     private val auth = FirebaseAuth.getInstance()
     private val db = Firebase.database
     private val storage = FirebaseStorage.getInstance()
-    private lateinit var imguri: Uri
+    private var imguri: Uri? = null
 
     private val BackPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            selectgoHome()
+            selectgoMain()
         }
     }
 
@@ -115,7 +118,11 @@ class SettingDogActivity : AppCompatActivity() {
             editBirth.setOnClickListener {
                 val cal = Calendar.getInstance()
                 val dateCallback = DatePickerDialog.OnDateSetListener { view, year, month, day ->
-                    val birth = "${year}/${month}/${day}"
+                    val birth = "${year}/${month + 1}/${day}"
+                    if (getAge(birth) == -1) {
+                        Toast.makeText(this@SettingDogActivity, "올바른 생일을 입력 해주세요!", Toast.LENGTH_SHORT).show()
+                        return@OnDateSetListener
+                    }
                     doginfo.birth = birth
                     binding.editBirth.text = birth
                 }
@@ -155,11 +162,26 @@ class SettingDogActivity : AppCompatActivity() {
                                 val storgeRef = storage.getReference("$uid")
                                 lifecycleScope.launch {
                                     val doginfoJob = async(Dispatchers.IO) {
-                                        userRef.child("$uid").child("dog").setValue(doginfo).await()
+                                        try {
+                                            userRef.child("$uid").child("dog").setValue(doginfo)
+                                                .await()
+                                        } catch (e: Exception) {
+                                            return@async
+                                        }
                                     }
+
                                     val profileUriJob = async(Dispatchers.IO) {
-                                        storgeRef.child("images").child("profileimg")
-                                            .putFile(imguri).await()
+                                        try {
+                                            if (imguri == null) {
+                                                storgeRef.child("images").child("profileimg")
+                                                    .delete().await()
+                                            } else {
+                                                storgeRef.child("images").child("profileimg")
+                                                    .putFile(imguri!!).await()
+                                            }
+                                        } catch (e: Exception) {
+                                            return@async
+                                        }
                                     }
 
                                     doginfoJob.await()
@@ -178,12 +200,12 @@ class SettingDogActivity : AppCompatActivity() {
             }
 
             btnBack.setOnClickListener {
-                selectgoHome()
+                selectgoMain()
             }
         }
     }
 
-    private fun selectgoHome() {
+    private fun selectgoMain() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("나가시겠어요?")
         val listener = DialogInterface.OnClickListener { _, ans ->
@@ -196,6 +218,24 @@ class SettingDogActivity : AppCompatActivity() {
         builder.setPositiveButton("네", listener)
         builder.setNegativeButton("아니요", null)
         builder.show()
+    }
+
+    private fun getAge(date: String): Int {
+        val currentDate = Calendar.getInstance()
+        var age = -1
+
+        val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+        val birthDate = dateFormat.parse(date)
+        val calBirthDate = Calendar.getInstance().apply { time = birthDate }
+
+        if (calBirthDate.time < currentDate.time) {
+            age = currentDate.get(Calendar.YEAR) - calBirthDate.get(Calendar.YEAR)
+            if (currentDate.get(Calendar.DAY_OF_YEAR) < calBirthDate.get(Calendar.DAY_OF_YEAR)) {
+                age--
+            }
+            Log.d("savepoint", age.toString())
+        }
+        return age
     }
 
     private fun goHome() {
