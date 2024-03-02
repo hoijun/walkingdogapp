@@ -70,3 +70,7 @@ t
 Dapp/src/main/java/com/example/walkingdogapp/WalkdateslistAdapater.kt,6\c\6c5af68d617e7cbb42dce34800ea55f3172e701a
 p
 @app/src/main/java/com/example/walkingdogapp/GlobalApplication.kt,c\3\c32b807c1562d8623ec14027b3d9c93b80435ffa
+m
+=app/src/main/java/com/example/walkingdogapp/DetailWalkInfo.kt,e\c\ec2471cce9308107d04fac877bbd45a08c04466a
+u
+Eapp/src/main/java/com/example/walkingdogapp/DetailWalkInfoFragment.kt,4\4\44c0e0cba1c1b3a539b27dfdfb0abe51a2ea1c18

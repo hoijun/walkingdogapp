@@ -1,16 +1,21 @@
 
-^kotlin:S899¸":Do something with the "Boolean" value returned by "mkdir".(å‰ñ‰ùÿÿÿÿ8¢¼öÒß1
-<kotlin:S6310â"Avoid hardcoded dispatchers.(©ÒÕò8«¼öÒß1
-<kotlin:S6310î"Avoid hardcoded dispatchers.(ä¹ÔÅ8«¼öÒß1
-<kotlin:S6310ú"Avoid hardcoded dispatchers.(éÁï³8«¼öÒß1
-Akotlin:S6310…"Avoid hardcoded dispatchers.(Â÷ò“şÿÿÿÿ8«¼öÒß1
-;kotlin:S6310"Avoid hardcoded dispatchers.(¹¡ \8«¼öÒß1
->kotlin:S1128/"Remove this unused import.(åËÒÎúÿÿÿÿ8Ã¼öÒß1
-9kotlin:S11281"Remove this unused import.(º’8Ä¼öÒß1
-Hkotlin:S1874"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8Ç¼öÒß1
-wkotlin:S3776á"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(™‚•Šùÿÿÿÿ8È¼öÒß1
-wkotlin:S3776Ú"RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(ˆà–Éıÿÿÿÿ8È¼öÒß1
-rkotlin:S3776ù"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8É¼öÒß1
-wkotlin:S3776ß"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(Üıìªÿÿÿÿÿ8É¼öÒß1
-Nkotlin:S1066".Merge this "if" statement with the nested one.(•³â8Ï¼öÒß1
-Kkotlin:S6518r",Replace function call with indexed accessor.(€ÖÄş8Ò¼öÒß1
+^kotlin:S899ù":Do something with the "Boolean" value returned by "mkdir".(å‰ñ‰ùÿÿÿÿ8¥­×…à1
+<kotlin:S6310ë"Avoid hardcoded dispatchers.(©ÒÕò8¯­×…à1
+<kotlin:S6310ú"Avoid hardcoded dispatchers.(ä¹ÔÅ8¯­×…à1
+<kotlin:S6310†"Avoid hardcoded dispatchers.(éÁï³8¯­×…à1
+Akotlin:S6310‘"Avoid hardcoded dispatchers.(Â÷ò“şÿÿÿÿ8¯­×…à1
+;kotlin:S6310›"Avoid hardcoded dispatchers.(¹¡ \8¯­×…à1
+<kotlin:S6310¤"Avoid hardcoded dispatchers.(“åé¿8¯­×…à1
+Akotlin:S6310³"Avoid hardcoded dispatchers.(‘ñ¹íûÿÿÿÿ8¯­×…à1
+Hkotlin:S1145Ò"#Remove this useless "if" statement.(¢¢şøúÿÿÿÿ8¹­×…à1
+9kotlin:S1128"Remove this unused import.(ºÛ÷¥8Í­×…à1
+9kotlin:S11281"Remove this unused import.(ÄÚêç8Í­×…à1
+>kotlin:S11283"Remove this unused import.(åËÒÎúÿÿÿÿ8Í­×…à1
+9kotlin:S11285"Remove this unused import.(º’8Í­×…à1
+Hkotlin:S1874—"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8Ú­×…à1
+wkotlin:S3776ê"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(™‚•Šùÿÿÿÿ8Û­×…à1
+wkotlin:S3776å"RRefactor this method to reduce its Cognitive Complexity from 39 to the 15 allowed.(ï¹ã®øÿÿÿÿ8Û­×…à1
+rkotlin:S3776º"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8Û­×…à1
+wkotlin:S3776í"RRefactor this method to reduce its Cognitive Complexity from 29 to the 15 allowed.(Üıìªÿÿÿÿÿ8Û­×…à1
+Nkotlin:S1066˜".Merge this "if" statement with the nested one.(•³â8á­×…à1
+Kkotlin:S6518z",Replace function call with indexed accessor.(€ÖÄş8ä­×…à1
