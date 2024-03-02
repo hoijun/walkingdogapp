@@ -25,9 +25,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.naver.maps.geometry.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -204,7 +206,8 @@ class MainActivity : AppCompatActivity() {
                                             dateinfos[0], dateinfos[1], dateinfos[2],
                                             datedata.child("distance")
                                                 .getValue(Float::class.java)!!,
-                                            datedata.child("time").getValue(Int::class.java)!!
+                                            datedata.child("time").getValue(Int::class.java)!!,
+                                            datedata.child("coords").getValue<List<WalkLatLng>>()!!
                                         )
                                     )
                                 }

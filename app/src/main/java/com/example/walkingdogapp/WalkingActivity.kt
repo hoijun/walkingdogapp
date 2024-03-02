@@ -7,6 +7,8 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.PointF
 import android.media.MediaScannerConnection
@@ -34,6 +36,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.storage.FirebaseStorage
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
@@ -43,6 +46,7 @@ import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -50,6 +54,7 @@ import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -57,6 +62,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.Random
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -66,6 +73,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mynavermap: NaverMap
     private lateinit var walkViewModel: userInfoViewModel
     private var db = FirebaseDatabase.getInstance()
+    private val storage = FirebaseStorage.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
     private var coordList = mutableListOf<LatLng>()
@@ -112,6 +120,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 보류
         walkViewModel = ViewModelProvider(this).get(userInfoViewModel::class.java)
+        walkViewModel.getLastLocation()
 
         // 백그라운드 위치 서비스 시작
         startWalkingService()
@@ -192,7 +201,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 trackingMarker.position = coordList.last()  // 현재 위치에 아이콘 설정
                 trackingMarker.map = mynavermap
                 trackingCamera =
-                    CameraUpdate.scrollTo(coordList.last()).animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
+                    CameraUpdate.scrollAndZoomTo(coordList.last(), 16.0).animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
                 mynavermap.moveCamera(trackingCamera)
 
                 val markersToRemove = mutableListOf<Marker>()
@@ -326,11 +335,13 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    if (WalkingService.totalDistance < 500 || WalkingService.walkTime.value!! < 300) {
+                    if (false) {
                         Toast.makeText(this, "거리 또는 시간이 너무 부족해요!",Toast.LENGTH_SHORT).show()
                     }
                     else {
-                        saveWalkInfo(WalkingService.totalDistance, WalkingService.walkTime.value!!)
+                        setSaveScreen()
+                        saveWalkInfo(WalkingService.totalDistance, WalkingService.walkTime.value!!,
+                            WalkingService.coordList.value!!)
                     }
                     stopWalkingService()
                     goHome()
@@ -343,15 +354,19 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // 거리 및 시간 저장, 날짜: 시간 별로 산책 기록 저장
-    private fun saveWalkInfo(distance: Float, time: Int) {
+    private fun saveWalkInfo(distance: Float, time: Int, coords: List<LatLng>) {
         val uid = auth.currentUser?.uid
         val userRef = db.getReference("Users").child("$uid").child("user")
         val dogRef = db.getReference("Users").child("$uid").child("dog")
-        userRef.addListenerForSingleValueEvent(object: ValueEventListener {
+        val storgeRef = storage.getReference("$uid")
+        val baos = ByteArrayOutputStream()
+
+        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 endTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
                 val walkDateinfo =
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " " + startTime + " " + endTime
+                    LocalDateTime.now()
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " " + startTime + " " + endTime
                 val totalDistance =
                     snapshot.child("totaldistance").getValue(Long::class.java)?.toFloat()
                 val totalTime =
@@ -359,71 +374,121 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 var error = false
 
-                binding.walkingscreen.visibility = View.INVISIBLE
-                binding.waitImage.visibility = View.VISIBLE
-
                 lifecycleScope.launch {
-                        val totaldistanceJob = async(Dispatchers.IO) {
-                            try {
-                                if (totalDistance != null) {
-                                    userRef.child("totaldistance")
-                                        .setValue(totalDistance + distance)
-                                        .await()
-                                }
-                            } catch (e: Exception) {
-                                error = true
+                    val totaldistanceJob = async(Dispatchers.IO) {
+                        try {
+                            if (totalDistance != null) {
+                                userRef.child("totaldistance")
+                                    .setValue(totalDistance + distance)
+                                    .await()
                             }
+                        } catch (e: Exception) {
+                            error = true
                         }
+                    }
 
-                        val totaltimeJob = async(Dispatchers.IO) {
-                            try {
-                                if (totalTime != null) {
-                                    Log.d("totalTime", WalkingService.walkTime.value!!.toString())
-                                    userRef.child("totaltime").setValue(totalTime + time).await()
-                                }
-                            } catch (e: Exception) {
-                                error = true
+                    val totaltimeJob = async(Dispatchers.IO) {
+                        try {
+                            if (totalTime != null) {
+                                Log.d("totalTime", WalkingService.walkTime.value!!.toString())
+                                userRef.child("totaltime").setValue(totalTime + time).await()
                             }
+                        } catch (e: Exception) {
+                            error = true
                         }
+                    }
 
-                        val datedistanceJob = async(Dispatchers.IO) {
-                            try {
-                                dogRef.child("walkdates").child(walkDateinfo)
-                                    .child("distance").setValue(distance).await()
-                            } catch (e: Exception) {
-                                error = true
+                    val datedistanceJob = async(Dispatchers.IO) {
+                        try {
+                            dogRef.child("walkdates").child(walkDateinfo)
+                                .child("distance").setValue(distance).await()
+                        } catch (e: Exception) {
+                            error = true
+                        }
+                    }
+
+                    // 산책 화면 사진으로 저장
+                    val datetimeJob = async(Dispatchers.IO) {
+                        try {
+                            dogRef.child("walkdates").child(walkDateinfo)
+                                .child("time").setValue(time).await()
+                        } catch (e: Exception) {
+                            error = true
+                        }
+                    }
+
+                    val dateCoordsJob = async(Dispatchers.IO) {
+                        try {
+                            val savecoords = mutableListOf<WalkLatLng>()
+                            for (coord in coords) {
+                                savecoords.add(WalkLatLng(coord.latitude, coord.longitude))
                             }
+                            dogRef.child("walkdates").child(walkDateinfo)
+                                .child("coords").setValue(savecoords).await()
+                        } catch (e: Exception) {
+                            error = true
                         }
+                    }
 
-                        val datetimeJob = async(Dispatchers.IO) {
-                            try {
-                                dogRef.child("walkdates").child(walkDateinfo)
-                                    .child("time").setValue(time).await()
-                            } catch (e: Exception) {
-                                error = true
-                            }
+                    val bitmap = getMapBitmap()
+
+                    val mapcaptureJob = async(Dispatchers.IO) {
+                        try {
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+                            val data = baos.toByteArray()
+                            storgeRef.child("images").child("mapCapture").child(walkDateinfo)
+                                .putBytes(data).await()
+                        } catch (e: Exception) {
+                            error = true
                         }
+                    }
 
-                        totaldistanceJob.await()
-                        totaltimeJob.await()
-                        datedistanceJob.await()
-                        datetimeJob.await()
+                    totaldistanceJob.await()
+                    totaltimeJob.await()
+                    datedistanceJob.await()
+                    datetimeJob.await()
+                    mapcaptureJob.await()
+                    dateCoordsJob.await()
 
-                        if (error) {
-                            Toast.makeText(this@WalkingActivity, "산책 기록 저장 실패", Toast.LENGTH_SHORT).show()
-                        }
+                    if (error) {
+                        Toast.makeText(this@WalkingActivity, "산책 기록 저장 실패", Toast.LENGTH_SHORT)
+                            .show()
+                    }
 
-                        stopWalkingService()
-                        goHome()
-
+                    stopWalkingService()
+                    goHome()
                 }
             }
+
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(this@WalkingActivity, "산책 기록 저장 실패", Toast.LENGTH_SHORT).show()
                 stopWalkingService()
                 goHome()
             }
         })
+    }
+
+    private suspend fun getMapBitmap(): Bitmap {
+        return suspendCoroutine { continuation ->
+            mynavermap.takeSnapshot(false) {
+                continuation.resume(it)
+            }
+        }
+    }
+
+    private fun setSaveScreen() {
+        binding.walkingscreen.visibility = View.INVISIBLE
+        binding.waitImage.visibility = View.VISIBLE
+
+        val coors = WalkingService.coordList.value!!
+        if (coors.isNotEmpty()) {
+            val middleCoor = coors[coors.size / 2]
+            val saveCamera = CameraUpdate.scrollAndZoomTo(
+                LatLng(middleCoor.latitude, middleCoor.longitude),
+                12.5
+            )
+            mynavermap.moveCamera(saveCamera)
+        }
     }
 
     private fun startCamera() {
