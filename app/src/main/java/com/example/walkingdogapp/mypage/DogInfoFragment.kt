@@ -1,4 +1,4 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.mypage
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,7 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.activityViewModels
+import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.setting.SettingDogActivity
 import com.example.walkingdogapp.databinding.FragmentDogInfoBinding
+import com.example.walkingdogapp.userinfo.DogInfo
+import com.example.walkingdogapp.userinfo.userInfoViewModel
 
 class DogInfoFragment : Fragment() {
     private var _binding: FragmentDogInfoBinding? = null
@@ -20,7 +24,7 @@ class DogInfoFragment : Fragment() {
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            mainactivity.changeFragment(MyPageFragment())
+            goMypage()
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +44,7 @@ class DogInfoFragment : Fragment() {
 
         binding.apply {
             btnBack.setOnClickListener {
-                mainactivity.changeFragment(MyPageFragment())
+                goMypage()
             }
 
             btnSettingdog.setOnClickListener {
@@ -63,5 +67,9 @@ class DogInfoFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun goMypage() {
+        mainactivity.changeFragment(MyPageFragment())
     }
 }

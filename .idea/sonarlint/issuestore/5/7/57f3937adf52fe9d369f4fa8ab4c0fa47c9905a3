@@ -1,15 +1,3 @@
 
-9kotlin:S1128"Remove this unused import.(üƒŠ¸8Çè §Ü1
-9kotlin:S1128	"Remove this unused import.(ÁÈÚø8Çè §Ü1
->kotlin:S1128"Remove this unused import.(ÙÃä¡şÿÿÿÿ8Èè §Ü1
->kotlin:S1128"Remove this unused import.(İáÛ¦ÿÿÿÿÿ8Èè §Ü1
->kotlin:S1128"Remove this unused import.(Õ”îøÿÿÿÿ8Èè §Ü1
->kotlin:S1128"Remove this unused import.(àÆºÖüÿÿÿÿ8Èè §Ü1
-9kotlin:S1128"Remove this unused import.(ÒÂ¦8Èè §Ü1
->kotlin:S1128"Remove this unused import.(£ñ¹¸ûÿÿÿÿ8Èè §Ü1
->kotlin:S1128"Remove this unused import.(‚°—Øşÿÿÿÿ8Èè §Ü1
-8kotlin:S1128"Remove this unused import.(ƒ£ıp8Èè §Ü1
->kotlin:S1128 "Remove this unused import.(ÖõÁ½ıÿÿÿÿ8Èè §Ü1
-9kotlin:S1128!"Remove this unused import.(şŒ¢Æ8Èè §Ü1
-qkotlin:S37760"RRefactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.(©Àùè8Éè §Ü1
-Nkotlin:S1066‘".Merge this "if" statement with the nested one.(ØºÛÿ8¶¢ÿÜß1
+qkotlin:S3776("RRefactor this method to reduce its Cognitive Complexity from 32 to the 15 allowed.(©Àùè8ë‚‰­à1
+Nkotlin:S1066š".Merge this "if" statement with the nested one.(ØºÛÿ8ì‚‰­à1

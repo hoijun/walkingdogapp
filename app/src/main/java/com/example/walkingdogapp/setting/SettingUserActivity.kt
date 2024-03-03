@@ -1,4 +1,4 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.setting
 
 import android.app.DatePickerDialog
 import android.content.DialogInterface
@@ -12,7 +12,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.ActivitySettingUserBinding
+import com.example.walkingdogapp.userinfo.UserInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase

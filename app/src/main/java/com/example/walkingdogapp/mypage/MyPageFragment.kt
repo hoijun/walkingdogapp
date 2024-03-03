@@ -1,15 +1,21 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.mypage
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentMyPageBinding
+import com.example.walkingdogapp.setting.SettingDogActivity
+import com.example.walkingdogapp.setting.SettingUserActivity
+import com.example.walkingdogapp.userinfo.DogInfo
+import com.example.walkingdogapp.userinfo.UserInfo
+import com.example.walkingdogapp.userinfo.userInfoViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -27,7 +33,7 @@ class MyPageFragment : Fragment() {
         super.onCreate(savedInstanceState)
         mainactivity = activity as MainActivity
         mainactivity.binding.menuBn.visibility = View.VISIBLE
-        MainActivity.preFragment = "Mypage"
+        MainActivity.preFragment = "Mypage"  // 다른 액티비티로 이동 할 때 마이페이지에서 이동을 표시
     }
 
     override fun onCreateView(
@@ -66,7 +72,7 @@ class MyPageFragment : Fragment() {
             }
 
             menuWalkinfo.setOnClickListener {
-                mainactivity.changeFragment(WalkInfoFragment())
+                mainactivity.changeFragment(WalkInfoFragment(listOf<String>()))
             }
 
             if(userInfo.name != "") {

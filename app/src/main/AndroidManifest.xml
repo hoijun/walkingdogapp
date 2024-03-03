@@ -37,11 +37,11 @@
         android:theme="@style/Theme.WalkingDogApp"
         tools:targetApi="31">
         <activity
-            android:name=".SettingUserActivity"
+            android:name=".setting.SettingUserActivity"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".SettingDogActivity"
+            android:name=".setting.SettingDogActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -84,7 +84,7 @@
         </activity>
 
         <service
-            android:name=".WalkingService"
+            android:name=".walking.WalkingService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />
@@ -107,7 +107,7 @@
             android:value="${NaverMap_API_KEY}" />
 
         <activity
-            android:name=".WalkingActivity"
+            android:name=".walking.WalkingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

@@ -1,11 +1,18 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.mypage
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.walkingdogapp.userinfo.Walkdate
 import com.example.walkingdogapp.databinding.WalkdateslistItemBinding
 
 class WalkdateslistAdapater(private val dates: List<Walkdate>): RecyclerView.Adapter<WalkdateslistAdapater.WalkdateslisViewHolder>() {
+
+    fun interface OnItemClickListener {
+        fun onItemClick(date: Walkdate)
+    }
+
+    var itemClickListener : OnItemClickListener? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalkdateslisViewHolder {
         val binding = WalkdateslistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return WalkdateslisViewHolder(binding)
@@ -21,7 +28,7 @@ class WalkdateslistAdapater(private val dates: List<Walkdate>): RecyclerView.Ada
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
-
+                itemClickListener?.onItemClick(dates[bindingAdapterPosition])
             }
         }
         fun bind(walkdate: Walkdate) {

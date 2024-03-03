@@ -1,4 +1,4 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.setting
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

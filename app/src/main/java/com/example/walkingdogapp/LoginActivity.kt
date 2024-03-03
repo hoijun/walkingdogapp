@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.example.walkingdogapp.databinding.ActivityLoginBinding
+import com.example.walkingdogapp.userinfo.DogInfo
+import com.example.walkingdogapp.userinfo.UserInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.database.ktx.database

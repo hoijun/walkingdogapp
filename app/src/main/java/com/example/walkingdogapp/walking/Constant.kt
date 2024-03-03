@@ -1,4 +1,4 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.walking
 
 class Constant {
     companion object {

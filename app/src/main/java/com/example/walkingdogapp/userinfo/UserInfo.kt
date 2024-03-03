@@ -1,4 +1,4 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.userinfo
 
 class UserInfo {
     var email = ""
