@@ -1,4 +1,4 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.walking
 
 import android.Manifest
 import android.app.ActivityManager
@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.PointF
 import android.media.MediaScannerConnection
@@ -30,7 +29,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.R
+import com.example.walkingdogapp.userinfo.WalkLatLng
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
+import com.example.walkingdogapp.userinfo.userInfoViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -46,11 +49,8 @@ import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -73,7 +73,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mynavermap: NaverMap
     private lateinit var walkViewModel: userInfoViewModel
     private var db = FirebaseDatabase.getInstance()
-    private val storage = FirebaseStorage.getInstance()
+    // private val storage = FirebaseStorage.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
     private var coordList = mutableListOf<LatLng>()
@@ -127,7 +127,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
 
-        val mapFragment: MapFragment = supportFragmentManager.findFragmentById(R.id.map_fragment) as MapFragment
+        val mapFragment: MapFragment = supportFragmentManager.findFragmentById(R.id.map_fragment) as MapFragment?
+            ?: MapFragment.newInstance().also {
+                supportFragmentManager.beginTransaction().add(R.id.map_fragment, it).commit()
+        }
+
         mapFragment.getMapAsync(this)
 
         this.onBackPressedDispatcher.addCallback(this, BackPressCallback)
@@ -218,7 +222,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     trackingPath.map = null
                     trackingPath.coords = coordList // 이동 경로 그림
                     trackingPath.map = mynavermap
-                    binding.InfoDistance.text = getString(R.string.distance,
+                    binding.InfoDistance.text = getString(
+                        R.string.distance,
                         WalkingService.totalDistance / 1000.0)
                 }
             }
@@ -335,12 +340,13 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    if (false) {
+                    if (WalkingService.totalDistance < 500 || WalkingService.walkTime.value!! < 300) {
                         Toast.makeText(this, "거리 또는 시간이 너무 부족해요!",Toast.LENGTH_SHORT).show()
                     }
                     else {
                         setSaveScreen()
-                        saveWalkInfo(WalkingService.totalDistance, WalkingService.walkTime.value!!,
+                        saveWalkInfo(
+                            WalkingService.totalDistance, WalkingService.walkTime.value!!,
                             WalkingService.coordList.value!!)
                     }
                     stopWalkingService()
@@ -358,8 +364,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         val uid = auth.currentUser?.uid
         val userRef = db.getReference("Users").child("$uid").child("user")
         val dogRef = db.getReference("Users").child("$uid").child("dog")
-        val storgeRef = storage.getReference("$uid")
-        val baos = ByteArrayOutputStream()
+        // val storgeRef = storage.getReference("$uid")
+        // val baos = ByteArrayOutputStream()
 
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -407,7 +413,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                     }
 
-                    // 산책 화면 사진으로 저장
                     val datetimeJob = async(Dispatchers.IO) {
                         try {
                             dogRef.child("walkdates").child(walkDateinfo)
@@ -432,7 +437,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     val bitmap = getMapBitmap()
 
-                    val mapcaptureJob = async(Dispatchers.IO) {
+                    // 산책 화면 사진으로 저장
+                    /* val mapcaptureJob = async(Dispatchers.IO) {
                         try {
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
                             val data = baos.toByteArray()
@@ -441,13 +447,13 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         } catch (e: Exception) {
                             error = true
                         }
-                    }
+                    }*/
 
                     totaldistanceJob.await()
                     totaltimeJob.await()
                     datedistanceJob.await()
                     datetimeJob.await()
-                    mapcaptureJob.await()
+                    // mapcaptureJob.await()
                     dateCoordsJob.await()
 
                     if (error) {

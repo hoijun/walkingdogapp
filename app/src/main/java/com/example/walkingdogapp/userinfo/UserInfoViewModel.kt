@@ -1,4 +1,4 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.userinfo
 
 import android.Manifest
 import android.app.Application

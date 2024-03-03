@@ -1,31 +1,41 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.mypage
 
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.walkingdogapp.userinfo.DogInfo
+import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.R
+import com.example.walkingdogapp.userinfo.Walkdate
 import com.example.walkingdogapp.databinding.FragmentWalkInfoBinding
+import com.example.walkingdogapp.userinfo.userInfoViewModel
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 
-
-class WalkInfoFragment : Fragment() {
+// 매개 변수는 상세정보 프래그먼트로 부터 되돌아 올 때 상세정보를 보기 원했던 산책 날짜가 달력에 표시가 유지 되도록 하기 위함
+class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
     private lateinit var mainactivity: MainActivity
     private var _binding: FragmentWalkInfoBinding? = null
+
     private val myViewModel: userInfoViewModel by activityViewModels()
     private lateinit var userdogInfo: DogInfo
+
     private var walkdates = mutableListOf<CalendarDay>()
+    private val walkinfostartday = mutableListOf<Walkdate>()
+    private var selectedDay = CalendarDay.from(2000, 10 ,14)
+
     private lateinit var adapter: WalkdateslistAdapater
     private val binding get() = _binding!!
+
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            mainactivity.changeFragment(MyPageFragment())
+            goMypage()
         }
     }
 
@@ -35,6 +45,13 @@ class WalkInfoFragment : Fragment() {
         mainactivity.binding.menuBn.visibility = View.GONE
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
         userdogInfo = myViewModel.doginfo.value ?: DogInfo()
+        if (selectedDayInfo.isNotEmpty()) {
+            selectedDay = CalendarDay.from(
+                selectedDayInfo[0].toInt(),
+                selectedDayInfo[1].toInt(),
+                selectedDayInfo[2].toInt()
+            )
+        }
     }
 
     override fun onCreateView(
@@ -48,25 +65,36 @@ class WalkInfoFragment : Fragment() {
         val sundayDecorator = SundayDecorator()
         val saturdayDecorator = SaturdayDecorator()
         var selectedMonthDecorator = SelectedMonthDecorator(CalendarDay.today().month)
-        val walkinfotoday = mutableListOf<Walkdate>()
-
-        // 산책 정보의 날짜 및 현재 날짜 산책 정보
-        for (date: Walkdate in userdogInfo.dates) {
-            val dayinfo = date.day.split("-")
-            walkdates.add(CalendarDay.from(dayinfo[0].toInt(), dayinfo[1].toInt(), dayinfo[2].toInt()))
-
-            if(CalendarDay.today().date.toString() == date.day) {
-                walkinfotoday.add(date)
-            }
-        }
-
-        val walkDayDecorator = WalkDayDecorator(walkdates)
 
         binding.apply {
-            adapter = WalkdateslistAdapater(walkinfotoday)
+            btnGoMypage.setOnClickListener {
+                goMypage()
+            }
+
+            if(selectedDayInfo.isEmpty()) { // 마이 페이지에서 들어 왔을 때
+                walkcalendar.selectedDate = CalendarDay.today() // 현재 날짜 표시
+            } else { // 상세정보 창에서 다시 되돌아 왔을 때
+                walkcalendar.selectedDate = selectedDay
+            }
+
+            // 산책 정보의 날짜 및 현재 날짜 산책 정보
+            for (date: Walkdate in userdogInfo.dates) {
+                val dayinfo = date.day.split("-")
+                walkdates.add(CalendarDay.from(dayinfo[0].toInt(), dayinfo[1].toInt(), dayinfo[2].toInt())) // 산책한 날 얻음
+
+                if(CalendarDay.today().date.toString() == date.day && selectedDayInfo.isEmpty()) { // 마이 페이지에서 들어 왔을 때
+                    walkinfostartday.add(date)
+                } else if(selectedDay.date.toString() == date.day) {  // 현재 날짜 표시
+                    walkinfostartday.add(date)
+                }
+            }
+            val walkDayDecorator = WalkDayDecorator(walkdates) // 산책한 날 표시
+            adapter = WalkdateslistAdapater(walkinfostartday)
+            adapter.itemClickListener = WalkdateslistAdapater.OnItemClickListener { selectDate ->
+                mainactivity.changeFragment(DetailWalkInfoFragment(selectDate))
+            }
             walkinfoRecyclerview.adapter = adapter
 
-            walkcalendar.selectedDate = CalendarDay.today() // 현재 날짜 표시
             walkcalendar.addDecorators(dayDecorator, walkDayDecorator, saturdayDecorator, sundayDecorator, selectedMonthDecorator)
             walkcalendar.setTitleFormatter { day -> // 년 월 표시 변경
                 val inputText = day.date
@@ -91,26 +119,37 @@ class WalkInfoFragment : Fragment() {
                 }
 
                 adapter = WalkdateslistAdapater(walkinfoOfdate)
+                adapter.itemClickListener = WalkdateslistAdapater.OnItemClickListener { selectDate ->
+                    mainactivity.changeFragment(DetailWalkInfoFragment(selectDate))
+                }
                 walkinfoRecyclerview.adapter = adapter
             }
+
             walkcalendar.setOnMonthChangedListener { widget, date -> // 달 바꿀때
                 walkcalendar.removeDecorators()
                 walkcalendar.invalidateDecorators() // 데코 초기화
-                adapter = WalkdateslistAdapater(listOf()) // 빈 리사이클러 뷰
-
+                Log.d("savepoint", "aaaaa")
                 if (date.month == CalendarDay.today().month) {
                     walkcalendar.selectedDate = CalendarDay.today() // 현재 달로 바꿀 때 마다 현재 날짜 표시
+                    adapter = WalkdateslistAdapater(walkinfostartday)
                 } else {
+                    adapter = WalkdateslistAdapater(listOf()) // 빈 리사이클러 뷰
                     walkcalendar.selectedDate = null
                 }
 
-                selectedMonthDecorator = SelectedMonthDecorator(date.month) 
+                selectedMonthDecorator = SelectedMonthDecorator(date.month)
+                adapter.itemClickListener = WalkdateslistAdapater.OnItemClickListener { selectDate ->
+                    mainactivity.changeFragment(DetailWalkInfoFragment(selectDate))
+                }
                 walkinfoRecyclerview.adapter = adapter
                 walkcalendar.addDecorators(dayDecorator, walkDayDecorator, saturdayDecorator, sundayDecorator, selectedMonthDecorator) //데코 설정
             }
-
             walkinfoRecyclerview.layoutManager = LinearLayoutManager(context)
         }
         return binding.root
+    }
+
+    private fun goMypage() {
+        mainactivity.changeFragment(MyPageFragment())
     }
 }

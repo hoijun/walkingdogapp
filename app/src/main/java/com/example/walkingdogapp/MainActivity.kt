@@ -21,6 +21,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.walkingdogapp.databinding.ActivityMainBinding
+import com.example.walkingdogapp.mypage.MyPageFragment
+import com.example.walkingdogapp.userinfo.DogInfo
+import com.example.walkingdogapp.userinfo.UserInfo
+import com.example.walkingdogapp.userinfo.WalkLatLng
+import com.example.walkingdogapp.userinfo.Walkdate
+import com.example.walkingdogapp.userinfo.userInfoViewModel
+import com.example.walkingdogapp.walking.WalkingActivity
+import com.example.walkingdogapp.walking.WalkingService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -29,7 +37,6 @@ import com.google.firebase.database.getValue
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.naver.maps.geometry.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -75,7 +82,7 @@ class MainActivity : AppCompatActivity() {
 
         if(preFragment == "Mypage") {
             binding.menuBn.selectedItemId = R.id.navigation_mypage
-        }
+        } // 다른 액티비티로 마이페이지에서 변경 했었을 경우, 다시 되돌아 올 때 바텀바의 표시를 마이페이지로 변경
 
         // 위치 권한
         ActivityCompat.requestPermissions(this, PERMISSIONS, LOCATION_PERMISSION_REQUEST_CODE)
@@ -207,7 +214,7 @@ class MainActivity : AppCompatActivity() {
                                             datedata.child("distance")
                                                 .getValue(Float::class.java)!!,
                                             datedata.child("time").getValue(Int::class.java)!!,
-                                            datedata.child("coords").getValue<List<WalkLatLng>>()!!
+                                            datedata.child("coords").getValue<List<WalkLatLng>>() ?: listOf<WalkLatLng>()
                                         )
                                     )
                                 }

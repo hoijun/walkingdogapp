@@ -1,22 +1,13 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.setting
 
 import android.app.Dialog
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Color
-import android.graphics.Point
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Toast
-import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.LayoutManager
-import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.example.walkingdogapp.databinding.DoglistDialogBinding
-import org.checkerframework.checker.nullness.qual.NonNull
 
 class DoglistDialog(context: Context, private val callback: (String) -> Unit) : Dialog(context){
     private lateinit var binding: DoglistDialogBinding
