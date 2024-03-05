@@ -51,6 +51,7 @@ class SplashActivity : AppCompatActivity() {
                     startMain()
                 } else {
                     // 오류가 난 경우!
+                    startLogin()
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
                 }
             }

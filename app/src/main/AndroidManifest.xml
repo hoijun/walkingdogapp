@@ -37,11 +37,11 @@
         android:theme="@style/Theme.WalkingDogApp"
         tools:targetApi="31">
         <activity
-            android:name=".setting.SettingUserActivity"
+            android:name=".registerinfo.RegisterUserActivity"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".setting.SettingDogActivity"
+            android:name=".registerinfo.RegisterDogActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

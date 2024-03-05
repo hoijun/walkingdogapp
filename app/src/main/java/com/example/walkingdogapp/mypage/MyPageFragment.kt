@@ -11,8 +11,8 @@ import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentMyPageBinding
-import com.example.walkingdogapp.setting.SettingDogActivity
-import com.example.walkingdogapp.setting.SettingUserActivity
+import com.example.walkingdogapp.registerinfo.RegisterDogActivity
+import com.example.walkingdogapp.registerinfo.RegisterUserActivity
 import com.example.walkingdogapp.userinfo.DogInfo
 import com.example.walkingdogapp.userinfo.UserInfo
 import com.example.walkingdogapp.userinfo.userInfoViewModel
@@ -46,7 +46,7 @@ class MyPageFragment : Fragment() {
 
         binding.apply {
             btnSetting.setOnClickListener {
-
+                mainactivity.changeFragment(SettingFragment())
             }
 
             menuDogInfo.setOnClickListener {
@@ -58,13 +58,13 @@ class MyPageFragment : Fragment() {
             }
 
             modifydoginfo.setOnClickListener {
-                val settingdogIntent = Intent(requireContext(), SettingDogActivity::class.java)
-                startActivity(settingdogIntent)
+                val registerDogIntent = Intent(requireContext(), RegisterDogActivity::class.java)
+                startActivity(registerDogIntent)
             }
 
             modifyuserinfo.setOnClickListener {
-                val settinguserIntent = Intent(requireContext(), SettingUserActivity::class.java)
-                startActivity(settinguserIntent)
+                val registerUserIntent = Intent(requireContext(), RegisterUserActivity::class.java)
+                startActivity(registerUserIntent)
             }
 
             managepictures.setOnClickListener {

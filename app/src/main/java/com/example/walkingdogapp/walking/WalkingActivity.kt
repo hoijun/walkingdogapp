@@ -18,6 +18,8 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
+import android.view.DragEvent
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -81,6 +83,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private var trackingMarker = Marker()
     private var trackingPath = PathOverlay()
     private lateinit var trackingCamera : CameraUpdate
+    private var trackingCameraMode = true // 지도의 화면이 자동으로 사용자에 위치에 따라 움직이는 지
 
     private var animalMarkers = mutableListOf<Marker>()
 
@@ -159,10 +162,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
             btnStart.setOnClickListener {
                 if (isWalkingServiceRunning()) {
-                    if(isTracking) {
+                    if (isTracking) {
                         stopTracking()
-                    }
-                    else {
+                    } else {
                         startTracking()
                     }
                 }
@@ -171,6 +173,24 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             btnCamera.setOnClickListener {
                 startCamera()
             }
+
+            trackingCameraModeOnBtn.setOnClickListener {
+                if (!trackingCameraMode) {
+                    trackingCameraMode = true
+                    if (coordList.isNotEmpty()) {
+                        trackingCamera =
+                            CameraUpdate.scrollAndZoomTo(coordList.last(), 16.0)
+                                .animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
+                        mynavermap.moveCamera(trackingCamera)
+                        trackingCameraModeOnBtn.setImageResource(com.nhn.android.oauth.R.drawable.naver_icon)
+                    }
+                    return@setOnClickListener
+                }
+
+                // 현재 위치 따라가기 였을 경우
+                trackingCameraMode = false
+                trackingCameraModeOnBtn.setImageResource(R.drawable.waitimage)
+            }
         }
     }
 
@@ -178,6 +198,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         this.mynavermap = map
         mynavermap.uiSettings.isRotateGesturesEnabled = false
         mynavermap.uiSettings.isCompassEnabled = false
+        mynavermap.uiSettings.isTiltGesturesEnabled = false
 
         trackingMarker.icon = OverlayImage.fromResource(R.mipmap.ic_launcher_round)
         trackingMarker.width = 100
@@ -204,9 +225,13 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 trackingMarker.map = null
                 trackingMarker.position = coordList.last()  // 현재 위치에 아이콘 설정
                 trackingMarker.map = mynavermap
-                trackingCamera =
-                    CameraUpdate.scrollAndZoomTo(coordList.last(), 16.0).animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
-                mynavermap.moveCamera(trackingCamera)
+
+                if(trackingCameraMode) {
+                    trackingCamera =
+                        CameraUpdate.scrollAndZoomTo(coordList.last(), 16.0)
+                            .animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
+                    mynavermap.moveCamera(trackingCamera)
+                }
 
                 val markersToRemove = mutableListOf<Marker>()
                 for (marker in animalMarkers) { // 마커 특정 거리 이상일 경우 제거
@@ -435,7 +460,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                     }
 
-                    val bitmap = getMapBitmap()
+                    // val bitmap = getMapBitmap()
 
                     // 산책 화면 사진으로 저장
                     /* val mapcaptureJob = async(Dispatchers.IO) {
@@ -474,13 +499,13 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         })
     }
 
-    private suspend fun getMapBitmap(): Bitmap {
+    /* private suspend fun getMapBitmap(): Bitmap {
         return suspendCoroutine { continuation ->
             mynavermap.takeSnapshot(false) {
                 continuation.resume(it)
             }
         }
-    }
+    }*/
 
     private fun setSaveScreen() {
         binding.walkingscreen.visibility = View.INVISIBLE
