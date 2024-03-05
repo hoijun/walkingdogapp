@@ -91,7 +91,7 @@ class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
             val walkDayDecorator = WalkDayDecorator(walkdates) // 산책한 날 표시
             adapter = WalkdateslistAdapater(walkinfostartday)
             adapter.itemClickListener = WalkdateslistAdapater.OnItemClickListener { selectDate ->
-                mainactivity.changeFragment(DetailWalkInfoFragment(selectDate))
+                goDetail(selectDate)
             }
             walkinfoRecyclerview.adapter = adapter
 
@@ -120,7 +120,7 @@ class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
 
                 adapter = WalkdateslistAdapater(walkinfoOfdate)
                 adapter.itemClickListener = WalkdateslistAdapater.OnItemClickListener { selectDate ->
-                    mainactivity.changeFragment(DetailWalkInfoFragment(selectDate))
+                    goDetail(selectDate)
                 }
                 walkinfoRecyclerview.adapter = adapter
             }
@@ -139,7 +139,7 @@ class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
 
                 selectedMonthDecorator = SelectedMonthDecorator(date.month)
                 adapter.itemClickListener = WalkdateslistAdapater.OnItemClickListener { selectDate ->
-                    mainactivity.changeFragment(DetailWalkInfoFragment(selectDate))
+                    goDetail(selectDate)
                 }
                 walkinfoRecyclerview.adapter = adapter
                 walkcalendar.addDecorators(dayDecorator, walkDayDecorator, saturdayDecorator, sundayDecorator, selectedMonthDecorator) //데코 설정
@@ -151,5 +151,10 @@ class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
 
     private fun goMypage() {
         mainactivity.changeFragment(MyPageFragment())
+    }
+
+    private fun goDetail(date: Walkdate) {
+        mainactivity.changeFragment(DetailWalkInfoFragment(date))
+        mainactivity.binding.menuBn.visibility = View.GONE
     }
 }

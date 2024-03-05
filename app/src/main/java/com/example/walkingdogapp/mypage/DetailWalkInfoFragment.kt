@@ -38,7 +38,7 @@ class DetailWalkInfoFragment(private val dateinfo: Walkdate) : Fragment(), OnMap
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainactivity = activity as MainActivity
-        mainactivity.binding.menuBn.visibility = View.VISIBLE
+        mainactivity.binding.menuBn.visibility = View.GONE
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
         val mapFragment: MapFragment =
             childFragmentManager.findFragmentById(R.id.map_fragment) as MapFragment?
@@ -77,6 +77,8 @@ class DetailWalkInfoFragment(private val dateinfo: Walkdate) : Fragment(), OnMap
         this.mynavermap = map
         mynavermap.uiSettings.isRotateGesturesEnabled = false
         mynavermap.uiSettings.isCompassEnabled = false
+
+        mynavermap.uiSettings.isZoomControlEnabled = false
 
         trackingPath.width = 15
         trackingPath.color = Color.YELLOW

@@ -256,6 +256,8 @@ class MainActivity : AppCompatActivity() {
                 mainviewmodel.savedogInfo(dog)
                 mainviewmodel.saveuserInfo(user)
 
+                binding.waitImage.visibility = View.GONE
+
                 if (profileDrawable != null) {
                     mainviewmodel.saveImgDrawble(profileDrawable)
                 }

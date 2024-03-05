@@ -19,7 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.databinding.FragmentHomeBinding
-import com.example.walkingdogapp.setting.SettingDogActivity
+import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.userinfo.userInfoViewModel
 import com.example.walkingdogapp.walking.WalkingActivity
 
@@ -55,8 +55,8 @@ class HomeFragment : Fragment() {
 
         binding.apply {
             btnRegister.setOnClickListener {
-                val settingIntent = Intent(requireContext(), SettingDogActivity::class.java)
-                startActivity(settingIntent)
+                val registerDogIntent = Intent(requireContext(), RegisterDogActivity::class.java)
+                startActivity(registerDogIntent)
             }
 
             btnWalk.setOnClickListener {
@@ -65,9 +65,9 @@ class HomeFragment : Fragment() {
                     val listener = DialogInterface.OnClickListener { _, ans ->
                         when (ans) {
                             DialogInterface.BUTTON_POSITIVE -> {
-                                val settingIntent =
-                                    Intent(requireContext(), SettingDogActivity::class.java)
-                                startActivity(settingIntent)
+                                val registerDogIntent =
+                                    Intent(requireContext(), RegisterDogActivity::class.java)
+                                startActivity(registerDogIntent)
                             }
                         }
                     }

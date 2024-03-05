@@ -4,9 +4,11 @@ import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.databinding.ActivityLoginBinding
 import com.example.walkingdogapp.userinfo.DogInfo
 import com.example.walkingdogapp.userinfo.UserInfo
@@ -14,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
@@ -23,17 +26,26 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlin.system.exitProcess
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var auth: FirebaseAuth
     private lateinit var loginInfo: android.content.SharedPreferences
+
+    private lateinit var auth: FirebaseAuth
     private val db = Firebase.database
+
     private var backPressedTime : Long = 0
+
     private val kakaoLoginCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
         if (error != null) {
             Log.e(TAG, "로그인 실패 $error")
+            binding.loginscreen.visibility = View.VISIBLE
+            binding.waitImage.visibility = View.INVISIBLE
         } else if (token != null) {
             Log.e(TAG, "로그인 성공 ${token.accessToken}")
             loginApp("kakao")
@@ -47,6 +59,8 @@ class LoginActivity : AppCompatActivity() {
         override fun onFailure(httpStatus: Int, message: String) {
             val errorCode = NaverIdLoginSDK.getLastErrorCode().code
             val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
+            binding.loginscreen.visibility = View.VISIBLE
+            binding.waitImage.visibility = View.INVISIBLE
             Log.e("test", "$errorCode $errorDescription")
         }
 
@@ -62,10 +76,14 @@ class LoginActivity : AppCompatActivity() {
         }
 
         override fun onError(errorCode: Int, message: String) {
+            binding.loginscreen.visibility = View.VISIBLE
+            binding.waitImage.visibility = View.INVISIBLE
             TODO("Not yet implemented")
         }
 
         override fun onFailure(httpStatus: Int, message: String) {
+            binding.loginscreen.visibility = View.VISIBLE
+            binding.waitImage.visibility = View.INVISIBLE
             TODO("Not yet implemented")
         }
     }
@@ -101,12 +119,18 @@ class LoginActivity : AppCompatActivity() {
             KakaoLogin.setOnClickListener {
                 try {
                     loginKakao()
+                    binding.loginscreen.visibility = View.INVISIBLE
+                    binding.waitImage.visibility = View.VISIBLE
                 } catch (e: Exception) {
                     e.message?.let { it1 -> Log.d("error", it1) }
+                    binding.loginscreen.visibility = View.VISIBLE
+                    binding.waitImage.visibility = View.INVISIBLE
                 }
             }
             NaverLogin.setOnClickListener {
                 NaverIdLoginSDK.authenticate(this@LoginActivity, naverLoginCallback)
+                binding.loginscreen.visibility = View.INVISIBLE
+                binding.waitImage.visibility = View.VISIBLE
             }
         }
     }
@@ -116,6 +140,8 @@ class LoginActivity : AppCompatActivity() {
             UserApiClient.instance.loginWithKakaoTalk(this) { token, error ->
                 if (error != null) {
                     Log.e(TAG, "로그인 실패", error)
+                    binding.loginscreen.visibility = View.VISIBLE
+                    binding.waitImage.visibility = View.INVISIBLE
                     if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
                         return@loginWithKakaoTalk
                     } else {
@@ -137,6 +163,8 @@ class LoginActivity : AppCompatActivity() {
             UserApiClient.instance.me { user, error1 ->
                 if (error1 != null) {
                     Log.e(TAG, "사용자 정보 요청 실패", error1)
+                    binding.loginscreen.visibility = View.VISIBLE
+                    binding.waitImage.visibility = View.INVISIBLE
                 } else if (user != null) {
                     saveUser(user.kakaoAccount?.email ?: "", user.id.toString())
                     signupFirebase(user.kakaoAccount?.email ?: "", user.id.toString())
@@ -164,7 +192,6 @@ class LoginActivity : AppCompatActivity() {
     private fun signupFirebase(email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
             if (it.isSuccessful) {
-                Log.d(TAG, "로그인 성공")
                 val uid = auth.currentUser?.uid
                 if (uid != null) {
                     saveUid(uid)
@@ -172,13 +199,37 @@ class LoginActivity : AppCompatActivity() {
                 val userRef = db.getReference("Users")
 
                 val userInfo = UserInfo()
-                userInfo.email = email
-                userRef.child("$uid").child("user").setValue(userInfo)
-
                 val dogInfo = DogInfo()
-                userRef.child("$uid").child("dog").setValue(dogInfo)
+                userInfo.email = email
 
-                startMain()
+                lifecycleScope.launch {
+                    val userinfojob = async(Dispatchers.IO) {
+                        try {
+                            userRef.child("$uid").child("user").setValue(userInfo).await()
+                        } catch (e: Exception) {
+                            Toast.makeText(this@LoginActivity, "로그인 실패" , Toast.LENGTH_SHORT).show()
+                            binding.loginscreen.visibility = View.VISIBLE
+                            binding.waitImage.visibility = View.INVISIBLE
+                            return@async
+                        }
+                    }
+
+                    val doginfojob = async(Dispatchers.IO) {
+                        try {
+                            userRef.child("$uid").child("dog").setValue(dogInfo).await()
+                        } catch (e: Exception) {
+                            Toast.makeText(this@LoginActivity, "로그인 실패" , Toast.LENGTH_SHORT).show()
+                            binding.loginscreen.visibility = View.VISIBLE
+                            binding.waitImage.visibility = View.INVISIBLE
+                            return@async
+                        }
+                    }
+                    Log.d(TAG, "로그인 성공")
+                    userinfojob.await()
+                    doginfojob.await()
+
+                    startMain()
+                }
             } else {
                 if (it.exception is FirebaseAuthUserCollisionException) {
                     //이미 가입된 이메일일 경우
@@ -187,6 +238,8 @@ class LoginActivity : AppCompatActivity() {
                     //예외메세지가 있다면 출력
                     //에러가 났다거나 서버가 연결이 실패했다거나
                     Toast.makeText(this, it.exception?.message, Toast.LENGTH_LONG).show()
+                    binding.loginscreen.visibility = View.VISIBLE
+                    binding.waitImage.visibility = View.INVISIBLE
                 }
             }
         }
@@ -204,6 +257,8 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 // 오류가 난 경우!
                 Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
+                binding.loginscreen.visibility = View.VISIBLE
+                binding.waitImage.visibility = View.INVISIBLE
             }
         }
     }
