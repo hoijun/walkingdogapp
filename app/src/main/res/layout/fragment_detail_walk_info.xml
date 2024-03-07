@@ -31,7 +31,7 @@
             android:layout_height="0dp"
             android:text="산책 기록"
             android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textSize="22sp"
             android:textStyle="bold"
             android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"

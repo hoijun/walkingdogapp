@@ -25,8 +25,10 @@ class userInfoViewModel(application: Application) : AndroidViewModel(application
     private val _currentCoord = MutableLiveData<LatLng>()
     private val _doginfo = MutableLiveData<DogInfo>()
     private val _userinfo = MutableLiveData<UserInfo>()
+    private val _totalwalkinfo = MutableLiveData<totalWalkInfo>()
     private val _imguri = MutableLiveData<Uri>()
     private val _imgdrawable = MutableLiveData<Drawable>()
+    private val _walkDates = MutableLiveData<List<Walkdate>>()
     private var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var address : List<String>
     private val applic = application
@@ -45,6 +47,12 @@ class userInfoViewModel(application: Application) : AndroidViewModel(application
 
     val userinfo: LiveData<UserInfo>
         get() = _userinfo
+
+    val totalwalkinfo: LiveData<totalWalkInfo>
+        get() = _totalwalkinfo
+
+    val walkDates: LiveData<List<Walkdate>>
+        get() = _walkDates
 
     init {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(applic)
@@ -68,6 +76,14 @@ class userInfoViewModel(application: Application) : AndroidViewModel(application
 
     fun saveuserInfo(userInfo: UserInfo) {
         _userinfo.value = userInfo
+    }
+
+    fun savetotalwalkInfo(totalwalkInfo: totalWalkInfo) {
+        _totalwalkinfo.value = totalwalkInfo
+    }
+
+    fun savewalkdates(walkDates: List<Walkdate>) {
+        _walkDates.value = walkDates
     }
 
     // 현재 좌표

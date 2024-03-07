@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.databinding.ActivityLoginBinding
 import com.example.walkingdogapp.userinfo.DogInfo
 import com.example.walkingdogapp.userinfo.UserInfo
+import com.example.walkingdogapp.userinfo.totalWalkInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.database.ktx.database
@@ -200,12 +201,24 @@ class LoginActivity : AppCompatActivity() {
 
                 val userInfo = UserInfo()
                 val dogInfo = DogInfo()
+                val totalwalkInfo = totalWalkInfo()
                 userInfo.email = email
 
                 lifecycleScope.launch {
                     val userinfojob = async(Dispatchers.IO) {
                         try {
                             userRef.child("$uid").child("user").setValue(userInfo).await()
+                        } catch (e: Exception) {
+                            Toast.makeText(this@LoginActivity, "로그인 실패" , Toast.LENGTH_SHORT).show()
+                            binding.loginscreen.visibility = View.VISIBLE
+                            binding.waitImage.visibility = View.INVISIBLE
+                            return@async
+                        }
+                    }
+
+                    val totalwalkinfojob = async(Dispatchers.IO) {
+                        try {
+                            userRef.child("$uid").child("totalWalk").setValue(totalwalkInfo).await()
                         } catch (e: Exception) {
                             Toast.makeText(this@LoginActivity, "로그인 실패" , Toast.LENGTH_SHORT).show()
                             binding.loginscreen.visibility = View.VISIBLE
@@ -226,6 +239,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                     Log.d(TAG, "로그인 성공")
                     userinfojob.await()
+                    totalwalkinfojob.await()
                     doginfojob.await()
 
                     startMain()

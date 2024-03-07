@@ -15,6 +15,8 @@ import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.registerinfo.RegisterUserActivity
 import com.example.walkingdogapp.userinfo.DogInfo
 import com.example.walkingdogapp.userinfo.UserInfo
+import com.example.walkingdogapp.userinfo.Walkdate
+import com.example.walkingdogapp.userinfo.totalWalkInfo
 import com.example.walkingdogapp.userinfo.userInfoViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -27,6 +29,8 @@ class MyPageFragment : Fragment() {
     private val myViewModel: userInfoViewModel by activityViewModels()
     private lateinit var userdogInfo: DogInfo
     private lateinit var userInfo: UserInfo
+    private lateinit var totalwalkInfo: totalWalkInfo
+    private lateinit var walkdates: List<Walkdate>
     private lateinit var mainactivity: MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +47,8 @@ class MyPageFragment : Fragment() {
         _binding = FragmentMyPageBinding.inflate(inflater,container, false)
         userdogInfo = myViewModel.doginfo.value ?: DogInfo()
         userInfo = myViewModel.userinfo.value ?: UserInfo()
+        totalwalkInfo = myViewModel.totalwalkinfo.value ?: totalWalkInfo()
+        walkdates = myViewModel.walkDates.value ?: listOf<Walkdate>()
 
         binding.apply {
             btnSetting.setOnClickListener {
@@ -87,9 +93,10 @@ class MyPageFragment : Fragment() {
                 }
             }
 
-            menuDistance.text = getString(R.string.totaldistance, userInfo.totaldistance / 1000.0)
-            walkDistance.text = getString(R.string.totaldistance, userInfo.totaldistance / 1000.0)
-            walkCount.text = "${userdogInfo.dates.size}회"
+            menuDistance.text = getString(R.string.totaldistance, totalwalkInfo.totaldistance / 1000.0)
+            walkDistance.text = getString(R.string.totaldistance, totalwalkInfo.totaldistance / 1000.0)
+            walkTime.text =  "${(totalwalkInfo.totaltime / 60)}분"
+            walkCount.text = "${walkdates.size}회"
         }
         return binding.root
     }
