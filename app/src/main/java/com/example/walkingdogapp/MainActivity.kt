@@ -20,12 +20,14 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.example.walkingdogapp.collection.CollectionFragment
 import com.example.walkingdogapp.databinding.ActivityMainBinding
 import com.example.walkingdogapp.mypage.MyPageFragment
 import com.example.walkingdogapp.userinfo.DogInfo
 import com.example.walkingdogapp.userinfo.UserInfo
 import com.example.walkingdogapp.userinfo.WalkLatLng
 import com.example.walkingdogapp.userinfo.Walkdate
+import com.example.walkingdogapp.userinfo.totalWalkInfo
 import com.example.walkingdogapp.userinfo.userInfoViewModel
 import com.example.walkingdogapp.walking.WalkingActivity
 import com.example.walkingdogapp.walking.WalkingService
@@ -105,8 +107,8 @@ class MainActivity : AppCompatActivity() {
                         true
                     }
 
-                    R.id.navigation_book -> {
-                        changeFragment(BookFragment())
+                    R.id.navigation_collection -> {
+                        changeFragment(CollectionFragment())
                         true
                     }
 
@@ -128,7 +130,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager
             .beginTransaction()
             .replace(binding.screenFl.id, fragment)
-            .commit()
+            .commitAllowingStateLoss()
         binding.menuBn.visibility = View.VISIBLE
     }
 
@@ -191,18 +193,19 @@ class MainActivity : AppCompatActivity() {
                         UserInfo()
                     }
                 }
-                // 강아지 프로필 사진
-                val profileUriDeferred = async(Dispatchers.IO) {
+
+                val totalWalkDeferred = async(Dispatchers.IO) {
                     try {
-                        storgeRef.child("images").child("profileimg").downloadUrl.await()
-                            ?: Uri.EMPTY
+                        userRef.child("totalWalk").get().await().getValue(totalWalkInfo::class.java)
+                            ?: totalWalkInfo()
                     } catch (e: Exception) {
-                        Uri.EMPTY
+                        totalWalkInfo()
                     }
                 }
+
                 // 강아지 산책 정보
                 val walkdateDeferred = suspendCoroutine { continuation ->
-                    userRef.child("dog").child("walkdates").addListenerForSingleValueEvent(object: ValueEventListener{
+                    userRef.child("walkdates").addListenerForSingleValueEvent(object: ValueEventListener{
                         override fun onDataChange(snapshot: DataSnapshot) {
                             val dates = mutableListOf<Walkdate>()
                             if (snapshot.exists()) {
@@ -228,7 +231,18 @@ class MainActivity : AppCompatActivity() {
                     })
                 }
 
+                // 강아지 프로필 사진
+                val profileUriDeferred = async(Dispatchers.IO) {
+                    try {
+                        storgeRef.child("images").child("profileimg").downloadUrl.await()
+                            ?: Uri.EMPTY
+                    } catch (e: Exception) {
+                        Uri.EMPTY
+                    }
+                }
+
                 val profileUri = profileUriDeferred.await()
+
                 // 강아지 프로필 사진 -> drawble 형태로 변경
                 val profileDrawable = suspendCoroutine { continuation ->
                     Glide.with(applicationContext).asDrawable().load(profileUri)
@@ -252,9 +266,11 @@ class MainActivity : AppCompatActivity() {
 
                 val dog = dogDefferd.await()
                 val user = userDefferd.await()
-                dog.dates = walkdateDeferred
+                val totalWalk = totalWalkDeferred.await()
                 mainviewmodel.savedogInfo(dog)
                 mainviewmodel.saveuserInfo(user)
+                mainviewmodel.savetotalwalkInfo(totalWalk)
+                mainviewmodel.savewalkdates(walkdateDeferred)
 
                 binding.waitImage.visibility = View.GONE
 

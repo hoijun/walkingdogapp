@@ -1,29 +1,25 @@
 
-^kotlin:S899˜":Do something with the "Boolean" value returned by "mkdir".(å‰ñ‰ùÿÿÿÿ8ºŒ´ıà1
-Bkotlin:S125N"Remove this commented out code.(â‰Ğ²şÿÿÿÿ8¾Œ´ıà1
->kotlin:S125ˆ"Remove this commented out code.(ŞŸ‹§8¾Œ´ıà1
->kotlin:S125Ï"Remove this commented out code.(–ú 8¾Œ´ıà1
-Ckotlin:S125á"Remove this commented out code.(°ÅÂßıÿÿÿÿ8¿Œ´ıà1
-Ckotlin:S125ö"Remove this commented out code.(½¢òüÿÿÿÿ8¿Œ´ıà1
-<kotlin:S6310‰"Avoid hardcoded dispatchers.(©ÒÕò8ÄŒ´ıà1
-<kotlin:S6310™"Avoid hardcoded dispatchers.(ä¹ÔÅ8ÄŒ´ıà1
-<kotlin:S6310¥"Avoid hardcoded dispatchers.(éÁï³8ÄŒ´ıà1
-Akotlin:S6310°"Avoid hardcoded dispatchers.(Â÷ò“şÿÿÿÿ8ÄŒ´ıà1
-;kotlin:S6310¹"Avoid hardcoded dispatchers.(¹¡ \8ÄŒ´ıà1
-<kotlin:S6310Â"Avoid hardcoded dispatchers.(“åé¿8ÄŒ´ıà1
+^kotlin:S899ö":Do something with the "Boolean" value returned by "mkdir".(å‰ñ‰ùÿÿÿÿ8ÅØõŸá1
+Bkotlin:S125P"Remove this commented out code.(â‰Ğ²şÿÿÿÿ8ÊØõŸá1
+>kotlin:S125Š"Remove this commented out code.(ŞŸ‹§8ÊØõŸá1
+>kotlin:S125¯"Remove this commented out code.(–ú 8ÊØõŸá1
+Ckotlin:S125À"Remove this commented out code.(°ÅÂßıÿÿÿÿ8ËØõŸá1
+Ckotlin:S125Ô"Remove this commented out code.(½¢òüÿÿÿÿ8ËØõŸá1
+<kotlin:S6310‹"Avoid hardcoded dispatchers.(©ÒÕò8ĞØõŸá1
+;kotlin:S6310™"Avoid hardcoded dispatchers.(Ã‘÷\8ÑØõŸá1
+<kotlin:S6310£"Avoid hardcoded dispatchers.(ÎŞƒŞ8ÑØõŸá1
 >kotlin:S1128
-"Remove this unused import.(Ô¼³úÿÿÿÿÿ8áŒ´ıà1
-9kotlin:S1128"Remove this unused import.(ÁÅŞ8áŒ´ıà1
-9kotlin:S1128"Remove this unused import.(¾Ó¸™8áŒ´ıà1
->kotlin:S1128,"Remove this unused import.(•ó†Ïÿÿÿÿÿ8áŒ´ıà1
-9kotlin:S1128;"Remove this unused import.(äÓßã8áŒ´ıà1
-8kotlin:S1128C"Remove this unused import.(ƒ£ıp8áŒ´ıà1
->kotlin:S1128D"Remove this unused import.(ÖõÁ½ıÿÿÿÿ8áŒ´ıà1
-Hkotlin:S1874µ"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8åŒ´ıà1
-vkotlin:S3776v"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(¶Á»¬şÿÿÿÿ8æŒ´ıà1
-wkotlin:S3776ˆ"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(™‚•Šùÿÿÿÿ8æŒ´ıà1
-wkotlin:S3776„"RRefactor this method to reduce its Cognitive Complexity from 35 to the 15 allowed.(ï¹ã®øÿÿÿÿ8æŒ´ıà1
-rkotlin:S3776Ù"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8æŒ´ıà1
-wkotlin:S3776Œ"RRefactor this method to reduce its Cognitive Complexity from 26 to the 15 allowed.(Üıìªÿÿÿÿÿ8æŒ´ıà1
-Nkotlin:S1066¶".Merge this "if" statement with the nested one.(•³â8ìŒ´ıà1
-Kkotlin:S6518}",Replace function call with indexed accessor.(€ÖÄş8îŒ´ıà1
+"Remove this unused import.(Ô¼³úÿÿÿÿÿ8íØõŸá1
+9kotlin:S1128"Remove this unused import.(ÁÅŞ8íØõŸá1
+9kotlin:S1128"Remove this unused import.(¾Ó¸™8íØõŸá1
+>kotlin:S1128."Remove this unused import.(•ó†Ïÿÿÿÿÿ8íØõŸá1
+9kotlin:S1128="Remove this unused import.(äÓßã8íØõŸá1
+8kotlin:S1128E"Remove this unused import.(ƒ£ıp8íØõŸá1
+>kotlin:S1128F"Remove this unused import.(ÖõÁ½ıÿÿÿÿ8íØõŸá1
+Hkotlin:S1874·"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8ñØõŸá1
+vkotlin:S3776x"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(¶Á»¬şÿÿÿÿ8òØõŸá1
+wkotlin:S3776Š"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(™‚•Šùÿÿÿÿ8òØõŸá1
+wkotlin:S3776‡"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(ï¹ã®øÿÿÿÿ8óØõŸá1
+rkotlin:S3776·"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8óØõŸá1
+Nkotlin:S1066¸".Merge this "if" statement with the nested one.(•³â8ùØõŸá1
+Kkotlin:S6518",Replace function call with indexed accessor.(€ÖÄş8ûØõŸá1

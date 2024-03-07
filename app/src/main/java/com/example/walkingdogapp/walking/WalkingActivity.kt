@@ -35,6 +35,8 @@ import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.userinfo.WalkLatLng
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
+import com.example.walkingdogapp.userinfo.saveWalkdate
+import com.example.walkingdogapp.userinfo.totalWalkInfo
 import com.example.walkingdogapp.userinfo.userInfoViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -362,11 +364,14 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun selectStopWalk() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("산책 그만 할까요?")
+
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    if (WalkingService.totalDistance < 500 || WalkingService.walkTime.value!! < 300) {
+                    if (WalkingService.totalDistance < 300 || WalkingService.walkTime.value!! < 300) {
                         Toast.makeText(this, "거리 또는 시간이 너무 부족해요!",Toast.LENGTH_SHORT).show()
+                        stopWalkingService()
+                        goHome()
                     }
                     else {
                         setSaveScreen()
@@ -374,8 +379,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             WalkingService.totalDistance, WalkingService.walkTime.value!!,
                             WalkingService.coordList.value!!)
                     }
-                    stopWalkingService()
-                    goHome()
                 }
             }
         }
@@ -387,8 +390,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     // 거리 및 시간 저장, 날짜: 시간 별로 산책 기록 저장
     private fun saveWalkInfo(distance: Float, time: Int, coords: List<LatLng>) {
         val uid = auth.currentUser?.uid
-        val userRef = db.getReference("Users").child("$uid").child("user")
-        val dogRef = db.getReference("Users").child("$uid").child("dog")
+        val userRef = db.getReference("Users").child("$uid")
         // val storgeRef = storage.getReference("$uid")
         // val baos = ByteArrayOutputStream()
 
@@ -398,63 +400,29 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 val walkDateinfo =
                     LocalDateTime.now()
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " " + startTime + " " + endTime
-                val totalDistance =
-                    snapshot.child("totaldistance").getValue(Long::class.java)?.toFloat()
-                val totalTime =
-                    snapshot.child("totaltime").getValue(Long::class.java)?.toInt()
+
+                val total = snapshot.child("totalWalk").getValue(totalWalkInfo::class.java)
 
                 var error = false
 
                 lifecycleScope.launch {
-                    val totaldistanceJob = async(Dispatchers.IO) {
+                    val totalwalkJob = async(Dispatchers.IO) {
                         try {
-                            if (totalDistance != null) {
-                                userRef.child("totaldistance")
-                                    .setValue(totalDistance + distance)
-                                    .await()
+                            if (total != null) {
+                                userRef.child("totalWalk").setValue(totalWalkInfo(total.totaldistance + distance,total.totaltime + time)).await()
                             }
                         } catch (e: Exception) {
                             error = true
                         }
                     }
 
-                    val totaltimeJob = async(Dispatchers.IO) {
-                        try {
-                            if (totalTime != null) {
-                                Log.d("totalTime", WalkingService.walkTime.value!!.toString())
-                                userRef.child("totaltime").setValue(totalTime + time).await()
-                            }
-                        } catch (e: Exception) {
-                            error = true
-                        }
-                    }
-
-                    val datedistanceJob = async(Dispatchers.IO) {
-                        try {
-                            dogRef.child("walkdates").child(walkDateinfo)
-                                .child("distance").setValue(distance).await()
-                        } catch (e: Exception) {
-                            error = true
-                        }
-                    }
-
-                    val datetimeJob = async(Dispatchers.IO) {
-                        try {
-                            dogRef.child("walkdates").child(walkDateinfo)
-                                .child("time").setValue(time).await()
-                        } catch (e: Exception) {
-                            error = true
-                        }
-                    }
-
-                    val dateCoordsJob = async(Dispatchers.IO) {
+                    val saveWalkdateJob = async(Dispatchers.IO) {
                         try {
                             val savecoords = mutableListOf<WalkLatLng>()
                             for (coord in coords) {
                                 savecoords.add(WalkLatLng(coord.latitude, coord.longitude))
                             }
-                            dogRef.child("walkdates").child(walkDateinfo)
-                                .child("coords").setValue(savecoords).await()
+                            userRef.child("walkdates").child(walkDateinfo).setValue(saveWalkdate(distance, time, savecoords)).await()
                         } catch (e: Exception) {
                             error = true
                         }
@@ -474,12 +442,10 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                     }*/
 
-                    totaldistanceJob.await()
-                    totaltimeJob.await()
-                    datedistanceJob.await()
-                    datetimeJob.await()
+                    totalwalkJob.await()
+                    saveWalkdateJob.await()
+
                     // mapcaptureJob.await()
-                    dateCoordsJob.await()
 
                     if (error) {
                         Toast.makeText(this@WalkingActivity, "산책 기록 저장 실패", Toast.LENGTH_SHORT)

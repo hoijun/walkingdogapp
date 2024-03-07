@@ -60,3 +60,17 @@ y
 Iapp/src/main/java/com/example/walkingdogapp/registerinfo/DoglistDialog.kt,4\7\47e9577fafe3397c34e7cd108054da6941fb9be9
 j
 :app/src/main/java/com/example/walkingdogapp/WriteDialog.kt,5\8\586cf98db0e3ebabb8d6be4f9650d1d78fb1bf69
+p
+@app/src/main/java/com/example/walkingdogapp/userinfo/UserInfo.kt,3\f\3f9914b8e8da0177a7b16017238de281c189de19
+r
+Bapp/src/main/java/com/example/walkingdogapp/mypage/CalendarDeco.kt,6\1\61b74e08d165f3b3c3161e7eba9144058db6c7de
+y
+Iapp/src/main/java/com/example/walkingdogapp/userinfo/UserInfoViewModel.kt,6\7\6775c684ba98944e9ba13d93dc6aa03b70c4ed38
+|
+Lapp/src/main/java/com/example/walkingdogapp/collection/CollectionFragment.kt,8\7\874338ebe2d0785e1571e66e5479937d653e6eb4
+
+Oapp/src/main/java/com/example/walkingdogapp/collection/CollectionlistAdapter.kt,0\5\0516d3d81365fda2d286aa5cadee7b3ec0744604
+z
+Japp/src/main/java/com/example/walkingdogapp/registerinfo/DoglistAdpater.kt,4\9\4975cc6373fe71c7017b054096ecd67ca7b43cfd
+ƒ
+Sapp/src/main/java/com/example/walkingdogapp/collection/GridSpacingItemDecoration.kt,8\2\824bbf3b4683ea76c94909ef108b33ff38e7f508

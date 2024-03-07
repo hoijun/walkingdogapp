@@ -5,6 +5,6 @@ class UserInfo {
     var name = ""
     var gender = ""
     var birth = ""
-    var totaldistance = 0
-    var totaltime = 0
 }
+
+data class totalWalkInfo(var totaldistance: Float = 0.0f, var totaltime: Int = 0)

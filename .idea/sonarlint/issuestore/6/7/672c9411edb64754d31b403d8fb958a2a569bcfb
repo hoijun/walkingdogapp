@@ -1,8 +1,9 @@
 
-Akotlin:S6310±"Avoid hardcoded dispatchers.(¨¯üÿÿÿÿ8ÃûÔ¡à1
-<kotlin:S6310º"Avoid hardcoded dispatchers.(¬ÿĞ8ÃûÔ¡à1
-Akotlin:S6310Ã"Avoid hardcoded dispatchers.(Ñûü£øÿÿÿÿ8ÃûÔ¡à1
-Hkotlin:S1874 "#Deprecated code should not be used.(å´¾”şÿÿÿÿ8¹úÖ¡à1
-wkotlin:S3776«"RRefactor this method to reduce its Cognitive Complexity from 29 to the 15 allowed.(ùîÁûşÿÿÿÿ8»úÖ¡à1
-Nkotlin:S1066¡".Merge this "if" statement with the nested one.(•³â8¾úÖ¡à1
-Pkotlin:S6518a",Replace function call with indexed accessor.(£¨ˆŸüÿÿÿÿ8¿úÖ¡à1
+Akotlin:S6310²"Avoid hardcoded dispatchers.(¨¯üÿÿÿÿ8ÃûÔ¡à1
+<kotlin:S6310»"Avoid hardcoded dispatchers.(¬ÿĞ8ÃûÔ¡à1
+Akotlin:S6310Ä"Avoid hardcoded dispatchers.(İ­š€üÿÿÿÿ8»ÊÖá1
+Akotlin:S6310ê"Avoid hardcoded dispatchers.(Ñûü£øÿÿÿÿ8¹»åá1
+Hkotlin:S1874¡"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8¹úÖ¡à1
+wkotlin:S3776¬"RRefactor this method to reduce its Cognitive Complexity from 32 to the 15 allowed.(ùîÁûşÿÿÿÿ8»úÖ¡à1
+Nkotlin:S1066¢".Merge this "if" statement with the nested one.(•³â8¾úÖ¡à1
+Pkotlin:S6518b",Replace function call with indexed accessor.(£¨ˆŸüÿÿÿÿ8¿úÖ¡à1
