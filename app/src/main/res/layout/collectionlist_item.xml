@@ -15,7 +15,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.7"
+        app:layout_constraintWidth_percent="0.8"
         app:layout_constraintDimensionRatio="1:1"
         android:src="@drawable/ic_launcher_background" />
 
@@ -28,7 +28,7 @@
         app:layout_constraintTop_toBottomOf="@id/collection_img" >
 
         <TextView
-            android:id="@+id/img_number"
+            android:id="@+id/collection_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="001"
@@ -42,7 +42,7 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
-            android:id="@+id/img_title"
+            android:id="@+id/collection_Name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="양치하는 곰돌이"
@@ -52,14 +52,14 @@
             android:textSize="14sp"
             android:layout_marginTop="2.5dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/img_number"
+            app:layout_constraintTop_toBottomOf="@id/collection_number"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="16.5dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/img_title"
+            app:layout_constraintTop_toBottomOf="@id/collection_Name"
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

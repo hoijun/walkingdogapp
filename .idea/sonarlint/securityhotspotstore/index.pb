@@ -74,3 +74,9 @@ z
 Japp/src/main/java/com/example/walkingdogapp/registerinfo/DoglistAdpater.kt,4\9\4975cc6373fe71c7017b054096ecd67ca7b43cfd
 ƒ
 Sapp/src/main/java/com/example/walkingdogapp/collection/GridSpacingItemDecoration.kt,8\2\824bbf3b4683ea76c94909ef108b33ff38e7f508
+x
+Happ/src/main/java/com/example/walkingdogapp/collection/CollectionInfo.kt,d\9\d956773f4dac57853cbc03d5adc3669f770fec2c
+g
+7app/src/main/java/com/example/walkingdogapp/Constant.kt,f\d\fd2f786f164915ff724c972287c7beb1871be770
+u
+Eapp/src/main/java/com/example/walkingdogapp/album/AlbumMapFragment.kt,0\6\0627825d60d79cd413881b35fa685e0592618ddb

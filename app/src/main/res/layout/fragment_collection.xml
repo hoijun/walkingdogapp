@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".collection.CollectionFragment">
+    
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/collection_top"
@@ -30,7 +31,7 @@
             app:layout_constraintWidth_percent="0.4" />
 
         <ImageView
-            android:id="@+id/btn_searching"
+            android:id="@+id/open_searching"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginEnd="10dp"
@@ -42,6 +43,36 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/collection_search"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.07"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/collection_top" >
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchview"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:background="@drawable/roundstyle3"
+            app:queryHint="키워드 입력..."
+            app:queryBackground="@null"
+            app:iconifiedByDefault="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/collection_middle"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -49,14 +80,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.07"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/collection_top" >
+        app:layout_constraintTop_toBottomOf="@+id/collection_search" >
 
         <TextView
             android:id="@+id/filter"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:gravity="center"
-            android:text="필터  ∨"
+            android:text="필터"
             android:textColor="@color/black"
             android:textSize="15sp"
             android:textStyle="bold"
@@ -79,8 +110,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintHeight_percent="0.645"
-            app:layout_constraintWidth_percent="0.115"
-            app:srcCompat="@android:drawable/ic_menu_search" />
+            app:layout_constraintWidth_percent="0.115"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -98,7 +128,4 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

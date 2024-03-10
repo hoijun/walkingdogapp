@@ -1,4 +1,7 @@
-package com.example.walkingdogapp.walking
+package com.example.walkingdogapp
+
+import kotlin.collections.HashMap
+
 
 class Constant {
     companion object {
@@ -7,5 +10,11 @@ class Constant {
         const val ACTION_STOP_Walking_SERVICE = "stopWalkingService"
         const val ACTION_START_Walking_Tracking = "startWalkingTracking"
         const val ACTION_STOP_Walking_Tracking = "stopWalkingTracking"
+
+        val item_whether = HashMap<String, Boolean>().apply {
+            for (num: Int in 1..11) {
+                put(String.format("%03d", num), false)
+            }
+        }
     }
 }

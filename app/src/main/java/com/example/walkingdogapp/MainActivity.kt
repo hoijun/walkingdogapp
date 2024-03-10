@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.example.walkingdogapp.album.AlbumMapFragment
 import com.example.walkingdogapp.collection.CollectionFragment
 import com.example.walkingdogapp.databinding.ActivityMainBinding
 import com.example.walkingdogapp.mypage.MyPageFragment
@@ -231,6 +232,14 @@ class MainActivity : AppCompatActivity() {
                     })
                 }
 
+                val colletionDeferred = async(Dispatchers.IO) {
+                    try {
+                        userRef.child("collection").get().await().getValue<HashMap<String, Boolean>>() ?: Constant.item_whether
+                    } catch (e: Exception) {
+                        Constant.item_whether
+                    }
+                }
+
                 // 강아지 프로필 사진
                 val profileUriDeferred = async(Dispatchers.IO) {
                     try {
@@ -267,10 +276,12 @@ class MainActivity : AppCompatActivity() {
                 val dog = dogDefferd.await()
                 val user = userDefferd.await()
                 val totalWalk = totalWalkDeferred.await()
+                val collection = colletionDeferred.await()
                 mainviewmodel.savedogInfo(dog)
                 mainviewmodel.saveuserInfo(user)
                 mainviewmodel.savetotalwalkInfo(totalWalk)
                 mainviewmodel.savewalkdates(walkdateDeferred)
+                mainviewmodel.savecollectionInfo(collection)
 
                 binding.waitImage.visibility = View.GONE
 
