@@ -36,6 +36,7 @@ import kotlin.system.exitProcess
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var loginInfo: android.content.SharedPreferences
+    private var item_whether = Constant.item_whether
 
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.database
@@ -227,6 +228,18 @@ class LoginActivity : AppCompatActivity() {
                         }
                     }
 
+                    val collectionInfojob = async(Dispatchers.IO) {
+                        try {
+                            userRef.child("$uid").child("collection").setValue(item_whether)
+                                .await()
+                        } catch (e: Exception) {
+                            Toast.makeText(this@LoginActivity, "로그인 실패", Toast.LENGTH_SHORT).show()
+                            binding.loginscreen.visibility = View.VISIBLE
+                            binding.waitImage.visibility = View.INVISIBLE
+                            return@async
+                        }
+                    }
+
                     val doginfojob = async(Dispatchers.IO) {
                         try {
                             userRef.child("$uid").child("dog").setValue(dogInfo).await()
@@ -237,9 +250,11 @@ class LoginActivity : AppCompatActivity() {
                             return@async
                         }
                     }
+
                     Log.d(TAG, "로그인 성공")
                     userinfojob.await()
                     totalwalkinfojob.await()
+                    collectionInfojob.await()
                     doginfojob.await()
 
                     startMain()

@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PointF
 import android.media.MediaScannerConnection
@@ -18,9 +19,8 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
-import android.view.DragEvent
-import android.view.MotionEvent
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,6 +31,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DecodeFormat
+import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.userinfo.WalkLatLng
@@ -43,7 +46,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.storage.FirebaseStorage
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
@@ -53,12 +55,12 @@ import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
+import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -66,8 +68,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.Random
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -77,6 +77,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mynavermap: NaverMap
     private lateinit var walkViewModel: userInfoViewModel
     private var db = FirebaseDatabase.getInstance()
+
     // private val storage = FirebaseStorage.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
@@ -84,8 +85,25 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private var isTracking = false
     private var trackingMarker = Marker()
     private var trackingPath = PathOverlay()
-    private lateinit var trackingCamera : CameraUpdate
+    private lateinit var trackingCamera: CameraUpdate
     private var trackingCameraMode = true // 지도의 화면이 자동으로 사용자에 위치에 따라 움직이는 지
+
+    private var collectionitemWeather = Constant.item_whether
+    private var collectionImgs = listOf(
+        R.drawable.collection_001,
+        R.drawable.collection_002,
+        R.drawable.collection_003,
+        R.drawable.collection_004,
+        R.drawable.collection_005,
+        R.drawable.collection_006,
+        R.drawable.collection_007,
+        R.drawable.collection_008,
+        R.drawable.collection_009,
+        R.drawable.collection_010,
+        R.drawable.collection_011
+    )
+
+    private var colletion_imgsBitmap = mutableListOf<Bitmap>()
 
     private var animalMarkers = mutableListOf<Marker>()
 
@@ -129,6 +147,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 백그라운드 위치 서비스 시작
         startWalkingService()
+
+        imgtoBitmap()
 
         startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
 
@@ -263,26 +283,43 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun imgtoBitmap() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            val option = BitmapFactory.Options()
+            option.inSampleSize = 6
+            for (img in collectionImgs) {
+                colletion_imgsBitmap.add(BitmapFactory.decodeResource(resources, img, option))
+            }
+        }
+    }
+
     private fun randomMarker() { // 마커 랜덤 표시
         lifecycleScope.launch(Dispatchers.Main) {
             delay(10000) // 10초 후에
             while (isWalkingServiceRunning()) {
                 repeat(2) {
                     if (coordList.isNotEmpty()) {
-                        val randomCoord = getRandomCoord(coordList.last(), 300)
-                        val animalMarker = Marker()
-                        animalMarker.icon = OverlayImage.fromResource(R.mipmap.ic_launcher_round)
-                        animalMarker.width = 100
-                        animalMarker.height = 100
-                        animalMarker.anchor = PointF(0.5f, 0.5f)
-                        animalMarker.setOnClickListener {
-                            if (coordList.last().distanceTo(animalMarker.position) < 5) {
-                                animalMarker.map = null
-                                animalMarkers.remove(animalMarker)
-                            }
-                            true
-                        }
                         if (animalMarkers.size < 6) { // 마커의 갯수 상한선
+                            val randomCoord = getRandomCoord(coordList.last(), 300)
+                            val randomNumber = kotlin.random.Random.nextInt(1, 12)
+                            val animalMarker = Marker()
+                            animalMarker.icon =
+                                OverlayImage.fromBitmap(colletion_imgsBitmap[randomNumber - 1])
+                            animalMarker.width = 100
+                            animalMarker.height = 100
+                            animalMarker.anchor = PointF(0.5f, 0.5f)
+                            animalMarker.tag = String.format("%03d", randomNumber)
+                            animalMarker.setOnClickListener {
+                                if (coordList.last().distanceTo(animalMarker.position) < 10) {
+                                    collectionitemWeather.replace(
+                                        animalMarker.tag.toString(),
+                                        true
+                                    )
+                                    animalMarker.map = null
+                                    animalMarkers.remove(animalMarker)
+                                }
+                                true
+                            }
                             animalMarker.position = randomCoord
                             animalMarker.map = mynavermap
                             animalMarkers.add(animalMarker)
@@ -410,6 +447,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         try {
                             if (total != null) {
                                 userRef.child("totalWalk").setValue(totalWalkInfo(total.totaldistance + distance,total.totaltime + time)).await()
+                            } else {
+                                userRef.child("totalWalk").setValue(totalWalkInfo(distance, time))
+                                    .await()
                             }
                         } catch (e: Exception) {
                             error = true
@@ -423,6 +463,15 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                                 savecoords.add(WalkLatLng(coord.latitude, coord.longitude))
                             }
                             userRef.child("walkdates").child(walkDateinfo).setValue(saveWalkdate(distance, time, savecoords)).await()
+                        } catch (e: Exception) {
+                            error = true
+                        }
+                    }
+
+                    val collectionInfojob = async(Dispatchers.IO) {
+                        try {
+                            userRef.child("collection").setValue(collectionitemWeather)
+                                .await()
                         } catch (e: Exception) {
                             error = true
                         }
@@ -444,6 +493,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     totalwalkJob.await()
                     saveWalkdateJob.await()
+                    collectionInfojob.await()
 
                     // mapcaptureJob.await()
 
