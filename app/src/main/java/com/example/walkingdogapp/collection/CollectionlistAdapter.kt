@@ -78,11 +78,11 @@ class CollectionlistAdapter(private val collections: List<CollectionInfo>, priva
             }
 
             @SuppressLint("NotifyDataSetChanged")
+            @Suppress("UNCHECKED_CAST")
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
                 collectionsInfo = results.values as List<CollectionInfo>
                 notifyDataSetChanged()
             }
-
         }
     }
 }

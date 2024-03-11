@@ -1,12 +1,16 @@
 
-Tkotlin:S1172z"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ
-:kotlin:S6310¨"Avoid hardcoded dispatchers.(¿ª¢íÿÿÿÿÿ
-5kotlin:S6310±"Avoid hardcoded dispatchers.(âùº¸
-okotlin:S3776K"RRefactor this method to reduce its Cognitive Complexity from 42 to the 15 allowed.(¶Á»¬şÿÿÿÿ
-Ekotlin:S6518ì",Replace function call with indexed accessor.(Õ«“ä
-Ekotlin:S6518ì",Replace function call with indexed accessor.(Õ«“ä
-Jkotlin:S6518í",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ
-Jkotlin:S6518í",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ
-Ekotlin:S6518ƒ",Replace function call with indexed accessor.(Ì÷Á•
-Ekotlin:S6518ƒ",Replace function call with indexed accessor.(Ì÷Á•
-Ekotlin:S6518ƒ",Replace function call with indexed accessor.(Ì÷Á•
+‚kotlin:S1172¨"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ8—¦øâ1J$5fdd3005-3823-4a57-aacc-59408f87b9e5
+gkotlin:S6310â"Avoid hardcoded dispatchers.(¿ª¢íÿÿÿÿÿ8Ÿ¦øâ1J$4b41a831-6f12-47f0-8513-5d76611a336b
+bkotlin:S6310ë"Avoid hardcoded dispatchers.(âùº¸8Ÿ¦øâ1J$1040e4ac-4132-4619-b8c4-360e0d600b8e
+_kotlin:S1128	"Remove this unused import.( ¯–8°¦øâ1J$638d9839-3f10-4c12-92f3-acb15bf1d536
+dkotlin:S1128."Remove this unused import.(Î©—ûÿÿÿÿ8°¦øâ1J$361b6f15-68ce-4e2e-9212-ce16085e308c
+mkotlin:S1874^"#Deprecated code should not be used.(éÕ°ÿÿÿÿÿ8²¦øâ1J$03efb478-58d9-4279-809b-f5146cab28ec
+nkotlin:S1874‘"#Deprecated code should not be used.(õ˜‰¿øÿÿÿÿ8 „øâ1J$ee1929a7-38d3-4df1-a0e9-cb85ce00de66
+œkotlin:S3776T"RRefactor this method to reduce its Cognitive Complexity from 53 to the 15 allowed.(¶Á»¬şÿÿÿÿ8³¦øâ1J$f848def2-e992-4119-9fbd-f9f78a0ef057
+rkotlin:S6518»",Replace function call with indexed accessor.(Õ«“ä8¹¦øâ1J$d4fd7dd5-f2a6-4205-98b8-c21465cd3603
+rkotlin:S6518»",Replace function call with indexed accessor.(Õ«“ä8¹¦øâ1J$5327a042-45f0-40cd-a0cd-89569a550cc3
+wkotlin:S6518¼",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8¹¦øâ1J$ff87f8a5-8b11-4114-8ef5-4caeed775071
+wkotlin:S6518¼",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8Âíøâ1J$c114df0d-2190-4373-bbab-e5ca16c34c82
+wkotlin:S6518¸",Replace function call with indexed accessor.(‹©Õºûÿÿÿÿ8Âíøâ1J$b65e6c8f-3391-48ce-bf20-2d2f03027b83
+rkotlin:S6518¹",Replace function call with indexed accessor.(í…ù8Ãíøâ1J$9f17323d-e0ad-4f11-b85a-c903b14a40da
+wkotlin:S6518º",Replace function call with indexed accessor.(Œ‹‰çùÿÿÿÿ8Ãíøâ1J$58fcb2b6-d883-4c6f-ab52-52e7a10061d8

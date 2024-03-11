@@ -9,8 +9,6 @@ P
 Mapp/src/androidTest/java/com/example/walkingdogapp/ExampleInstrumentedTest.kt,a\8\a8191d5cfc0938a4abfeee8c017c8ed40c12e808
 n
 >app/src/test/java/com/example/walkingdogapp/ExampleUnitTest.kt,f\4\f49b21b5f707ca3fc6a6aa0585f573eeec451f7d
-o
-?app/src/main/java/com/example/walkingdogapp/AlbumMapFragment.kt,1\d\1de88f6301c0c7948a2b19fdbf0d44ee07c9df8f
 D
 app/build.gradle.kts,d\2\d2a4383452aad84a18429a5844d31330a012a9e6
 @
@@ -80,3 +78,5 @@ g
 7app/src/main/java/com/example/walkingdogapp/Constant.kt,f\d\fd2f786f164915ff724c972287c7beb1871be770
 u
 Eapp/src/main/java/com/example/walkingdogapp/album/AlbumMapFragment.kt,0\6\0627825d60d79cd413881b35fa685e0592618ddb
+u
+Eapp/src/main/java/com/example/walkingdogapp/walking/WalkingService.kt,b\1\b14f548bff7688e796094d3d8df6bd40daa270b1

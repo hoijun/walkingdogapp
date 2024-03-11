@@ -25,6 +25,8 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.naver.maps.geometry.LatLng
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Timer
 import kotlin.concurrent.timer
 
@@ -41,7 +43,8 @@ class WalkingService : Service() {
         val coordList = MutableLiveData<MutableList<LatLng>>()
         val isTracking = MutableLiveData<Boolean>()
         val walkTime = MutableLiveData<Int>()
-        var totalDistance = 0f
+        var walkDistance = 0f
+        var startTime = ""
     }
 
     private fun postInitialValue() {
@@ -50,7 +53,8 @@ class WalkingService : Service() {
         coordList.postValue(mutableListOf())
         totalTime = 0
         miscount = 0
-        totalDistance = 0f
+        walkDistance = 0f
+        startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
     }
 
     // 위치 업데이트
@@ -78,9 +82,9 @@ class WalkingService : Service() {
                             Log.d("current coord", "$pos")
                         }
                         if (coordList.value!!.size > 1) { // 거리 증가
-                            totalDistance += coordList.value!!.last()
+                            walkDistance += coordList.value!!.last()
                                 .distanceTo(coordList.value!![coordList.value!!.size - 2]).toFloat()
-                            Log.d("current coord", "distance: $totalDistance")
+                            Log.d("current coord", "distance: $walkDistance")
                         }
                     }
                 }

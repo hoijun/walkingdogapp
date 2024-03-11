@@ -1,6 +1,8 @@
 package com.example.walkingdogapp.userinfo
 
-class UserInfo {
+import java.io.Serializable
+
+class UserInfo : Serializable {
     var email = ""
     var name = ""
     var gender = ""
