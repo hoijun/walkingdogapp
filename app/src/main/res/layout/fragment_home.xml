@@ -103,10 +103,11 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:src="@drawable/waitimage"
-                app:layout_constraintHeight_percent="0.5"
+                app:layout_constraintHeight_percent="0.45"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/View2"
-                app:layout_constraintWidth_percent="1.0" />
+                app:layout_constraintWidth_percent="0.8" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

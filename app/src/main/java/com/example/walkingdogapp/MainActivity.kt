@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object { // 다른 액티비티로 변경 시 어떤 프래그먼트에서 변경했는지 
         var preFragment = "Home"
+        var profileImgUri = Uri.EMPTY
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -251,6 +252,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 val profileUri = profileUriDeferred.await()
+                profileImgUri = profileUri
 
                 // 강아지 프로필 사진 -> drawble 형태로 변경
                 val profileDrawable = suspendCoroutine { continuation ->

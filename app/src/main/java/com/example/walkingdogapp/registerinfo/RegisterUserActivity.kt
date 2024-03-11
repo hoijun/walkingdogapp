@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.ActivityRegisterUserBinding
+import com.example.walkingdogapp.userinfo.DogInfo
 import com.example.walkingdogapp.userinfo.UserInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
@@ -28,7 +30,7 @@ import java.util.Locale
 
 class RegisterUserActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterUserBinding
-    private var userinfo = UserInfo()
+    private lateinit var userinfo: UserInfo
     private val auth = FirebaseAuth.getInstance()
     private val db = Firebase.database
     private val BackPressCallback = object : OnBackPressedCallback(true) {
@@ -42,7 +44,27 @@ class RegisterUserActivity : AppCompatActivity() {
         setContentView(binding.root)
         this.onBackPressedDispatcher.addCallback(this, BackPressCallback)
 
+        val currentUserinfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra("userinfo", UserInfo::class.java)
+        } else {
+            intent.getSerializableExtra("userinfo") as UserInfo?
+        }
+
+        userinfo = currentUserinfo ?: UserInfo()
+
         binding.apply {
+            if(userinfo.name != "") {
+                editName.setText(userinfo.name)
+                editName.setSelection(userinfo.name.length)
+
+                editBirth.text = userinfo.birth
+
+                when(userinfo.gender) {
+                    "남" ->  btnUserismale.setBackgroundColor(Color.DKGRAY)
+                    "여" ->  btnUserisfemale.setBackgroundColor(Color.DKGRAY)
+                }
+            }
+
             btnUserisfemale.setOnClickListener {
                 userinfo.gender = btnUserisfemale.text.toString()
                 btnUserisfemale.setBackgroundColor(Color.DKGRAY)
@@ -72,12 +94,14 @@ class RegisterUserActivity : AppCompatActivity() {
             }
 
             registerUser.setOnClickListener {
-                if (editName.text.toString() == "" || editBirth.text == "") {
-                    val builder = AlertDialog.Builder(this@RegisterUserActivity)
-                    builder.setTitle("빈칸이 남아있어요.")
-                    builder.setPositiveButton("확인", null)
-                    builder.show()
-                    return@setOnClickListener
+                userinfo.apply {
+                    if (editName.text.toString() == "" || editBirth.text == "" || gender == "") {
+                        val builder = AlertDialog.Builder(this@RegisterUserActivity)
+                        builder.setTitle("빈칸이 남아있어요.")
+                        builder.setPositiveButton("확인", null)
+                        builder.show()
+                        return@setOnClickListener
+                    }
                 }
 
                 userinfo.name = editName.text.toString()

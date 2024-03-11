@@ -1,11 +1,13 @@
 package com.example.walkingdogapp.mypage
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.graphics.drawable.toBitmapOrNull
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.MainActivity
@@ -18,6 +20,7 @@ import com.example.walkingdogapp.userinfo.UserInfo
 import com.example.walkingdogapp.userinfo.Walkdate
 import com.example.walkingdogapp.userinfo.totalWalkInfo
 import com.example.walkingdogapp.userinfo.userInfoViewModel
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -57,7 +60,8 @@ class MyPageFragment : Fragment() {
 
             menuDogInfo.setOnClickListener {
                 if(userdogInfo.name == "") {
-                    Toast.makeText(requireContext(), "먼저 강아지 정보를 설정해주세요!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "먼저 강아지 정보를 설정해주세요!", Toast.LENGTH_SHORT)
+                        .show()
                     return@setOnClickListener
                 }
                 mainactivity.changeFragment(DogInfoFragment())
@@ -65,11 +69,13 @@ class MyPageFragment : Fragment() {
 
             modifydoginfo.setOnClickListener {
                 val registerDogIntent = Intent(requireContext(), RegisterDogActivity::class.java)
+                registerDogIntent.putExtra("doginfo", userdogInfo)
                 startActivity(registerDogIntent)
             }
 
             modifyuserinfo.setOnClickListener {
                 val registerUserIntent = Intent(requireContext(), RegisterUserActivity::class.java)
+                registerUserIntent.putExtra("userinfo", userInfo)
                 startActivity(registerUserIntent)
             }
 

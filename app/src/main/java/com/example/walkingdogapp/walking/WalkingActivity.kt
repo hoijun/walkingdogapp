@@ -78,7 +78,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var walkViewModel: userInfoViewModel
     private var db = FirebaseDatabase.getInstance()
 
-    // private val storage = FirebaseStorage.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
     private var coordList = mutableListOf<LatLng>()
@@ -88,7 +87,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var trackingCamera: CameraUpdate
     private var trackingCameraMode = true // 지도의 화면이 자동으로 사용자에 위치에 따라 움직이는 지
 
-    private var collectionitemWeather = Constant.item_whether
+    private var getCollectionItems = mutableListOf<String>()
     private var collectionImgs = listOf(
         R.drawable.collection_001,
         R.drawable.collection_002,
@@ -149,8 +148,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         startWalkingService()
 
         imgtoBitmap()
-
-        startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
 
         val mapFragment: MapFragment = supportFragmentManager.findFragmentById(R.id.map_fragment) as MapFragment?
             ?: MapFragment.newInstance().also {
@@ -271,7 +268,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     trackingPath.map = mynavermap
                     binding.InfoDistance.text = getString(
                         R.string.distance,
-                        WalkingService.totalDistance / 1000.0)
+                        WalkingService.walkDistance / 1000.0)
                 }
             }
         }
@@ -310,11 +307,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             animalMarker.anchor = PointF(0.5f, 0.5f)
                             animalMarker.tag = String.format("%03d", randomNumber)
                             animalMarker.setOnClickListener {
-                                if (coordList.last().distanceTo(animalMarker.position) < 10) {
-                                    collectionitemWeather.replace(
-                                        animalMarker.tag.toString(),
-                                        true
-                                    )
+                                if (coordList.last().distanceTo(animalMarker.position) < 20) {
+                                    getCollectionItems.add(animalMarker.tag.toString())
                                     animalMarker.map = null
                                     animalMarkers.remove(animalMarker)
                                 }
@@ -405,15 +399,16 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    if (WalkingService.totalDistance < 300 || WalkingService.walkTime.value!! < 300) {
+                    if (WalkingService.walkDistance < 300 || WalkingService.walkTime.value!! < 300) {
                         Toast.makeText(this, "거리 또는 시간이 너무 부족해요!",Toast.LENGTH_SHORT).show()
                         stopWalkingService()
                         goHome()
                     }
                     else {
+                        startTime = WalkingService.startTime
                         setSaveScreen()
                         saveWalkInfo(
-                            WalkingService.totalDistance, WalkingService.walkTime.value!!,
+                            WalkingService.walkDistance, WalkingService.walkTime.value!!,
                             WalkingService.coordList.value!!)
                     }
                 }
@@ -428,8 +423,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun saveWalkInfo(distance: Float, time: Int, coords: List<LatLng>) {
         val uid = auth.currentUser?.uid
         val userRef = db.getReference("Users").child("$uid")
-        // val storgeRef = storage.getReference("$uid")
-        // val baos = ByteArrayOutputStream()
 
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -470,32 +463,20 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     val collectionInfojob = async(Dispatchers.IO) {
                         try {
-                            userRef.child("collection").setValue(collectionitemWeather)
-                                .await()
+                            val update = mutableMapOf<String, Any>()
+                            for (item in getCollectionItems) {
+                                update[item] = true
+                            }
+
+                            userRef.child("collection").updateChildren(update).await()
                         } catch (e: Exception) {
                             error = true
                         }
                     }
 
-                    // val bitmap = getMapBitmap()
-
-                    // 산책 화면 사진으로 저장
-                    /* val mapcaptureJob = async(Dispatchers.IO) {
-                        try {
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-                            val data = baos.toByteArray()
-                            storgeRef.child("images").child("mapCapture").child(walkDateinfo)
-                                .putBytes(data).await()
-                        } catch (e: Exception) {
-                            error = true
-                        }
-                    }*/
-
                     totalwalkJob.await()
                     saveWalkdateJob.await()
                     collectionInfojob.await()
-
-                    // mapcaptureJob.await()
 
                     if (error) {
                         Toast.makeText(this@WalkingActivity, "산책 기록 저장 실패", Toast.LENGTH_SHORT)
@@ -514,14 +495,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         })
     }
-
-    /* private suspend fun getMapBitmap(): Bitmap {
-        return suspendCoroutine { continuation ->
-            mynavermap.takeSnapshot(false) {
-                continuation.resume(it)
-            }
-        }
-    }*/
 
     private fun setSaveScreen() {
         binding.walkingscreen.visibility = View.INVISIBLE
