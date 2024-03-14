@@ -1,10 +1,10 @@
 
-gkotlin:S6310µ"Avoid hardcoded dispatchers.(¨¯üÿÿÿÿ8ü¿öâ1J$7d8cf0e3-2b44-4191-b3dd-232260044faf
-bkotlin:S6310¾"Avoid hardcoded dispatchers.(¬ÿĞ8ü¿öâ1J$09244af3-422a-486d-9e1c-9cae10392fde
-gkotlin:S6310Ç"Avoid hardcoded dispatchers.(İ­š€üÿÿÿÿ8ü¿öâ1J$aaf90f94-d67a-4968-8b53-cb6d2a96f857
-bkotlin:S6310ì"Avoid hardcoded dispatchers.(¡áşº8ü¿öâ1J$5ca4d1c5-f978-40f8-b130-7d6c01919a28
-gkotlin:S6310õ"Avoid hardcoded dispatchers.(Ñûü£øÿÿÿÿ8ü¿öâ1J$2d15d183-16fa-4298-8cfc-5c70dd29d01f
-nkotlin:S1874¤"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8‰Àöâ1J$228d7182-3e66-4435-b928-2046e8f186bf
-kotlin:S3776¯"RRefactor this method to reduce its Cognitive Complexity from 35 to the 15 allowed.(ùîÁûşÿÿÿÿ8ŠÀöâ1J$b48a0a86-0aaa-43ae-a042-bd82da0ac2e0
-tkotlin:S1066¥".Merge this "if" statement with the nested one.(•³â8Àöâ1J$a9f61730-92d8-4224-be2f-c82c107d930c
-vkotlin:S6518e",Replace function call with indexed accessor.(£¨ˆŸüÿÿÿÿ8Àöâ1J$5b67416e-b4b9-4100-a7d4-524af2ea3130
+gkotlin:S6310µ"Avoid hardcoded dispatchers.(¨¯üÿÿÿÿ8´•ß›ã1J$aed870b0-8943-42b4-a8a2-649d5fd6133d
+bkotlin:S6310¾"Avoid hardcoded dispatchers.(¬ÿĞ8´•ß›ã1J$29f1bb7e-c59a-4ee5-8571-457652a8eb57
+gkotlin:S6310Ç"Avoid hardcoded dispatchers.(İ­š€üÿÿÿÿ8´•ß›ã1J$86a7c19b-8b17-4a19-b4d8-a8f1cb16c211
+bkotlin:S6310ì"Avoid hardcoded dispatchers.(¡áşº8´•ß›ã1J$da6163c0-fcd7-46aa-a26d-4eabe2e24574
+gkotlin:S6310õ"Avoid hardcoded dispatchers.(Ñûü£øÿÿÿÿ8´•ß›ã1J$57787fe9-8ac4-4c07-a11b-17221aeac028
+nkotlin:S1874¤"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8Ã•ß›ã1J$52b90596-2f4a-45c6-8a5d-5fd7af84d9ba
+kotlin:S3776¯"RRefactor this method to reduce its Cognitive Complexity from 35 to the 15 allowed.(ùîÁûşÿÿÿÿ8Ä•ß›ã1J$9293cc92-396c-4dd5-97e7-3cf6cdc046a2
+tkotlin:S1066¥".Merge this "if" statement with the nested one.(•³â8È•ß›ã1J$944d4bbb-b69a-47e4-a7fa-1b32f6e71b21
+vkotlin:S6518e",Replace function call with indexed accessor.(£¨ˆŸüÿÿÿÿ8Ê•ß›ã1J$6732c89c-b48b-4db1-815f-f15b3894fd08

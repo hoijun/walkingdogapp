@@ -108,7 +108,7 @@ class userInfoViewModel(application: Application) : AndroidViewModel(application
     }
 
     // 현재 좌표를 주소로 변경
-     fun getCurrentAddress(coord: LatLng, callback: (String) -> Unit) {
+    fun getCurrentAddress(coord: LatLng, callback: (String) -> Unit) {
         val geocoder = Geocoder(applic, Locale.getDefault())
         if (Build.VERSION.SDK_INT < 33) {
             Log.d("SDK", "LESSTHAN33")

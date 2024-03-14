@@ -2,6 +2,7 @@ package com.example.walkingdogapp.registerinfo
 
 import android.Manifest
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -26,6 +27,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.ActivityRegisterDogBinding
 import com.example.walkingdogapp.userinfo.DogInfo
@@ -65,7 +67,7 @@ class RegisterDogActivity : AppCompatActivity() {
             getExtension(uri)?.let { Log.d("extension", it) }
         }
         if (uri != null && getExtension(uri) == "jpg") {
-            imguri = PressImage(uri)
+            imguri = PressImage(uri, this)
             Log.d("PhotoPickerAAA", "Selected URI: $uri")
             binding.registerImage.setImageURI(uri)
         } else {
@@ -167,7 +169,7 @@ class RegisterDogActivity : AppCompatActivity() {
                 val cal = Calendar.getInstance()
                 val dateCallback = DatePickerDialog.OnDateSetListener { view, year, month, day ->
                     val birth = "${year}/${month + 1}/${day}"
-                    if (getAge(birth) == -1) {
+                    if (Constant.getAge(birth) == -1) {
                         Toast.makeText(
                             this@RegisterDogActivity,
                             "올바른 생일을 입력 해주세요!",
@@ -265,12 +267,12 @@ class RegisterDogActivity : AppCompatActivity() {
         }
     }
 
-    private fun PressImage(uri: Uri): Uri {
+    private fun PressImage(uri: Uri, context: Context): Uri {
         val bitmap = try {
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, uri))
+                ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri))
             } else {
-                MediaStore.Images.Media.getBitmap(contentResolver, uri)
+                MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
             }
         } catch (e: Exception) {
             return Uri.EMPTY
@@ -280,7 +282,7 @@ class RegisterDogActivity : AppCompatActivity() {
         val byteArrayOutputStream = ByteArrayOutputStream()
         pressBitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream)
 
-        val tempFile = File.createTempFile("pressed_img", ".jpg", this.cacheDir)
+        val tempFile = File.createTempFile("pressed_img", ".jpg", context.cacheDir)
         val fileOutputStream = FileOutputStream(tempFile)
         fileOutputStream.write(byteArrayOutputStream.toByteArray())
         fileOutputStream.close()
@@ -301,23 +303,6 @@ class RegisterDogActivity : AppCompatActivity() {
         builder.setPositiveButton("네", listener)
         builder.setNegativeButton("아니요", null)
         builder.show()
-    }
-
-    private fun getAge(date: String): Int {
-        val currentDate = Calendar.getInstance()
-        var age = -1
-
-        val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-        val birthDate = dateFormat.parse(date)
-        val calBirthDate = Calendar.getInstance().apply { time = birthDate }
-
-        if (calBirthDate.time < currentDate.time) {
-            age = currentDate.get(Calendar.YEAR) - calBirthDate.get(Calendar.YEAR)
-            if (currentDate.get(Calendar.DAY_OF_YEAR) < calBirthDate.get(Calendar.DAY_OF_YEAR)) {
-                age--
-            }
-        }
-        return age
     }
 
     private fun goHome() {

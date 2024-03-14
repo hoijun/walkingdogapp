@@ -23,9 +23,9 @@ class DoglistDialog(context: Context, private val callback: (String) -> Unit) : 
 
         val dialogRecyclerView = binding.dialogRecyclerView
         dialogRecyclerView.layoutManager = LinearLayoutManager(context)
-        val adapter = DoglistAdpater(dogs)
-        adapter.itemClickListener =
-            DoglistAdpater.OnItemClickListener { name ->
+        val adaptar = DoglistAdpatar(dogs)
+        adaptar.itemClickListener =
+            DoglistAdpatar.OnItemClickListener { name ->
                 if(name == "직접 입력") {
                     val writeDogDialog = WriteDialog(context, "강아지 종을 입력해주세요.", callback)
                     writeDogDialog.show()
@@ -35,7 +35,7 @@ class DoglistDialog(context: Context, private val callback: (String) -> Unit) : 
                 }
                 dismiss()
             }
-        dialogRecyclerView.adapter = adapter
+        dialogRecyclerView.adapter = adaptar
     }
 
     private fun resizeDialog() {

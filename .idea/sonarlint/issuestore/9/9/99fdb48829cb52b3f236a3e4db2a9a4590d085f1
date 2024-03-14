@@ -1,14 +1,13 @@
 
-[kotlin:S1172R"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ8•ê©ñâ1
-;kotlin:S6310w"Avoid hardcoded dispatchers.(–±Øå8™ê©ñâ1
-;kotlin:S6310"Avoid hardcoded dispatchers.(ÂÈ¨Õ8™ê©ñâ1
-;kotlin:S6310‡"Avoid hardcoded dispatchers.(—æ†8™ê©ñâ1
-Bkotlin:S18742"#Deprecated code should not be used.(–ˆŞ¨8¢ê©ñâ1
-vkotlin:S3776)"RRefactor this method to reduce its Cognitive Complexity from 41 to the 15 allowed.(¶Á»¬şÿÿÿÿ8£ê©ñâ1
-Lkotlin:S6518¬",Replace function call with indexed accessor.(Õ«“ä8¦ê©ñâ1
-Lkotlin:S6518¬",Replace function call with indexed accessor.(Õ«“ä8¦ê©ñâ1
-Qkotlin:S6518­",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8¦ê©ñâ1
-Qkotlin:S6518­",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8¦ê©ñâ1
-Kkotlin:S6518[",Replace function call with indexed accessor.(¢Òåë8¦ê©ñâ1
-Kkotlin:S6518[",Replace function call with indexed accessor.(¢Òåë8¦ê©ñâ1
-Kkotlin:S6518[",Replace function call with indexed accessor.(¢Òåë8¦ê©ñâ1
+kotlin:S1172S"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ8•ê©ñâ1J$6a4a5144-a75d-45fa-ae39-4a5dc5aaaa7d
+bkotlin:S6310‚"Avoid hardcoded dispatchers.(–±Øå8™ê©ñâ1J$2e13452e-9135-45a3-8cd5-6ec25f261cae
+bkotlin:S6310Š"Avoid hardcoded dispatchers.(ÂÈ¨Õ8™ê©ñâ1J$5fa64659-2c27-4f19-a24b-67da4fbd111f
+akotlin:S6310’"Avoid hardcoded dispatchers.(—æ†8™ê©ñâ1J$420c218c-3110-444d-a8de-1aa3fce79faa
+dkotlin:S1128	"Remove this unused import.(ÊÒÅ­ùÿÿÿÿ8»šğ¿ã1J$08d755ec-f9cf-4663-a764-06a79efd1ff6
+_kotlin:S1128"Remove this unused import.(Ñç€8¼šğ¿ã1J$f6e791ef-ea03-45b3-a798-315c13c5da4d
+dkotlin:S1128"Remove this unused import.(Úœåùÿÿÿÿ8¼šğ¿ã1J$574bbb0d-826d-4581-8093-726cc29f5890
+hkotlin:S18743"#Deprecated code should not be used.(–ˆŞ¨8¢ê©ñâ1J$8a00c9a3-56a2-4f62-8866-c3b370d90845
+œkotlin:S3776*"RRefactor this method to reduce its Cognitive Complexity from 41 to the 15 allowed.(¶Á»¬şÿÿÿÿ8£ê©ñâ1J$01da28ac-fa76-44a3-8ef0-0888242f48e8
+vkotlin:S6518c",Replace function call with indexed accessor.(‹©Õºûÿÿÿÿ8¦ê©ñâ1J$08e7a727-b8c0-49ed-970b-1c3c55a33702
+qkotlin:S6518d",Replace function call with indexed accessor.(í…ù8¦ê©ñâ1J$8bd64bbe-5105-42d3-86d8-92de7f0f65b3
+vkotlin:S6518e",Replace function call with indexed accessor.(Œ‹‰çùÿÿÿÿ8¦ê©ñâ1J$36a12d5e-0235-48d6-859a-3900f0a3774e

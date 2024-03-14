@@ -13,6 +13,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.ActivityRegisterUserBinding
 import com.example.walkingdogapp.userinfo.DogInfo
@@ -53,15 +54,15 @@ class RegisterUserActivity : AppCompatActivity() {
         userinfo = currentUserinfo ?: UserInfo()
 
         binding.apply {
-            if(userinfo.name != "") {
+            if (userinfo.name != "") {
                 editName.setText(userinfo.name)
                 editName.setSelection(userinfo.name.length)
 
                 editBirth.text = userinfo.birth
 
-                when(userinfo.gender) {
-                    "남" ->  btnUserismale.setBackgroundColor(Color.DKGRAY)
-                    "여" ->  btnUserisfemale.setBackgroundColor(Color.DKGRAY)
+                when (userinfo.gender) {
+                    "남" -> btnUserismale.setBackgroundColor(Color.DKGRAY)
+                    "여" -> btnUserisfemale.setBackgroundColor(Color.DKGRAY)
                 }
             }
 
@@ -81,14 +82,24 @@ class RegisterUserActivity : AppCompatActivity() {
                 val cal = Calendar.getInstance()
                 val dateCallback = DatePickerDialog.OnDateSetListener { view, year, month, day ->
                     val birth = "${year}/${month + 1}/${day}"
-                    if (getAge(birth) == -1) {
-                        Toast.makeText(this@RegisterUserActivity, "올바른 생일을 입력 해주세요!", Toast.LENGTH_SHORT).show()
+                    if (Constant.getAge(birth) == -1) {
+                        Toast.makeText(
+                            this@RegisterUserActivity,
+                            "올바른 생일을 입력 해주세요!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         return@OnDateSetListener
                     }
                     userinfo.birth = birth
                     binding.editBirth.text = birth
                 }
-                val datepicker = DatePickerDialog(this@RegisterUserActivity, dateCallback, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH))
+                val datepicker = DatePickerDialog(
+                    this@RegisterUserActivity,
+                    dateCallback,
+                    cal.get(Calendar.YEAR),
+                    cal.get(Calendar.MONTH),
+                    cal.get(Calendar.DAY_OF_MONTH)
+                )
                 datepicker.datePicker.maxDate = cal.timeInMillis
                 datepicker.show()
             }
@@ -137,7 +148,8 @@ class RegisterUserActivity : AppCompatActivity() {
                                         userRef.child("birth").setValue(userinfo.birth).await()
                                     } catch (e: Exception) {
                                         return@async
-                                }}
+                                    }
+                                }
 
                                 nameDeferred.await()
                                 genderDeferred.await()
@@ -158,24 +170,6 @@ class RegisterUserActivity : AppCompatActivity() {
                 selectgoMain()
             }
         }
-    }
-
-    private fun getAge(date: String): Int {
-        val currentDate = Calendar.getInstance()
-        var age = -1
-
-        val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-        val birthDate = dateFormat.parse(date)
-        val calBirthDate = Calendar.getInstance().apply { time = birthDate }
-
-        if (calBirthDate.time < currentDate.time) {
-            age = currentDate.get(Calendar.YEAR) - calBirthDate.get(Calendar.YEAR)
-            if (currentDate.get(Calendar.DAY_OF_YEAR) < calBirthDate.get(Calendar.DAY_OF_YEAR)) {
-                age--
-            }
-            Log.d("savepoint", age.toString())
-        }
-        return age
     }
 
     private fun selectgoMain() {

@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingdogapp.databinding.DoglistDialogItemBinding
 
-class DoglistAdpater(private val dogs: List<String>) : RecyclerView.Adapter<DoglistAdpater.DoglistViewHolder>() {
+class DoglistAdpatar(private val dogs: List<String>) : RecyclerView.Adapter<DoglistAdpatar.DoglistViewHolder>() {
     fun interface OnItemClickListener {
         fun onItemClick(name:String)
     }

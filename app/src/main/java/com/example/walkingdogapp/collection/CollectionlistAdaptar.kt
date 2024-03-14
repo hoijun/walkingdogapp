@@ -9,12 +9,9 @@ import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.example.walkingdogapp.collection.CollectionlistAdapter.OnItemClickListener
 import com.example.walkingdogapp.databinding.CollectionlistItemBinding
-import com.example.walkingdogapp.registerinfo.DoglistAdpater
-import com.example.walkingdogapp.userinfo.Walkdate
 
-class CollectionlistAdapter(private val collections: List<CollectionInfo>, private val context: Context) : RecyclerView.Adapter<CollectionlistAdapter.CollectionlistViewHolder>(), Filterable {
+class CollectionlistAdaptar(private val collections: List<CollectionInfo>, private val context: Context) : RecyclerView.Adapter<CollectionlistAdaptar.CollectionlistViewHolder>(), Filterable {
     fun interface OnItemClickListener {
         fun onItemClick(item: CollectionInfo)
     }
@@ -50,7 +47,7 @@ class CollectionlistAdapter(private val collections: List<CollectionInfo>, priva
         }
     }
 
-    override fun getFilter(): Filter? {
+    override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val charString = constraint.toString()

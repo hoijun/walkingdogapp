@@ -24,8 +24,8 @@ class DetailWalkInfoFragment(private val dateinfo: Walkdate) : Fragment(), OnMap
     private val binding get() = _binding!!
 
     private lateinit var mynavermap: NaverMap
-    private var trackingPath = PathOverlay()
-    private lateinit var trackingCamera : CameraUpdate
+    private var walkPath = PathOverlay()
+    private lateinit var camera : CameraUpdate
     private var day = listOf<String>()
 
     private lateinit var mainactivity: MainActivity
@@ -80,8 +80,8 @@ class DetailWalkInfoFragment(private val dateinfo: Walkdate) : Fragment(), OnMap
 
         mynavermap.uiSettings.isZoomControlEnabled = false
 
-        trackingPath.width = 15
-        trackingPath.color = Color.YELLOW
+        walkPath.width = 15
+        walkPath.color = Color.YELLOW
 
         val walkcoords = mutableListOf<LatLng>()
 
@@ -90,12 +90,12 @@ class DetailWalkInfoFragment(private val dateinfo: Walkdate) : Fragment(), OnMap
         }
 
         if (walkcoords.isNotEmpty()) {
-            trackingCamera =
-                CameraUpdate.scrollAndZoomTo(walkcoords[walkcoords.size / 2], 16.0) // 현재 위치로 카메라 이동
-            mynavermap.moveCamera(trackingCamera)
+            camera =
+                CameraUpdate.scrollAndZoomTo(walkcoords[walkcoords.size / 2], 16.0) //
+            mynavermap.moveCamera(camera)
 
-            trackingPath.coords = walkcoords
-            trackingPath.map = mynavermap
+            walkPath.coords = walkcoords
+            walkPath.map = mynavermap
         }
     }
 

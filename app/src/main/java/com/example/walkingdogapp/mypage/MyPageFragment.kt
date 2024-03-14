@@ -2,7 +2,10 @@ package com.example.walkingdogapp.mypage
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +13,7 @@ import android.widget.Toast
 import androidx.core.graphics.drawable.toBitmapOrNull
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentMyPageBinding
@@ -93,13 +97,15 @@ class MyPageFragment : Fragment() {
 
             if(userdogInfo.name != ""){
                 menuDogname.text = userdogInfo.name
-                menuDogfeature.text = "${getAge(userdogInfo.birth)}살/ ${userdogInfo.weight}kg / ${userdogInfo.breed}"
+                menuDogfeature.text = "${Constant.getAge(userdogInfo.birth)}살/ ${userdogInfo.weight}kg / ${userdogInfo.breed}"
                 if (myViewModel.imgdrawble.value != null) {
                     menuDogimg.setImageDrawable(myViewModel.imgdrawble.value)
                 }
             }
 
             menuDistance.text = getString(R.string.totaldistance, totalwalkInfo.totaldistance / 1000.0)
+            numpictures.text = "${getAlbumImageCount()}개"
+
             walkDistance.text = getString(R.string.totaldistance, totalwalkInfo.totaldistance / 1000.0)
             walkTime.text =  "${(totalwalkInfo.totaltime / 60)}분"
             walkCount.text = "${walkdates.size}회"
@@ -112,17 +118,27 @@ class MyPageFragment : Fragment() {
         _binding = null
     }
 
-    private fun getAge(date: String): Int {
-        val currentDate = Calendar.getInstance()
-
-        val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-        val birthDate = dateFormat.parse(date)
-        val calBirthDate = Calendar.getInstance().apply { time = birthDate }
-
-        var age = currentDate.get(Calendar.YEAR) - calBirthDate.get(Calendar.YEAR)
-        if (currentDate.get(Calendar.DAY_OF_YEAR) < calBirthDate.get(Calendar.DAY_OF_YEAR)) {
-            age--
+    private fun getAlbumImageCount(): Int {
+        var count = 0
+        val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(MediaStore.Images.Media._ID)
+        val selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ?"
+        val selectionArgs = arrayOf("털뭉치")
+        val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC"
+        val cursor = requireActivity().contentResolver.query(
+            uri,
+            projection,
+            selection,
+            selectionArgs,
+            sortOrder
+        )
+        cursor?.use { cursor ->
+            val columnIndex: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            while (cursor.moveToNext()) {
+                val imagePath: String = cursor.getString(columnIndex)
+                count++
+            }
         }
-        return age
+        return count
     }
 }
