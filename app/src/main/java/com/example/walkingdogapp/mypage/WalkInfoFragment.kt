@@ -128,7 +128,6 @@ class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
             walkcalendar.setOnMonthChangedListener { widget, date -> // 달 바꿀때
                 walkcalendar.removeDecorators()
                 walkcalendar.invalidateDecorators() // 데코 초기화
-                Log.d("savepoint", "aaaaa")
                 if (date.month == CalendarDay.today().month) {
                     walkcalendar.selectedDate = CalendarDay.today() // 현재 달로 바꿀 때 마다 현재 날짜 표시
                     adapter = WalkdateslistAdapater(walkinfostartday)

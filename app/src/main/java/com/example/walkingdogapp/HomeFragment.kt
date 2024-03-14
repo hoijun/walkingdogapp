@@ -120,7 +120,6 @@ class HomeFragment : Fragment() {
                         val listener = DialogInterface.OnClickListener { _, ans ->
                             when (ans) {
                                 DialogInterface.BUTTON_POSITIVE -> {
-                                    // 권한 창으로 이동
                                     ActivityCompat.requestPermissions(
                                         requireActivity(),
                                         arrayOf(

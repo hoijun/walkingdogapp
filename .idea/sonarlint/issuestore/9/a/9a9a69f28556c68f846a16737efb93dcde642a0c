@@ -1,16 +1,15 @@
 
-‚kotlin:S1172¨"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ8—¦øâ1J$5fdd3005-3823-4a57-aacc-59408f87b9e5
-gkotlin:S6310â"Avoid hardcoded dispatchers.(¿ª¢íÿÿÿÿÿ8Ÿ¦øâ1J$4b41a831-6f12-47f0-8513-5d76611a336b
-bkotlin:S6310ë"Avoid hardcoded dispatchers.(âùº¸8Ÿ¦øâ1J$1040e4ac-4132-4619-b8c4-360e0d600b8e
-_kotlin:S1128	"Remove this unused import.( ¯–8°¦øâ1J$638d9839-3f10-4c12-92f3-acb15bf1d536
-dkotlin:S1128."Remove this unused import.(Î©—ûÿÿÿÿ8°¦øâ1J$361b6f15-68ce-4e2e-9212-ce16085e308c
-mkotlin:S1874^"#Deprecated code should not be used.(éÕ°ÿÿÿÿÿ8²¦øâ1J$03efb478-58d9-4279-809b-f5146cab28ec
-nkotlin:S1874‘"#Deprecated code should not be used.(õ˜‰¿øÿÿÿÿ8 „øâ1J$ee1929a7-38d3-4df1-a0e9-cb85ce00de66
-œkotlin:S3776T"RRefactor this method to reduce its Cognitive Complexity from 53 to the 15 allowed.(¶Á»¬şÿÿÿÿ8³¦øâ1J$f848def2-e992-4119-9fbd-f9f78a0ef057
-rkotlin:S6518»",Replace function call with indexed accessor.(Õ«“ä8¹¦øâ1J$d4fd7dd5-f2a6-4205-98b8-c21465cd3603
-rkotlin:S6518»",Replace function call with indexed accessor.(Õ«“ä8¹¦øâ1J$5327a042-45f0-40cd-a0cd-89569a550cc3
-wkotlin:S6518¼",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8¹¦øâ1J$ff87f8a5-8b11-4114-8ef5-4caeed775071
-wkotlin:S6518¼",Replace function call with indexed accessor.(Àµ™—ÿÿÿÿÿ8Âíøâ1J$c114df0d-2190-4373-bbab-e5ca16c34c82
-wkotlin:S6518¸",Replace function call with indexed accessor.(‹©Õºûÿÿÿÿ8Âíøâ1J$b65e6c8f-3391-48ce-bf20-2d2f03027b83
-rkotlin:S6518¹",Replace function call with indexed accessor.(í…ù8Ãíøâ1J$9f17323d-e0ad-4f11-b85a-c903b14a40da
-wkotlin:S6518º",Replace function call with indexed accessor.(Œ‹‰çùÿÿÿÿ8Ãíøâ1J$58fcb2b6-d883-4c6f-ab52-52e7a10061d8
+‚kotlin:S1172ª"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ8—¦øâ1J$9bc9d3df-dbb0-4e19-92ba-64a02c13237b
+gkotlin:S6310ä"Avoid hardcoded dispatchers.(¿ª¢íÿÿÿÿÿ8Ÿ¦øâ1J$a0223d33-e7c4-4010-af6d-c4e90d73928f
+bkotlin:S6310í"Avoid hardcoded dispatchers.(âùº¸8Ÿ¦øâ1J$e64d170f-2f30-4e9b-9b43-5f996e8ae7a5
+_kotlin:S1128
+"Remove this unused import.( ¯–8°¦øâ1J$5f8071bf-f296-49a1-8302-5eba133ad88c
+_kotlin:S1128-"Remove this unused import.(Ñç€8Â®ÚÄã1J$beb69bcc-c9c9-453e-9f71-0d6b0a8dcfab
+dkotlin:S1128/"Remove this unused import.(Úœåùÿÿÿÿ8Â®ÚÄã1J$9c0c0c34-7d5e-4311-8fbd-64ed99d15f9f
+dkotlin:S11280"Remove this unused import.(Î©—ûÿÿÿÿ8°¦øâ1J$32c5abb7-1a22-4975-804d-3d8f8fc3cb40
+mkotlin:S1874`"#Deprecated code should not be used.(éÕ°ÿÿÿÿÿ8²¦øâ1J$5fcbf09a-94bd-42a7-bfb9-120aead3e876
+ikotlin:S1874“"#Deprecated code should not be used.(©ïıê8ÀïÙÄã1J$c5e733f0-daa3-4f43-9a85-683a65ee3b95
+œkotlin:S3776V"RRefactor this method to reduce its Cognitive Complexity from 53 to the 15 allowed.(¶Á»¬şÿÿÿÿ8³¦øâ1J$adce794e-e442-4490-bd62-e00f4786e633
+wkotlin:S6518º",Replace function call with indexed accessor.(‹©Õºûÿÿÿÿ8ÑïÙÄã1J$61e9f3f5-8310-496d-b3dd-494f2fdd738f
+rkotlin:S6518»",Replace function call with indexed accessor.(í…ù8ÑïÙÄã1J$69ef8a42-41ce-4f9f-ad98-45ddf21404cf
+wkotlin:S6518¼",Replace function call with indexed accessor.(Œ‹‰çùÿÿÿÿ8ÑïÙÄã1J$2284510e-f23f-49a1-a23e-9c4eb2b6bd18

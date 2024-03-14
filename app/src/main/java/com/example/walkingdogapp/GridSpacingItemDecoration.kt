@@ -1,4 +1,4 @@
-package com.example.walkingdogapp.collection
+package com.example.walkingdogapp
 
 import android.graphics.Rect
 import android.view.View
@@ -25,6 +25,36 @@ class GridSpacingItemDecoration(
                 // (column + 1) * ((1f / spanCount) * spacing)
                 right = (column + 1) * spacing / spanCount
                 if (position < spanCount) top = spacing
+                bottom = spacing
+            }
+        } else {
+            outRect.apply {
+                left = 0
+                right = 0
+                top = 0
+                bottom = 0
+            }
+        }
+    }
+}
+
+class HorizonSpacingItemDecoration(
+    private val itemCount: Int, // 아이템 갯수
+    private val spacing: Int // 간격
+) : ItemDecoration() {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
+        val position: Int = parent.getChildAdapterPosition(view)
+
+        if (position >= 0) {
+            outRect.apply {
+                left = if (position == 0) spacing else spacing / 2
+                right = if (position == itemCount - 1) spacing else spacing / 2
+                top = spacing
                 bottom = spacing
             }
         } else {

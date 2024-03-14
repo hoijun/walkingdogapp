@@ -20,6 +20,7 @@ import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -52,6 +53,7 @@ import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
@@ -88,7 +90,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private var trackingCameraMode = true // 지도의 화면이 자동으로 사용자에 위치에 따라 움직이는 지
 
     private var getCollectionItems = mutableListOf<String>()
-    private var collectionImgs = listOf(
+    private var collectionResources = listOf(
         R.drawable.collection_001,
         R.drawable.collection_002,
         R.drawable.collection_003,
@@ -101,10 +103,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         R.drawable.collection_010,
         R.drawable.collection_011
     )
+    private var collectionImgViews = mutableListOf<ImageView>()
 
-    private var colletion_imgsBitmap = mutableListOf<Bitmap>()
-
-    private var animalMarkers = mutableListOf<Marker>()
+    private var animalMarkers = mutableListOf<InfoWindow>()
 
     private val cameraPermission = arrayOf(Manifest.permission.CAMERA)
     private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -147,7 +148,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         // 백그라운드 위치 서비스 시작
         startWalkingService()
 
-        imgtoBitmap()
+        setcolletionImageView()
 
         val mapFragment: MapFragment = supportFragmentManager.findFragmentById(R.id.map_fragment) as MapFragment?
             ?: MapFragment.newInstance().also {
@@ -252,7 +253,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     mynavermap.moveCamera(trackingCamera)
                 }
 
-                val markersToRemove = mutableListOf<Marker>()
+                val markersToRemove = mutableListOf<InfoWindow>()
                 for (marker in animalMarkers) { // 마커 특정 거리 이상일 경우 제거
                     if (marker.position.distanceTo(coordList.last()) > 400) {
                         Log.d("coor", "clear")
@@ -279,14 +280,12 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             binding.InfoTime.text = getString(R.string.time, minutes, seconds)
         }
     }
-
-    private fun imgtoBitmap() {
-        lifecycleScope.launch(Dispatchers.Main) {
-            val option = BitmapFactory.Options()
-            option.inSampleSize = 6
-            for (img in collectionImgs) {
-                colletion_imgsBitmap.add(BitmapFactory.decodeResource(resources, img, option))
-            }
+    private fun setcolletionImageView() {
+        for(imgRes in collectionResources) {
+            val imgView = ImageView(this)
+            imgView.layoutParams = ViewGroup.LayoutParams(120, 120)
+            Glide.with(this).load(imgRes).override(100, 100).into(imgView)
+            collectionImgViews.add(imgView)
         }
     }
 
@@ -299,12 +298,13 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         if (animalMarkers.size < 6) { // 마커의 갯수 상한선
                             val randomCoord = getRandomCoord(coordList.last(), 300)
                             val randomNumber = kotlin.random.Random.nextInt(1, 12)
-                            val animalMarker = Marker()
-                            animalMarker.icon =
-                                OverlayImage.fromBitmap(colletion_imgsBitmap[randomNumber - 1])
-                            animalMarker.width = 100
-                            animalMarker.height = 100
-                            animalMarker.anchor = PointF(0.5f, 0.5f)
+                            val animalMarker = InfoWindow()
+                            animalMarker.adapter =
+                                object : InfoWindow.DefaultViewAdapter(this@WalkingActivity) {
+                                    override fun getContentView(p0: InfoWindow): View {
+                                        return collectionImgViews[randomNumber - 1]
+                                    }
+                                }
                             animalMarker.tag = String.format("%03d", randomNumber)
                             animalMarker.setOnClickListener {
                                 if (coordList.last().distanceTo(animalMarker.position) < 20) {
