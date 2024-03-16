@@ -16,6 +16,7 @@ import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
+import com.example.walkingdogapp.album.GalleryFragment
 import com.example.walkingdogapp.databinding.FragmentMyPageBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.registerinfo.RegisterUserActivity
@@ -84,7 +85,7 @@ class MyPageFragment : Fragment() {
             }
 
             managepictures.setOnClickListener {
-
+                mainactivity.changeFragment(GalleryFragment())
             }
 
             menuWalkinfo.setOnClickListener {
@@ -122,8 +123,8 @@ class MyPageFragment : Fragment() {
         var count = 0
         val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(MediaStore.Images.Media._ID)
-        val selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ?"
-        val selectionArgs = arrayOf("털뭉치")
+        val selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ?"
+        val selectionArgs = arrayOf("털뭉치", "%munchi_%")
         val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC"
         val cursor = requireActivity().contentResolver.query(
             uri,

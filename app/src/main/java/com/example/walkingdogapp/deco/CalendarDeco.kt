@@ -1,4 +1,4 @@
-package com.example.walkingdogapp.mypage
+package com.example.walkingdogapp.deco
 
 import android.content.Context
 import android.graphics.Color
@@ -16,6 +16,19 @@ class DayDecorator(context: Context): DayViewDecorator {
     // true를 리턴 시 모든 요일에 내가 설정한 드로어블이 적용된다
     override fun shouldDecorate(day: CalendarDay): Boolean {
         return true
+    }
+
+    // 일자 선택 시 내가 정의한 드로어블이 적용되도록 한다
+    override fun decorate(view: DayViewFacade) {
+        view.setSelectionDrawable(drawable!!)
+    }
+}
+
+class ToDayDecorator(context: Context, private val today: CalendarDay): DayViewDecorator {
+    var drawable = ContextCompat.getDrawable(context, R.drawable.transparent_calendar_element)
+    // true를 리턴 시 모든 요일에 내가 설정한 드로어블이 적용된다
+    override fun shouldDecorate(day: CalendarDay): Boolean {
+        return day == today
     }
 
     // 일자 선택 시 내가 정의한 드로어블이 적용되도록 한다

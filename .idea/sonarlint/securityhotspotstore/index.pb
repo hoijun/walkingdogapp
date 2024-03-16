@@ -60,8 +60,6 @@ j
 :app/src/main/java/com/example/walkingdogapp/WriteDialog.kt,5\8\586cf98db0e3ebabb8d6be4f9650d1d78fb1bf69
 p
 @app/src/main/java/com/example/walkingdogapp/userinfo/UserInfo.kt,3\f\3f9914b8e8da0177a7b16017238de281c189de19
-r
-Bapp/src/main/java/com/example/walkingdogapp/mypage/CalendarDeco.kt,6\1\61b74e08d165f3b3c3161e7eba9144058db6c7de
 y
 Iapp/src/main/java/com/example/walkingdogapp/userinfo/UserInfoViewModel.kt,6\7\6775c684ba98944e9ba13d93dc6aa03b70c4ed38
 |
@@ -80,8 +78,6 @@ Lapp/src/main/java/com/example/walkingdogapp/album/AlbumMapitemlistAdaptar.kt,1
 Oapp/src/main/java/com/example/walkingdogapp/collection/CollectionlistAdaptar.kt,3\1\318698ed7569ab107bede1df11a530fb3a17e793
 z
 Japp/src/main/java/com/example/walkingdogapp/registerinfo/DoglistAdpatar.kt,c\a\ca646c315a4e31da47b616546faf08f36615e0cb
-x
-Happ/src/main/java/com/example/walkingdogapp/GridSpacingItemDecoration.kt,f\3\f3b3be38fdfd2a0d4033a39059e82ed44054e88a
 q
 Aapp/src/main/java/com/example/walkingdogapp/album/albumImgInfo.kt,1\7\1781632d63d527975157f3dfbac6c0d8969c7a26
 q
@@ -90,3 +86,9 @@ t
 Dapp/src/main/java/com/example/walkingdogapp/album/GalleryFragment.kt,5\1\51058a367b825b77732b1ed98ce7d50db2a96a28
 {
 Kapp/src/main/java/com/example/walkingdogapp/album/GalleryitemlistAdaptar.kt,3\1\31850a1a7566dbc09eb7fce587545f52e43ef606
+o
+?app/src/main/java/com/example/walkingdogapp/album/DateDialog.kt,2\0\2024c8518a1b5d1f5a678cb6c067c0abc10ce4e8
+p
+@app/src/main/java/com/example/walkingdogapp/Deco/CalendarDeco.kt,5\f\5f2ad19a2075c520cc4736093c0a958509807b06
+p
+@app/src/main/java/com/example/walkingdogapp/deco/CalendarDeco.kt,0\1\01975b963fbf4f5b5ab27996929c4df6e3b3dc10
