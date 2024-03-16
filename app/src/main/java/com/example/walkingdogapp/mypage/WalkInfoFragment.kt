@@ -1,7 +1,6 @@
 package com.example.walkingdogapp.mypage
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,9 +8,13 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.walkingdogapp.userinfo.DogInfo
+import com.example.walkingdogapp.deco.DayDecorator
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
+import com.example.walkingdogapp.deco.SaturdayDecorator
+import com.example.walkingdogapp.deco.SelectedMonthDecorator
+import com.example.walkingdogapp.deco.SundayDecorator
+import com.example.walkingdogapp.deco.WalkDayDecorator
 import com.example.walkingdogapp.userinfo.Walkdate
 import com.example.walkingdogapp.databinding.FragmentWalkInfoBinding
 import com.example.walkingdogapp.userinfo.userInfoViewModel
@@ -24,7 +27,6 @@ class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
     private var _binding: FragmentWalkInfoBinding? = null
 
     private val myViewModel: userInfoViewModel by activityViewModels()
-    private lateinit var userdogInfo: DogInfo
 
     private var walkdates = mutableListOf<CalendarDay>()
     private val walkinfostartday = mutableListOf<Walkdate>()
@@ -44,7 +46,6 @@ class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
         mainactivity = activity as MainActivity
         mainactivity.binding.menuBn.visibility = View.GONE
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
-        userdogInfo = myViewModel.doginfo.value ?: DogInfo()
         if (selectedDayInfo.isNotEmpty()) {
             selectedDay = CalendarDay.from(
                 selectedDayInfo[0].toInt(),

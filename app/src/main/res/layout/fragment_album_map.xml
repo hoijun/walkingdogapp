@@ -22,6 +22,39 @@
             android:layout_height="match_parent" />
     </FrameLayout>
 
+    <Button
+        android:id="@+id/btn_selectDate"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="날짜 선택"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        android:gravity="center"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:visibility="gone"
+        app:layout_constraintWidth_percent="0.3"
+        app:layout_constraintHeight_percent="0.08"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/selectdate"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintWidth_percent="0.3"
+        app:layout_constraintHeight_percent="0.05"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_selectDate" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -45,6 +78,23 @@
             android:textStyle="bold"
             android:textColor="@color/black"
             android:textSize="15sp"
+            app:layout_constraintWidth_percent="0.8"
+            app:layout_constraintHeight_percent="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/text_selectday"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="위에서 날짜를 선택해주세요!"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:visibility="gone"
             app:layout_constraintWidth_percent="0.8"
             app:layout_constraintHeight_percent="0.5"
             app:layout_constraintStart_toStartOf="parent"

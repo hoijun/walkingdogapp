@@ -2,7 +2,6 @@ package com.example.walkingdogapp.collection
 
 import android.os.Bundle
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.walkingdogapp.Constant
-import com.example.walkingdogapp.GridSpacingItemDecoration
+import com.example.walkingdogapp.deco.GridSpacingItemDecoration
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentCollectionBinding
 import com.example.walkingdogapp.userinfo.userInfoViewModel

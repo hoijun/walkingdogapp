@@ -1,20 +1,20 @@
 
-„kotlin:S899":Do something with the "Boolean" value returned by "mkdir".(ε‰ρ‰ωÿÿÿÿ8›εγ1J$1f224fd5-f461-4336-9a3f-15b619b575be
-bkotlin:S6310¥"Avoid hardcoded dispatchers.(©ÒΥς8››εγ1J$7e7eb64e-f525-4d4f-8e46-434d7f71623f
-akotlin:S6310·"Avoid hardcoded dispatchers.(Γ‘χ\8››εγ1J$7c0ef225-80db-400b-bc31-b38fa0083d1b
-bkotlin:S6310Δ"Avoid hardcoded dispatchers.(Ξήƒή8››εγ1J$c36ac55c-b2a1-4d6f-9bf7-c0f5e41d4418
-gkotlin:S6310Π"Avoid hardcoded dispatchers.(¤Τ‡Βϋÿÿÿÿ8››εγ1J$6c9b11ee-a1cb-4373-8c85-c0dbb06e8700
+„kotlin:S899":Do something with the "Boolean" value returned by "mkdir".(ε‰ρ‰ωÿÿÿÿ8›εγ1J$10d3f448-a7ff-498e-831f-ed4d3b6b7531
+bkotlin:S6310¥"Avoid hardcoded dispatchers.(©ÒΥς8››εγ1J$009d9f67-40c5-4204-9d3f-bb2230189d7f
+akotlin:S6310·"Avoid hardcoded dispatchers.(Γ‘χ\8››εγ1J$4a205547-032d-44b2-9dd1-3b7d443b0fe1
+bkotlin:S6310Δ"Avoid hardcoded dispatchers.(Ξήƒή8››εγ1J$6ba09657-758f-4107-a657-c8362e2dc1ce
+gkotlin:S6310Π"Avoid hardcoded dispatchers.(¤Τ‡Βϋÿÿÿÿ8››εγ1J$6f18cbd4-6953-4f1a-b403-ae49f5879407
 dkotlin:S1128
-"Remove this unused import.(ΤΌ³ϊÿÿÿÿÿ8Έ›εγ1J$01c7d352-00d3-4d0d-9955-5809a64ccd3c
-_kotlin:S1128"Remove this unused import.( ―–8Έ›εγ1J$acb4f7ed-0030-45ec-aa6e-6699f4e4f4f2
-_kotlin:S1128$"Remove this unused import.(€»Ψ8Έ›εγ1J$f5c96eef-9aba-45e1-bc73-f3862d9cd310
-dkotlin:S1128<"Remove this unused import.(νωψόÿÿÿÿ8Έ›εγ1J$d7789774-1aa2-45c5-92cf-09c3c55f2ebc
-nkotlin:S1874Φ"#Deprecated code should not be used.(ε΄Ύ”ώÿÿÿÿ8Ό›εγ1J$8101029b-d46d-4f28-a518-99ec10bbe5dd
-kotlin:S3776"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(¶Α»¬ώÿÿÿÿ8Ύ›εγ1J$79d4bcc8-5f51-489d-9ac3-c9d3331f8ecd
-kotlin:S3776¤"RRefactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.(™‚•ωÿÿÿÿ8Ύ›εγ1J$4ce75257-8885-493e-bd84-19f1ba129d3a
-kotlin:S3776§"RRefactor this method to reduce its Cognitive Complexity from 28 to the 15 allowed.(οΉγ®ψÿÿÿÿ8Ύ›εγ1J$81e3e8ff-7d6f-4655-b375-a6981b4f383a
-kotlin:S3776Ξ"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8Ύ›εγ1J$617be03f-1eb8-4da1-b077-24d44d30554f
-kotlin:S3776¬"RRefactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.(άύμªÿÿÿÿÿ8Ώ›εγ1J$5691234f-b83e-4aac-aa4f-90291cceb5e6
-tkotlin:S1066Χ".Merge this "if" statement with the nested one.(•³β8Ε›εγ1J$ff901c45-bb69-4808-af08-99945a804530
-ykotlin:S1066©".Merge this "if" statement with the nested one.(²τι§ψÿÿÿÿ8Ε›εγ1J$4fcd3240-0fa6-47a5-ac73-551bb43faf88
-rkotlin:S6518‘",Replace function call with indexed accessor.(€ΦΔώ8Θ›εγ1J$369161cf-40d3-4ffc-b246-e86cf624ff99
+"Remove this unused import.(ΤΌ³ϊÿÿÿÿÿ8Έ›εγ1J$81ef223c-67ac-45ae-b5bb-f8d0e213096a
+_kotlin:S1128"Remove this unused import.( ―–8Έ›εγ1J$f8519ab7-da29-4557-bd4d-756d5a02e6c6
+_kotlin:S1128$"Remove this unused import.(€»Ψ8Έ›εγ1J$7bcbf146-3b68-4c4f-8cc6-572b917e1950
+dkotlin:S1128<"Remove this unused import.(νωψόÿÿÿÿ8Έ›εγ1J$a402fbd0-a929-4885-9595-db3ee20d74ac
+nkotlin:S1874Φ"#Deprecated code should not be used.(ε΄Ύ”ώÿÿÿÿ8Ό›εγ1J$53dab245-3698-41fb-8ef5-184782d24c64
+kotlin:S3776"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(¶Α»¬ώÿÿÿÿ8Ύ›εγ1J$64782f8e-812e-4bbf-a414-a11118eb80a6
+kotlin:S3776¤"RRefactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.(™‚•ωÿÿÿÿ8Ύ›εγ1J$093dbf90-e342-47a9-86cb-9bb1cba0bfa3
+kotlin:S3776§"RRefactor this method to reduce its Cognitive Complexity from 28 to the 15 allowed.(οΉγ®ψÿÿÿÿ8Ύ›εγ1J$a532b6d4-dde6-46f7-9c3a-5ee0d650dc0a
+kotlin:S3776Ξ"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8Ύ›εγ1J$5b948b94-8e76-43ef-a9cd-4859230d3495
+kotlin:S3776¬"RRefactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.(άύμªÿÿÿÿÿ8Ώ›εγ1J$e3af3701-b6ca-4848-9222-718bc2eac975
+tkotlin:S1066Χ".Merge this "if" statement with the nested one.(•³β8Ε›εγ1J$9fb4ae71-5d6d-44e4-8c5d-5e5fb1553c4c
+ykotlin:S1066©".Merge this "if" statement with the nested one.(²τι§ψÿÿÿÿ8Ε›εγ1J$12f10e2b-5b2d-4b2d-bc29-db20ef0f78f7
+rkotlin:S6518‘",Replace function call with indexed accessor.(€ΦΔώ8Θ›εγ1J$4d5f8d20-4242-4b32-a054-933058c348d7

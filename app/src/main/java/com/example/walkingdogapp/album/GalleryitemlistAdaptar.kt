@@ -5,16 +5,18 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.databinding.GallerylistItemBinding
 import com.naver.maps.geometry.LatLng
 
 class GalleryitemlistAdaptar(private val imgList: MutableList<GalleryImgInfo>, private val context: Context) : RecyclerView.Adapter<GalleryitemlistAdaptar.AlbumMapitemlistViewHolder>() {
 
     fun interface OnItemClickListener {
-        fun onItemClick(latLng: LatLng, tag: Int)
+        fun onItemClick(imgInfo: GalleryImgInfo)
     }
 
-    var itemClickListener : GalleryitemlistAdaptar.OnItemClickListener? = null
+    var itemClickListener : OnItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumMapitemlistViewHolder {
         val binding = GallerylistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -31,10 +33,11 @@ class GalleryitemlistAdaptar(private val imgList: MutableList<GalleryImgInfo>, p
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
+                itemClickListener?.onItemClick(imgList[bindingAdapterPosition])
             }
         }
-        fun bind(ImgInfo: GalleryImgInfo) {
-
+        fun bind(imgInfo: GalleryImgInfo) {
+            Glide.with(context).load(imgInfo.uri).format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(binding.galleryImg)
         }
     }
 }
