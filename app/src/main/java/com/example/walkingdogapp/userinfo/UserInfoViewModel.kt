@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.walkingdogapp.album.GalleryImgInfo
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
@@ -26,19 +27,16 @@ class userInfoViewModel(application: Application) : AndroidViewModel(application
     private val _doginfo = MutableLiveData<DogInfo>()
     private val _userinfo = MutableLiveData<UserInfo>()
     private val _totalwalkinfo = MutableLiveData<totalWalkInfo>()
-    private val _imguri = MutableLiveData<Uri>()
     private val _imgdrawable = MutableLiveData<Drawable>()
     private val _walkDates = MutableLiveData<List<Walkdate>>()
     private val _collectioninfo = MutableLiveData<HashMap<String, Boolean>>()
+    private val _albumImgs = MutableLiveData<List<GalleryImgInfo>>()
     private var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var address : List<String>
     private val applic = application
 
     val currentCoord: LiveData<LatLng>
         get() = _currentCoord
-
-    val imguri: LiveData<Uri>
-        get() = _imguri
 
     val imgdrawble: LiveData<Drawable>
         get() = _imgdrawable
@@ -58,16 +56,15 @@ class userInfoViewModel(application: Application) : AndroidViewModel(application
     val collectioninfo: LiveData<HashMap<String, Boolean>>
         get() = _collectioninfo
 
+    val albumImgs: LiveData<List<GalleryImgInfo>>
+        get() = _albumImgs
+
     init {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(applic)
     }
 
     private fun upadateLocateInfo(input: LatLng) {
         _currentCoord.value = input
-    }
-
-    fun saveImgUri(uri: Uri) {
-        _imguri.value = uri
     }
 
     fun saveImgDrawble(drawable: Drawable) {
@@ -92,6 +89,10 @@ class userInfoViewModel(application: Application) : AndroidViewModel(application
 
     fun savecollectionInfo(collectioninfo: HashMap<String, Boolean>){
         _collectioninfo.value = collectioninfo
+    }
+
+    fun savealbumImgs(albumImgs: List<GalleryImgInfo>) {
+        _albumImgs.value = albumImgs
     }
 
     // 현재 좌표

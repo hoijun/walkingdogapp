@@ -136,7 +136,7 @@ class CollectionFragment : Fragment() {
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    adaptar.filter?.filter(newText) // 입력 값에 따라 도감 필터
+                    adaptar.filter.filter(newText) // 입력 값에 따라 도감 필터
                     return false
                 }
             })

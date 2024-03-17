@@ -314,11 +314,11 @@ class RegisterDogActivity : AppCompatActivity() {
     }
 
     private fun showDoglist() {
-        val dialog = DoglistDialog(this) {
+        val dialog = DoglistDialog(supportFragmentManager) {
             binding.editBreed.text = it
             doginfo.breed = it
         }
-        dialog.show()
+        dialog.show(supportFragmentManager, "doglist")
     }
 
     private fun getExtension(uri: Uri): String? { // 파일 확장자

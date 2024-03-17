@@ -4,20 +4,22 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.fragment.app.DialogFragment
 import com.example.walkingdogapp.databinding.WriteDialogBinding
 
-class WriteDialog(context: Context, private val writeText : String, private val callback : (String) -> Unit) : Dialog(context) {
+class WriteDialog(private val writeText : String, private val callback : (String) -> Unit) : DialogFragment() {
     private lateinit var binding: WriteDialogBinding
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = WriteDialogBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        resizeDialog()
-        setCancelable(false)
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = WriteDialogBinding.inflate(inflater, container, false)
         binding.apply {
             write.hint = writeText
             finishButton.setOnClickListener {
@@ -29,12 +31,15 @@ class WriteDialog(context: Context, private val writeText : String, private val 
                 dismiss()
             }
         }
+        isCancelable = false
+        resizeDialog()
+        return binding.root
     }
 
     private fun resizeDialog() {
-        val params: ViewGroup.LayoutParams? = window?.attributes
+        val params: ViewGroup.LayoutParams? = this.dialog?.window?.attributes
         val deviceWidth = Resources.getSystem().displayMetrics.widthPixels
         params?.width = (deviceWidth * 0.8).toInt()
-        window?.attributes = params as WindowManager.LayoutParams
+        this.dialog?.window?.attributes = params as WindowManager.LayoutParams
     }
 }

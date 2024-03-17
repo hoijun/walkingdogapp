@@ -1,3 +1,4 @@
 
-kotlin:S101"TRename class "userInfoViewModel" to match the regular expression ^[A-Z][a-zA-Z0-9]*$(Á¸­ùÿÿÿÿ8½±¶á1J$1c6da8dd-1ae5-4174-ac34-7a2547f20858
-mkotlin:S1874t"#Deprecated code should not be used.(Æé™Ûüÿÿÿÿ8¾±¶á1J$653de0d7-e3ca-43fc-8393-c671a7b140ee
+dkotlin:S1128	"Remove this unused import.(œô”şúÿÿÿÿ8¹í‰Ğä1J$48dcfa49-5838-472a-bbaa-b79a702cf401
+kotlin:S101"TRename class "userInfoViewModel" to match the regular expression ^[A-Z][a-zA-Z0-9]*$(Á¸­ùÿÿÿÿ8ëÄ×Ïä1J$52307a4a-cd5f-49d0-ae98-d7f6d31df413
+mkotlin:S1874u"#Deprecated code should not be used.(Æé™Ûüÿÿÿÿ8ìÄ×Ïä1J$c96b36bc-53db-401a-847b-fd85a20a0aaa

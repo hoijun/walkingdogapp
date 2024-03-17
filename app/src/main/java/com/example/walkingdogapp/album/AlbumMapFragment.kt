@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +38,6 @@ import com.naver.maps.map.overlay.InfoWindow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Calendar
 
 class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     private var _binding: FragmentAlbumMapBinding? = null
@@ -117,7 +115,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                         }
                     }
                 }
-                dialog.show()
+                dialog.show(requireActivity().supportFragmentManager, "date")
             }
         }
         return binding.root
@@ -141,14 +139,10 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        lateimgCount = imgInfos.size
-        imgInfos.clear()
-    }
-
     override fun onStop() {
         super.onStop()
+        lateimgCount = imgInfos.size
+        imgInfos.clear()
         binding.imgRecyclerView.removeItemDecoration(itemDecoration)
     }
 
@@ -192,6 +186,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun getAlbumImage(selectdate: String) {
         if (selectdate == "") {
             binding.apply {
@@ -219,7 +214,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             val columnIndexId: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             val columnIndexDate: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
             while (cursor.moveToNext()) {
-                val imageDate = convertLongToTime(cursor.getLong(columnIndexDate))
+                val imageDate = Constant.convertLongToTime(SimpleDateFormat("yyyy-MM-dd"), cursor.getLong(columnIndexDate))
                 val imagePath: String = cursor.getString(columnIndexId)
                 val contentUri = Uri.withAppendedPath(uri, imagePath)
                 val imgView = getMarkerImageView(contentUri)
@@ -239,14 +234,6 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    private fun convertLongToTime(time: Long): String {
-        val format = SimpleDateFormat("yyyy-MM-dd")
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = time * 1000;
-        return format.format(calendar.time)
     }
 
     private fun getMarkerImageView(uri: Uri): ImageView {

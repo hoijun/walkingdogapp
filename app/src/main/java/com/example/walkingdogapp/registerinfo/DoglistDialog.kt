@@ -4,31 +4,35 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.walkingdogapp.WriteDialog
 import com.example.walkingdogapp.databinding.DoglistDialogBinding
+import com.example.walkingdogapp.databinding.WriteDialogBinding
 
-class DoglistDialog(context: Context, private val callback: (String) -> Unit) : Dialog(context){
+class DoglistDialog(private val fragmentManager: FragmentManager, private val callback: (String) -> Unit) : DialogFragment(){
     private lateinit var binding: DoglistDialogBinding
     private val dogs = listOf("직접 입력", "말티즈", "푸들", "포메라니안", "믹스견", "치와와", "시츄", "골든리트리버", "진돗개", "불독", "비글", "닥스훈트", "허스키", "a", "b", "c")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = DoglistDialogBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setCanceledOnTouchOutside(true)
 
-        resizeDialog()
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = DoglistDialogBinding.inflate(inflater, container, false)
         val dialogRecyclerView = binding.dialogRecyclerView
         dialogRecyclerView.layoutManager = LinearLayoutManager(context)
         val adaptar = DoglistAdpatar(dogs)
         adaptar.itemClickListener =
             DoglistAdpatar.OnItemClickListener { name ->
                 if(name == "직접 입력") {
-                    val writeDogDialog = WriteDialog(context, "강아지 종을 입력해주세요.", callback)
-                    writeDogDialog.show()
+                    val writeDogDialog = WriteDialog("강아지 종을 입력해주세요.", callback)
+                    writeDogDialog.show(fragmentManager, "doglist")
                 }
                 else {
                     callback(name)
@@ -36,10 +40,13 @@ class DoglistDialog(context: Context, private val callback: (String) -> Unit) : 
                 dismiss()
             }
         dialogRecyclerView.adapter = adaptar
+        resizeDialog()
+        this.dialog?.setCanceledOnTouchOutside(true)
+        return binding.root
     }
 
     private fun resizeDialog() {
-        val params: ViewGroup.LayoutParams? = window?.attributes
+        val params: ViewGroup.LayoutParams? = this.dialog?.window?.attributes
         val deviceWidth = Resources.getSystem().displayMetrics.widthPixels
         val deviceHeight = Resources.getSystem().displayMetrics.heightPixels
         params?.width = (deviceWidth * 0.8).toInt()
@@ -47,6 +54,6 @@ class DoglistDialog(context: Context, private val callback: (String) -> Unit) : 
         val layoutParams= binding.dialogRecyclerView.layoutParams
         layoutParams.width = (deviceWidth * 0.66).toInt()
         binding.dialogRecyclerView.layoutParams = layoutParams
-        window?.attributes = params as WindowManager.LayoutParams
+        this.dialog?.window?.attributes = params as WindowManager.LayoutParams
     }
 }

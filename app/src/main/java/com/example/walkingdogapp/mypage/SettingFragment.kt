@@ -126,7 +126,7 @@ class SettingFragment : Fragment() {
             }
 
             settingWithdrawal.setOnClickListener {
-                val writeDialog = WriteDialog(requireContext(), "이메일을 입력해 주세요.") { writeText ->
+                val writeDialog = WriteDialog("이메일을 입력해 주세요.") { writeText ->
                     if (userInfo.email == writeText) { // 이메일 올바르게 입력
                         lifecycleScope.launch {
                             if (userInfo.email.contains("naver.com")) { // 네이버로 로그인 했을 경우
@@ -187,7 +187,7 @@ class SettingFragment : Fragment() {
                         ).show()
                     }
                 }
-                writeDialog.show()
+                writeDialog.show(requireActivity().supportFragmentManager, "writeemail")
             }
         }
         return binding.root

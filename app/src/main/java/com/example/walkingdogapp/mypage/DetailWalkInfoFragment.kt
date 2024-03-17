@@ -1,7 +1,9 @@
 package com.example.walkingdogapp.mypage
 
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,8 +20,9 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.PathOverlay
 import okhttp3.internal.cookieToString
+import java.util.ArrayList
 
-class DetailWalkInfoFragment(private val dateinfo: Walkdate) : Fragment(), OnMapReadyCallback {
+class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
     private var _binding: FragmentDetailWalkInfoBinding? = null
     private val binding get() = _binding!!
 
@@ -27,6 +30,7 @@ class DetailWalkInfoFragment(private val dateinfo: Walkdate) : Fragment(), OnMap
     private var walkPath = PathOverlay()
     private lateinit var camera : CameraUpdate
     private var day = listOf<String>()
+    private var dateinfo = Walkdate()
 
     private lateinit var mainactivity: MainActivity
     private val callback = object : OnBackPressedCallback(true) {
@@ -53,6 +57,13 @@ class DetailWalkInfoFragment(private val dateinfo: Walkdate) : Fragment(), OnMap
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDetailWalkInfoBinding.inflate(inflater,container, false)
+
+        dateinfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable("selectdate", Walkdate::class.java)?: Walkdate()
+        } else {
+            (arguments?.getSerializable("selectdate") ?: Walkdate()) as Walkdate
+        }
+
         binding.apply {
             btnGoMypage.setOnClickListener {
                 goWalkInfo()
@@ -100,6 +111,11 @@ class DetailWalkInfoFragment(private val dateinfo: Walkdate) : Fragment(), OnMap
     }
 
     private fun goWalkInfo() {
-        mainactivity.changeFragment(WalkInfoFragment(day))
+        val bundle = Bundle()
+        bundle.putStringArrayList("selectdate", day as ArrayList<String>)
+        val walkInfoFragment = WalkInfoFragment().apply {
+            arguments = bundle
+        }
+        mainactivity.changeFragment(walkInfoFragment)
     }
 }

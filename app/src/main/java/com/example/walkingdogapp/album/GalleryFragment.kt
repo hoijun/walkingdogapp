@@ -15,24 +15,25 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.deco.GridSpacingItemDecoration
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentGalleryBinding
 import com.example.walkingdogapp.mypage.MyPageFragment
+import com.example.walkingdogapp.userinfo.userInfoViewModel
 import java.text.SimpleDateFormat
-import java.util.Calendar
 
 
 class GalleryFragment : Fragment() {
     private var _binding: FragmentGalleryBinding? = null
     private val binding get() = _binding!!
-
     private lateinit var mainactivity: MainActivity
-
+    private val myViewModel: userInfoViewModel by activityViewModels()
     private val imgInfos = mutableListOf<GalleryImgInfo>()
     private var adaptar: GalleryitemlistAdaptar? = null
+    private var isFragmentSwitched = false
 
     private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
@@ -86,8 +87,11 @@ class GalleryFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        imgInfos.clear()
+        if(!isFragmentSwitched) {
+            imgInfos.clear()
+        }
         binding.galleryRecyclerview.removeItemDecorationAt(0)
+        isFragmentSwitched = false
     }
 
     override fun onDestroyView() {
@@ -102,16 +106,27 @@ class GalleryFragment : Fragment() {
             btnBack.setOnClickListener {
                 goMypage()
             }
+
+            val imgNum = arguments?.getInt("select", 0) ?: 0
+
             adaptar = GalleryitemlistAdaptar(imgInfos, requireContext())
-            adaptar!!.itemClickListener = GalleryitemlistAdaptar.OnItemClickListener { imgInfo ->
-                Log.d("savepoint", imgInfo.date + " " + imgInfo.title)
+            adaptar!!.itemClickListener = GalleryitemlistAdaptar.OnItemClickListener { imgNum ->
+                val bundle = Bundle()
+                bundle.putInt("select", imgNum)
+                isFragmentSwitched = true
+                val detailPictureFragment = DetailPictureFragment().apply {
+                    arguments = bundle
+                }
+                mainactivity.changeFragment(detailPictureFragment)
             }
             galleryRecyclerview.layoutManager = GridLayoutManager(requireContext(), 3)
             galleryRecyclerview.addItemDecoration(GridSpacingItemDecoration(3, Constant.dpTopx(15f, requireContext())))
+            galleryRecyclerview.scrollToPosition(imgNum)
             galleryRecyclerview.adapter = adaptar
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun getAlbumImage() {
         val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(MediaStore.Images.Media._ID, MediaStore.Images.Media.TITLE, MediaStore.Images.Media.DATE_ADDED)
@@ -134,19 +149,11 @@ class GalleryFragment : Fragment() {
                 val imageTitle: String = cursor.getString(columnIndexTitle)
                 val imageDate: Long = cursor.getLong(columnIndexDate)
                 val contentUri = Uri.withAppendedPath(uri, imagePath)
-                imgInfos.add(GalleryImgInfo(contentUri, imageTitle, convertLongToTime(imageDate)))
+                imgInfos.add(GalleryImgInfo(contentUri, imageTitle, Constant.convertLongToTime(SimpleDateFormat("yyyy.MM.dd HH:mm"), imageDate)))
             }
+            myViewModel.savealbumImgs(imgInfos)
         }
     }
-
-    @SuppressLint("SimpleDateFormat")
-    private fun convertLongToTime(time: Long): String {
-        val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = time * 1000;
-        return format.format(calendar.time)
-    }
-
 
     private fun checkPermission(permissions: Array<out String>): Boolean {
         for (permission in permissions) {

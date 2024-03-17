@@ -89,6 +89,7 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />
+
         <service
             android:name="com.google.android.gms.metadata.ModuleDependencies"
             android:enabled="false"
@@ -114,6 +115,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait" />
 
         <provider
