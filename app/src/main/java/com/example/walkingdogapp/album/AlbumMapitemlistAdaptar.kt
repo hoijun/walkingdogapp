@@ -9,7 +9,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.databinding.AlbummapItemBinding
 import com.naver.maps.geometry.LatLng
-import com.naver.maps.map.overlay.InfoWindow
 
 class AlbumMapitemlistAdaptar(private val imginfoList: MutableList<AlbumMapImgInfo>, private val context: Context) : RecyclerView.Adapter<AlbumMapitemlistAdaptar.AlbumMapitemlistViewHolder>() {
 

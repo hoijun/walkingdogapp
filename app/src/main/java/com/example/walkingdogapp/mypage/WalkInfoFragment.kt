@@ -1,6 +1,8 @@
 package com.example.walkingdogapp.mypage
 
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +24,7 @@ import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 
 // 매개 변수는 상세정보 프래그먼트로 부터 되돌아 올 때 상세정보를 보기 원했던 산책 날짜가 달력에 표시가 유지 되도록 하기 위함
-class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
+class WalkInfoFragment : Fragment() { // 수정
     private lateinit var mainactivity: MainActivity
     private var _binding: FragmentWalkInfoBinding? = null
 
@@ -31,6 +33,7 @@ class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
     private var walkdates = mutableListOf<CalendarDay>()
     private val walkinfostartday = mutableListOf<Walkdate>()
     private var selectedDay = CalendarDay.from(2000, 10 ,14)
+    private var lateSelectedDayInfo = listOf<String>()
 
     private lateinit var adapter: WalkdateslistAdapater
     private val binding get() = _binding!!
@@ -46,11 +49,14 @@ class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
         mainactivity = activity as MainActivity
         mainactivity.binding.menuBn.visibility = View.GONE
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
-        if (selectedDayInfo.isNotEmpty()) {
+
+        lateSelectedDayInfo = arguments?.getStringArrayList("selectdate") ?: listOf<String>()
+
+        if (lateSelectedDayInfo.isNotEmpty()) {
             selectedDay = CalendarDay.from(
-                selectedDayInfo[0].toInt(),
-                selectedDayInfo[1].toInt(),
-                selectedDayInfo[2].toInt()
+                lateSelectedDayInfo[0].toInt(),
+                lateSelectedDayInfo[1].toInt(),
+                lateSelectedDayInfo[2].toInt()
             )
         }
     }
@@ -72,7 +78,7 @@ class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
                 goMypage()
             }
 
-            if(selectedDayInfo.isEmpty()) { // 마이 페이지에서 들어 왔을 때
+            if(lateSelectedDayInfo.isEmpty()) { // 마이 페이지에서 들어 왔을 때
                 walkcalendar.selectedDate = CalendarDay.today() // 현재 날짜 표시
             } else { // 상세정보 창에서 다시 되돌아 왔을 때
                 walkcalendar.selectedDate = selectedDay
@@ -83,7 +89,7 @@ class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
                 val dayinfo = date.day.split("-")
                 walkdates.add(CalendarDay.from(dayinfo[0].toInt(), dayinfo[1].toInt(), dayinfo[2].toInt())) // 산책한 날 얻음
 
-                if(CalendarDay.today().date.toString() == date.day && selectedDayInfo.isEmpty()) { // 마이 페이지에서 들어 왔을 때
+                if(CalendarDay.today().date.toString() == date.day && lateSelectedDayInfo.isEmpty()) { // 마이 페이지에서 들어 왔을 때
                     walkinfostartday.add(date)
                 } else if(selectedDay.date.toString() == date.day) {  // 현재 날짜 표시
                     walkinfostartday.add(date)
@@ -154,7 +160,12 @@ class WalkInfoFragment(private val selectedDayInfo: List<String>) : Fragment() {
     }
 
     private fun goDetail(date: Walkdate) {
-        mainactivity.changeFragment(DetailWalkInfoFragment(date))
+        val bundle = Bundle()
+        bundle.putSerializable("selectdate", date)
+        val detailWalkInfoFragment = DetailWalkInfoFragment().apply {
+            arguments = bundle
+        }
+        mainactivity.changeFragment(detailWalkInfoFragment)
         mainactivity.binding.menuBn.visibility = View.GONE
     }
 }

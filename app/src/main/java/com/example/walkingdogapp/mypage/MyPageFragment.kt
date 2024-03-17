@@ -89,7 +89,7 @@ class MyPageFragment : Fragment() {
             }
 
             menuWalkinfo.setOnClickListener {
-                mainactivity.changeFragment(WalkInfoFragment(listOf<String>()))
+                mainactivity.changeFragment(WalkInfoFragment())
             }
 
             if(userInfo.name != "") {

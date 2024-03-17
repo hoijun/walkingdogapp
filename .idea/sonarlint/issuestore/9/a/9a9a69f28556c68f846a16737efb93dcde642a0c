@@ -1,15 +1,15 @@
 
-‚kotlin:S1172ª"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ8—¦øâ1J$4d146eae-a6a4-4840-a416-07e5d56cc264
-gkotlin:S6310ä"Avoid hardcoded dispatchers.(¿ª¢íÿÿÿÿÿ8Ÿ¦øâ1J$6b56da92-4aef-46c1-a1c3-3e4795cc21a6
-bkotlin:S6310í"Avoid hardcoded dispatchers.(âùº¸8Ÿ¦øâ1J$73f0e5d1-8e28-4401-8921-79a81d5c7b8d
+‚kotlin:S1172ª"7Use "_" instead of this unused lambda parameter "view".(Šßíšÿÿÿÿÿ8—¦øâ1J$050d509a-45ea-47ee-bbb8-d0bae3bbd5ce
+gkotlin:S6310ä"Avoid hardcoded dispatchers.(¿ª¢íÿÿÿÿÿ8Ÿ¦øâ1J$68253222-aaa1-44b4-9e97-a01e8ab84d89
+bkotlin:S6310í"Avoid hardcoded dispatchers.(âùº¸8Ÿ¦øâ1J$1173abb7-7671-4133-bbe5-61b001c2da2b
 _kotlin:S1128
-"Remove this unused import.( ¯–8°¦øâ1J$88da6172-a129-48cf-926e-3ecae2a0533c
-_kotlin:S1128-"Remove this unused import.(Ñç€8Â®ÚÄã1J$2fda10f3-1ba0-46cb-8120-744de6b89f6b
-dkotlin:S1128/"Remove this unused import.(Úœåùÿÿÿÿ8Â®ÚÄã1J$2706089c-ffcc-469c-b892-5bc2417b3145
-dkotlin:S11280"Remove this unused import.(Î©—ûÿÿÿÿ8°¦øâ1J$2e40920d-ff7c-4450-a089-34fd5951c6f9
-mkotlin:S1874`"#Deprecated code should not be used.(éÕ°ÿÿÿÿÿ8²¦øâ1J$c391c4da-50ec-4d36-ba72-fffe9e677fbb
-ikotlin:S1874“"#Deprecated code should not be used.(©ïıê8ÀïÙÄã1J$127ba46e-0a0a-4985-b32f-feedc22f71ec
-œkotlin:S3776V"RRefactor this method to reduce its Cognitive Complexity from 53 to the 15 allowed.(¶Á»¬şÿÿÿÿ8³¦øâ1J$466d5421-d757-4ac0-8b97-9cdc9152940c
-wkotlin:S6518º",Replace function call with indexed accessor.(‹©Õºûÿÿÿÿ8ÑïÙÄã1J$061d0890-3284-467e-b379-c0a50e1a1d1d
-rkotlin:S6518»",Replace function call with indexed accessor.(í…ù8ÑïÙÄã1J$90e5021a-8d9d-46de-9dff-fc77a77921bd
-wkotlin:S6518¼",Replace function call with indexed accessor.(Œ‹‰çùÿÿÿÿ8ÑïÙÄã1J$b6b905cb-8d39-4719-ba03-dbee04f678e4
+"Remove this unused import.( ¯–8°¦øâ1J$40c3b33e-ac88-4305-b700-1920a72b5cd2
+_kotlin:S1128-"Remove this unused import.(Ñç€8Â®ÚÄã1J$132b997f-8499-48f5-9025-fa9dab8029d3
+dkotlin:S1128/"Remove this unused import.(Úœåùÿÿÿÿ8Â®ÚÄã1J$fc536804-fcac-43d2-9f22-d63036e0c04f
+dkotlin:S11280"Remove this unused import.(Î©—ûÿÿÿÿ8°¦øâ1J$03066e13-7e2f-43ff-a5e7-6da083d4ba2f
+mkotlin:S1874`"#Deprecated code should not be used.(éÕ°ÿÿÿÿÿ8²¦øâ1J$0cd34fc2-fe06-4f4e-b6e4-1c3e9bc149c5
+ikotlin:S1874“"#Deprecated code should not be used.(©ïıê8ÀïÙÄã1J$c63e9c21-c2ea-4347-8de7-14c4eb9036bd
+œkotlin:S3776V"RRefactor this method to reduce its Cognitive Complexity from 53 to the 15 allowed.(¶Á»¬şÿÿÿÿ8³¦øâ1J$aba81833-ece6-4429-8d50-25772db68d62
+wkotlin:S6518º",Replace function call with indexed accessor.(‹©Õºûÿÿÿÿ8ÑïÙÄã1J$2a9ba43e-77f8-4776-95fb-b0560cf846fe
+rkotlin:S6518»",Replace function call with indexed accessor.(í…ù8ÑïÙÄã1J$74ff9ba8-5b8b-499b-807c-419a9a24ae0d
+wkotlin:S6518¼",Replace function call with indexed accessor.(Œ‹‰çùÿÿÿÿ8ÑïÙÄã1J$5a33e576-0381-473b-b26f-3c3a6ca72a2d

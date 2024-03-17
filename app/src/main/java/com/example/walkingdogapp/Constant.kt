@@ -49,5 +49,11 @@ class Constant {
             }
             return age
         }
+
+        fun convertLongToTime(format: SimpleDateFormat, time: Long): String {
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = time * 1000;
+            return format.format(calendar.time)
+        }
     }
 }

@@ -13,7 +13,7 @@ import com.naver.maps.geometry.LatLng
 class GalleryitemlistAdaptar(private val imgList: MutableList<GalleryImgInfo>, private val context: Context) : RecyclerView.Adapter<GalleryitemlistAdaptar.AlbumMapitemlistViewHolder>() {
 
     fun interface OnItemClickListener {
-        fun onItemClick(imgInfo: GalleryImgInfo)
+        fun onItemClick(imgNum: Int)
     }
 
     var itemClickListener : OnItemClickListener? = null
@@ -33,7 +33,7 @@ class GalleryitemlistAdaptar(private val imgList: MutableList<GalleryImgInfo>, p
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
-                itemClickListener?.onItemClick(imgList[bindingAdapterPosition])
+                itemClickListener?.onItemClick(bindingAdapterPosition)
             }
         }
         fun bind(imgInfo: GalleryImgInfo) {

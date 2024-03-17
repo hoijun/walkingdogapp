@@ -1,13 +1,15 @@
 package com.example.walkingdogapp.album
 
-import android.app.Dialog
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.fragment.app.DialogFragment
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.DateDialogBinding
 import com.example.walkingdogapp.deco.SelectedMonthDecorator
@@ -17,16 +19,11 @@ import com.example.walkingdogapp.userinfo.Walkdate
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 
-class DateDialog(context: Context, private val walkdatelist: List<Walkdate>, private val callback : (String) -> Unit) : Dialog(context) {
+class DateDialog(private val context: Context, private val walkdatelist: List<Walkdate>, private val callback : (String) -> Unit) : DialogFragment() {
     private lateinit var binding: DateDialogBinding
     private var walkdates = mutableListOf<CalendarDay>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DateDialogBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        val todayDecorator = ToDayDecorator(context, CalendarDay.today())
-        var selectedMonthDecorator = SelectedMonthDecorator(CalendarDay.today().month)
         for (date: Walkdate in walkdatelist) {
             val dayinfo = date.day.split("-")
             walkdates.add(
@@ -37,6 +34,16 @@ class DateDialog(context: Context, private val walkdatelist: List<Walkdate>, pri
                 )
             ) // 산책한 날 얻음
         }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = DateDialogBinding.inflate(inflater, container, false)
+        val todayDecorator = ToDayDecorator(context, CalendarDay.today())
+        var selectedMonthDecorator = SelectedMonthDecorator(CalendarDay.today().month)
         val walkDayDecorator = WalkDayDecorator(walkdates) // 산책한 날 표시
         binding.apply {
             walkcalendar.addDecorators(walkDayDecorator, selectedMonthDecorator, todayDecorator)
@@ -55,7 +62,7 @@ class DateDialog(context: Context, private val walkdatelist: List<Walkdate>, pri
             walkcalendar.state().edit().setMaximumDate(CalendarDay.today()).commit() // 최대 날짜 설정
 
             walkcalendar.selectedDate = CalendarDay.today() // 오늘 날짜
-            
+
             walkcalendar.setOnDateChangedListener { widget, date, selected ->
                 callback(date.date.toString())
                 dismiss()
@@ -75,15 +82,16 @@ class DateDialog(context: Context, private val walkdatelist: List<Walkdate>, pri
             }
         }
 
-        setCancelable(true)
+        isCancelable = true
         resizeDialog()
-        window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        return binding.root
     }
 
     private fun resizeDialog() {
-        val params: ViewGroup.LayoutParams? = window?.attributes
+        val params: ViewGroup.LayoutParams? = this.dialog?.window?.attributes
         val deviceWidth = Resources.getSystem().displayMetrics.widthPixels
         params?.width = (deviceWidth * 0.8).toInt()
-        window?.attributes = params as WindowManager.LayoutParams
+        this.dialog?.window?.attributes = params as WindowManager.LayoutParams
     }
 }
