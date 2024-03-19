@@ -19,8 +19,6 @@ import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.PathOverlay
-import okhttp3.internal.cookieToString
-import java.util.ArrayList
 
 class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
     private var _binding: FragmentDetailWalkInfoBinding? = null
@@ -41,7 +39,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainactivity = activity as MainActivity
+        mainactivity = requireActivity() as MainActivity
         mainactivity.binding.menuBn.visibility = View.GONE
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
         val mapFragment: MapFragment =
@@ -77,6 +75,11 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             walktime.text = "${(dateinfo.time / 60)}분"
         }
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
     override fun onDestroyView() {
@@ -117,5 +120,6 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             arguments = bundle
         }
         mainactivity.changeFragment(walkInfoFragment)
+        Log.d("savepoint", "aaaaa")
     }
 }

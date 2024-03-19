@@ -46,7 +46,7 @@ class WalkInfoFragment : Fragment() { // 수정
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainactivity = activity as MainActivity
+        mainactivity = requireActivity() as MainActivity
         mainactivity.binding.menuBn.visibility = View.GONE
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
 
@@ -66,6 +66,8 @@ class WalkInfoFragment : Fragment() { // 수정
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentWalkInfoBinding.inflate(inflater,container, false)
+
+        Log.d("savepoint", "aaaab")
 
         // 달력 커스텀
         val dayDecorator = DayDecorator(requireContext())
@@ -153,6 +155,11 @@ class WalkInfoFragment : Fragment() { // 수정
             walkinfoRecyclerview.layoutManager = LinearLayoutManager(context)
         }
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
     private fun goMypage() {

@@ -96,3 +96,5 @@ z
 Japp/src/main/java/com/example/walkingdogapp/album/DetailPictureFragment.kt,5\b\5b8569945a98cd394227fef10b70f1dd45d8d180
 Å
 Qapp/src/main/java/com/example/walkingdogapp/album/DetailPictureitemlistAdapter.kt,3\8\382215e2b5fe79f4ea87909ecd6af443966b1830
+
+Oapp/src/main/java/com/example/walkingdogapp/album/GalleryBottomSheetFragment.kt,3\8\38658ec21a11ae921c9a3a1b72de122d10e1182e

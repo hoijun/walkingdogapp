@@ -314,7 +314,8 @@ class RegisterDogActivity : AppCompatActivity() {
     }
 
     private fun showDoglist() {
-        val dialog = DoglistDialog(supportFragmentManager) {
+        val dialog = DoglistDialog()
+        dialog.onClickItemListener = DoglistDialog.OnClickItemListener {
             binding.editBreed.text = it
             doginfo.breed = it
         }

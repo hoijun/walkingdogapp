@@ -33,9 +33,9 @@ import kotlin.concurrent.timer
 
 class WalkingService : Service() {
     private lateinit var locationRequest: LocationRequest
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private  var fusedLocationProviderClient: FusedLocationProviderClient? = null
     private lateinit var builder : NotificationCompat.Builder
-    private lateinit var walkTimer: Timer
+    private var walkTimer: Timer? = Timer()
     private var miscount = 0
     private var totalTime = 0
 
@@ -131,7 +131,8 @@ class WalkingService : Service() {
         val channelId = "WalkingDogApp_Channel"
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val resultIntent = Intent(applicationContext, WalkingActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent =
+            PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_IMMUTABLE)
         builder = NotificationCompat.Builder(applicationContext, channelId)
         builder.setSmallIcon(R.mipmap.ic_launcher)
         builder.setContentTitle("털뭉치")
@@ -152,9 +153,13 @@ class WalkingService : Service() {
             notificationManager.createNotificationChannel(notificationChannel)
         }
 
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        { return }
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
 
         locationRequest = LocationRequest.Builder(2500)
             .setMinUpdateIntervalMillis(2500)
@@ -162,16 +167,22 @@ class WalkingService : Service() {
             .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
             .build()
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest,
+        fusedLocationProviderClient!!.requestLocationUpdates(
+            locationRequest,
             locationCallback,
-            Looper.getMainLooper())
+            Looper.getMainLooper()
+        )
 
         isTracking.postValue(true)
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             startForeground(Constant.Walking_SERVICE_ID, builder.build())
         } else {
-            startForeground(Constant.Walking_SERVICE_ID, builder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
+            startForeground(
+                Constant.Walking_SERVICE_ID,
+                builder.build(),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+            )
         }
 
         startTimer()
@@ -181,7 +192,7 @@ class WalkingService : Service() {
     private fun startTracking() {
         isTracking.postValue(true)
         startTimer()
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest,
+        fusedLocationProviderClient?.requestLocationUpdates(locationRequest,
             locationCallback,
             Looper.getMainLooper()) // 위치 업데이트 재개
         Log.d("current coord", "Start Tracking")
@@ -190,13 +201,13 @@ class WalkingService : Service() {
     private fun stopTracking() {
         isTracking.postValue(false)
         stopTimer()
-        fusedLocationProviderClient.removeLocationUpdates(locationCallback) // 위치 업데이트 중단
+        fusedLocationProviderClient?.removeLocationUpdates(locationCallback) // 위치 업데이트 중단
     }
 
     private fun stopLocationService() {
         isTracking.postValue(false)
         stopTimer()
-        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+        fusedLocationProviderClient?.removeLocationUpdates(locationCallback)
         postInitialValue()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
@@ -211,6 +222,6 @@ class WalkingService : Service() {
     }
 
     private fun stopTimer() {
-        walkTimer.cancel()
+        walkTimer?.cancel()
     }
 }

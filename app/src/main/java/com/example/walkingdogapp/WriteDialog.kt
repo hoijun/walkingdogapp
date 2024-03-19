@@ -11,19 +11,25 @@ import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import com.example.walkingdogapp.databinding.WriteDialogBinding
 
-class WriteDialog(private val writeText : String, private val callback : (String) -> Unit) : DialogFragment() {
+class WriteDialog : DialogFragment() {
     private lateinit var binding: WriteDialogBinding
 
+    fun interface OnClickYesListener {
+        fun onClick(text: String)
+    }
+
+    var clickYesListener: OnClickYesListener? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = WriteDialogBinding.inflate(inflater, container, false)
+        val writeText = arguments?.getString("text")?: ""
         binding.apply {
             write.hint = writeText
             finishButton.setOnClickListener {
-                callback(write.text.toString())
+                clickYesListener?.onClick(write.text.toString())
                 dismiss()
             }
 

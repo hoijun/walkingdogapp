@@ -1,8 +1,11 @@
 package com.example.walkingdogapp.mypage
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -10,6 +13,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmapOrNull
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -41,9 +46,29 @@ class MyPageFragment : Fragment() {
     private lateinit var walkdates: List<Walkdate>
     private lateinit var mainactivity: MainActivity
 
+    private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
+    } else {
+        arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+    }
+
+    private val requestStoragePermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { storagePermission ->
+            when (storagePermission) {
+                true -> {
+                    binding.numpictures.text = "${getAlbumImageCount()}개"
+                }
+
+                false -> return@registerForActivityResult
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainactivity = activity as MainActivity
+        mainactivity = requireActivity() as MainActivity
         mainactivity.binding.menuBn.visibility = View.VISIBLE
         MainActivity.preFragment = "Mypage"  // 다른 액티비티로 이동 할 때 마이페이지에서 이동을 표시
     }
@@ -105,7 +130,6 @@ class MyPageFragment : Fragment() {
             }
 
             menuDistance.text = getString(R.string.totaldistance, totalwalkInfo.totaldistance / 1000.0)
-            numpictures.text = "${getAlbumImageCount()}개"
 
             walkDistance.text = getString(R.string.totaldistance, totalwalkInfo.totaldistance / 1000.0)
             walkTime.text =  "${(totalwalkInfo.totaltime / 60)}분"
@@ -114,9 +138,30 @@ class MyPageFragment : Fragment() {
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (checkPermission(storegePermission)) {
+            binding.numpictures.text = "${getAlbumImageCount()}개"
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun checkPermission(permissions: Array<out String>): Boolean {
+        for (permission in permissions) {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    permission
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestStoragePermission.launch(permission)
+                return false
+            }
+        }
+        return true
     }
 
     private fun getAlbumImageCount(): Int {
@@ -134,9 +179,7 @@ class MyPageFragment : Fragment() {
             sortOrder
         )
         cursor?.use { cursor ->
-            val columnIndex: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             while (cursor.moveToNext()) {
-                val imagePath: String = cursor.getString(columnIndex)
                 count++
             }
         }

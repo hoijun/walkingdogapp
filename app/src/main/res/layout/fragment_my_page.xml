@@ -250,7 +250,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:gravity="center"
-                android:text="0개"
+                android:text="\?개"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 android:textStyle="bold"

@@ -56,7 +56,7 @@ class SettingFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainactivity = activity as MainActivity
+        mainactivity = requireActivity() as MainActivity
         mainactivity.binding.menuBn.visibility = View.GONE
 
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
@@ -126,7 +126,8 @@ class SettingFragment : Fragment() {
             }
 
             settingWithdrawal.setOnClickListener {
-                val writeDialog = WriteDialog("이메일을 입력해 주세요.") { writeText ->
+                val writeDialog = WriteDialog()
+                writeDialog.clickYesListener = WriteDialog.OnClickYesListener { writeText ->
                     if (userInfo.email == writeText) { // 이메일 올바르게 입력
                         lifecycleScope.launch {
                             if (userInfo.email.contains("naver.com")) { // 네이버로 로그인 했을 경우
@@ -156,7 +157,11 @@ class SettingFragment : Fragment() {
                                         }
                                     })
                                 } else { // 유저 정보가 올바르게 지워지지 않았을 경우
-                                    Toast.makeText(requireContext(), "탈퇴가 재대로 안됐어요..", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "탈퇴가 재대로 안됐어요..",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     binding.settingscreen.visibility = View.VISIBLE
                                     binding.waitImage.visibility = View.INVISIBLE
                                 }
@@ -173,7 +178,11 @@ class SettingFragment : Fragment() {
                                         goLogin()
                                     }
                                 } else { // 유저 정보가 올바르게 지워지지 않았을 경우
-                                    Toast.makeText(requireContext(), "탈퇴가 재대로 안됐어요..", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "탈퇴가 재대로 안됐어요..",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     binding.settingscreen.visibility = View.VISIBLE
                                     binding.waitImage.visibility = View.INVISIBLE
                                 }
@@ -187,10 +196,18 @@ class SettingFragment : Fragment() {
                         ).show()
                     }
                 }
+                val bundle = Bundle()
+                bundle.putString("text", "이메일을 입력해주세요.")
+                writeDialog.arguments = bundle
                 writeDialog.show(requireActivity().supportFragmentManager, "writeemail")
             }
         }
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
     private fun goMypage() {
