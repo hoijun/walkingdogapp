@@ -66,6 +66,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             true -> {
                 binding.btnSelectDate.visibility = View.VISIBLE
                 binding.selectdate.visibility = View.VISIBLE
+                binding.permissionBtn.visibility = View.GONE
                 getAlbumImage(selectday)
                 setRecyclerView(selectday)
             }
@@ -99,7 +100,8 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             }
 
             btnSelectDate.setOnClickListener {
-                val dialog = DateDialog(requireContext(), myViewModel.walkDates.value ?: listOf()) { date ->
+                val dialog = DateDialog()
+                dialog.dateClickListener = DateDialog.OnDateClickListener { date ->
                     lifecycleScope.launch {
                         binding.imgRecyclerView.removeItemDecoration(itemDecoration)
                         binding.selectdate.text = date
@@ -109,7 +111,6 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                         getAlbumImage(selectday)
                         setRecyclerView(selectday)
                         setMarker()
-
                         if(imgInfos.isNotEmpty()) {
                             moveCamera(imgInfos[0].latLng, CameraAnimation.Easing)
                         }
@@ -124,10 +125,9 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     override fun onStart() {
         super.onStart()
         if (checkPermission(storegePermission)) {
-            if(binding.btnSelectDate.visibility == View.GONE) {
-                binding.btnSelectDate.visibility = View.VISIBLE
-                binding.selectdate.visibility = View.VISIBLE
-            }
+            binding.btnSelectDate.visibility = View.VISIBLE
+            binding.selectdate.visibility = View.VISIBLE
+            binding.permissionBtn.visibility = View.GONE
             getAlbumImage(selectday)
             setRecyclerView(selectday)
             if (markers.isNotEmpty() && imgInfos.size != lateimgCount) {
@@ -157,7 +157,6 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         }
         binding.apply {
             if (imgInfos.isNotEmpty()) {
-                permissionBtn.visibility = View.GONE
                 textSelectday.visibility = View.GONE
                 imgRecyclerView.visibility = View.VISIBLE
                 adaptar = AlbumMapitemlistAdaptar(imgInfos, requireContext())
@@ -178,7 +177,6 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                 imgRecyclerView.adapter = adaptar
                 return
             }
-            permissionBtn.visibility = View.GONE
             textSelectday.visibility = View.VISIBLE
             imgRecyclerView.visibility = View.GONE
 
@@ -190,7 +188,6 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     private fun getAlbumImage(selectdate: String) {
         if (selectdate == "") {
             binding.apply {
-                permissionBtn.visibility = View.GONE
                 textSelectday.visibility = View.VISIBLE
                 imgRecyclerView.visibility = View.GONE
             }

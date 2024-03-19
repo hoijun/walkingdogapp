@@ -1,14 +1,13 @@
 package com.example.walkingdogapp.walking
 
 import android.Manifest
+import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PointF
 import android.media.MediaScannerConnection
@@ -33,12 +32,11 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
-import com.example.walkingdogapp.userinfo.WalkLatLng
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
+import com.example.walkingdogapp.userinfo.WalkLatLng
 import com.example.walkingdogapp.userinfo.saveWalkdate
 import com.example.walkingdogapp.userinfo.totalWalkInfo
 import com.example.walkingdogapp.userinfo.userInfoViewModel
@@ -57,7 +55,6 @@ import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
-import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -130,7 +127,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private val getResultCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == RESULT_OK) {
+        if (it.resultCode == Activity.RESULT_OK) {
             galleryAddPic()
         }
     }
@@ -146,7 +143,12 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         walkViewModel.getLastLocation()
 
         // 백그라운드 위치 서비스 시작
-        startWalkingService()
+        try {
+            startWalkingService()
+        } catch (e: Exception) {
+            Toast.makeText(this, "오류로 인해 산책이 종료 됩니다.", Toast.LENGTH_SHORT).show()
+            goHome()
+        }
 
         setcolletionImageView()
 
@@ -211,6 +213,19 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 trackingCameraMode = false
                 trackingCameraModeOnBtn.setImageResource(R.drawable.waitimage)
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Toast.makeText(this, "오류가 생겨 산책이 종료 되었습니다", Toast.LENGTH_SHORT).show()
+            stopWalkingService()
+            goHome()
         }
     }
 
@@ -280,6 +295,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             binding.InfoTime.text = getString(R.string.time, minutes, seconds)
         }
     }
+
     private fun setcolletionImageView() {
         for(imgRes in collectionResources) {
             val imgView = ImageView(this)
@@ -299,6 +315,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             val randomCoord = getRandomCoord(coordList.last(), 300)
                             val randomNumber = kotlin.random.Random.nextInt(1, 12)
                             val animalMarker = InfoWindow()
+                            if(collectionImgViews[randomNumber - 1].parent != null) {
+                                ((collectionImgViews[randomNumber - 1].parent) as ViewGroup).removeView(collectionImgViews[randomNumber - 1])
+                            }
                             animalMarker.adapter =
                                 object : InfoWindow.DefaultViewAdapter(this@WalkingActivity) {
                                     override fun getContentView(p0: InfoWindow): View {
@@ -316,7 +335,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             }
                             animalMarker.position = randomCoord
                             animalMarker.map = mynavermap
-                            animalMarkers.add(animalMarker)
+                            animalMarkers.add(animalMarker) // 일단 오류
                         }
                     }
                 }
@@ -520,6 +539,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun takePhoto(intent: Intent) {
         val parentDir =
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absoluteFile
+        if(!parentDir.exists()) {
+            parentDir.mkdir()
+        }
         val subDir = File(parentDir, "털뭉치")
         if (!subDir.exists()) {
             subDir.mkdir()
@@ -531,13 +553,15 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             ex.printStackTrace()
             null
         }
+
         photoFile?.also {
             uri = FileProvider.getUriForFile(
                 this,
-                "walkingdogapp.provider",
+                "$packageName.provider",
                 it
             )
             intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             getResultCamera.launch(intent)
         }
     }

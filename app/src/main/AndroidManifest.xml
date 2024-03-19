@@ -112,6 +112,8 @@
             android:name=".walking.WalkingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -120,13 +122,15 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="walkingdogapp.provider"
+            android:authorities="com.example.walkingdogapp.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_path" />
         </provider>
+
+
     </application>
 
 </manifest>

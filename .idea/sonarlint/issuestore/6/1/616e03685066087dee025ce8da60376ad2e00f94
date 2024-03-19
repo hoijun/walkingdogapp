@@ -1,6 +1,5 @@
 
-|kotlin:S1172x"2Use "_" instead of these unused lambda parameters.(İ¾×ıÿÿÿÿ8ó€ªÔä1J$381eb372-cc83-4d85-bbb3-06a995091adc
-„kotlin:S1172‡"9Use "_" instead of this unused lambda parameter "widget".(Ğíëáùÿÿÿÿ8ó€ªÔä1J$74aaea67-bb35-44c0-9a8d-bfcbc27ba07e
-_kotlin:S1128"Remove this unused import.(Üº¸¡8ÿ€ªÔä1J$5ff9e239-e24d-462c-be6e-7d0f9e61b444
-dkotlin:S1128"Remove this unused import.(ÊÒÅ­ùÿÿÿÿ8™·¿Ôä1J$dbae4921-92ca-4b14-933c-2079d305afe5
-—kotlin:S3776@"RRefactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.(©Àùè8ªÔä1J$2b4de29b-ea11-4364-b798-d914a344cb0d
+|kotlin:S1172z"2Use "_" instead of these unused lambda parameters.(İ¾×ıÿÿÿÿ8ó€ªÔä1J$c7cb2c20-46d7-4887-9256-2b82322287f9
+„kotlin:S1172‰"9Use "_" instead of this unused lambda parameter "widget".(Ğíëáùÿÿÿÿ8ó€ªÔä1J$940c6f9c-3d08-4058-9468-91e101c663cf
+_kotlin:S1128"Remove this unused import.(Üº¸¡8ÿ€ªÔä1J$939471e5-eb76-487b-a443-fce7f79de4de
+—kotlin:S3776@"RRefactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.(©Àùè8ªÔä1J$ed7ce758-3b22-4542-ba07-16806b3704e6

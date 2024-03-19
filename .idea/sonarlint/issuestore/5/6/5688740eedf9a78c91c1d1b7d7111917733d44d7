@@ -1,20 +1,16 @@
 
-„kotlin:S899":Do something with the "Boolean" value returned by "mkdir".(ε‰ρ‰ωÿÿÿÿ8›εγ1J$10d3f448-a7ff-498e-831f-ed4d3b6b7531
-bkotlin:S6310¥"Avoid hardcoded dispatchers.(©ÒΥς8››εγ1J$009d9f67-40c5-4204-9d3f-bb2230189d7f
-akotlin:S6310·"Avoid hardcoded dispatchers.(Γ‘χ\8››εγ1J$4a205547-032d-44b2-9dd1-3b7d443b0fe1
-bkotlin:S6310Δ"Avoid hardcoded dispatchers.(Ξήƒή8››εγ1J$6ba09657-758f-4107-a657-c8362e2dc1ce
-gkotlin:S6310Π"Avoid hardcoded dispatchers.(¤Τ‡Βϋÿÿÿÿ8››εγ1J$6f18cbd4-6953-4f1a-b403-ae49f5879407
-dkotlin:S1128
-"Remove this unused import.(ΤΌ³ϊÿÿÿÿÿ8Έ›εγ1J$81ef223c-67ac-45ae-b5bb-f8d0e213096a
-_kotlin:S1128"Remove this unused import.( ―–8Έ›εγ1J$f8519ab7-da29-4557-bd4d-756d5a02e6c6
-_kotlin:S1128$"Remove this unused import.(€»Ψ8Έ›εγ1J$7bcbf146-3b68-4c4f-8cc6-572b917e1950
-dkotlin:S1128<"Remove this unused import.(νωψόÿÿÿÿ8Έ›εγ1J$a402fbd0-a929-4885-9595-db3ee20d74ac
-nkotlin:S1874Φ"#Deprecated code should not be used.(ε΄Ύ”ώÿÿÿÿ8Ό›εγ1J$53dab245-3698-41fb-8ef5-184782d24c64
-kotlin:S3776"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(¶Α»¬ώÿÿÿÿ8Ύ›εγ1J$64782f8e-812e-4bbf-a414-a11118eb80a6
-kotlin:S3776¤"RRefactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.(™‚•ωÿÿÿÿ8Ύ›εγ1J$093dbf90-e342-47a9-86cb-9bb1cba0bfa3
-kotlin:S3776§"RRefactor this method to reduce its Cognitive Complexity from 28 to the 15 allowed.(οΉγ®ψÿÿÿÿ8Ύ›εγ1J$a532b6d4-dde6-46f7-9c3a-5ee0d650dc0a
-kotlin:S3776Ξ"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8Ύ›εγ1J$5b948b94-8e76-43ef-a9cd-4859230d3495
-kotlin:S3776¬"RRefactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.(άύμªÿÿÿÿÿ8Ώ›εγ1J$e3af3701-b6ca-4848-9222-718bc2eac975
-tkotlin:S1066Χ".Merge this "if" statement with the nested one.(•³β8Ε›εγ1J$9fb4ae71-5d6d-44e4-8c5d-5e5fb1553c4c
-ykotlin:S1066©".Merge this "if" statement with the nested one.(²τι§ψÿÿÿÿ8Ε›εγ1J$12f10e2b-5b2d-4b2d-bc29-db20ef0f78f7
-rkotlin:S6518‘",Replace function call with indexed accessor.(€ΦΔώ8Θ›εγ1J$4d5f8d20-4242-4b32-a054-933058c348d7
+kotlin:S899":Do something with the "Boolean" value returned by "mkdir".(υΙύ8σ¨ε1J$407d779c-f268-441b-9e51-e6116eaf8f7f
+„kotlin:S899£":Do something with the "Boolean" value returned by "mkdir".(ε‰ρ‰ωÿÿÿÿ8σ¨ε1J$c65b7092-d055-4cfc-91f9-fc43d4d79167
+bkotlin:S6310µ"Avoid hardcoded dispatchers.(©ÒΥς8ώ¨ε1J$b69b7b02-af47-44eb-ae43-76ae65b05cdf
+akotlin:S6310Κ"Avoid hardcoded dispatchers.(Γ‘χ\8ÿ¨ε1J$2a2dc334-3ae2-4290-a42a-baa862d59118
+bkotlin:S6310Χ"Avoid hardcoded dispatchers.(Ξήƒή8ÿ¨ε1J$0b650a7f-6fe0-48de-bc67-1176e60540b7
+gkotlin:S6310γ"Avoid hardcoded dispatchers.(¤Τ‡Βϋÿÿÿÿ8ÿ¨ε1J$7d498ba5-c1bf-4bdd-87a5-3bcc2e32ef63
+nkotlin:S1874ι"#Deprecated code should not be used.(ε΄Ύ”ώÿÿÿÿ8Ά›¨ε1J$5dac06f3-721d-4340-825c-0ea3816e3c5a
+kotlin:S3776‡"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(¶Α»¬ώÿÿÿÿ8£›¨ε1J$92087244-7f78-4e3d-9fec-66b9fafcbb73
+kotlin:S3776΄"RRefactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.(™‚•ωÿÿÿÿ8¤›¨ε1J$57af0860-6d6f-474b-be65-e758240e4801
+kotlin:S3776Ί"RRefactor this method to reduce its Cognitive Complexity from 28 to the 15 allowed.(οΉγ®ψÿÿÿÿ8¤›¨ε1J$86886104-6b30-4001-944d-43285820cfcf
+kotlin:S3776ζ"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8¤›¨ε1J$8c0d6407-9335-4b0c-a789-53c58fb8b9d0
+kotlin:S3776Ώ"RRefactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.(άύμªÿÿÿÿÿ8¤›¨ε1J$48f19bb5-660b-4b6e-a7d5-0cc1144235b7
+tkotlin:S1066κ".Merge this "if" statement with the nested one.(•³β8«›¨ε1J$f928cb22-cdae-414b-b0e3-12a683064c87
+ykotlin:S1066Ή".Merge this "if" statement with the nested one.(²τι§ψÿÿÿÿ8«›¨ε1J$443cd3f7-9577-4287-ac79-424622c5aca8
+rkotlin:S6518",Replace function call with indexed accessor.(€ΦΔώ8®›¨ε1J$923816c4-a2ff-4886-a3e8-011e3dcb626f

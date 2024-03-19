@@ -1,21 +1,18 @@
 package com.example.walkingdogapp.mypage
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.core.graphics.drawable.toBitmapOrNull
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.databinding.FragmentDogInfoBinding
+import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.userinfo.DogInfo
 import com.example.walkingdogapp.userinfo.userInfoViewModel
-import java.io.ByteArrayOutputStream
 
 class DogInfoFragment : Fragment() {
     private var _binding: FragmentDogInfoBinding? = null
@@ -32,7 +29,7 @@ class DogInfoFragment : Fragment() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainactivity = activity as MainActivity
+        mainactivity = requireActivity() as MainActivity
         mainactivity.binding.menuBn.visibility = View.GONE
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
@@ -71,6 +68,11 @@ class DogInfoFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
     private fun goMypage() {

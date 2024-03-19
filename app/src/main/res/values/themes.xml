@@ -29,4 +29,13 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
+
+    <style name="RoundCornerBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/RoundCornerModalStyle</item>
+    </style>
+
+    <style name="RoundCornerModalStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/roundstyle4</item>
+    </style>
+
 </resources>

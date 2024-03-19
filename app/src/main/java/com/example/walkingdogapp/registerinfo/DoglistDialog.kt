@@ -15,10 +15,15 @@ import com.example.walkingdogapp.WriteDialog
 import com.example.walkingdogapp.databinding.DoglistDialogBinding
 import com.example.walkingdogapp.databinding.WriteDialogBinding
 
-class DoglistDialog(private val fragmentManager: FragmentManager, private val callback: (String) -> Unit) : DialogFragment(){
+class DoglistDialog : DialogFragment(){
     private lateinit var binding: DoglistDialogBinding
     private val dogs = listOf("직접 입력", "말티즈", "푸들", "포메라니안", "믹스견", "치와와", "시츄", "골든리트리버", "진돗개", "불독", "비글", "닥스훈트", "허스키", "a", "b", "c")
 
+    fun interface OnClickItemListener {
+        fun onClickItem(text: String)
+    }
+
+    var onClickItemListener: OnClickItemListener? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -31,11 +36,17 @@ class DoglistDialog(private val fragmentManager: FragmentManager, private val ca
         adaptar.itemClickListener =
             DoglistAdpatar.OnItemClickListener { name ->
                 if(name == "직접 입력") {
-                    val writeDogDialog = WriteDialog("강아지 종을 입력해주세요.", callback)
-                    writeDogDialog.show(fragmentManager, "doglist")
+                    val writeDogDialog = WriteDialog()
+                    writeDogDialog.clickYesListener = WriteDialog.OnClickYesListener { text ->
+                        onClickItemListener?.onClickItem(text)
+                    }
+                    val bundle = Bundle()
+                    bundle.putString("text", "강아지 종을 입력해주세요.")
+                    writeDogDialog.arguments = bundle
+                    writeDogDialog.show(requireActivity().supportFragmentManager, "doglist")
                 }
                 else {
-                    callback(name)
+                    onClickItemListener?.onClickItem(name)
                 }
                 dismiss()
             }

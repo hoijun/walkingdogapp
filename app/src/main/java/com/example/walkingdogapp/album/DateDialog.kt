@@ -10,20 +10,32 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.DateDialogBinding
 import com.example.walkingdogapp.deco.SelectedMonthDecorator
 import com.example.walkingdogapp.deco.ToDayDecorator
 import com.example.walkingdogapp.deco.WalkDayDecorator
 import com.example.walkingdogapp.userinfo.Walkdate
+import com.example.walkingdogapp.userinfo.userInfoViewModel
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 
-class DateDialog(private val context: Context, private val walkdatelist: List<Walkdate>, private val callback : (String) -> Unit) : DialogFragment() {
+class DateDialog : DialogFragment() {
     private lateinit var binding: DateDialogBinding
     private var walkdates = mutableListOf<CalendarDay>()
+    private val myViewModel: userInfoViewModel by activityViewModels()
+    private var walkdatelist = listOf<Walkdate>()
+
+    fun interface OnDateClickListener {
+        fun onDateClick(date: String)
+    }
+
+    var dateClickListener: OnDateClickListener? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        walkdatelist = myViewModel.walkDates.value?: listOf()
         for (date: Walkdate in walkdatelist) {
             val dayinfo = date.day.split("-")
             walkdates.add(
@@ -42,7 +54,7 @@ class DateDialog(private val context: Context, private val walkdatelist: List<Wa
         savedInstanceState: Bundle?
     ): View {
         binding = DateDialogBinding.inflate(inflater, container, false)
-        val todayDecorator = ToDayDecorator(context, CalendarDay.today())
+        val todayDecorator = ToDayDecorator(requireContext(), CalendarDay.today())
         var selectedMonthDecorator = SelectedMonthDecorator(CalendarDay.today().month)
         val walkDayDecorator = WalkDayDecorator(walkdates) // 산책한 날 표시
         binding.apply {
@@ -58,13 +70,13 @@ class DateDialog(private val context: Context, private val walkdatelist: List<Wa
                     .append(calendarHeaderElements[1]).append("월")
                 calendarHeaderBuilder.toString()
             }
-            walkcalendar.setWeekDayFormatter(ArrayWeekDayFormatter(context.resources.getTextArray(R.array.custom_weekdays)))
+            walkcalendar.setWeekDayFormatter(ArrayWeekDayFormatter(requireContext().resources.getTextArray(R.array.custom_weekdays)))
             walkcalendar.state().edit().setMaximumDate(CalendarDay.today()).commit() // 최대 날짜 설정
 
             walkcalendar.selectedDate = CalendarDay.today() // 오늘 날짜
 
             walkcalendar.setOnDateChangedListener { widget, date, selected ->
-                callback(date.date.toString())
+                dateClickListener?.onDateClick(date.date.toString())
                 dismiss()
                 return@setOnDateChangedListener
             }

@@ -21,6 +21,7 @@ import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.deco.GridSpacingItemDecoration
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentGalleryBinding
+import com.example.walkingdogapp.deco.HorizonSpacingItemDecoration
 import com.example.walkingdogapp.mypage.MyPageFragment
 import com.example.walkingdogapp.userinfo.userInfoViewModel
 import java.text.SimpleDateFormat
@@ -34,6 +35,7 @@ class GalleryFragment : Fragment() {
     private val imgInfos = mutableListOf<GalleryImgInfo>()
     private var adaptar: GalleryitemlistAdaptar? = null
     private var isFragmentSwitched = false
+    private lateinit var itemDecoration: GridSpacingItemDecoration
 
     private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
@@ -48,6 +50,7 @@ class GalleryFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { storagePermission ->
             when (storagePermission) {
                 true -> {
+                    binding.permissionBtn.visibility = View.GONE
                     getAlbumImage()
                     setRecyclerView()
                 }
@@ -64,9 +67,10 @@ class GalleryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainactivity = activity as MainActivity
+        mainactivity = requireActivity() as MainActivity
         mainactivity.binding.menuBn.visibility = View.GONE
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        itemDecoration = GridSpacingItemDecoration(3, Constant.dpTopx(15f, requireContext()))
     }
 
     override fun onCreateView(
@@ -74,15 +78,27 @@ class GalleryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentGalleryBinding.inflate(inflater, container, false)
+        if (checkPermission(storegePermission)) {
+            binding.permissionBtn.visibility = View.GONE
+        }
+        binding.btnBack.setOnClickListener {
+            goMypage()
+        }
         return binding.root
     }
 
     override fun onStart() {
         super.onStart()
         if (checkPermission(storegePermission)) {
+            binding.permissionBtn.visibility = View.GONE
             getAlbumImage()
             setRecyclerView()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
     override fun onStop() {
@@ -90,7 +106,7 @@ class GalleryFragment : Fragment() {
         if(!isFragmentSwitched) {
             imgInfos.clear()
         }
-        binding.galleryRecyclerview.removeItemDecorationAt(0)
+        binding.galleryRecyclerview.removeItemDecoration(itemDecoration)
         isFragmentSwitched = false
     }
 
@@ -101,14 +117,8 @@ class GalleryFragment : Fragment() {
 
     private fun setRecyclerView() {
         binding.apply {
-            permissionBtn.visibility = View.GONE
             galleryRecyclerview.visibility = View.VISIBLE
-            btnBack.setOnClickListener {
-                goMypage()
-            }
-
             val imgNum = arguments?.getInt("select", 0) ?: 0
-
             adaptar = GalleryitemlistAdaptar(imgInfos, requireContext())
             adaptar!!.itemClickListener = GalleryitemlistAdaptar.OnItemClickListener { imgNum ->
                 val bundle = Bundle()
@@ -120,7 +130,7 @@ class GalleryFragment : Fragment() {
                 mainactivity.changeFragment(detailPictureFragment)
             }
             galleryRecyclerview.layoutManager = GridLayoutManager(requireContext(), 3)
-            galleryRecyclerview.addItemDecoration(GridSpacingItemDecoration(3, Constant.dpTopx(15f, requireContext())))
+            galleryRecyclerview.addItemDecoration(itemDecoration)
             galleryRecyclerview.scrollToPosition(imgNum)
             galleryRecyclerview.adapter = adaptar
         }
@@ -149,7 +159,7 @@ class GalleryFragment : Fragment() {
                 val imageTitle: String = cursor.getString(columnIndexTitle)
                 val imageDate: Long = cursor.getLong(columnIndexDate)
                 val contentUri = Uri.withAppendedPath(uri, imagePath)
-                imgInfos.add(GalleryImgInfo(contentUri, imageTitle, Constant.convertLongToTime(SimpleDateFormat("yyyy.MM.dd HH:mm"), imageDate)))
+                imgInfos.add(GalleryImgInfo(contentUri, imageTitle, Constant.convertLongToTime(SimpleDateFormat("yyyy년 MM월 dd일 HH:mm"), imageDate)))
             }
             myViewModel.savealbumImgs(imgInfos)
         }
