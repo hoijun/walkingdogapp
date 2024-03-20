@@ -86,15 +86,5 @@ t
 Dapp/src/main/java/com/example/walkingdogapp/album/GalleryFragment.kt,5\1\51058a367b825b77732b1ed98ce7d50db2a96a28
 {
 Kapp/src/main/java/com/example/walkingdogapp/album/GalleryitemlistAdaptar.kt,3\1\31850a1a7566dbc09eb7fce587545f52e43ef606
-o
-?app/src/main/java/com/example/walkingdogapp/album/DateDialog.kt,2\0\2024c8518a1b5d1f5a678cb6c067c0abc10ce4e8
-p
-@app/src/main/java/com/example/walkingdogapp/Deco/CalendarDeco.kt,5\f\5f2ad19a2075c520cc4736093c0a958509807b06
-p
-@app/src/main/java/com/example/walkingdogapp/deco/CalendarDeco.kt,0\1\01975b963fbf4f5b5ab27996929c4df6e3b3dc10
-z
-Japp/src/main/java/com/example/walkingdogapp/album/DetailPictureFragment.kt,5\b\5b8569945a98cd394227fef10b70f1dd45d8d180
-Å
-Qapp/src/main/java/com/example/walkingdogapp/album/DetailPictureitemlistAdapter.kt,3\8\382215e2b5fe79f4ea87909ecd6af443966b1830
 
 Oapp/src/main/java/com/example/walkingdogapp/album/GalleryBottomSheetFragment.kt,3\8\38658ec21a11ae921c9a3a1b72de122d10e1182e

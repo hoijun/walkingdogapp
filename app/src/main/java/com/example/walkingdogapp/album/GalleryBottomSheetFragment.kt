@@ -13,6 +13,7 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -78,6 +79,8 @@ class GalleryBottomSheetFragment : BottomSheetDialogFragment() {
                 }
             }
         }
+
+        this.dialog?.window!!.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return binding.root
     }

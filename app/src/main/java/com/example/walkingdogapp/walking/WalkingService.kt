@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
@@ -128,6 +129,30 @@ class WalkingService : Service() {
     }
 
     private fun startLocationService() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
+        }
+
+
+
         val channelId = "WalkingDogApp_Channel"
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val resultIntent = Intent(applicationContext, WalkingActivity::class.java)
@@ -153,13 +178,6 @@ class WalkingService : Service() {
             notificationManager.createNotificationChannel(notificationChannel)
         }
 
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
 
         locationRequest = LocationRequest.Builder(2500)
             .setMinUpdateIntervalMillis(2500)
