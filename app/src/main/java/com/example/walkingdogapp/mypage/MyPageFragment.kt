@@ -110,7 +110,11 @@ class MyPageFragment : Fragment() {
             }
 
             managepictures.setOnClickListener {
-                mainactivity.changeFragment(GalleryFragment())
+                if (checkPermission(storegePermission)) {
+                    mainactivity.changeFragment(GalleryFragment())
+                } else {
+                    Toast.makeText(requireContext(), "갤러리 이용을 위해 권한을 모두 허용 해주세요!", Toast.LENGTH_SHORT).show()
+                }
             }
 
             menuWalkinfo.setOnClickListener {

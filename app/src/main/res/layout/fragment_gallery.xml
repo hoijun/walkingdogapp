@@ -55,20 +55,5 @@
             android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
-        <Button
-            android:id="@+id/permission_btn"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:text="이미지 권한을 모두 허용으로 해주세요."
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            app:layout_constraintWidth_percent="0.8"
-            app:layout_constraintHeight_percent="0.1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
