@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.deco.GridSpacingItemDecoration
@@ -24,6 +25,7 @@ import com.example.walkingdogapp.databinding.FragmentGalleryBinding
 import com.example.walkingdogapp.deco.HorizonSpacingItemDecoration
 import com.example.walkingdogapp.mypage.MyPageFragment
 import com.example.walkingdogapp.userinfo.userInfoViewModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
 
@@ -80,6 +82,8 @@ class GalleryFragment : Fragment() {
         _binding = FragmentGalleryBinding.inflate(inflater, container, false)
         if (checkPermission(storegePermission)) {
             binding.permissionBtn.visibility = View.GONE
+            getAlbumImage()
+            setRecyclerView()
         }
         binding.btnBack.setOnClickListener {
             goMypage()
@@ -91,8 +95,18 @@ class GalleryFragment : Fragment() {
         super.onStart()
         if (checkPermission(storegePermission)) {
             binding.permissionBtn.visibility = View.GONE
-            getAlbumImage()
-            setRecyclerView()
+            val iterator = imgInfos.iterator()
+            while (iterator.hasNext()) {
+                val img = iterator.next()
+                if (!Constant.isImageExists(img.uri, requireActivity())) {
+                    lifecycleScope.launch {
+                        val index = imgInfos.indexOf(img)
+                        iterator.remove()
+                        adaptar?.notifyItemRemoved(index)
+                    }
+                }
+            }
+            binding.galleryRecyclerview.addItemDecoration(itemDecoration)
         }
     }
 
@@ -103,9 +117,6 @@ class GalleryFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        if(!isFragmentSwitched) {
-            imgInfos.clear()
-        }
         binding.galleryRecyclerview.removeItemDecoration(itemDecoration)
         isFragmentSwitched = false
     }
@@ -130,7 +141,6 @@ class GalleryFragment : Fragment() {
                 mainactivity.changeFragment(detailPictureFragment)
             }
             galleryRecyclerview.layoutManager = GridLayoutManager(requireContext(), 3)
-            galleryRecyclerview.addItemDecoration(itemDecoration)
             galleryRecyclerview.scrollToPosition(imgNum)
             galleryRecyclerview.adapter = adaptar
         }
