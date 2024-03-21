@@ -2,11 +2,13 @@ package com.example.walkingdogapp.album
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -52,14 +54,28 @@ class GalleryFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { storagePermission ->
             when (storagePermission) {
                 true -> {
-                    binding.permissionBtn.visibility = View.GONE
                     getAlbumImage()
                     setRecyclerView()
+                    binding.galleryRecyclerview.addItemDecoration(itemDecoration)
                 }
 
                 false -> return@registerForActivityResult
             }
         }
+
+    private val requsetSettingsAction = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        when(checkPermission(storegePermission)) {
+            true -> {
+                getAlbumImage()
+                setRecyclerView()
+            }
+
+            false -> {
+                return@registerForActivityResult
+            }
+        }
+    }
+
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -81,20 +97,21 @@ class GalleryFragment : Fragment() {
     ): View {
         _binding = FragmentGalleryBinding.inflate(inflater, container, false)
         if (checkPermission(storegePermission)) {
-            binding.permissionBtn.visibility = View.GONE
             getAlbumImage()
             setRecyclerView()
         }
-        binding.btnBack.setOnClickListener {
-            goMypage()
+        binding.apply {
+            btnBack.setOnClickListener {
+                goMypage()
+            }
         }
+
         return binding.root
     }
 
     override fun onStart() {
         super.onStart()
         if (checkPermission(storegePermission)) {
-            binding.permissionBtn.visibility = View.GONE
             val iterator = imgInfos.iterator()
             while (iterator.hasNext()) {
                 val img = iterator.next()
