@@ -1,5 +1,6 @@
 package com.example.walkingdogapp
 
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -11,6 +12,7 @@ import android.util.TypedValue
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -54,6 +56,20 @@ class Constant {
             val calendar = Calendar.getInstance()
             calendar.timeInMillis = time * 1000;
             return format.format(calendar.time)
+        }
+
+        fun isImageExists(uri: Uri , context: Context): Boolean {
+            val contentResolver: ContentResolver = context.contentResolver
+            try {
+                val inputStream = contentResolver.openInputStream(uri)
+                if (inputStream != null) {
+                    inputStream.close()
+                    return true // 이미지가 존재함
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+            return false // 이미지가 존재하지 않음
         }
     }
 }

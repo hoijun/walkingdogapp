@@ -1,16 +1,16 @@
 
-kotlin:S899¯":Do something with the "Boolean" value returned by "mkdir".(õÉı8èíÖå1J$9e171742-7a37-4ee8-8752-12e89788d03f
-„kotlin:S899³":Do something with the "Boolean" value returned by "mkdir".(å‰ñ‰ùÿÿÿÿ8éíÖå1J$4a3c5f0a-4e5c-4281-a01a-326919ce3445
-bkotlin:S6310Å"Avoid hardcoded dispatchers.(©ÒÕò8‚íÖå1J$c2399231-1fd0-434e-92ba-b78ae1f23955
-akotlin:S6310Ú"Avoid hardcoded dispatchers.(Ã‘÷\8‚íÖå1J$8cf3eb11-5bf8-4517-90e9-e0bc01ab4d62
-bkotlin:S6310ç"Avoid hardcoded dispatchers.(ÎŞƒŞ8‘‚íÖå1J$e78b4996-06d2-497b-8ee5-26129cf7305f
-gkotlin:S6310ó"Avoid hardcoded dispatchers.(¤Ô‡Âûÿÿÿÿ8‘‚íÖå1J$4230e232-f6c9-4643-9c36-5fd5b8ab7c16
-nkotlin:S1874ù"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8ˆƒíÖå1J$f6850d74-2ec1-460f-9db2-a32eaeee8749
-kotlin:S3776‡"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(¶Á»¬şÿÿÿÿ8ŒƒíÖå1J$7ad3f5ed-8197-498f-aa93-9601066c1ce6
-kotlin:S3776Ä"RRefactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.(™‚•Šùÿÿÿÿ8ƒíÖå1J$36c35a1d-ca60-4a6c-83a5-1d9a65fa350e
-kotlin:S3776Ê"RRefactor this method to reduce its Cognitive Complexity from 28 to the 15 allowed.(ï¹ã®øÿÿÿÿ8ƒíÖå1J$18795bbe-ddcf-4950-b049-5e2ade5bfa2f
-˜kotlin:S3776ö"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8ƒíÖå1J$a021e439-cfb7-476b-a8f5-00623c7d90ea
-kotlin:S3776Ï"RRefactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.(Üıìªÿÿÿÿÿ8ƒíÖå1J$82a22e3f-8131-4af3-851f-9fb0a6fcc60e
-tkotlin:S1066ú".Merge this "if" statement with the nested one.(•³â8¨ƒíÖå1J$09238897-130a-4dc5-93d7-27253680475d
-ykotlin:S1066É".Merge this "if" statement with the nested one.(²ôé§øÿÿÿÿ8©ƒíÖå1J$dae0b5ac-1c67-44b7-a607-a91128b02077
-rkotlin:S6518",Replace function call with indexed accessor.(€ÖÄş8µƒíÖå1J$e2d30435-5c0b-4aed-af8a-2afee4162035
+kotlin:S899¯":Do something with the "Boolean" value returned by "mkdir".(õÉı8óš¨å1J$0e379d87-6a6c-435a-97bc-0f9dad8fefc2
+„kotlin:S899³":Do something with the "Boolean" value returned by "mkdir".(å‰ñ‰ùÿÿÿÿ8óš¨å1J$d74cedb6-22af-42dd-bf2a-f8963182b53c
+bkotlin:S6310Å"Avoid hardcoded dispatchers.(©ÒÕò8şš¨å1J$89e76691-a240-47b6-97f7-446939dbb53a
+akotlin:S6310Ú"Avoid hardcoded dispatchers.(Ã‘÷\8ÿš¨å1J$c196407b-6076-4507-8de8-63ed3ed32705
+bkotlin:S6310ç"Avoid hardcoded dispatchers.(ÎŞƒŞ8ÿš¨å1J$3fe3e685-101b-4a00-ac25-0c5b16f1ec9f
+gkotlin:S6310ó"Avoid hardcoded dispatchers.(¤Ô‡Âûÿÿÿÿ8ÿš¨å1J$f71ae14f-3213-49c7-ae35-dadc8058da7a
+nkotlin:S1874ù"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8¢›¨å1J$226d6a33-2fec-4108-9c11-26fe9d65e93a
+kotlin:S3776‡"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(¶Á»¬şÿÿÿÿ8£›¨å1J$eac0d87d-04bd-47fb-8aee-84c42d2e9c1d
+kotlin:S3776Ä"RRefactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.(™‚•Šùÿÿÿÿ8¤›¨å1J$36efcdcf-309d-470e-97be-9713ec42fdc2
+kotlin:S3776Ê"RRefactor this method to reduce its Cognitive Complexity from 28 to the 15 allowed.(ï¹ã®øÿÿÿÿ8¤›¨å1J$30b076b8-4af9-4669-b215-e39f7ee4066c
+˜kotlin:S3776ö"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(“‘¨‘8¤›¨å1J$9359aadd-5ac8-4431-82f1-e870df10422c
+kotlin:S3776Ï"RRefactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.(Üıìªÿÿÿÿÿ8¤›¨å1J$12660a15-de2f-4ceb-a8f3-eacfc4acb4be
+tkotlin:S1066ú".Merge this "if" statement with the nested one.(•³â8«›¨å1J$67a4c310-9fbf-4f40-b52e-3fe7adf212fc
+ykotlin:S1066É".Merge this "if" statement with the nested one.(²ôé§øÿÿÿÿ8«›¨å1J$3488ea78-d4e0-41b6-9abc-aab75ba8920b
+rkotlin:S6518",Replace function call with indexed accessor.(€ÖÄş8®›¨å1J$b2c3afb2-8221-490d-8489-b33497902441

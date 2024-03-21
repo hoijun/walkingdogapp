@@ -88,3 +88,7 @@ Dapp/src/main/java/com/example/walkingdogapp/album/GalleryFragment.kt,5\1\51058
 Kapp/src/main/java/com/example/walkingdogapp/album/GalleryitemlistAdaptar.kt,3\1\31850a1a7566dbc09eb7fce587545f52e43ef606
 
 Oapp/src/main/java/com/example/walkingdogapp/album/GalleryBottomSheetFragment.kt,3\8\38658ec21a11ae921c9a3a1b72de122d10e1182e
+z
+Japp/src/main/java/com/example/walkingdogapp/album/DetailPictureFragment.kt,5\b\5b8569945a98cd394227fef10b70f1dd45d8d180
+Å
+Qapp/src/main/java/com/example/walkingdogapp/album/DetailPictureitemlistAdapter.kt,3\8\382215e2b5fe79f4ea87909ecd6af443966b1830
