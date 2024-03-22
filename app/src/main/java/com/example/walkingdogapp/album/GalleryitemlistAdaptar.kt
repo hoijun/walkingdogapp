@@ -12,10 +12,13 @@ import com.naver.maps.geometry.LatLng
 
 class GalleryitemlistAdaptar(private val imgList: MutableList<GalleryImgInfo>, private val context: Context) : RecyclerView.Adapter<GalleryitemlistAdaptar.AlbumMapitemlistViewHolder>() {
 
-    fun interface OnItemClickListener {
+    interface OnItemClickListener {
         fun onItemClick(imgNum: Int)
+        fun onItemLongClick(imgUri: Uri)
+        fun omItemClickInSelectMode(imgUri: Uri)
     }
 
+    var selectImg = false
     var itemClickListener : OnItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumMapitemlistViewHolder {
@@ -33,11 +36,25 @@ class GalleryitemlistAdaptar(private val imgList: MutableList<GalleryImgInfo>, p
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
-                itemClickListener?.onItemClick(bindingAdapterPosition)
+                if (!selectImg) {
+                    itemClickListener?.onItemClick(bindingAdapterPosition)
+                } else {
+                    itemClickListener?.omItemClickInSelectMode(imgList[bindingAdapterPosition].uri)
+                }
+            }
+
+            binding.root.setOnLongClickListener {
+                itemClickListener?.onItemLongClick(imgList[bindingAdapterPosition].uri)
+                selectImg = true
+                true
             }
         }
         fun bind(imgInfo: GalleryImgInfo) {
             Glide.with(context).load(imgInfo.uri).format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(binding.galleryImg)
         }
+    }
+
+    fun unselectMode() {
+        selectImg = false
     }
 }
