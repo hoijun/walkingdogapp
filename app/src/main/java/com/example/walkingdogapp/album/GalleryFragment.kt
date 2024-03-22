@@ -37,9 +37,11 @@ class GalleryFragment : Fragment() {
     private lateinit var mainactivity: MainActivity
     private val myViewModel: userInfoViewModel by activityViewModels()
     private val imgInfos = mutableListOf<GalleryImgInfo>()
+    private val removeImgList = mutableListOf<Uri>()
     private var adaptar: GalleryitemlistAdaptar? = null
     private var isFragmentSwitched = false
     private lateinit var itemDecoration: GridSpacingItemDecoration
+    private var selectMode = false
 
     private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
@@ -63,23 +65,14 @@ class GalleryFragment : Fragment() {
             }
         }
 
-    private val requsetSettingsAction = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        when(checkPermission(storegePermission)) {
-            true -> {
-                getAlbumImage()
-                setRecyclerView()
-            }
-
-            false -> {
-                return@registerForActivityResult
-            }
-        }
-    }
-
-
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            goMypage()
+            if(!selectMode) {
+                goMypage()
+            } else {
+                selectMode = false
+                adaptar?.unselectMode()
+            }
         }
     }
 
@@ -148,14 +141,26 @@ class GalleryFragment : Fragment() {
             galleryRecyclerview.visibility = View.VISIBLE
             val imgNum = arguments?.getInt("select", 0) ?: 0
             adaptar = GalleryitemlistAdaptar(imgInfos, requireContext())
-            adaptar!!.itemClickListener = GalleryitemlistAdaptar.OnItemClickListener { imgNum ->
-                val bundle = Bundle()
-                bundle.putInt("select", imgNum)
-                isFragmentSwitched = true
-                val detailPictureFragment = DetailPictureFragment().apply {
-                    arguments = bundle
+            adaptar!!.itemClickListener = object : GalleryitemlistAdaptar.OnItemClickListener {
+                override fun onItemClick(imgNum: Int) {
+                    val bundle = Bundle()
+                    bundle.putInt("select", imgNum)
+                    isFragmentSwitched = true
+                    val detailPictureFragment = DetailPictureFragment().apply {
+                        arguments = bundle
+                    }
+                    mainactivity.changeFragment(detailPictureFragment)
                 }
-                mainactivity.changeFragment(detailPictureFragment)
+
+                override fun onItemLongClick(imgUri: Uri) {
+                    selectMode = true
+                    removeImgList.add(imgUri)
+                }
+
+                override fun omItemClickInSelectMode(imgUri: Uri) {
+                    removeImgList.add(imgUri)
+                }
+
             }
             galleryRecyclerview.layoutManager = GridLayoutManager(requireContext(), 3)
             galleryRecyclerview.scrollToPosition(imgNum)
