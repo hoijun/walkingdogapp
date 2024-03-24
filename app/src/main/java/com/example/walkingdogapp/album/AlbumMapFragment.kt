@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -130,7 +131,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             binding.permissionBtn.visibility = View.GONE
             getAlbumImage(selectday)
             setRecyclerView(selectday)
-            if (markers.isNotEmpty() && imgInfos.size != lateimgCount) {
+            if (markers.isNotEmpty()) {
                 lifecycleScope.launch {
                     removeMarker()
                     setMarker()
@@ -162,7 +163,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                 adaptar = AlbumMapitemlistAdaptar(imgInfos, requireContext())
                 adaptar.itemClickListener =
                     AlbumMapitemlistAdaptar.OnItemClickListener { latLng, num ->
-                        moveCamera(latLng, CameraAnimation.Easing)
+                        Log.d("savepoint", num.toString())
                         for (marker in markers) {
                             if (marker.tag as Int == num) {
                                 marker.zIndex = 10
@@ -170,6 +171,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                             }
                             marker.zIndex = 0
                         }
+                        moveCamera(latLng, CameraAnimation.Easing)
                     }
                 imgRecyclerView.layoutManager =
                     LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -198,7 +200,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         val selection =
             "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ?"
         val selectionArgs = arrayOf("털뭉치", "%munchi_%")
-        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
+        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} ASC"
         val cursor = requireActivity().contentResolver.query(
             uri,
             projection,
@@ -304,11 +306,15 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                         return imgInfo.imgView?.rootView ?: ImageView(requireContext())
                     }
                 }
+                Log.d("savepoint", markerNum.toString())
                 imgMarker.tag = markerNum
                 imgInfo.tag = imgMarker.tag as Int
                 imgMarker.position = imgInfo.latLng
                 imgMarker.map = mynavermap
                 markers.add(imgMarker)
+            }
+            if(markers.isNotEmpty()) {
+                markers[0].zIndex = 10
             }
         }
     }

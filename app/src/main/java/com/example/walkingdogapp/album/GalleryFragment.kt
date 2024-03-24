@@ -2,29 +2,31 @@ package com.example.walkingdogapp.album
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
+import android.app.Activity
+import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.walkingdogapp.Constant
-import com.example.walkingdogapp.deco.GridSpacingItemDecoration
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentGalleryBinding
-import com.example.walkingdogapp.deco.HorizonSpacingItemDecoration
+import com.example.walkingdogapp.deco.GridSpacingItemDecoration
 import com.example.walkingdogapp.mypage.MyPageFragment
 import com.example.walkingdogapp.userinfo.userInfoViewModel
 import kotlinx.coroutines.launch
@@ -70,8 +72,17 @@ class GalleryFragment : Fragment() {
             if(!selectMode) {
                 goMypage()
             } else {
-                selectMode = false
-                adaptar?.unselectMode()
+                unSelectMode()
+            }
+        }
+    }
+
+    private val launcher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        when(result.resultCode) {
+            Activity.RESULT_OK -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                udpateRecyclerView()
+                unSelectMode()
+                Toast.makeText(requireContext(), "사진을 삭제 했습니다.", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -97,27 +108,53 @@ class GalleryFragment : Fragment() {
             btnBack.setOnClickListener {
                 goMypage()
             }
-        }
 
+            removeBtn.setOnClickListener {
+                try {
+                    if (removeImgList.isEmpty()) {
+                        unSelectMode()
+                        return@setOnClickListener
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        val intentSender = MediaStore.createDeleteRequest(
+                            requireActivity().contentResolver,
+                            removeImgList
+                        ).intentSender
+                        launcher.launch(IntentSenderRequest.Builder(intentSender).build())
+                    } else {
+                        val builder = AlertDialog.Builder(requireContext())
+                        builder.setTitle("사진을 삭제하시겠습니까?")
+                        val listener = DialogInterface.OnClickListener { _, ans ->
+                            when (ans) {
+                                DialogInterface.BUTTON_POSITIVE -> {
+                                    for (uri in removeImgList) {
+                                        requireActivity().contentResolver.delete(uri, null, null)
+                                    }
+                                    udpateRecyclerView()
+                                    unSelectMode()
+                                }
+                            }
+                        }
+                        builder.setPositiveButton("네", listener)
+                        builder.setNegativeButton("아니오", null)
+                        builder.show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), "삭제하는 데 오류가 발생 했어요.", Toast.LENGTH_SHORT).show()
+                    unSelectMode()
+                    return@setOnClickListener
+                }
+            }
+        }
         return binding.root
     }
 
     override fun onStart() {
         super.onStart()
         if (checkPermission(storegePermission)) {
-            val iterator = imgInfos.iterator()
-            while (iterator.hasNext()) {
-                val img = iterator.next()
-                if (!Constant.isImageExists(img.uri, requireActivity())) {
-                    lifecycleScope.launch {
-                        val index = imgInfos.indexOf(img)
-                        iterator.remove()
-                        adaptar?.notifyItemRemoved(index)
-                    }
-                }
-            }
-            binding.galleryRecyclerview.addItemDecoration(itemDecoration)
+            udpateRecyclerView()
         }
+        binding.galleryRecyclerview.addItemDecoration(itemDecoration)
     }
 
     override fun onResume() {
@@ -127,6 +164,7 @@ class GalleryFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
+        unSelectMode()
         binding.galleryRecyclerview.removeItemDecoration(itemDecoration)
         isFragmentSwitched = false
     }
@@ -139,26 +177,40 @@ class GalleryFragment : Fragment() {
     private fun setRecyclerView() {
         binding.apply {
             galleryRecyclerview.visibility = View.VISIBLE
+            val itemAnimator = DefaultItemAnimator()
+            itemAnimator.supportsChangeAnimations = false
+            galleryRecyclerview.itemAnimator = itemAnimator
             val imgNum = arguments?.getInt("select", 0) ?: 0
             adaptar = GalleryitemlistAdaptar(imgInfos, requireContext())
             adaptar!!.itemClickListener = object : GalleryitemlistAdaptar.OnItemClickListener {
                 override fun onItemClick(imgNum: Int) {
-                    val bundle = Bundle()
-                    bundle.putInt("select", imgNum)
-                    isFragmentSwitched = true
-                    val detailPictureFragment = DetailPictureFragment().apply {
-                        arguments = bundle
+                    if(!selectMode) {
+                        val bundle = Bundle()
+                        bundle.putInt("select", imgNum)
+                        isFragmentSwitched = true
+                        val detailPictureFragment = DetailPictureFragment().apply {
+                            arguments = bundle
+                        }
+                        mainactivity.changeFragment(detailPictureFragment)
                     }
-                    mainactivity.changeFragment(detailPictureFragment)
                 }
 
                 override fun onItemLongClick(imgUri: Uri) {
+                    removeBtn.visibility = View.VISIBLE
                     selectMode = true
-                    removeImgList.add(imgUri)
+                    if (removeImgList.contains(imgUri)) {
+                        removeImgList.remove(imgUri)
+                    } else {
+                        removeImgList.add(imgUri)
+                    }
                 }
 
                 override fun omItemClickInSelectMode(imgUri: Uri) {
-                    removeImgList.add(imgUri)
+                    if (removeImgList.contains(imgUri)) {
+                        removeImgList.remove(imgUri)
+                    } else {
+                        removeImgList.add(imgUri)
+                    }
                 }
 
             }
@@ -211,9 +263,28 @@ class GalleryFragment : Fragment() {
         return true
     }
 
+    private fun unSelectMode() {
+        selectMode = false
+        binding.removeBtn.visibility = View.GONE
+        removeImgList.clear()
+        adaptar?.unselectMode()
+    }
+
     private fun goMypage() {
         mainactivity.changeFragment(MyPageFragment())
     }
 
+    private fun udpateRecyclerView() {
+        val iterator = imgInfos.iterator()
+        while (iterator.hasNext()) {
+            val img = iterator.next()
+            if (!Constant.isImageExists(img.uri, requireActivity())) {
+                lifecycleScope.launch {
+                    val index = imgInfos.indexOf(img)
+                    iterator.remove()
+                    adaptar?.notifyItemRemoved(index)
+                }
+            }
+        }
+    }
 }
-
