@@ -18,6 +18,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.example.walkingdogapp.alarm.SettingAlarmFragment
 import com.example.walkingdogapp.databinding.FragmentHomeBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.userinfo.userInfoViewModel
@@ -28,12 +29,15 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
     private val myViewModel: userInfoViewModel by activityViewModels()
     private lateinit var builder: AlertDialog.Builder
+    private lateinit var mainactivity: MainActivity
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.POST_NOTIFICATIONS), 999)
         builder = AlertDialog.Builder(requireContext())
+        mainactivity = requireActivity() as MainActivity
+        mainactivity.binding.menuBn.visibility = View.VISIBLE
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -57,6 +61,10 @@ class HomeFragment : Fragment() {
             btnRegister.setOnClickListener {
                 val registerDogIntent = Intent(requireContext(), RegisterDogActivity::class.java)
                 startActivity(registerDogIntent)
+            }
+
+            btnAlarm.setOnClickListener {
+                mainactivity.changeFragment(SettingAlarmFragment())
             }
 
             btnWalk.setOnClickListener {

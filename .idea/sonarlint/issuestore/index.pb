@@ -92,3 +92,17 @@ z
 Japp/src/main/java/com/example/walkingdogapp/album/DetailPictureFragment.kt,5\b\5b8569945a98cd394227fef10b70f1dd45d8d180
 Å
 Qapp/src/main/java/com/example/walkingdogapp/album/DetailPictureitemlistAdapter.kt,3\8\382215e2b5fe79f4ea87909ecd6af443966b1830
+Ä
+Papp/src/main/java/com/example/walkingdogapp/collection/DetailCollectionDialog.kt,0\b\0b25e8175299ef99b33e24d890da26d387ea9373
+o
+?app/src/main/java/com/example/walkingdogapp/album/DateDialog.kt,2\0\2024c8518a1b5d1f5a678cb6c067c0abc10ce4e8
+r
+Bapp/src/main/java/com/example/walkingdogapp/alarm/AlarmReceiver.kt,3\e\3ec252605345da9687b0c343e497ab7ba6548343
+s
+Capp/src/main/java/com/example/walkingdogapp/alarm/AlarmFunctions.kt,8\0\8085afa1f07e636d7882e4d3d12ae58823916354
+y
+Iapp/src/main/java/com/example/walkingdogapp/alarm/SettingAlarmFragment.kt,2\9\29072ed1e094ac8ba0fe6b51a984230ecabfebd9
+u
+Eapp/src/main/java/com/example/walkingdogapp/alarm/AlarmlistAdapter.kt,8\f\8f0aff00cc778b4dc294b20648dfd5db535f33b5
+w
+Gapp/src/main/java/com/example/walkingdogapp/alarm/SettingAlarmDialog.kt,e\a\eaf99ce89291c6ca5cd0cee079c84f52e4d904e1

@@ -10,7 +10,7 @@ import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.databinding.AlbummapItemBinding
 import com.naver.maps.geometry.LatLng
 
-class AlbumMapitemlistAdaptar(private val imginfoList: MutableList<AlbumMapImgInfo>, private val context: Context) : RecyclerView.Adapter<AlbumMapitemlistAdaptar.AlbumMapitemlistViewHolder>() {
+class AlbumMapitemlistAdaptar(private val imginfoList: MutableList<AlbumMapImgInfo>, private val context: Context): RecyclerView.Adapter<AlbumMapitemlistAdaptar.AlbumMapitemlistViewHolder>() {
 
     fun interface OnItemClickListener {
         fun onItemClick(latLng: LatLng, tag: Int)
