@@ -151,8 +151,6 @@ class WalkingService : Service() {
             }
         }
 
-
-
         val channelId = "WalkingDogApp_Channel"
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val resultIntent = Intent(applicationContext, WalkingActivity::class.java)
@@ -202,7 +200,6 @@ class WalkingService : Service() {
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
             )
         }
-
         startTimer()
     }
 

@@ -1,0 +1,7 @@
+
+qkotlin:S1172["-Remove this unused function parameter "code".(‹Êä,8ô·‹°è1J$d6e00d2c-e943-478d-bb71-2729ec23dc98
+rkotlin:S1144[".Remove this unused private "saveAlarm" method.(‹Êä,8ÈÁŠ°è1J$c191113e-733f-48f3-901f-179302d7f802
+kotlin:S1186["ZAdd a nested comment explaining why this function is empty or complete the implementation.(‹Êä,8ı·‹°è1J$fff5620c-7892-467d-986e-2b1538dd3c7b
+vkotlin:S6518(",Replace function call with indexed accessor.(ø‘Ùûÿÿÿÿ8›üÛ•è1J$195c4f3d-de21-4b9d-85a9-4f8ce8e6923c
+pkotlin:S6518)",Replace function call with indexed accessor.(•ÓÕ8›üÛ•è1J$c87c4941-d4c7-4a0c-8a36-f5580ff608b0
+qkotlin:S6518*",Replace function call with indexed accessor.(“ĞÖ8›üÛ•è1J$cd3234eb-dfa8-418c-909e-b7dd5c575832

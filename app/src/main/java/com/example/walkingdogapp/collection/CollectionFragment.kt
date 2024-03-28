@@ -111,7 +111,17 @@ class CollectionFragment : Fragment() {
         val gridListManager = GridLayoutManager(requireContext(), 3)
         val adaptar = CollectionlistAdaptar(collections, requireContext())
         adaptar.itemClickListener = CollectionlistAdaptar.OnItemClickListener { collection ->
-            Log.d("savepoint", collection.collectionText)
+            if (collection.collectionImg != R.drawable.waitimage) {
+                val detailCollectionDialog = DetailCollectionDialog().apply {
+                    val bundle = Bundle()
+                    bundle.putSerializable("collectionInfo", collection)
+                    arguments = bundle
+                }
+                detailCollectionDialog.show(
+                    requireActivity().supportFragmentManager,
+                    "detailcollection"
+                )
+            }
         }
 
         binding.apply {
@@ -120,7 +130,7 @@ class CollectionFragment : Fragment() {
             collectionRecyclerview.adapter = adaptar
 
             openSearching.setOnClickListener {
-                // 입력창의 보이는 지 안보이는 지에 따라
+                // 입력창이 보이는 지 안보이는 지에 따라
                 if(collectionSearch.visibility == View.GONE) {
                     collectionSearch.visibility = View.VISIBLE
                     openSearching.setImageResource(com.google.android.material.R.drawable.material_ic_menu_arrow_up_black_24dp)
