@@ -21,13 +21,13 @@ import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.alarm.SettingAlarmFragment
 import com.example.walkingdogapp.databinding.FragmentHomeBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
-import com.example.walkingdogapp.userinfo.userInfoViewModel
+import com.example.walkingdogapp.userinfo.UserInfoViewModel
 import com.example.walkingdogapp.walking.WalkingActivity
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val myViewModel: userInfoViewModel by activityViewModels()
+    private val myViewModel: UserInfoViewModel by activityViewModels()
     private lateinit var builder: AlertDialog.Builder
     private lateinit var mainactivity: MainActivity
 

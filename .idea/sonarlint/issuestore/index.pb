@@ -106,3 +106,13 @@ u
 Eapp/src/main/java/com/example/walkingdogapp/alarm/AlarmlistAdapter.kt,8\f\8f0aff00cc778b4dc294b20648dfd5db535f33b5
 w
 Gapp/src/main/java/com/example/walkingdogapp/alarm/SettingAlarmDialog.kt,e\a\eaf99ce89291c6ca5cd0cee079c84f52e4d904e1
+s
+Capp/src/main/java/com/example/walkingdogapp/alarm/AlarmDataModel.kt,7\f\7fab1b97f0657c45cdeb37bdc56b0afdf327275e
+y
+Iapp/src/main/java/com/example/walkingdogapp/alarm/RestartAlarmReceiver.kt,8\1\81dc185a2f61d660391f4d7a8cdb57fbd5c1e322
+y
+Iapp/src/main/java/com/example/walkingdogapp/userinfo/userInfoViewModel.kt,5\c\5cad35c94bb74920c4d6acbb1e278a1d79eecc4b
+z
+Japp/src/main/java/com/example/walkingdogapp/userinfo/UserInfoRepository.kt,d\3\d3153841b7c93361d3902da52ebf7254de330d62
+y
+Iapp/src/main/java/com/example/walkingdogapp/userinfo/LocalUserDatabase.kt,0\4\04c2746dc57fe8bfb7d4aa8ba7bad5218af6f1b8

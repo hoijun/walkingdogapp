@@ -28,7 +28,7 @@ import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentGalleryBinding
 import com.example.walkingdogapp.deco.GridSpacingItemDecoration
 import com.example.walkingdogapp.mypage.MyPageFragment
-import com.example.walkingdogapp.userinfo.userInfoViewModel
+import com.example.walkingdogapp.userinfo.UserInfoViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
@@ -37,7 +37,7 @@ class GalleryFragment : Fragment() {
     private var _binding: FragmentGalleryBinding? = null
     private val binding get() = _binding!!
     private lateinit var mainactivity: MainActivity
-    private val myViewModel: userInfoViewModel by activityViewModels()
+    private val myViewModel: UserInfoViewModel by activityViewModels()
     private val imgInfos = mutableListOf<GalleryImgInfo>()
     private val removeImgList = mutableListOf<Uri>()
     private var adaptar: GalleryitemlistAdaptar? = null
@@ -109,7 +109,7 @@ class GalleryFragment : Fragment() {
                 goMypage()
             }
 
-            removeBtn.setOnClickListener {
+            imgremoveBtn.setOnClickListener {
                 try {
                     if (removeImgList.isEmpty()) {
                         unSelectMode()
@@ -196,7 +196,7 @@ class GalleryFragment : Fragment() {
                 }
 
                 override fun onItemLongClick(imgUri: Uri) {
-                    removeBtn.visibility = View.VISIBLE
+                    imgremoveBtn.visibility = View.VISIBLE
                     selectMode = true
                     if (removeImgList.contains(imgUri)) {
                         removeImgList.remove(imgUri)
@@ -205,7 +205,7 @@ class GalleryFragment : Fragment() {
                     }
                 }
 
-                override fun omItemClickInSelectMode(imgUri: Uri) {
+                override fun onItemClickInSelectMode(imgUri: Uri) {
                     if (removeImgList.contains(imgUri)) {
                         removeImgList.remove(imgUri)
                     } else {
@@ -265,7 +265,7 @@ class GalleryFragment : Fragment() {
 
     private fun unSelectMode() {
         selectMode = false
-        binding.removeBtn.visibility = View.GONE
+        binding.imgremoveBtn.visibility = View.GONE
         removeImgList.clear()
         adaptar?.unselectMode()
     }

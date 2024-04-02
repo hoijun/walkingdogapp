@@ -28,7 +28,7 @@ import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.deco.HorizonSpacingItemDecoration
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentAlbumMapBinding
-import com.example.walkingdogapp.userinfo.userInfoViewModel
+import com.example.walkingdogapp.userinfo.UserInfoViewModel
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
@@ -45,7 +45,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     private val binding get() = _binding!!
     private val imgInfos = mutableListOf<AlbumMapImgInfo>()
     private lateinit var adaptar: AlbumMapitemlistAdaptar
-    private val myViewModel: userInfoViewModel by activityViewModels()
+    private val myViewModel: UserInfoViewModel by activityViewModels()
 
     private lateinit var mynavermap: NaverMap
     private lateinit var camera : CameraUpdate

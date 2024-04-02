@@ -12,13 +12,13 @@ import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentDogInfoBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.userinfo.DogInfo
-import com.example.walkingdogapp.userinfo.userInfoViewModel
+import com.example.walkingdogapp.userinfo.UserInfoViewModel
 
 class DogInfoFragment : Fragment() {
     private var _binding: FragmentDogInfoBinding? = null
     private val binding get() = _binding!!
 
-    private val myViewModel: userInfoViewModel by activityViewModels()
+    private val myViewModel: UserInfoViewModel by activityViewModels()
     private lateinit var userdogInfo: DogInfo
     private lateinit var mainactivity: MainActivity
 

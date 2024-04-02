@@ -18,7 +18,7 @@ class GalleryitemlistAdaptar(private val imgList: MutableList<GalleryImgInfo>, p
     interface OnItemClickListener {
         fun onItemClick(imgNum: Int)
         fun onItemLongClick(imgUri: Uri)
-        fun omItemClickInSelectMode(imgUri: Uri)
+        fun onItemClickInSelectMode(imgUri: Uri)
     }
 
     private val selectedItems = mutableListOf<GalleryImgInfo>()
@@ -36,15 +36,6 @@ class GalleryitemlistAdaptar(private val imgList: MutableList<GalleryImgInfo>, p
         holder.bind(imgList[position])
     }
 
-    private fun toggleSelection(imgInfo: GalleryImgInfo) {
-        if (selectedItems.contains(imgInfo)) {
-            selectedItems.remove(imgInfo)
-        } else {
-            selectedItems.add(imgInfo)
-        }
-        notifyItemRangeChanged(0, itemCount, null)
-    }
-
     inner class AlbumMapitemlistViewHolder(private val binding: GallerylistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
@@ -52,7 +43,7 @@ class GalleryitemlistAdaptar(private val imgList: MutableList<GalleryImgInfo>, p
                 if (!selectMode) {
                     itemClickListener?.onItemClick(bindingAdapterPosition)
                 } else {
-                    itemClickListener?.omItemClickInSelectMode(imgList[bindingAdapterPosition].uri)
+                    itemClickListener?.onItemClickInSelectMode(imgList[bindingAdapterPosition].uri)
                     toggleSelection(imgList[bindingAdapterPosition])
                 }
             }
@@ -74,6 +65,15 @@ class GalleryitemlistAdaptar(private val imgList: MutableList<GalleryImgInfo>, p
                 binding.checkBox.visibility = View.GONE
             }
         }
+    }
+
+    private fun toggleSelection(imgInfo: GalleryImgInfo) {
+        if (selectedItems.contains(imgInfo)) {
+            selectedItems.remove(imgInfo)
+        } else {
+            selectedItems.add(imgInfo)
+        }
+        notifyItemRangeChanged(0, itemCount, null)
     }
 
     fun unselectMode() {
