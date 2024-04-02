@@ -1,7 +1,9 @@
 
-qkotlin:S1172["-Remove this unused function parameter "code".(‹Êä,8ô·‹°è1J$d6e00d2c-e943-478d-bb71-2729ec23dc98
-rkotlin:S1144[".Remove this unused private "saveAlarm" method.(‹Êä,8ÈÁŠ°è1J$c191113e-733f-48f3-901f-179302d7f802
-kotlin:S1186["ZAdd a nested comment explaining why this function is empty or complete the implementation.(‹Êä,8ı·‹°è1J$fff5620c-7892-467d-986e-2b1538dd3c7b
-vkotlin:S6518(",Replace function call with indexed accessor.(ø‘Ùûÿÿÿÿ8›üÛ•è1J$195c4f3d-de21-4b9d-85a9-4f8ce8e6923c
-pkotlin:S6518)",Replace function call with indexed accessor.(•ÓÕ8›üÛ•è1J$c87c4941-d4c7-4a0c-8a36-f5580ff608b0
-qkotlin:S6518*",Replace function call with indexed accessor.(“ĞÖ8›üÛ•è1J$cd3234eb-dfa8-418c-909e-b7dd5c575832
+dkotlin:S1128"Remove this unused import.(ÊÒÅ­ùÿÿÿÿ8èÄÇöé1J$ac5825e1-d26b-4ae1-b517-0523d38d980b
+mkotlin:S1874+"#Deprecated code should not be used.(«ô¬†şÿÿÿÿ8ô‰¿é1J$651f0499-e1f6-4fbb-9de1-90b46d1ea140
+—kotlin:S3776""RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(©Àùè8ô‰¿é1J$9bb0a402-8c0b-408c-bad8-91e2d0a4a287
+vkotlin:S65181",Replace function call with indexed accessor.(…ÀÜ‹úÿÿÿÿ8÷‰¿é1J$8b3672f8-bd98-4120-abff-f593530403e0
+qkotlin:S65182",Replace function call with indexed accessor.(®öêÕ8÷‰¿é1J$da26f9ad-b239-4262-9645-6354a7efe938
+vkotlin:S6518K",Replace function call with indexed accessor.(ø‘Ùûÿÿÿÿ8÷‰¿é1J$df0245e7-b516-4adb-9c8e-ba4297be7ade
+pkotlin:S6518L",Replace function call with indexed accessor.(•ÓÕ8÷‰¿é1J$dab268b1-fa1b-461c-b37f-d595842f73bc
+qkotlin:S6518M",Replace function call with indexed accessor.(“ĞÖ8÷‰¿é1J$072a2bab-1eec-48c3-8ea7-cf4c43f94064

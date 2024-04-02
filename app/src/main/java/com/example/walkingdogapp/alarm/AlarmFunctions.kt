@@ -17,20 +17,25 @@ import java.util.Date
 
 class AlarmFunctions(private val context: Context?) {
     private lateinit var pendingIntent: PendingIntent
-    private val interval: Long = 24 * 60 * 60 * 1000
 
     @SuppressLint("SimpleDateFormat", "ScheduleExactAlarm")
-    fun callAlarm(time : Long, alarm_code : Int, weeks : Array<Boolean>?) {
+    fun callAlarm(time: Long, alarm_code: Int, weeks: Array<Boolean>?, onoff: Boolean) {
         val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val receiverIntent = Intent(context, AlarmReceiver::class.java) //리시버로 전달될 인텐트 설정
         receiverIntent.apply {
             putExtra("alarm_rqCode", alarm_code) //요청 코드를 리시버에 전달
             putExtra("week", weeks)
             putExtra("time", time)
+            putExtra("OnOff", onoff)
         }
 
-        val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
-            PendingIntent.getBroadcast(context, alarm_code, receiverIntent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PendingIntent.getBroadcast(
+                context,
+                alarm_code,
+                receiverIntent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
         } else {
             PendingIntent.getBroadcast(
                 context,
@@ -48,7 +53,7 @@ class AlarmFunctions(private val context: Context?) {
         val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmReceiver::class.java)
 
-        pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+        pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PendingIntent.getBroadcast(context, alarm_code, intent, PendingIntent.FLAG_IMMUTABLE)
         } else {
             PendingIntent.getBroadcast(

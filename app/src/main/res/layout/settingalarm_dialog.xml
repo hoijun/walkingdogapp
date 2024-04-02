@@ -155,10 +155,10 @@
             app:layout_constraintTop_toBottomOf="@id/week">
 
             <Button
-                android:id="@+id/addAlarm"
+                android:id="@+id/saveAlarm"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
-                android:text="추가"
+                android:text="저장"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold"
@@ -178,7 +178,7 @@
                 android:id="@+id/exist"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
-                android:text="삭제"
+                android:text="취소"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold"

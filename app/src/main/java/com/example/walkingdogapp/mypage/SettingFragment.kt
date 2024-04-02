@@ -14,21 +14,20 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.LoginActivity
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.R
 import com.example.walkingdogapp.WriteDialog
+import com.example.walkingdogapp.alarm.AlarmFunctions
 import com.example.walkingdogapp.databinding.FragmentSettingBinding
 import com.example.walkingdogapp.userinfo.DogInfo
 import com.example.walkingdogapp.userinfo.UserInfo
-import com.example.walkingdogapp.userinfo.userInfoViewModel
+import com.example.walkingdogapp.userinfo.UserInfoViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.kakao.sdk.user.UserApiClient
-import com.kakao.sdk.user.model.User
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
-import com.navercorp.nid.oauth.api.NidOAuthApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -37,11 +36,11 @@ import kotlinx.coroutines.tasks.await
 class SettingFragment : Fragment() {
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
-    private val myViewModel: userInfoViewModel by activityViewModels()
+    private val myViewModel: UserInfoViewModel by activityViewModels()
     private lateinit var userdogInfo: DogInfo
     private lateinit var userInfo: UserInfo
     private lateinit var mainactivity: MainActivity
-
+    private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
     private val auth = FirebaseAuth.getInstance()
     private val storage = FirebaseStorage.getInstance()
     private var db = FirebaseDatabase.getInstance()
@@ -84,6 +83,7 @@ class SettingFragment : Fragment() {
                         NaverIdLoginSDK.logout()
                         auth.signOut()
                         goLogin()
+                        removeAlarms()
                         Toast.makeText(requireContext(), "로그아웃 성공", Toast.LENGTH_SHORT)
                             .show()
                     } catch (e: Exception) {
@@ -102,6 +102,7 @@ class SettingFragment : Fragment() {
                         } else {
                             auth.signOut()
                             goLogin()
+                            removeAlarms()
                             Toast.makeText(requireContext(), "로그아웃 성공", Toast.LENGTH_SHORT)
                                 .show()
                         }
@@ -138,6 +139,7 @@ class SettingFragment : Fragment() {
                                         auth.currentUser?.delete()
                                     } catch (e: Exception) {
                                         goLogin()
+                                        removeAlarms()
                                     }
                                     NidOAuthLogin().callDeleteTokenApi(object :
                                         OAuthLoginCallback {
@@ -150,10 +152,12 @@ class SettingFragment : Fragment() {
                                             message: String
                                         ) {
                                             goLogin()
+                                            removeAlarms()
                                         }
 
                                         override fun onSuccess() {
                                             goLogin()
+                                            removeAlarms()
                                         }
                                     })
                                 } else { // 유저 정보가 올바르게 지워지지 않았을 경우
@@ -173,9 +177,11 @@ class SettingFragment : Fragment() {
                                         auth.currentUser?.delete()
                                     } catch (e: Exception) {
                                         goLogin()
+                                        removeAlarms()
                                     }
                                     UserApiClient.instance.unlink { error ->
                                         goLogin()
+                                        removeAlarms()
                                     }
                                 } else { // 유저 정보가 올바르게 지워지지 않았을 경우
                                     Toast.makeText(
@@ -268,5 +274,15 @@ class SettingFragment : Fragment() {
             return@async !error
         }
         return result.await()
+    }
+
+    private fun removeAlarms() {
+        val alarmFunctions = AlarmFunctions(requireContext())
+        coroutineScope.launch {
+            for (alarm in myViewModel.getAlarmList().value ?: listOf()) {
+                alarmFunctions.cancelAlarm(alarm.alarm_code)
+                myViewModel.deleteAlarm(alarm)
+            }
+        }
     }
 }

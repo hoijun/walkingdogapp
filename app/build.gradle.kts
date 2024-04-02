@@ -5,6 +5,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id("com.google.devtools.ksp")
 }
 
 val properties = Properties().apply {
@@ -83,20 +84,21 @@ android {
 }
 
 dependencies {
-    implementation("com.google.android.gms:play-services-location:21.1.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
-    implementation("com.google.firebase:firebase-database-ktx:20.3.0")
-    implementation("com.google.firebase:firebase-analytics-ktx:21.5.1")
+    implementation("com.google.firebase:firebase-database-ktx:20.3.1")
+    implementation("com.google.firebase:firebase-analytics-ktx:21.6.1")
     implementation("com.google.firebase:firebase-auth:22.3.1")
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
+    implementation("com.google.code.gson:gson:2.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.legacy:legacy-support-core-utils:1.0.0")
-    implementation("androidx.browser:browser:1.7.0")
+    implementation("androidx.browser:browser:1.8.0")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
@@ -108,6 +110,10 @@ dependencies {
     implementation("androidx.test.ext:junit-ktx:1.1.5")
     implementation("androidx.activity:activity-ktx:1.8.2")
     implementation("androidx.media:media:1.7.0")
+    implementation("androidx.room:room-runtime:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.1")

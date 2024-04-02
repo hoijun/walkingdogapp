@@ -1,7 +1,6 @@
 package com.example.walkingdogapp.collection
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,12 +11,12 @@ import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.deco.GridSpacingItemDecoration
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentCollectionBinding
-import com.example.walkingdogapp.userinfo.userInfoViewModel
+import com.example.walkingdogapp.userinfo.UserInfoViewModel
 
 class CollectionFragment : Fragment() {
     private var _binding: FragmentCollectionBinding? = null
     private val binding get() = _binding!!
-    private val myViewModel: userInfoViewModel by activityViewModels()
+    private val myViewModel: UserInfoViewModel by activityViewModels()
     private lateinit var collections: List<CollectionInfo>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

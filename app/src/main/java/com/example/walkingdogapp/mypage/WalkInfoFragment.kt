@@ -1,8 +1,6 @@
 package com.example.walkingdogapp.mypage
 
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +17,7 @@ import com.example.walkingdogapp.deco.SundayDecorator
 import com.example.walkingdogapp.deco.WalkDayDecorator
 import com.example.walkingdogapp.userinfo.Walkdate
 import com.example.walkingdogapp.databinding.FragmentWalkInfoBinding
-import com.example.walkingdogapp.userinfo.userInfoViewModel
+import com.example.walkingdogapp.userinfo.UserInfoViewModel
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 
@@ -28,7 +26,7 @@ class WalkInfoFragment : Fragment() { // 수정
     private lateinit var mainactivity: MainActivity
     private var _binding: FragmentWalkInfoBinding? = null
 
-    private val myViewModel: userInfoViewModel by activityViewModels()
+    private val myViewModel: UserInfoViewModel by activityViewModels()
 
     private var walkdates = mutableListOf<CalendarDay>()
     private val walkinfostartday = mutableListOf<Walkdate>()
@@ -66,8 +64,6 @@ class WalkInfoFragment : Fragment() { // 수정
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentWalkInfoBinding.inflate(inflater,container, false)
-
-        Log.d("savepoint", "aaaab")
 
         // 달력 커스텀
         val dayDecorator = DayDecorator(requireContext())

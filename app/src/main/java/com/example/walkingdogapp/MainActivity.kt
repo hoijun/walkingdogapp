@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -30,7 +29,7 @@ import com.example.walkingdogapp.userinfo.UserInfo
 import com.example.walkingdogapp.userinfo.WalkLatLng
 import com.example.walkingdogapp.userinfo.Walkdate
 import com.example.walkingdogapp.userinfo.totalWalkInfo
-import com.example.walkingdogapp.userinfo.userInfoViewModel
+import com.example.walkingdogapp.userinfo.UserInfoViewModel
 import com.example.walkingdogapp.walking.WalkingActivity
 import com.example.walkingdogapp.walking.WalkingService
 import com.google.firebase.auth.FirebaseAuth
@@ -51,7 +50,7 @@ import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
-    private lateinit var mainviewmodel: userInfoViewModel
+    private lateinit var mainviewmodel: UserInfoViewModel
     private val LOCATION_PERMISSION_REQUEST_CODE = 1000
     private val PERMISSIONS = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -99,7 +98,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(walkingIntent)
         }
         // 보류
-        mainviewmodel = ViewModelProvider(this).get(userInfoViewModel::class.java)
+        mainviewmodel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
 
         // 화면 전환
         binding.menuBn.run {

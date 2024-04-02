@@ -1,12 +1,10 @@
 
-gkotlin:S6310¶"Avoid hardcoded dispatchers.(¨¯üÿÿÿÿ8­Š“å1J$e3a76ec4-3345-4aa2-9c60-916e2906772d
-bkotlin:S6310¿"Avoid hardcoded dispatchers.(¬ÿĞ8­Š“å1J$fb9addb5-82e9-4df5-8422-72f9021e2f66
-gkotlin:S6310È"Avoid hardcoded dispatchers.(İ­š€üÿÿÿÿ8­Š“å1J$7d27dbac-e74a-4042-b3b9-e2ee1f5fb0d5
-bkotlin:S6310í"Avoid hardcoded dispatchers.(¡áşº8­Š“å1J$b0c7dd94-37be-4d1c-aa6f-b2981d8e5a74
-gkotlin:S6310ö"Avoid hardcoded dispatchers.(Ñûü£øÿÿÿÿ8­Š“å1J$824c2f3d-e318-4ecf-8870-c5f0e0f332f6
-_kotlin:S1128
-"Remove this unused import.(Üº¸¡8ÚÇÀ’å1J$3fe394a0-63dd-4d8c-a362-adaba301fdc2
-nkotlin:S1874¥"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8»Š“å1J$2e8d1022-0999-432a-8629-73164bd382eb
-kotlin:S3776°"RRefactor this method to reduce its Cognitive Complexity from 35 to the 15 allowed.(ùîÁûşÿÿÿÿ8¼Š“å1J$55b99cdf-d73c-4912-aa92-9a3d111d20bb
-tkotlin:S1066¦".Merge this "if" statement with the nested one.(•³â8¿Š“å1J$5cb2d109-3b65-4204-a541-4b0db7d00b00
-vkotlin:S6518f",Replace function call with indexed accessor.(£¨ˆŸüÿÿÿÿ8úÚÿ’å1J$0a09e7a1-f3c8-4600-9aeb-6407972c7a6e
+gkotlin:S6310µ"Avoid hardcoded dispatchers.(¨¯üÿÿÿÿ8­Š“å1J$54eab221-550a-4861-a5c6-d9792fcd9412
+bkotlin:S6310¾"Avoid hardcoded dispatchers.(¬ÿĞ8­Š“å1J$2e14455d-4e57-441a-bb60-d94ca0ebf20b
+gkotlin:S6310Ç"Avoid hardcoded dispatchers.(İ­š€üÿÿÿÿ8­Š“å1J$0063756a-3f32-495d-a7e4-6322b3c997cb
+bkotlin:S6310ì"Avoid hardcoded dispatchers.(¡áşº8­Š“å1J$fe81ff77-3042-49dd-8b73-c4e6fb78005c
+gkotlin:S6310õ"Avoid hardcoded dispatchers.(Ñûü£øÿÿÿÿ8­Š“å1J$c66074ca-55b4-49e6-abc1-124b4f457704
+nkotlin:S1874¤"#Deprecated code should not be used.(å´¾”şÿÿÿÿ8»Š“å1J$d7d83895-169b-4a64-a852-19f669dfd437
+kotlin:S3776¯"RRefactor this method to reduce its Cognitive Complexity from 35 to the 15 allowed.(ùîÁûşÿÿÿÿ8¼Š“å1J$a28a3b31-879b-4de8-8036-91ef0a317141
+tkotlin:S1066¥".Merge this "if" statement with the nested one.(•³â8¿Š“å1J$5b6fed85-ad81-4c2c-8ce9-44700b311a56
+Kkotlin:S6518e",Replace function call with indexed accessor.(âµÁ¥8ˆÁ®¼é1

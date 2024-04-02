@@ -33,9 +33,16 @@ class AlarmReceiver: BroadcastReceiver() {
         } else
             intent?.getSerializableExtra("week") as Array<Boolean>
 
+        val onOff = intent?.extras?.getBoolean("OnOff")?: false
+
+        if(!onOff) {
+            return
+        }
+
         if (weeks != null) {
             val calendar = Calendar.getInstance()
-            if (!weeks.get(calendar.get(Calendar.DAY_OF_WEEK) - 1)) return
+            if (!weeks.get(calendar.get(Calendar.DAY_OF_WEEK) - 1))
+                return
         }
 
         manager = context?.getSystemService(Service.NOTIFICATION_SERVICE) as NotificationManager
@@ -88,6 +95,6 @@ class AlarmReceiver: BroadcastReceiver() {
         Log.d("savepoint", calendar.get(Calendar.DATE).toString())
 
         val alarmFunctions = AlarmFunctions(context)
-        alarmFunctions.callAlarm(calendar.timeInMillis, requestCode, weeks)
+        alarmFunctions.callAlarm(calendar.timeInMillis, requestCode, weeks, onOff)
     }
 }

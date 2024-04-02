@@ -39,7 +39,7 @@ import com.example.walkingdogapp.databinding.ActivityWalkingBinding
 import com.example.walkingdogapp.userinfo.WalkLatLng
 import com.example.walkingdogapp.userinfo.saveWalkdate
 import com.example.walkingdogapp.userinfo.totalWalkInfo
-import com.example.walkingdogapp.userinfo.userInfoViewModel
+import com.example.walkingdogapp.userinfo.UserInfoViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -74,7 +74,7 @@ import kotlin.math.sin
 class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityWalkingBinding
     private lateinit var mynavermap: NaverMap
-    private lateinit var walkViewModel: userInfoViewModel
+    private lateinit var walkViewModel: UserInfoViewModel
     private var db = FirebaseDatabase.getInstance()
 
     private val auth = FirebaseAuth.getInstance()
@@ -139,7 +139,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(binding.root)
 
         // 보류
-        walkViewModel = ViewModelProvider(this).get(userInfoViewModel::class.java)
+        walkViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
         walkViewModel.getLastLocation()
 
         // 백그라운드 위치 서비스 시작
