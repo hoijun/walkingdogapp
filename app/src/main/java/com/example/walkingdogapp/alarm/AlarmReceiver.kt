@@ -1,6 +1,7 @@
 package com.example.walkingdogapp.alarm
 
 import android.app.AlarmManager
+import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -15,6 +16,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_DEFAULT
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.SplashActivity
+import com.example.walkingdogapp.userinfo.UserInfoRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 class AlarmReceiver: BroadcastReceiver() {
@@ -94,7 +99,11 @@ class AlarmReceiver: BroadcastReceiver() {
 
         Log.d("savepoint", calendar.get(Calendar.DATE).toString())
 
+        val repository = UserInfoRepository(context.applicationContext as Application)
         val alarmFunctions = AlarmFunctions(context)
         alarmFunctions.callAlarm(calendar.timeInMillis, requestCode, weeks, onOff)
+        CoroutineScope(Dispatchers.IO).launch {
+            repository.updateAlarmTime(requestCode, calendar.timeInMillis)
+        }
     }
 }

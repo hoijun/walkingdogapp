@@ -65,4 +65,7 @@ interface AlarmDao {
 
     @Query("UPDATE active_alarms SET alarmOn = :alarmOn WHERE alarm_code = :alarm_code")
     fun updateAlarmStatus(alarm_code: Int, alarmOn: Boolean)
+
+    @Query("UPDATE active_alarms SET time = :time WHERE alarm_code = :alarm_code")
+    fun updateAlarmTime(alarm_code: Int, time: Long)
 }
