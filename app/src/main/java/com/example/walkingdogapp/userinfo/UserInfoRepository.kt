@@ -31,4 +31,8 @@ class UserInfoRepository(application: Application) {
     fun onOffAlarm(alarm_code: Int, alarmOn: Boolean) {
         alarmDao.updateAlarmStatus(alarm_code, alarmOn)
     }
+
+    fun updateAlarmTime(alarm_code: Int, time: Long) {
+        alarmDao.updateAlarmTime(alarm_code, time)
+    }
 }
