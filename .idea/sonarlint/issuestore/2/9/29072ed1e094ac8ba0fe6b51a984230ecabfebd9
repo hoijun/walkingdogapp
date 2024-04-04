@@ -1,8 +1,8 @@
 
-dkotlin:S1128"Remove this unused import.(ÊÒÅ­ùÿÿÿÿ8²öã–ê1J$085793e8-4bdf-4fe8-92b9-343cb71ab423
-dkotlin:S1128"Remove this unused import.(œÚä‚øÿÿÿÿ8²öã–ê1J$5128a45b-e6c8-4404-be9b-f8b7107bf004
-dkotlin:S1128"Remove this unused import.(Ó¸Ñÿÿÿÿÿ8²öã–ê1J$6911fec6-7810-4c0a-a44c-90d389e819c2
-dkotlin:S1128"Remove this unused import.(ŞŠ‹Ùüÿÿÿÿ8²öã–ê1J$e5bef428-4d38-44b7-b2f7-775281bc3796
-—kotlin:S37766"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(©Àùè8Âöã–ê1J$fcfddbe3-af4c-4417-a92e-893f377d2f46
-wkotlin:S6518Ç",Replace function call with indexed accessor.(¶ÙòÙüÿÿÿÿ8Âöã–ê1J$1f3cd69f-fbe5-4d18-bafa-9aa07710797c
-wkotlin:S6518Ç",Replace function call with indexed accessor.(¶ÙòÙüÿÿÿÿ8Âöã–ê1J$2deed9d4-7126-420d-9fff-9ddefba45639
+dkotlin:S1128"Remove this unused import.(ÊÒÅ­ùÿÿÿÿ8Û™’ùé1J$5e2dafc9-b07d-435b-aedb-b90dd675b245
+dkotlin:S1128"Remove this unused import.(œÚä‚øÿÿÿÿ8 ÆÈöé1J$33deb14b-7a55-4846-ac60-0eec8942cc5c
+dkotlin:S1128"Remove this unused import.(Ó¸Ñÿÿÿÿÿ8ãæÇöé1J$74c9ae2b-bfa0-444f-82f4-ec7195409dc7
+dkotlin:S1128"Remove this unused import.(ŞŠ‹Ùüÿÿÿÿ8ÍÅ±÷é1J$233060a0-9012-453a-9939-b9122dcc3c23
+—kotlin:S37766"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(©Àùè8¬°óé1J$b0f12eb2-c9a3-4eb0-be92-afddca97947f
+wkotlin:S6518Ç",Replace function call with indexed accessor.(¶ÙòÙüÿÿÿÿ8õ´®÷é1J$85fb1de0-d72a-41ff-8215-edbbc0235091
+wkotlin:S6518Ç",Replace function call with indexed accessor.(¶ÙòÙüÿÿÿÿ8õ´®÷é1J$a10c4d48-639d-4d57-ab31-4655490e5d79
