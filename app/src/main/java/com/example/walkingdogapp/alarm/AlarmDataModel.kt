@@ -55,7 +55,10 @@ data class AlarmDataModel(
 @Dao
 interface AlarmDao {
     @Query("select * from active_alarms")
-    fun getAllAlarms() : LiveData<List<AlarmDataModel>>
+    fun getAllAlarms() : LiveData<List<AlarmDataModel>> // 라이브 데이터 자체가 비동기적으로 작동하여 별도의 코루틴을 사용할 필요 없음.
+
+    @Query("select * from active_alarms")
+    fun getAlarmsList() : List<AlarmDataModel> // 반면 일반적인 리스트를 반환 할때는 코루틴을 사용해 반환 받아야 함.
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) // 알람은 중복되지 않게 저장
     fun addAlarm(item: AlarmDataModel)
