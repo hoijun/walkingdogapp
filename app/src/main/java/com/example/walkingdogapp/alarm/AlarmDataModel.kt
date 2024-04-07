@@ -40,7 +40,9 @@ data class AlarmDataModel(
         if (alarm_code != other.alarm_code) return false
         if (time != other.time) return false
         if (!weeks.contentEquals(other.weeks)) return false
-        return alarmOn == other.alarmOn
+        if (alarmOn != other.alarmOn) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
@@ -51,6 +53,7 @@ data class AlarmDataModel(
         return result
     }
 }
+
 
 @Dao
 interface AlarmDao {

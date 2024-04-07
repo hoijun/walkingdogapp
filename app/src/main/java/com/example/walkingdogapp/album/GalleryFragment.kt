@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -279,11 +280,9 @@ class GalleryFragment : Fragment() {
         while (iterator.hasNext()) {
             val img = iterator.next()
             if (!Constant.isImageExists(img.uri, requireActivity())) {
-                lifecycleScope.launch {
-                    val index = imgInfos.indexOf(img)
-                    iterator.remove()
-                    adaptar?.notifyItemRemoved(index)
-                }
+                val index = imgInfos.indexOf(img)
+                iterator.remove()
+                adaptar?.notifyItemRemoved(index)
             }
         }
     }

@@ -2,7 +2,6 @@ package com.example.walkingdogapp.alarm
 
 import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,15 +9,13 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.DefaultItemAnimator
 import com.example.walkingdogapp.HomeFragment
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.album.GalleryitemlistAdaptar
 import com.example.walkingdogapp.databinding.FragmentSettingAlarmBinding
 import com.example.walkingdogapp.userinfo.UserInfoViewModel
-import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
@@ -32,6 +29,7 @@ class SettingAlarmFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var mainactivity: MainActivity
     private var removeAlarmList = mutableListOf<AlarmDataModel>()
+    private var alarmList = mutableListOf<AlarmDataModel>()
     private var adaptar: AlarmlistAdapter? = null
     private var selectMode = false
 
@@ -40,6 +38,8 @@ class SettingAlarmFragment : Fragment() {
             if(!selectMode) {
                 goHome()
             } else {
+                binding.btnAlarmremove.visibility = View.GONE
+                binding.btnAddAlarm.visibility = View.VISIBLE
                 unSelectMode()
             }
         }
@@ -65,9 +65,22 @@ class SettingAlarmFragment : Fragment() {
                 settingAlarmDialog.onAddAlarmListener =
                     object : SettingAlarmDialog.OnAddAlarmListener {
                         override fun onAddAlarm(alarm: AlarmDataModel) {
+                            if (alarmList.any { it.alarm_code == alarm.alarm_code }) {
+                                return
+                            }
                             coroutineScope.launch {
-                                alarmFunctions.callAlarm(alarm.time, alarm.alarm_code, alarm.weeks, alarm.alarmOn)
+                                alarmFunctions.callAlarm(
+                                    alarm.time,
+                                    alarm.alarm_code,
+                                    alarm.weeks,
+                                    alarm.alarmOn
+                                )
                                 myViewModel.addAlarm(alarm)
+                                alarmList.add(alarm)
+                                alarmList.sortBy { alarmTimeToString(it.time).toInt() }
+                                withContext(Dispatchers.Main) {
+                                    adaptar?.notifyItemInserted(alarmList.indexOf(alarm))
+                                }
                             }
                         }
 
@@ -81,78 +94,110 @@ class SettingAlarmFragment : Fragment() {
                 settingAlarmDialog.show(requireActivity().supportFragmentManager, "alarm")
             }
 
-            myViewModel.getAlarmList().observe(viewLifecycleOwner) { alarmList ->
-                val sortedList = alarmList.sortedBy { alarmTimeToString(it.time).toInt() }
-                adaptar = AlarmlistAdapter(sortedList)
-                adaptar?.onItemClickListener = object : AlarmlistAdapter.OnItemClickListener {
-                    override fun onItemClick(alarm: AlarmDataModel) {
-                        val settingAlarmDialog = SettingAlarmDialog().apply {
-                            val bundle = Bundle()
-                            bundle.putSerializable("alarmInfo", alarm)
-                            arguments = bundle
-                        }
-
-                        settingAlarmDialog.onAddAlarmListener =
-                            object : SettingAlarmDialog.OnAddAlarmListener {
-                                override fun onAddAlarm(alarm: AlarmDataModel) {
-                                    return
-                                }
-
-                                override fun onChangeAlarm(
-                                    newAlarm: AlarmDataModel,
-                                    oldAlarm: AlarmDataModel
-                                ) {
-                                    coroutineScope.launch {
-                                        alarmFunctions.cancelAlarm(oldAlarm.alarm_code)
-                                        alarmFunctions.callAlarm(
-                                            newAlarm.time,
-                                            newAlarm.alarm_code,
-                                            newAlarm.weeks,
-                                            alarm.alarmOn
-                                        )
-                                        myViewModel.deleteAlarm(oldAlarm)
-                                        myViewModel.addAlarm(newAlarm)
-                                    }
-                                }
+            coroutineScope.launch {
+                alarmList = myViewModel.getAlarmList().sortedBy { alarmTimeToString(it.time).toInt() }.toMutableList()
+                adaptar = AlarmlistAdapter(alarmList)
+                withContext(Dispatchers.Main) {
+                    adaptar?.onItemClickListener = object : AlarmlistAdapter.OnItemClickListener {
+                        override fun onItemClick(alarm: AlarmDataModel) {
+                            val settingAlarmDialog = SettingAlarmDialog().apply {
+                                val bundle = Bundle()
+                                bundle.putSerializable("alarmInfo", alarm)
+                                arguments = bundle
                             }
 
-                        settingAlarmDialog.show(
-                            requireActivity().supportFragmentManager,
-                            "modifyAlarm"
-                        )
-                    }
+                            settingAlarmDialog.onAddAlarmListener =
+                                object : SettingAlarmDialog.OnAddAlarmListener {
+                                    override fun onAddAlarm(alarm: AlarmDataModel) {
+                                        return
+                                    }
 
-                    override fun onItemLongClick(alarm: AlarmDataModel) {
-                        btnAlarmremove.visibility = View.VISIBLE
-                        btnAddAlarm.visibility = View.GONE
-                        selectMode = true
-                        if (removeAlarmList.contains(alarm)) {
-                            removeAlarmList.remove(alarm)
-                        } else {
-                            removeAlarmList.add(alarm)
+                                    override fun onChangeAlarm(
+                                        newAlarm: AlarmDataModel,
+                                        oldAlarm: AlarmDataModel
+                                    ) {
+                                        if (alarmList.any { it.alarm_code == newAlarm.alarm_code }) {
+                                            return
+                                        }
+                                        coroutineScope.launch {
+                                            alarmFunctions.cancelAlarm(oldAlarm.alarm_code)
+                                            alarmFunctions.callAlarm(
+                                                newAlarm.time,
+                                                newAlarm.alarm_code,
+                                                newAlarm.weeks,
+                                                oldAlarm.alarmOn
+                                            )
+                                            myViewModel.deleteAlarm(oldAlarm)
+                                            myViewModel.addAlarm(newAlarm)
+                                            val oldalarm = alarmList.indexOf(oldAlarm)
+                                            alarmList.remove(oldAlarm)
+                                            alarmList.add(newAlarm)
+                                            alarmList.sortBy { alarmTimeToString(it.time).toInt() }
+                                            withContext(Dispatchers.Main) {
+                                                adaptar?.notifyItemRemoved(oldalarm)
+                                                adaptar?.notifyItemInserted(alarmList.indexOf(newAlarm))
+                                            }
+                                        }
+                                    }
+                                }
+
+                            settingAlarmDialog.show(
+                                requireActivity().supportFragmentManager,
+                                "modifyAlarm"
+                            )
+                        }
+
+                        override fun onItemLongClick(alarm: AlarmDataModel) {
+                            btnAlarmremove.visibility = View.VISIBLE
+                            btnAddAlarm.visibility = View.GONE
+                            selectMode = true
+                            if (removeAlarmList.contains(alarm)) {
+                                removeAlarmList.remove(alarm)
+                            } else {
+                                removeAlarmList.add(alarm)
+                            }
+                        }
+
+                        override fun onItemClickInSelectMode(alarm: AlarmDataModel) {
+                            if (removeAlarmList.contains(alarm)) {
+                                removeAlarmList.remove(alarm)
+                            } else {
+                                removeAlarmList.add(alarm)
+                            }
+                        }
+
+                        override fun onSwitchCheckedChangeListener(
+                            alarm: AlarmDataModel,
+                            ischecked: Boolean
+                        ) {
+                            coroutineScope.launch {
+                                alarmFunctions.cancelAlarm(alarm.alarm_code)
+                                val calendar = Calendar.getInstance().apply {
+                                    val today = get(Calendar.DATE)
+                                    timeInMillis = alarm.time
+                                    set(Calendar.DATE, today)
+                                    if (System.currentTimeMillis() > timeInMillis) {
+                                        add(Calendar.DATE, 1)
+                                    }
+                                }
+
+                                alarmFunctions.callAlarm(
+                                    calendar.timeInMillis,
+                                    alarm.alarm_code,
+                                    alarm.weeks,
+                                    ischecked
+                                )
+                                myViewModel.onOffAlarm(alarm, ischecked)
+                            }
                         }
                     }
-
-                    override fun onItemClickInSelectMode(alarm: AlarmDataModel) {
-                        if (removeAlarmList.contains(alarm)) {
-                            removeAlarmList.remove(alarm)
-                        } else {
-                            removeAlarmList.add(alarm)
-                        }
-                    }
-
-                    override fun onSwitchCheckedChangeListener(
-                        alarm: AlarmDataModel,
-                        ischecked: Boolean
-                    ) {
-                        coroutineScope.launch {
-                            myViewModel.onOffAlarm(alarm, ischecked)
-                        }
-                    }
+                    val itemAnimator = DefaultItemAnimator()
+                    itemAnimator.supportsChangeAnimations = false
+                    AlarmRecyclerView.itemAnimator = itemAnimator
+                    AlarmRecyclerView.adapter = adaptar
                 }
-                AlarmRecyclerView.itemAnimator = null
-                AlarmRecyclerView.adapter = adaptar
             }
+
 
             btnAlarmremove.setOnClickListener {
                 val builder = AlertDialog.Builder(requireContext())
@@ -165,6 +210,7 @@ class SettingAlarmFragment : Fragment() {
                                     alarmFunctions.cancelAlarm(alarm.alarm_code)
                                     myViewModel.deleteAlarm(alarm)
                                 }
+                                removeItems()
                                 unSelectMode()
                             }
                             btnAlarmremove.visibility = View.GONE
@@ -196,12 +242,24 @@ class SettingAlarmFragment : Fragment() {
     private fun alarmTimeToString(time: Long): String {
         val setCalendar = Calendar.getInstance()
         setCalendar.timeInMillis = time
-        return setCalendar.get(Calendar.HOUR_OF_DAY).toString() + setCalendar.get(Calendar.MINUTE).toString()
+        return setCalendar.get(Calendar.HOUR_OF_DAY).toString() + String.format("%02d", setCalendar.get(Calendar.MINUTE))
     }
 
     private fun unSelectMode() {
         selectMode = false
         removeAlarmList.clear()
         adaptar?.unselectMode()
+    }
+
+    private fun removeItems() {
+        val iterator = alarmList.iterator()
+        while (iterator.hasNext()) {
+            val alarm = iterator.next()
+            if (removeAlarmList.contains(alarm)) {
+                val index = alarmList.indexOf(alarm)
+                iterator.remove()
+                adaptar?.notifyItemRemoved(index)
+            }
+        }
     }
 }

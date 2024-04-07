@@ -91,16 +91,15 @@ class AlarmReceiver: BroadcastReceiver() {
 
         manager.notify(1, notification)
 
-        val time = intent.extras!!.getLong("time")
         val calendar = Calendar.getInstance().apply {
-            timeInMillis = time
+            timeInMillis = System.currentTimeMillis()
             add(Calendar.DATE, 1)
+            set(Calendar.SECOND, 0)
         }
-
-        Log.d("savepoint", calendar.get(Calendar.DATE).toString())
 
         val repository = UserInfoRepository(context.applicationContext as Application)
         val alarmFunctions = AlarmFunctions(context)
+        alarmFunctions.cancelAlarm(requestCode)
         alarmFunctions.callAlarm(calendar.timeInMillis, requestCode, weeks, onOff)
         CoroutineScope(Dispatchers.IO).launch {
             repository.updateAlarmTime(requestCode, calendar.timeInMillis)

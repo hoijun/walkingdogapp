@@ -5,15 +5,17 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.walkingdogapp.alarm.AlarmDao
 import com.example.walkingdogapp.alarm.AlarmDataModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class UserInfoRepository(application: Application) {
     private val alarmDao: AlarmDao
-    private val alarmList: LiveData<List<AlarmDataModel>>
+    private lateinit var alarmList: List<AlarmDataModel>
 
     init {
         val db = LocalUserDatabase.getInstance(application)
         alarmDao = db!!.alarmDao()
-        alarmList = alarmDao.getAllAlarms()
     }
 
     fun add(alarm: AlarmDataModel) {
@@ -24,7 +26,8 @@ class UserInfoRepository(application: Application) {
         alarmDao.deleteAlarm(alarm.alarm_code)
     }
 
-    fun getAll(): LiveData<List<AlarmDataModel>> {
+    fun getAll(): List<AlarmDataModel> {
+        alarmList = alarmDao.getAlarmsList()
         return alarmList
     }
 
