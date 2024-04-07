@@ -19,7 +19,6 @@ import java.util.Calendar
 
 class SettingAlarmDialog : DialogFragment() {
     private lateinit var binding: SettingalarmDialogBinding
-    private val myViewModel: UserInfoViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }

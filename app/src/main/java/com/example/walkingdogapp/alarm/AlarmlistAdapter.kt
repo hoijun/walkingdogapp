@@ -119,8 +119,8 @@ class AlarmlistAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerVi
 
     private fun getAlarmInfo(alarm: AlarmDataModel): List<String> {
         val time = alarm.time
-        val setCalendar = Calendar.getInstance().also {
-            it.timeInMillis = time
+        val setCalendar = Calendar.getInstance().apply {
+            timeInMillis = time
         }
         val hour = setCalendar.get(Calendar.HOUR_OF_DAY).toString()
         val minutes = setCalendar.get(Calendar.MINUTE)

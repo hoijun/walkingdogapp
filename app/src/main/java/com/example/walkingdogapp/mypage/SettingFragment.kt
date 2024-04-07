@@ -279,7 +279,7 @@ class SettingFragment : Fragment() {
     private fun removeAlarms() {
         val alarmFunctions = AlarmFunctions(requireContext())
         coroutineScope.launch {
-            for (alarm in myViewModel.getAlarmList().value ?: listOf()) {
+            for (alarm in myViewModel.getAlarmList()) {
                 alarmFunctions.cancelAlarm(alarm.alarm_code)
                 myViewModel.deleteAlarm(alarm)
             }

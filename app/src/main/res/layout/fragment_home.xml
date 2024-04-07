@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".HomeFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -67,10 +67,10 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:gravity="bottom"
+                android:text="지역"
                 android:textColor="@color/black"
                 android:textSize="25sp"
                 android:textStyle="bold"
-                android:text="지역"
                 app:layout_constraintHeight_percent="0.15"
                 app:layout_constraintStart_toEndOf="@id/View1"
                 app:layout_constraintTop_toTopOf="parent"
@@ -80,8 +80,8 @@
                 android:id="@+id/text_hello"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:textColor="@color/black"
                 android:text="안녕하세요."
+                android:textColor="@color/black"
                 android:textSize="30sp"
                 android:textStyle="bold"
                 app:layout_constraintHeight_percent="0.15"
@@ -103,9 +103,9 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:src="@drawable/waitimage"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.45"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/View2"
                 app:layout_constraintWidth_percent="0.8" />
 
@@ -154,16 +154,16 @@
                 android:id="@+id/msg_register"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:gravity="center"
                 android:text="등록"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.15"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/btn_register"
-                app:layout_constraintWidth_percent="0.6"/>
+                app:layout_constraintWidth_percent="0.6" />
 
             <Button
                 android:id="@+id/btn_walk"
@@ -172,11 +172,11 @@
                 android:text="산책 시작"
                 android:textSize="25sp"
                 android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.3"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/msg_register"
-                app:layout_constraintWidth_percent="0.85"/>
+                app:layout_constraintWidth_percent="0.85" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

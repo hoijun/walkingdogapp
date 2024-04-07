@@ -101,7 +101,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
         repository.add(alarm)
     }
 
-    fun getAlarmList(): LiveData<List<AlarmDataModel>> {
+    fun getAlarmList(): List<AlarmDataModel> {
         return repository.getAll()
     }
 
