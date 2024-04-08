@@ -38,12 +38,6 @@ class AlarmReceiver: BroadcastReceiver() {
         } else
             intent?.getSerializableExtra("week") as Array<Boolean>
 
-        val onOff = intent?.extras?.getBoolean("OnOff")?: false
-
-        if(!onOff) {
-            return
-        }
-
         if (weeks != null) {
             val calendar = Calendar.getInstance()
             if (!weeks.get(calendar.get(Calendar.DAY_OF_WEEK) - 1))
@@ -100,7 +94,7 @@ class AlarmReceiver: BroadcastReceiver() {
         val repository = UserInfoRepository(context.applicationContext as Application)
         val alarmFunctions = AlarmFunctions(context)
         alarmFunctions.cancelAlarm(requestCode)
-        alarmFunctions.callAlarm(calendar.timeInMillis, requestCode, weeks, onOff)
+        alarmFunctions.callAlarm(calendar.timeInMillis, requestCode, weeks)
         CoroutineScope(Dispatchers.IO).launch {
             repository.updateAlarmTime(requestCode, calendar.timeInMillis)
         }
