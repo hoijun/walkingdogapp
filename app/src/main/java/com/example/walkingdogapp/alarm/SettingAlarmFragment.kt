@@ -2,6 +2,7 @@ package com.example.walkingdogapp.alarm
 
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -72,8 +73,7 @@ class SettingAlarmFragment : Fragment() {
                                 alarmFunctions.callAlarm(
                                     alarm.time,
                                     alarm.alarm_code,
-                                    alarm.weeks,
-                                    alarm.alarmOn
+                                    alarm.weeks
                                 )
                                 myViewModel.addAlarm(alarm)
                                 alarmList.add(alarm)
@@ -121,20 +121,24 @@ class SettingAlarmFragment : Fragment() {
                                         }
                                         coroutineScope.launch {
                                             alarmFunctions.cancelAlarm(oldAlarm.alarm_code)
-                                            alarmFunctions.callAlarm(
-                                                newAlarm.time,
-                                                newAlarm.alarm_code,
-                                                newAlarm.weeks,
-                                                oldAlarm.alarmOn
-                                            )
+
                                             myViewModel.deleteAlarm(oldAlarm)
                                             myViewModel.addAlarm(newAlarm)
-                                            val oldalarm = alarmList.indexOf(oldAlarm)
-                                            alarmList.remove(oldAlarm)
-                                            alarmList.add(newAlarm)
-                                            alarmList.sortBy { alarmTimeToString(it.time).toInt() }
+
+                                            if(oldAlarm.alarmOn) {
+                                                alarmFunctions.callAlarm(
+                                                    newAlarm.time,
+                                                    newAlarm.alarm_code,
+                                                    newAlarm.weeks,
+                                                )
+                                            }
+
                                             withContext(Dispatchers.Main) {
-                                                adaptar?.notifyItemRemoved(oldalarm)
+                                                val old = alarmList.indexOf(oldAlarm)
+                                                alarmList.remove(oldAlarm)
+                                                adaptar?.notifyItemRemoved(old)
+                                                alarmList.add(newAlarm)
+                                                alarmList.sortBy { alarmTimeToString(it.time).toInt() }
                                                 adaptar?.notifyItemInserted(alarmList.indexOf(newAlarm))
                                             }
                                         }
@@ -171,22 +175,25 @@ class SettingAlarmFragment : Fragment() {
                             ischecked: Boolean
                         ) {
                             coroutineScope.launch {
-                                alarmFunctions.cancelAlarm(alarm.alarm_code)
-                                val calendar = Calendar.getInstance().apply {
-                                    val today = get(Calendar.DATE)
-                                    timeInMillis = alarm.time
-                                    set(Calendar.DATE, today)
-                                    if (System.currentTimeMillis() > timeInMillis) {
-                                        add(Calendar.DATE, 1)
+                                if (ischecked) {
+                                    val calendar = Calendar.getInstance().apply {
+                                        val today = get(Calendar.DATE)
+                                        timeInMillis = alarm.time
+                                        set(Calendar.DATE, today)
+                                        if (System.currentTimeMillis() > timeInMillis) {
+                                            add(Calendar.DATE, 1)
+                                        }
                                     }
-                                }
 
-                                alarmFunctions.callAlarm(
-                                    calendar.timeInMillis,
-                                    alarm.alarm_code,
-                                    alarm.weeks,
-                                    ischecked
-                                )
+                                    alarmFunctions.callAlarm(
+                                        calendar.timeInMillis,
+                                        alarm.alarm_code,
+                                        alarm.weeks,
+                                    )
+                                } else {
+                                    alarmFunctions.cancelAlarm(alarm.alarm_code)
+                                }
+                                alarmList[alarmList.indexOf(alarm)].alarmOn = ischecked
                                 myViewModel.onOffAlarm(alarm, ischecked)
                             }
                         }

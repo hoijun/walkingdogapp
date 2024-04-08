@@ -19,7 +19,7 @@ class AlarmFunctions(private val context: Context?) {
     private lateinit var pendingIntent: PendingIntent
 
     @SuppressLint("SimpleDateFormat", "ScheduleExactAlarm")
-    fun callAlarm(time: Long, alarm_code: Int, weeks: Array<Boolean>?, onoff: Boolean) {
+    fun callAlarm(time: Long, alarm_code: Int, weeks: Array<Boolean>?) {
         val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val receiverIntent = Intent(context, AlarmReceiver::class.java) //리시버로 전달될 인텐트 설정
 
@@ -27,7 +27,6 @@ class AlarmFunctions(private val context: Context?) {
         receiverIntent.apply {
             putExtra("alarm_rqCode", alarm_code) //요청 코드를 리시버에 전달
             putExtra("week", weeks)
-            putExtra("OnOff", onoff)
         }
 
         val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
