@@ -21,7 +21,8 @@ import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 
 class DateDialog : DialogFragment() {
-    private lateinit var binding: DateDialogBinding
+    private var _binding: DateDialogBinding? = null
+    private val binding get() = _binding!!
     private var walkdates = mutableListOf<CalendarDay>()
     private val myViewModel: UserInfoViewModel by activityViewModels()
     private var walkdatelist = listOf<Walkdate>()
@@ -52,7 +53,7 @@ class DateDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DateDialogBinding.inflate(inflater, container, false)
+        _binding = DateDialogBinding.inflate(inflater, container, false)
         val todayDecorator = ToDayDecorator(requireContext(), CalendarDay.today())
         var selectedMonthDecorator = SelectedMonthDecorator(CalendarDay.today().month)
         val walkDayDecorator = WalkDayDecorator(walkdates) // 산책한 날 표시
@@ -97,6 +98,11 @@ class DateDialog : DialogFragment() {
         resizeDialog()
         this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return binding.root
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     private fun resizeDialog() {

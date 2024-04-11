@@ -12,8 +12,8 @@ import androidx.fragment.app.DialogFragment
 import com.example.walkingdogapp.databinding.WriteDialogBinding
 
 class WriteDialog : DialogFragment() {
-    private lateinit var binding: WriteDialogBinding
-
+    private var _binding: WriteDialogBinding? = null
+    private val binding get() = _binding!!
     fun interface OnClickYesListener {
         fun onClick(text: String)
     }
@@ -24,7 +24,7 @@ class WriteDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = WriteDialogBinding.inflate(inflater, container, false)
+        _binding = WriteDialogBinding.inflate(inflater, container, false)
         val writeText = arguments?.getString("text")?: ""
         binding.apply {
             write.hint = writeText
@@ -42,10 +42,16 @@ class WriteDialog : DialogFragment() {
         return binding.root
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
     private fun resizeDialog() {
         val params: ViewGroup.LayoutParams? = this.dialog?.window?.attributes
         val deviceWidth = Resources.getSystem().displayMetrics.widthPixels
         params?.width = (deviceWidth * 0.8).toInt()
         this.dialog?.window?.attributes = params as WindowManager.LayoutParams
     }
+
 }

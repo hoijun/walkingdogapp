@@ -23,7 +23,6 @@ import java.util.Calendar
 
 
 class SettingAlarmFragment : Fragment() {
-
     private var _binding: FragmentSettingAlarmBinding? = null
     private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
     private val myViewModel: UserInfoViewModel by activityViewModels()
@@ -240,6 +239,11 @@ class SettingAlarmFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun goHome() {
