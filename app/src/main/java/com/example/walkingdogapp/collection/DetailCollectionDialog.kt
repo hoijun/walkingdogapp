@@ -13,14 +13,15 @@ import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
 import com.example.walkingdogapp.databinding.DetailcollectionDialogBinding
 class DetailCollectionDialog: DialogFragment() {
-    private lateinit var binding: DetailcollectionDialogBinding
+    private var _binding: DetailcollectionDialogBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DetailcollectionDialogBinding.inflate(inflater, container, false)
+        _binding = DetailcollectionDialogBinding.inflate(inflater, container, false)
         val collectionInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable("collectionInfo", CollectionInfo::class.java)?: CollectionInfo()
         } else {
@@ -37,6 +38,11 @@ class DetailCollectionDialog: DialogFragment() {
         this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         resizeDialog()
         return binding.root
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     private fun resizeDialog() {

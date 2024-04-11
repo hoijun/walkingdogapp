@@ -16,7 +16,8 @@ import com.example.walkingdogapp.databinding.DoglistDialogBinding
 import com.example.walkingdogapp.databinding.WriteDialogBinding
 
 class DoglistDialog : DialogFragment(){
-    private lateinit var binding: DoglistDialogBinding
+    private var _binding: DoglistDialogBinding? = null
+    private val binding get() = _binding!!
     private val dogs = listOf("직접 입력", "말티즈", "푸들", "포메라니안", "믹스견", "치와와", "시츄", "골든리트리버", "진돗개", "불독", "비글", "닥스훈트", "허스키", "a", "b", "c")
 
     fun interface OnClickItemListener {
@@ -29,7 +30,7 @@ class DoglistDialog : DialogFragment(){
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DoglistDialogBinding.inflate(inflater, container, false)
+        _binding = DoglistDialogBinding.inflate(inflater, container, false)
         val dialogRecyclerView = binding.dialogRecyclerView
         dialogRecyclerView.layoutManager = LinearLayoutManager(context)
         val adaptar = DoglistAdpatar(dogs)
@@ -54,6 +55,11 @@ class DoglistDialog : DialogFragment(){
         resizeDialog()
         this.dialog?.setCanceledOnTouchOutside(true)
         return binding.root
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     private fun resizeDialog() {

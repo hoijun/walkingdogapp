@@ -18,7 +18,8 @@ import com.example.walkingdogapp.userinfo.UserInfoViewModel
 import java.util.Calendar
 
 class SettingAlarmDialog : DialogFragment() {
-    private lateinit var binding: SettingalarmDialogBinding
+    private var _binding: SettingalarmDialogBinding? = null
+    private val binding get() = _binding!!
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -34,7 +35,7 @@ class SettingAlarmDialog : DialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = SettingalarmDialogBinding.inflate(inflater, container, false)
+        _binding = SettingalarmDialogBinding.inflate(inflater, container, false)
 
         val alarmInfo = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable("alarmInfo", AlarmDataModel::class.java)
@@ -123,6 +124,11 @@ class SettingAlarmDialog : DialogFragment() {
         resizeDialog()
         this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return binding.root
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     private fun resizeDialog() {

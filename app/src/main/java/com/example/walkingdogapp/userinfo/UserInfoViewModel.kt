@@ -139,7 +139,6 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
                 callback("지역")
             }
         } else {
-            Log.d("SDK", "MOERTHAN33")
             geocoder.getFromLocation(coord.latitude, coord.longitude,
                 7,
                 @RequiresApi(33) object :
