@@ -5,16 +5,14 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.databinding.SettingalarmDialogBinding
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
+import com.example.walkingdogapp.userinfo.AlarmDataModel
 import java.util.Calendar
 
 class SettingAlarmDialog : DialogFragment() {

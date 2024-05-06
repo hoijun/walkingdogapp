@@ -6,25 +6,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingdogapp.userinfo.Walkdate
 import com.example.walkingdogapp.databinding.WalkdateslistItemBinding
 
-class WalkdateslistAdapater(private val dates: List<Walkdate>): RecyclerView.Adapter<WalkdateslistAdapater.WalkdateslisViewHolder>() {
+class WalkdateslistAdapater(private val dates: List<Walkdate>): RecyclerView.Adapter<WalkdateslistAdapater.WalkdateslistViewHolder>() {
 
     fun interface OnItemClickListener {
         fun onItemClick(date: Walkdate)
     }
 
     var itemClickListener : OnItemClickListener? = null
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalkdateslisViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalkdateslistViewHolder {
         val binding = WalkdateslistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return WalkdateslisViewHolder(binding)
+        return WalkdateslistViewHolder(binding)
     }
 
     override fun getItemCount(): Int = dates.size
 
-    override fun onBindViewHolder(holder: WalkdateslisViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: WalkdateslistViewHolder, position: Int) {
         holder.bind(dates[position])
     }
 
-    inner class WalkdateslisViewHolder(private val binding: WalkdateslistItemBinding) :
+    inner class WalkdateslistViewHolder(private val binding: WalkdateslistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {

@@ -1,13 +1,6 @@
 package com.example.walkingdogapp.userinfo
 
 import android.app.Application
-import android.util.Log
-import androidx.lifecycle.LiveData
-import com.example.walkingdogapp.alarm.AlarmDao
-import com.example.walkingdogapp.alarm.AlarmDataModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class UserInfoRepository(application: Application) {
     private val alarmDao: AlarmDao

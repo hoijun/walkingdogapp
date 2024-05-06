@@ -158,6 +158,11 @@ class WalkInfoFragment : Fragment() { // 수정
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun goMypage() {
         mainactivity.changeFragment(MyPageFragment())
     }

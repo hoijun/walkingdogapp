@@ -10,9 +10,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.databinding.ActivityLoginBinding
-import com.example.walkingdogapp.userinfo.DogInfo
 import com.example.walkingdogapp.userinfo.UserInfo
-import com.example.walkingdogapp.userinfo.totalWalkInfo
+import com.example.walkingdogapp.userinfo.WalkInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.database.ktx.database
@@ -200,8 +199,7 @@ class LoginActivity : AppCompatActivity() {
                 val userRef = db.getReference("Users")
 
                 val userInfo = UserInfo()
-                val dogInfo = DogInfo()
-                val totalwalkInfo = totalWalkInfo()
+                val totalwalkInfo = WalkInfo()
                 userInfo.email = email
 
                 lifecycleScope.launch {
@@ -239,22 +237,10 @@ class LoginActivity : AppCompatActivity() {
                         }
                     }
 
-                    val doginfojob = async(Dispatchers.IO) {
-                        try {
-                            userRef.child("$uid").child("dog").setValue(dogInfo).await()
-                        } catch (e: Exception) {
-                            Toast.makeText(this@LoginActivity, "로그인 실패" , Toast.LENGTH_SHORT).show()
-                            binding.loginscreen.visibility = View.VISIBLE
-                            binding.waitImage.visibility = View.INVISIBLE
-                            return@async
-                        }
-                    }
-
                     Log.d(TAG, "로그인 성공")
                     userinfojob.await()
                     totalwalkinfojob.await()
                     collectionInfojob.await()
-                    doginfojob.await()
 
                     startMain()
                 }

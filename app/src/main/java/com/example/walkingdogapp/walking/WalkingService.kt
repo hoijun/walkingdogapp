@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.os.Bundle
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
@@ -44,16 +45,19 @@ class WalkingService : Service() {
         val coordList = MutableLiveData<MutableList<LatLng>>()
         val isTracking = MutableLiveData<Boolean>()
         val walkTime = MutableLiveData<Int>()
+        var walkingDogs = arrayListOf<String>()
         var walkDistance = 0f
         var startTime = ""
     }
 
     private fun postInitialValue() {
+        Log.d("savepoint", "aaaaa")
         isTracking.postValue(false)
         walkTime.postValue(0)
         coordList.postValue(mutableListOf())
         totalTime = 0
         miscount = 0
+        walkingDogs = arrayListOf()
         walkDistance = 0f
         startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
     }
@@ -108,6 +112,7 @@ class WalkingService : Service() {
             if (action != null) {
                 when(action) {
                     Constant.ACTION_START_Walking_SERVICE -> {
+                        walkingDogs = intent.getStringArrayListExtra("selectedDogs")?: arrayListOf()
                         startLocationService()
                     }
 

@@ -1,7 +1,9 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.mainhome
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.ActivityManager
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,20 +11,25 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.alarm.SettingAlarmFragment
 import com.example.walkingdogapp.databinding.FragmentHomeBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.userinfo.UserInfoViewModel
 import com.example.walkingdogapp.walking.WalkingActivity
+import com.example.walkingdogapp.walking.WalkingService
+import com.google.android.material.tabs.TabLayoutMediator
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
@@ -30,12 +37,12 @@ class HomeFragment : Fragment() {
     private val myViewModel: UserInfoViewModel by activityViewModels()
     private lateinit var builder: AlertDialog.Builder
     private lateinit var mainactivity: MainActivity
+    private val selectedDogList = mutableListOf<String>()
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.POST_NOTIFICATIONS), 999)
-        builder = AlertDialog.Builder(requireContext())
         mainactivity = requireActivity() as MainActivity
         mainactivity.binding.menuBn.visibility = View.VISIBLE
     }
@@ -46,9 +53,8 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-
-        setUserInfo()
         MainActivity.preFragment = "Home" // 다른 액티비티로 이동 할 때 홈에서 이동을 표시
+        builder = AlertDialog.Builder(requireContext())
 
         // 좌표 -> 현재 위치 주소
         myViewModel.currentCoord.observe(viewLifecycleOwner) {
@@ -58,17 +64,31 @@ class HomeFragment : Fragment() {
         }
 
         binding.apply {
-            btnRegister.setOnClickListener {
-                val registerDogIntent = Intent(requireContext(), RegisterDogActivity::class.java)
-                startActivity(registerDogIntent)
-            }
-
             btnAlarm.setOnClickListener {
                 mainactivity.changeFragment(SettingAlarmFragment())
             }
 
+            val dogsList = myViewModel.dogsinfo.value?: listOf()
+            val homeDogListAdapter = HomeDogListAdapter(dogsList, requireContext(), myViewModel)
+            homeDogListAdapter.onClickDogListener = HomeDogListAdapter.OnClickDogListener { dogName ->
+                if(selectedDogList.contains(dogName)) {
+                    selectedDogList.remove(dogName)
+                } else {
+                    selectedDogList.add(dogName)
+                }
+
+                if(selectedDogList.isEmpty()) {
+                    selectedDogs.text = "같이 산책할 강아지를 체크 해주세요!"
+                } else {
+                    val selected = selectedDogList.joinToString(", ")
+                    selectedDogs.text = "${selected} 선택 중..."
+                }
+            }
+            homeDogsViewPager.adapter = homeDogListAdapter
+            TabLayoutMediator(homeDogsIndicator, homeDogsViewPager) { _, _ -> }.attach()
+
             btnWalk.setOnClickListener {
-                if (myViewModel.doginfo.value!!.name == "") {
+                if (myViewModel.dogsinfo.value?.isEmpty() == true) {
                     builder.setTitle("산책을 하기 위해 \n강아지 정보를 입력 해주세요!")
                     val listener = DialogInterface.OnClickListener { _, ans ->
                         when (ans) {
@@ -82,6 +102,11 @@ class HomeFragment : Fragment() {
                     builder.setPositiveButton("네", listener)
                     builder.setNegativeButton("아니오", null)
                     builder.show()
+                    return@setOnClickListener
+                }
+
+                if (selectedDogList.isEmpty()) {
+                    Toast.makeText(requireContext(), "함께 산책할 강아지를 선택해주세요!", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
 
@@ -121,7 +146,9 @@ class HomeFragment : Fragment() {
                         )
                         == PackageManager.PERMISSION_GRANTED
                     ) {
-                        val intent = Intent(requireContext(), WalkingActivity::class.java)
+                        val intent = Intent(requireContext(), WalkingActivity::class.java).apply {
+                            this.putStringArrayListExtra("selectedDogs", ArrayList(selectedDogList))
+                        }
                         startActivity(intent)
                     } else {
                         builder.setTitle("산책을 하기 위해 위치 권한을 \n항상 허용으로 해주세요!")
@@ -142,7 +169,9 @@ class HomeFragment : Fragment() {
                         builder.show()
                     }
                 } else {
-                    val intent = Intent(requireContext(), WalkingActivity::class.java)
+                    val intent = Intent(requireContext(), WalkingActivity::class.java).apply {
+                        this.putStringArrayListExtra("selectedDogs", ArrayList(selectedDogList))
+                    }
                     startActivity(intent)
                 }
             }
@@ -153,23 +182,5 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun setUserInfo() {
-        val userdoginfo = myViewModel.doginfo.value
-        binding.apply {
-            if (userdoginfo != null) {
-                if (userdoginfo.name != "") { // 강아지 정보를 입력 했으면
-                    msgRegister.visibility = View.INVISIBLE
-                    btnRegister.visibility = View.INVISIBLE
-                    dogName.text = userdoginfo.name
-                    dogName.visibility = View.VISIBLE
-
-                    if (myViewModel.imgdrawble.value != null) { // 강아지 사진을 등록 했으면
-                        imgDog.setImageDrawable(myViewModel.imgdrawble.value)
-                    }
-                }
-            }
-        }
     }
 }

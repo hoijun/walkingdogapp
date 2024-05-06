@@ -37,7 +37,6 @@ class SettingFragment : Fragment() {
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
     private val myViewModel: UserInfoViewModel by activityViewModels()
-    private lateinit var userdogInfo: DogInfo
     private lateinit var userInfo: UserInfo
     private lateinit var mainactivity: MainActivity
     private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
@@ -60,7 +59,6 @@ class SettingFragment : Fragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
 
-        userdogInfo = myViewModel.doginfo.value ?: DogInfo()
         userInfo = myViewModel.userinfo.value ?: UserInfo()
     }
 
@@ -74,7 +72,6 @@ class SettingFragment : Fragment() {
                 goMypage()
             }
 
-            dogname.text = "${userdogInfo.name} 보호자"
             username.text = "${userInfo.name} 님"
 
             logoutbtn.setOnClickListener {
@@ -129,77 +126,78 @@ class SettingFragment : Fragment() {
             settingWithdrawal.setOnClickListener {
                 val writeDialog = WriteDialog()
                 writeDialog.clickYesListener = WriteDialog.OnClickYesListener { writeText ->
-                    if (userInfo.email == writeText) { // 이메일 올바르게 입력
-                        lifecycleScope.launch {
-                            if (userInfo.email.contains("naver.com")) { // 네이버로 로그인 했을 경우
-                                binding.settingscreen.visibility = View.INVISIBLE
-                                binding.waitImage.visibility = View.VISIBLE
-                                if (removeUserInfo()) { // 유저 정보가 올바르게 지워 졌을 경우
-                                    try {
-                                        auth.currentUser?.delete()
-                                    } catch (e: Exception) {
-                                        goLogin()
-                                        removeAlarms()
-                                    }
-                                    NidOAuthLogin().callDeleteTokenApi(object :
-                                        OAuthLoginCallback {
-                                        override fun onError(errorCode: Int, message: String) {
-                                            onFailure(errorCode, message)
-                                        }
-
-                                        override fun onFailure(
-                                            httpStatus: Int,
-                                            message: String
-                                        ) {
-                                            goLogin()
-                                            removeAlarms()
-                                        }
-
-                                        override fun onSuccess() {
-                                            goLogin()
-                                            removeAlarms()
-                                        }
-                                    })
-                                } else { // 유저 정보가 올바르게 지워지지 않았을 경우
-                                    Toast.makeText(
-                                        requireContext(),
-                                        "탈퇴가 재대로 안됐어요..",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    binding.settingscreen.visibility = View.VISIBLE
-                                    binding.waitImage.visibility = View.INVISIBLE
-                                }
-                            } else if (userInfo.email.contains("kakao.com")) { // 카카오로 로그인 했을 경우
-                                binding.settingscreen.visibility = View.INVISIBLE
-                                binding.waitImage.visibility = View.VISIBLE
-                                if (removeUserInfo()) {
-                                    try {
-                                        auth.currentUser?.delete()
-                                    } catch (e: Exception) {
-                                        goLogin()
-                                        removeAlarms()
-                                    }
-                                    UserApiClient.instance.unlink { error ->
-                                        goLogin()
-                                        removeAlarms()
-                                    }
-                                } else { // 유저 정보가 올바르게 지워지지 않았을 경우
-                                    Toast.makeText(
-                                        requireContext(),
-                                        "탈퇴가 재대로 안됐어요..",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    binding.settingscreen.visibility = View.VISIBLE
-                                    binding.waitImage.visibility = View.INVISIBLE
-                                }
-                            }
-                        }
-                    } else { // 입력한 값과 이메일이 같지 않았을 경우
+                    if (userInfo.email != writeText) {
                         Toast.makeText(
                             requireContext(),
                             "정확한 이메일을 입력해 주세요!",
                             Toast.LENGTH_SHORT
                         ).show()
+                        return@OnClickYesListener
+                    } // 이메일 올바르게 입력x
+
+                    lifecycleScope.launch {
+                        if (userInfo.email.contains("naver.com")) { // 네이버로 로그인 했을 경우
+                            binding.settingscreen.visibility = View.INVISIBLE
+                            binding.waitImage.visibility = View.VISIBLE
+                            if (removeUserInfo()) { // 유저 정보가 올바르게 지워 졌을 경우
+                                try {
+                                    auth.currentUser?.delete()
+                                } catch (e: Exception) {
+                                    goLogin()
+                                    removeAlarms()
+                                }
+                                NidOAuthLogin().callDeleteTokenApi(object :
+                                    OAuthLoginCallback {
+                                    override fun onError(errorCode: Int, message: String) {
+                                        onFailure(errorCode, message)
+                                    }
+
+                                    override fun onFailure(
+                                        httpStatus: Int,
+                                        message: String
+                                    ) {
+                                        goLogin()
+                                        removeAlarms()
+                                    }
+
+                                    override fun onSuccess() {
+                                        goLogin()
+                                        removeAlarms()
+                                    }
+                                })
+                            } else { // 유저 정보가 올바르게 지워지지 않았을 경우
+                                Toast.makeText(
+                                    requireContext(),
+                                    "탈퇴가 재대로 안됐어요..",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                binding.settingscreen.visibility = View.VISIBLE
+                                binding.waitImage.visibility = View.INVISIBLE
+                            }
+                        } else if (userInfo.email.contains("kakao.com")) { // 카카오로 로그인 했을 경우
+                            binding.settingscreen.visibility = View.INVISIBLE
+                            binding.waitImage.visibility = View.VISIBLE
+                            if (removeUserInfo()) {
+                                try {
+                                    auth.currentUser?.delete()
+                                } catch (e: Exception) {
+                                    goLogin()
+                                    removeAlarms()
+                                }
+                                UserApiClient.instance.unlink { error ->
+                                    goLogin()
+                                    removeAlarms()
+                                }
+                            } else { // 유저 정보가 올바르게 지워지지 않았을 경우
+                                Toast.makeText(
+                                    requireContext(),
+                                    "탈퇴가 재대로 안됐어요..",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                binding.settingscreen.visibility = View.VISIBLE
+                                binding.waitImage.visibility = View.INVISIBLE
+                            }
+                        }
                     }
                 }
                 val bundle = Bundle()
@@ -214,6 +212,11 @@ class SettingFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun goMypage() {
@@ -238,19 +241,19 @@ class SettingFragment : Fragment() {
     private suspend fun removeUserInfo(): Boolean {
         var error = false
         val uid = auth.currentUser?.uid
-        val storgeRef = storage.getReference("$uid").child("images").child("profileimg")
+        val storgeRef = storage.getReference("$uid").child("images")
         val userRef = db.getReference("Users").child("$uid")
         val result = lifecycleScope.async(Dispatchers.IO) {
             val deleteprofileJob = async(Dispatchers.IO) {
                 try {
-                    storgeRef.delete().await()
+                   storgeRef.listAll().addOnSuccessListener { listResult ->
+                       listResult.items.forEach { item ->
+                           item.delete()
+                       }
+                   }
                 } catch (e: Exception) {
-                    if (e.message.toString().contains("Object does not exist at location.")) {
-                        error = false
-                    } else {
-                        Log.d("savepoint", e.message.toString())
-                        error = true
-                    }
+                    Log.d("savepoint", e.message.toString())
+                    error = true
                 }
             }
 

@@ -5,7 +5,6 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -17,19 +16,18 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.example.walkingdogapp.album.AlbumMapFragment
 import com.example.walkingdogapp.collection.CollectionFragment
 import com.example.walkingdogapp.databinding.ActivityMainBinding
+import com.example.walkingdogapp.mainhome.HomeFragment
+import com.example.walkingdogapp.mypage.ManageDogsFragment
 import com.example.walkingdogapp.mypage.MyPageFragment
 import com.example.walkingdogapp.userinfo.DogInfo
 import com.example.walkingdogapp.userinfo.UserInfo
+import com.example.walkingdogapp.userinfo.UserInfoViewModel
+import com.example.walkingdogapp.userinfo.WalkInfo
 import com.example.walkingdogapp.userinfo.WalkLatLng
 import com.example.walkingdogapp.userinfo.Walkdate
-import com.example.walkingdogapp.userinfo.totalWalkInfo
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
 import com.example.walkingdogapp.walking.WalkingActivity
 import com.example.walkingdogapp.walking.WalkingService
 import com.google.firebase.auth.FirebaseAuth
@@ -76,7 +74,8 @@ class MainActivity : AppCompatActivity() {
 
     companion object { // 다른 액티비티로 변경 시 어떤 프래그먼트에서 변경했는지 
         var preFragment = "Home"
-        var profileImgUri = Uri.EMPTY
+        var dogNameList = mutableListOf<String>()
+        var dogUriList = HashMap<String, Uri>()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -158,7 +157,7 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    // 산책이 진행 여부
+    // 산책 진행 여부
     private fun isWalkingServiceRunning(): Boolean {
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         for (myService in activityManager.getRunningServices(Int.MAX_VALUE)) {
@@ -175,17 +174,45 @@ class MainActivity : AppCompatActivity() {
     private fun getUserInfo() {
         val uid = auth.currentUser?.uid
         val userRef = db.getReference("Users").child("$uid")
-        val storgeRef = storage.getReference("$uid")
+        val storgeRef = storage.getReference("$uid").child("images")
         lifecycleScope.launch {
             try { // 강아지 정보
-                val dogDefferd = async(Dispatchers.IO) {
-                    try {
-                        userRef.child("dog").get().await().getValue(DogInfo::class.java)
-                            ?: DogInfo()
-                    } catch (e: Exception) {
-                        DogInfo()
-                    }
+                val dogsDefferd = suspendCoroutine { continuation ->
+                    userRef.child("dog").addListenerForSingleValueEvent(object: ValueEventListener{
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val dogsList = mutableListOf<DogInfo>()
+                            val dogNames = mutableListOf<String>()
+                            if (snapshot.exists()) {
+                                for (dogInfo in snapshot.children) {
+                                    dogsList.add(
+                                        DogInfo(
+                                            dogInfo.child("name").getValue(String::class.java)!!,
+                                            dogInfo.child("breed").getValue(String::class.java)!!,
+                                            dogInfo.child("gender").getValue(String::class.java)!!,
+                                            dogInfo.child("birth").getValue(String::class.java)!!,
+                                            dogInfo.child("neutering")
+                                                .getValue(String::class.java)!!,
+                                            dogInfo.child("vaccination")
+                                                .getValue(String::class.java)!!,
+                                            dogInfo.child("weight").getValue(Int::class.java)!!,
+                                            dogInfo.child("feature").getValue(String::class.java)!!,
+                                            dogInfo.child("creationTime").getValue(Long::class.java)!!,
+                                            dogInfo.child("walkInfo").getValue(WalkInfo::class.java)!!
+                                        )
+                                    )
+                                    dogNames.add(dogInfo.child("name").getValue(String::class.java)!!)
+                                }
+                            }
+                            dogNameList = dogNames
+                            continuation.resume(dogsList.sortedBy { it.creationTime })
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            continuation.resume(listOf<DogInfo>())
+                        }
+                    })
                 }
+
                 // 유저 정보
                 val userDefferd = async(Dispatchers.IO) {
                     try {
@@ -198,10 +225,10 @@ class MainActivity : AppCompatActivity() {
 
                 val totalWalkDeferred = async(Dispatchers.IO) {
                     try {
-                        userRef.child("totalWalk").get().await().getValue(totalWalkInfo::class.java)
-                            ?: totalWalkInfo()
+                        userRef.child("totalWalkInfo").get().await().getValue(WalkInfo::class.java)
+                            ?: WalkInfo()
                     } catch (e: Exception) {
-                        totalWalkInfo()
+                        WalkInfo()
                     }
                 }
 
@@ -219,7 +246,8 @@ class MainActivity : AppCompatActivity() {
                                             datedata.child("distance")
                                                 .getValue(Float::class.java)!!,
                                             datedata.child("time").getValue(Int::class.java)!!,
-                                            datedata.child("coords").getValue<List<WalkLatLng>>() ?: listOf<WalkLatLng>()
+                                            datedata.child("coords").getValue<List<WalkLatLng>>() ?: listOf<WalkLatLng>(),
+                                            datedata.child("dogs").getValue<List<String>>() ?: listOf<String>()
                                         )
                                     )
                                 }
@@ -242,65 +270,69 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // 강아지 프로필 사진
-                val profileUriDeferred = async(Dispatchers.IO) {
+                val profileUriDeferred = suspendCoroutine { continuation ->
                     try {
-                        storgeRef.child("images").child("profileimg").downloadUrl.await()
-                            ?: Uri.EMPTY
+                        val imgs = HashMap<String, Uri>()
+                        var downloadCount = 0
+                        var imgCount: Int
+                        storgeRef.listAll().addOnSuccessListener { listResult ->
+                            imgCount = listResult.items.size
+                            if (imgCount == 0) {
+                                continuation.resume(HashMap<String, Uri>())
+                            }
+                            listResult.items.forEach { item ->
+                                item.downloadUrl.addOnSuccessListener { uri ->
+                                    downloadCount++
+                                    imgs[item.name] = uri
+
+                                    if(imgCount == downloadCount) {
+                                        continuation.resume(imgs)
+                                    }
+                                }
+                            }
+                        }
                     } catch (e: Exception) {
-                        Uri.EMPTY
+                        continuation.resume(HashMap<String, Uri>())
                     }
                 }
 
-                val profileUri = profileUriDeferred.await()
-                profileImgUri = profileUri
-
-                // 강아지 프로필 사진 -> drawble 형태로 변경
-                val profileDrawable = suspendCoroutine { continuation ->
-                    Glide.with(applicationContext).asDrawable().load(profileUri)
-                        .into(object : CustomTarget<Drawable>() {
-                            override fun onResourceReady(
-                                resource: Drawable,
-                                transition: Transition<in Drawable>?
-                            ) {
-                                continuation.resume(resource)
-                            }
-
-                            override fun onLoadCleared(placeholder: Drawable?) {
-                                continuation.resume(null)
-                            }
-
-                            override fun onLoadFailed(errorDrawable: Drawable?) {
-                                continuation.resume(null)
-                            }
-                        })
-                }
-
-                val dog = dogDefferd.await()
                 val user = userDefferd.await()
                 val totalWalk = totalWalkDeferred.await()
                 val collection = colletionDeferred.await()
-                mainviewmodel.savedogInfo(dog)
+                mainviewmodel.savedogsInfo(dogsDefferd)
                 mainviewmodel.saveuserInfo(user)
                 mainviewmodel.savetotalwalkInfo(totalWalk)
                 mainviewmodel.savewalkdates(walkdateDeferred)
                 mainviewmodel.savecollectionInfo(collection)
+                mainviewmodel.savedogsImg(profileUriDeferred)
+                dogUriList = profileUriDeferred
+                Log.d("savepoint", mainviewmodel.dogsinfo.value.toString())
+                Log.d("savepoint", mainviewmodel.walkDates.value.toString())
 
                 binding.waitImage.visibility = View.GONE
 
-                if (profileDrawable != null) {
-                    mainviewmodel.saveImgDrawble(profileDrawable)
-                }
-
-                if (preFragment == "Mypage") {
-                    changeFragment(MyPageFragment())
-                } else {
-                    changeFragment(HomeFragment())
+                when (preFragment) {
+                    "Mypage" -> {
+                        changeFragment(MyPageFragment())
+                    }
+                    "Home" -> {
+                        changeFragment(HomeFragment())
+                    }
+                    else -> {
+                        changeFragment(ManageDogsFragment())
+                    }
                 }
             } catch (e: Exception) {
-                if (preFragment == "Mypage") {
-                    changeFragment(MyPageFragment())
-                } else {
-                    changeFragment(HomeFragment())
+                when (preFragment) {
+                    "Mypage" -> {
+                        changeFragment(MyPageFragment())
+                    }
+                    "Home" -> {
+                        changeFragment(HomeFragment())
+                    }
+                    else -> {
+                        changeFragment(ManageDogsFragment())
+                    }
                 }
             }
         }
