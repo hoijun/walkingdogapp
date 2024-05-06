@@ -2,7 +2,6 @@ package com.example.walkingdogapp.alarm
 
 import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,9 +10,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
-import com.example.walkingdogapp.HomeFragment
+import com.example.walkingdogapp.mainhome.HomeFragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentSettingAlarmBinding
+import com.example.walkingdogapp.userinfo.AlarmDataModel
 import com.example.walkingdogapp.userinfo.UserInfoViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

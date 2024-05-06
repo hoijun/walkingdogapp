@@ -6,13 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingdogapp.databinding.AlarmlistItemBinding
-import com.google.android.material.switchmaterial.SwitchMaterial
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.example.walkingdogapp.userinfo.AlarmDataModel
 import java.util.Calendar
 
 class AlarmlistAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerView.Adapter<AlarmlistAdapter.AlarmitemlistViewHolder>() {
@@ -95,6 +89,12 @@ class AlarmlistAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerVi
                 } else {
                     checkBox.visibility = View.GONE
                     Onoff.visibility = View.VISIBLE
+                }
+
+                checkBox.setOnClickListener {
+                    onItemClickListener?.onItemClickInSelectMode(alarmList[bindingAdapterPosition])
+                    toggleSelection(alarmList[bindingAdapterPosition])
+                    Log.d("savepoint", "aaaa")
                 }
 
                 Onoff.isChecked = alarm.alarmOn

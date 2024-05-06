@@ -1,4 +1,4 @@
-package com.example.walkingdogapp.alarm
+package com.example.walkingdogapp.userinfo
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao

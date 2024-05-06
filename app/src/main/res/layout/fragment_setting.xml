@@ -89,7 +89,7 @@
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="24dp"
                 android:gravity="center|start"
-                android:text="털뭉치 보호자"
+                android:text="보호자"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 app:layout_constraintHeight_percent="0.3"

@@ -1,9 +1,7 @@
 package com.example.walkingdogapp.walking
 
 import android.Manifest
-import android.app.Activity
 import android.app.ActivityManager
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
@@ -36,10 +34,10 @@ import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
+import com.example.walkingdogapp.userinfo.UserInfoViewModel
+import com.example.walkingdogapp.userinfo.WalkInfo
 import com.example.walkingdogapp.userinfo.WalkLatLng
 import com.example.walkingdogapp.userinfo.saveWalkdate
-import com.example.walkingdogapp.userinfo.totalWalkInfo
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -118,6 +116,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var startTime = ""
     private var endTime = ""
+    private var selectedDogs = arrayListOf<String>()
 
     // 뒤로 가기
     private val BackPressCallback = object : OnBackPressedCallback(true) {
@@ -127,7 +126,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private val getResultCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == Activity.RESULT_OK) {
+        if (it.resultCode == RESULT_OK) {
             galleryAddPic()
         }
     }
@@ -137,10 +136,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding = ActivityWalkingBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         // 보류
         walkViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
         walkViewModel.getLastLocation()
+
+        selectedDogs = intent.getStringArrayListExtra("selectedDogs")?: arrayListOf()
 
         // 백그라운드 위치 서비스 시작
         try {
@@ -149,6 +149,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             Toast.makeText(this, "오류로 인해 산책이 종료 됩니다.", Toast.LENGTH_SHORT).show()
             goHome()
         }
+
 
         setcolletionImageView()
 
@@ -173,28 +174,38 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     btnStart.setImageResource(android.R.drawable.ic_media_play)
                 }
             }
-            Log.d("current coord", this.isTracking.toString())
         }
 
         // 버튼 이벤트 설정
         binding.apply {
-            imgPencil.setOnClickListener {
+            btnSave.setOnClickListener {
+                Log.d("savepoint", WalkingService.walkingDogs.toString())
                 selectStopWalk()
             }
 
             btnStart.setOnClickListener {
-                if (isWalkingServiceRunning()) {
-                    if (isTracking) {
-                        stopTracking()
-                    } else {
-                        startTracking()
-                    }
+                if (!isWalkingServiceRunning()) {
+                    return@setOnClickListener
+                }
+
+                if (isTracking) {
+                    stopTracking()
+                } else {
+                    startTracking()
                 }
             }
 
             btnCamera.setOnClickListener {
                 startCamera()
             }
+
+            val walkingDogText = if (WalkingService.walkingDogs.isNotEmpty()) {
+                WalkingService.walkingDogs.joinToString(", ") + " 산책 중.."
+            } else {
+                selectedDogs.joinToString(", ") + " 산책 중.."
+            }
+
+            walkingDogsText.text = walkingDogText
 
             trackingCameraModeOnBtn.setOnClickListener {
                 if (!trackingCameraMode) {
@@ -373,7 +384,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun isWalkingServiceRunning(): Boolean {
-        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
         for (myService in activityManager.getRunningServices(Int.MAX_VALUE)) {
             if (WalkingService::class.java.name == myService.service.className) {
                 if (myService.foreground) {
@@ -389,6 +400,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         if (!isWalkingServiceRunning()) {
             Log.d("WalkingService", "start")
             val serviceIntent = Intent(this, WalkingService::class.java)
+            serviceIntent.putStringArrayListExtra("selectedDogs", ArrayList(selectedDogs))
             serviceIntent.action = Constant.ACTION_START_Walking_SERVICE
             ContextCompat.startForegroundService(this, serviceIntent)
         }
@@ -444,7 +456,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         setSaveScreen()
                         saveWalkInfo(
                             WalkingService.walkDistance, WalkingService.walkTime.value!!,
-                            WalkingService.coordList.value!!)
+                            WalkingService.coordList.value!!, WalkingService.walkingDogs)
                     }
                 }
             }
@@ -455,7 +467,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // 거리 및 시간 저장, 날짜: 시간 별로 산책 기록 저장
-    private fun saveWalkInfo(distance: Float, time: Int, coords: List<LatLng>) {
+    private fun saveWalkInfo(distance: Float, time: Int, coords: List<LatLng>, walkDogs: List<String>) {
         val uid = auth.currentUser?.uid
         val userRef = db.getReference("Users").child("$uid")
 
@@ -466,18 +478,36 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     LocalDateTime.now()
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " " + startTime + " " + endTime
 
-                val total = snapshot.child("totalWalk").getValue(totalWalkInfo::class.java)
-
+                val totalWalk = snapshot.child("totalWalkInfo").getValue(WalkInfo::class.java)
+                val indivisualWalks = hashMapOf<String, WalkInfo?>().also {
+                    for (name in walkDogs) {
+                        it[name] = snapshot.child("dog").child(name).child("walkInfo").getValue(WalkInfo::class.java)
+                    }
+                }
                 var error = false
 
                 lifecycleScope.launch {
                     val totalwalkJob = async(Dispatchers.IO) {
                         try {
-                            if (total != null) {
-                                userRef.child("totalWalk").setValue(totalWalkInfo(total.totaldistance + distance,total.totaltime + time)).await()
+                            if (totalWalk != null) {
+                                userRef.child("totalWalkInfo").setValue(WalkInfo(totalWalk.totaldistance + distance,totalWalk.totaltime + time)).await()
                             } else {
-                                userRef.child("totalWalk").setValue(totalWalkInfo(distance, time))
+                                userRef.child("totalWalkInfo").setValue(WalkInfo(distance, time))
                                     .await()
+                            }
+                        } catch (e: Exception) {
+                            error = true
+                        }
+                    }
+
+                    val indivisualwalkJob = async(Dispatchers.IO) {
+                        try {
+                            for(dogName in walkDogs) {
+                                if (indivisualWalks[dogName] != null) {
+                                    userRef.child("dog").child(dogName).child("walkInfo").setValue(WalkInfo(indivisualWalks[dogName]!!.totaldistance + distance, indivisualWalks[dogName]!!.totaltime + time)).await()
+                                } else {
+                                    userRef.child("dog").child(dogName).child("walkInfo").setValue(WalkInfo(distance, time)).await()
+                                }
                             }
                         } catch (e: Exception) {
                             error = true
@@ -490,7 +520,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             for (coord in coords) {
                                 savecoords.add(WalkLatLng(coord.latitude, coord.longitude))
                             }
-                            userRef.child("walkdates").child(walkDateinfo).setValue(saveWalkdate(distance, time, savecoords)).await()
+                            userRef.child("walkdates").child(walkDateinfo).setValue(saveWalkdate(distance, time, savecoords, walkDogs)).await()
                         } catch (e: Exception) {
                             error = true
                         }
@@ -502,7 +532,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             for (item in getCollectionItems) {
                                 update[item] = true
                             }
-
                             userRef.child("collection").updateChildren(update).await()
                         } catch (e: Exception) {
                             error = true
@@ -510,6 +539,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
 
                     totalwalkJob.await()
+                    indivisualwalkJob.await()
                     saveWalkdateJob.await()
                     collectionInfojob.await()
 

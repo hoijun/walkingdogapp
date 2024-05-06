@@ -24,17 +24,18 @@ import com.example.walkingdogapp.registerinfo.RegisterUserActivity
 import com.example.walkingdogapp.userinfo.DogInfo
 import com.example.walkingdogapp.userinfo.UserInfo
 import com.example.walkingdogapp.userinfo.Walkdate
-import com.example.walkingdogapp.userinfo.totalWalkInfo
 import com.example.walkingdogapp.userinfo.UserInfoViewModel
+import com.example.walkingdogapp.userinfo.WalkInfo
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
 
 class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
     private val binding get() = _binding!!
     private val myViewModel: UserInfoViewModel by activityViewModels()
-    private lateinit var userdogInfo: DogInfo
     private lateinit var userInfo: UserInfo
-    private lateinit var totalwalkInfo: totalWalkInfo
+    private lateinit var totalwalkInfo: WalkInfo
     private lateinit var walkdates: List<Walkdate>
     private lateinit var mainactivity: MainActivity
 
@@ -70,9 +71,8 @@ class MyPageFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMyPageBinding.inflate(inflater,container, false)
-        userdogInfo = myViewModel.doginfo.value ?: DogInfo()
         userInfo = myViewModel.userinfo.value ?: UserInfo()
-        totalwalkInfo = myViewModel.totalwalkinfo.value ?: totalWalkInfo()
+        totalwalkInfo = myViewModel.totalwalkinfo.value ?: WalkInfo()
         walkdates = myViewModel.walkDates.value ?: listOf<Walkdate>()
 
         binding.apply {
@@ -80,28 +80,33 @@ class MyPageFragment : Fragment() {
                 mainactivity.changeFragment(SettingFragment())
             }
 
-            menuDogInfo.setOnClickListener {
-                if(userdogInfo.name == "") {
-                    Toast.makeText(requireContext(), "먼저 강아지 정보를 설정해주세요!", Toast.LENGTH_SHORT)
-                        .show()
-                    return@setOnClickListener
+            val dogsList = myViewModel.dogsinfo.value ?: listOf()
+            val mypageDogListAdapter = MypageDogListAdapter(dogsList, requireContext(), myViewModel)
+            mypageDogListAdapter.onitemClickListener = MypageDogListAdapter.OnitemClickListener {
+                val dogInfoFragment = DogInfoFragment().apply {
+                    val bundle = Bundle()
+                    bundle.putSerializable("doginfo", it)
+                    bundle.putString("before", "mypage")
+                    arguments = bundle
                 }
-                mainactivity.changeFragment(DogInfoFragment())
+                mainactivity.changeFragment(dogInfoFragment)
             }
 
-            modifydoginfo.setOnClickListener {
-                val registerDogIntent = Intent(requireContext(), RegisterDogActivity::class.java)
-                registerDogIntent.putExtra("doginfo", userdogInfo)
-                startActivity(registerDogIntent)
+            mypageDogsViewPager.adapter = mypageDogListAdapter
+            TabLayoutMediator(mypageDogsIndicator, mypageDogsViewPager) { _, _ -> }.attach()
+
+            managedoginfoBtn.setOnClickListener {
+                val manageDogsFragment = ManageDogsFragment()
+                mainactivity.changeFragment(manageDogsFragment)
             }
 
-            modifyuserinfo.setOnClickListener {
+            modifyuserinfoBtn.setOnClickListener {
                 val registerUserIntent = Intent(requireContext(), RegisterUserActivity::class.java)
                 registerUserIntent.putExtra("userinfo", userInfo)
                 startActivity(registerUserIntent)
             }
 
-            managepictures.setOnClickListener {
+            managepicturesBtn.setOnClickListener {
                 if (checkPermission(storegePermission)) {
                     mainactivity.changeFragment(GalleryFragment())
                 } else {
@@ -117,19 +122,12 @@ class MyPageFragment : Fragment() {
                 menuUsername.text = "${userInfo.name} 님"
             }
 
-            if(userdogInfo.name != ""){
-                menuDogname.text = userdogInfo.name
-                menuDogfeature.text = "${Constant.getAge(userdogInfo.birth)}살/ ${userdogInfo.weight}kg / ${userdogInfo.breed}"
-                if (myViewModel.imgdrawble.value != null) {
-                    menuDogimg.setImageDrawable(myViewModel.imgdrawble.value)
-                }
-            }
-
             menuDistance.text = getString(R.string.totaldistance, totalwalkInfo.totaldistance / 1000.0)
-
+            menuDogsCount.text = "${myViewModel.dogsinfo.value?.size}마리"
             walkDistance.text = getString(R.string.totaldistance, totalwalkInfo.totaldistance / 1000.0)
             walkTime.text =  "${(totalwalkInfo.totaltime / 60)}분"
             walkCount.text = "${walkdates.size}회"
+            
         }
         return binding.root
     }
