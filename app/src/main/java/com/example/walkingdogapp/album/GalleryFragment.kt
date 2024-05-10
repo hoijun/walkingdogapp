@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +20,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.walkingdogapp.Constant
@@ -29,8 +27,7 @@ import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentGalleryBinding
 import com.example.walkingdogapp.deco.GridSpacingItemDecoration
 import com.example.walkingdogapp.mypage.MyPageFragment
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
-import kotlinx.coroutines.launch
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import java.text.SimpleDateFormat
 
 

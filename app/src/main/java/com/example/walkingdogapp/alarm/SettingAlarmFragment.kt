@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import com.example.walkingdogapp.mainhome.HomeFragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentSettingAlarmBinding
-import com.example.walkingdogapp.userinfo.AlarmDataModel
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
+import com.example.walkingdogapp.datamodel.AlarmDataModel
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

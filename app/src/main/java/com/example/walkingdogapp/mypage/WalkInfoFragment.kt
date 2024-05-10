@@ -15,9 +15,9 @@ import com.example.walkingdogapp.deco.SaturdayDecorator
 import com.example.walkingdogapp.deco.SelectedMonthDecorator
 import com.example.walkingdogapp.deco.SundayDecorator
 import com.example.walkingdogapp.deco.WalkDayDecorator
-import com.example.walkingdogapp.userinfo.Walkdate
 import com.example.walkingdogapp.databinding.FragmentWalkInfoBinding
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
+import com.example.walkingdogapp.datamodel.WalkDate
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 
@@ -29,7 +29,7 @@ class WalkInfoFragment : Fragment() { // 수정
     private val myViewModel: UserInfoViewModel by activityViewModels()
 
     private var walkdates = mutableListOf<CalendarDay>()
-    private val walkinfostartday = mutableListOf<Walkdate>()
+    private val walkinfostartday = mutableListOf<WalkDate>()
     private var selectedDay = CalendarDay.from(2000, 10 ,14)
     private var lateSelectedDayInfo = listOf<String>()
 
@@ -83,7 +83,7 @@ class WalkInfoFragment : Fragment() { // 수정
             }
 
             // 산책 정보의 날짜 및 현재 날짜 산책 정보
-            for (date: Walkdate in myViewModel.walkDates.value ?: listOf<Walkdate>()) {
+            for (date: WalkDate in myViewModel.walkDates.value ?: listOf<WalkDate>()) {
                 val dayinfo = date.day.split("-")
                 walkdates.add(CalendarDay.from(dayinfo[0].toInt(), dayinfo[1].toInt(), dayinfo[2].toInt())) // 산책한 날 얻음
 
@@ -116,8 +116,8 @@ class WalkInfoFragment : Fragment() { // 수정
             walkcalendar.state().edit().setMaximumDate(CalendarDay.today()).commit() // 최대 날짜 설정
 
             walkcalendar.setOnDateChangedListener { widget, date, selected -> // 날짜 킅릭시
-                val walkinfoOfdate = mutableListOf<Walkdate>()
-                for (walkday: Walkdate in  myViewModel.walkDates.value ?: listOf<Walkdate>()) { // 선택한 날짜의 산책 정보
+                val walkinfoOfdate = mutableListOf<WalkDate>()
+                for (walkday: WalkDate in  myViewModel.walkDates.value ?: listOf<WalkDate>()) { // 선택한 날짜의 산책 정보
                     if(date.date.toString() == walkday.day) {
                         walkinfoOfdate.add(walkday)
                     }
@@ -167,7 +167,7 @@ class WalkInfoFragment : Fragment() { // 수정
         mainactivity.changeFragment(MyPageFragment())
     }
 
-    private fun goDetail(date: Walkdate) {
+    private fun goDetail(date: WalkDate) {
         val bundle = Bundle()
         bundle.putSerializable("selectdate", date)
         val detailWalkInfoFragment = DetailWalkInfoFragment().apply {

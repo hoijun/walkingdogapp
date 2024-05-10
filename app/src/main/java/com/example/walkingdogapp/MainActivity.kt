@@ -22,12 +22,12 @@ import com.example.walkingdogapp.databinding.ActivityMainBinding
 import com.example.walkingdogapp.mainhome.HomeFragment
 import com.example.walkingdogapp.mypage.ManageDogsFragment
 import com.example.walkingdogapp.mypage.MyPageFragment
-import com.example.walkingdogapp.userinfo.DogInfo
-import com.example.walkingdogapp.userinfo.UserInfo
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
-import com.example.walkingdogapp.userinfo.WalkInfo
-import com.example.walkingdogapp.userinfo.WalkLatLng
-import com.example.walkingdogapp.userinfo.Walkdate
+import com.example.walkingdogapp.datamodel.DogInfo
+import com.example.walkingdogapp.datamodel.UserInfo
+import com.example.walkingdogapp.datamodel.WalkDate
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.datamodel.WalkInfo
+import com.example.walkingdogapp.datamodel.WalkLatLng
 import com.example.walkingdogapp.walking.WalkingActivity
 import com.example.walkingdogapp.walking.WalkingService
 import com.google.firebase.auth.FirebaseAuth
@@ -49,8 +49,8 @@ import kotlin.system.exitProcess
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private lateinit var mainviewmodel: UserInfoViewModel
-    private val LOCATION_PERMISSION_REQUEST_CODE = 1000
-    private val PERMISSIONS = arrayOf(
+    private val locationPermissionRequestCode = 1000
+    private val permissions = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION,
     )
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         } // 다른 액티비티로 마이페이지에서 변경 했었을 경우, 다시 되돌아 올 때 바텀바의 표시를 마이페이지로 변경
 
         // 위치 권한
-        ActivityCompat.requestPermissions(this, PERMISSIONS, LOCATION_PERMISSION_REQUEST_CODE)
+        ActivityCompat.requestPermissions(this, permissions, locationPermissionRequestCode)
 
         this.onBackPressedDispatcher.addCallback(this, callback)
 
@@ -96,7 +96,8 @@ class MainActivity : AppCompatActivity() {
             val walkingIntent = Intent(this, WalkingActivity::class.java)
             startActivity(walkingIntent)
         }
-        // 보류
+
+
         mainviewmodel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
 
         // 화면 전환
@@ -140,15 +141,12 @@ class MainActivity : AppCompatActivity() {
         permissions: Array<String>,
         grantResults: IntArray
     ) {
-        Log.d("onRequest", "onRequestPermissionsResult")
         when (requestCode) {
-            LOCATION_PERMISSION_REQUEST_CODE -> {
+            locationPermissionRequestCode -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("권한 승인", "권한 승인됨")
                     mainviewmodel.getLastLocation()
                     getUserInfo()
                 } else {
-                    Log.d("권한 거부", "권한 거부됨")
                     getUserInfo()
                 }
                 return
@@ -174,10 +172,10 @@ class MainActivity : AppCompatActivity() {
     private fun getUserInfo() {
         val uid = auth.currentUser?.uid
         val userRef = db.getReference("Users").child("$uid")
-        val storgeRef = storage.getReference("$uid").child("images")
+        val storageRef = storage.getReference("$uid").child("images")
         lifecycleScope.launch {
             try { // 강아지 정보
-                val dogsDefferd = suspendCoroutine { continuation ->
+                val dogsDeferred = suspendCoroutine { continuation ->
                     userRef.child("dog").addListenerForSingleValueEvent(object: ValueEventListener{
                         override fun onDataChange(snapshot: DataSnapshot) {
                             val dogsList = mutableListOf<DogInfo>()
@@ -214,7 +212,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // 유저 정보
-                val userDefferd = async(Dispatchers.IO) {
+                val userDeferred = async(Dispatchers.IO) {
                     try {
                         userRef.child("user").get().await().getValue(UserInfo::class.java)
                             ?: UserInfo()
@@ -233,21 +231,22 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // 강아지 산책 정보
-                val walkdateDeferred = suspendCoroutine { continuation ->
+                val walkDateDeferred = suspendCoroutine { continuation ->
                     userRef.child("walkdates").addListenerForSingleValueEvent(object: ValueEventListener{
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            val dates = mutableListOf<Walkdate>()
+                            val dates = mutableListOf<WalkDate>()
                             if (snapshot.exists()) {
-                                for (datedata in snapshot.children) {
-                                    val dateinfos = datedata.key.toString().split(" ")
+                                for (dateData in snapshot.children) {
+                                    val dateInfos = dateData.key.toString().split(" ")
                                     dates.add(
-                                        Walkdate(
-                                            dateinfos[0], dateinfos[1], dateinfos[2],
-                                            datedata.child("distance")
+                                        WalkDate(
+                                            dateInfos[0], dateInfos[1], dateInfos[2],
+                                            dateData.child("distance")
                                                 .getValue(Float::class.java)!!,
-                                            datedata.child("time").getValue(Int::class.java)!!,
-                                            datedata.child("coords").getValue<List<WalkLatLng>>() ?: listOf<WalkLatLng>(),
-                                            datedata.child("dogs").getValue<List<String>>() ?: listOf<String>()
+                                            dateData.child("time").getValue(Int::class.java)!!,
+                                            dateData.child("coords").getValue<List<WalkLatLng>>() ?: listOf<WalkLatLng>(),
+                                            dateData.child("dogs").getValue<List<String>>() ?: listOf<String>(),
+                                            dateData.child("collections").getValue<List<String>>() ?: listOf<String>()
                                         )
                                     )
                                 }
@@ -256,12 +255,12 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         override fun onCancelled(error: DatabaseError) {
-                            continuation.resume(listOf<Walkdate>())
+                            continuation.resume(listOf<WalkDate>())
                         }
                     })
                 }
 
-                val colletionDeferred = async(Dispatchers.IO) {
+                val collectionDeferred = async(Dispatchers.IO) {
                     try {
                         userRef.child("collection").get().await().getValue<HashMap<String, Boolean>>() ?: Constant.item_whether
                     } catch (e: Exception) {
@@ -272,10 +271,10 @@ class MainActivity : AppCompatActivity() {
                 // 강아지 프로필 사진
                 val profileUriDeferred = suspendCoroutine { continuation ->
                     try {
-                        val imgs = HashMap<String, Uri>()
+                        val dogImgs = HashMap<String, Uri>()
                         var downloadCount = 0
                         var imgCount: Int
-                        storgeRef.listAll().addOnSuccessListener { listResult ->
+                        storageRef.listAll().addOnSuccessListener { listResult ->
                             imgCount = listResult.items.size
                             if (imgCount == 0) {
                                 continuation.resume(HashMap<String, Uri>())
@@ -283,10 +282,10 @@ class MainActivity : AppCompatActivity() {
                             listResult.items.forEach { item ->
                                 item.downloadUrl.addOnSuccessListener { uri ->
                                     downloadCount++
-                                    imgs[item.name] = uri
+                                    dogImgs[item.name] = uri
 
                                     if(imgCount == downloadCount) {
-                                        continuation.resume(imgs)
+                                        continuation.resume(dogImgs)
                                     }
                                 }
                             }
@@ -296,18 +295,16 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                val user = userDefferd.await()
+                val user = userDeferred.await()
                 val totalWalk = totalWalkDeferred.await()
-                val collection = colletionDeferred.await()
-                mainviewmodel.savedogsInfo(dogsDefferd)
+                val collection = collectionDeferred.await()
+                mainviewmodel.savedogsInfo(dogsDeferred)
                 mainviewmodel.saveuserInfo(user)
                 mainviewmodel.savetotalwalkInfo(totalWalk)
-                mainviewmodel.savewalkdates(walkdateDeferred)
+                mainviewmodel.savewalkdates(walkDateDeferred)
                 mainviewmodel.savecollectionInfo(collection)
                 mainviewmodel.savedogsImg(profileUriDeferred)
                 dogUriList = profileUriDeferred
-                Log.d("savepoint", mainviewmodel.dogsinfo.value.toString())
-                Log.d("savepoint", mainviewmodel.walkDates.value.toString())
 
                 binding.waitImage.visibility = View.GONE
 

@@ -11,7 +11,7 @@ import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentManageDogsBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 
 class ManageDogsFragment : Fragment() {
     private var _binding: FragmentManageDogsBinding? = null

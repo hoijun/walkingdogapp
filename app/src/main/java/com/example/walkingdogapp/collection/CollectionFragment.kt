@@ -11,7 +11,7 @@ import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.deco.GridSpacingItemDecoration
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentCollectionBinding
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 
 class CollectionFragment : Fragment() {
     private var _binding: FragmentCollectionBinding? = null

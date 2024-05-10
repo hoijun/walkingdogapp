@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentDetailWalkInfoBinding
-import com.example.walkingdogapp.userinfo.Walkdate
+import com.example.walkingdogapp.datamodel.WalkDate
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
@@ -28,7 +28,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
     private var walkPath = PathOverlay()
     private lateinit var camera : CameraUpdate
     private var day = listOf<String>()
-    private var dateinfo = Walkdate()
+    private var dateinfo = WalkDate()
 
     private lateinit var mainactivity: MainActivity
     private val callback = object : OnBackPressedCallback(true) {
@@ -57,9 +57,9 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
         _binding = FragmentDetailWalkInfoBinding.inflate(inflater,container, false)
 
         dateinfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable("selectdate", Walkdate::class.java)?: Walkdate()
+            arguments?.getSerializable("selectdate", WalkDate::class.java)?: WalkDate()
         } else {
-            (arguments?.getSerializable("selectdate") ?: Walkdate()) as Walkdate
+            (arguments?.getSerializable("selectdate") ?: WalkDate()) as WalkDate
         }
 
         binding.apply {
@@ -120,6 +120,5 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             arguments = bundle
         }
         mainactivity.changeFragment(walkInfoFragment)
-        Log.d("savepoint", "aaaaa")
     }
 }

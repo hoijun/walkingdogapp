@@ -28,7 +28,7 @@ import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.deco.HorizonSpacingItemDecoration
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentAlbumMapBinding
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
@@ -163,7 +163,6 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                 adaptar = AlbumMapitemlistAdaptar(imgInfos, requireContext())
                 adaptar.itemClickListener =
                     AlbumMapitemlistAdaptar.OnItemClickListener { latLng, num ->
-                        Log.d("savepoint", num.toString())
                         for (marker in markers) {
                             if (marker.tag as Int == num) {
                                 marker.zIndex = 10
@@ -306,7 +305,6 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                         return imgInfo.imgView?.rootView ?: ImageView(requireContext())
                     }
                 }
-                Log.d("savepoint", markerNum.toString())
                 imgMarker.tag = markerNum
                 imgInfo.tag = imgMarker.tag as Int
                 imgMarker.position = imgInfo.latLng

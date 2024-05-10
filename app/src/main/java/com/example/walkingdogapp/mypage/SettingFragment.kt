@@ -17,9 +17,8 @@ import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.WriteDialog
 import com.example.walkingdogapp.alarm.AlarmFunctions
 import com.example.walkingdogapp.databinding.FragmentSettingBinding
-import com.example.walkingdogapp.userinfo.DogInfo
-import com.example.walkingdogapp.userinfo.UserInfo
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
+import com.example.walkingdogapp.datamodel.UserInfo
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage

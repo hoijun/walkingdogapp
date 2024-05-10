@@ -14,19 +14,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.album.GalleryFragment
 import com.example.walkingdogapp.databinding.FragmentMyPageBinding
-import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.registerinfo.RegisterUserActivity
-import com.example.walkingdogapp.userinfo.DogInfo
-import com.example.walkingdogapp.userinfo.UserInfo
-import com.example.walkingdogapp.userinfo.Walkdate
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
-import com.example.walkingdogapp.userinfo.WalkInfo
-import com.google.android.material.tabs.TabLayout
+import com.example.walkingdogapp.datamodel.UserInfo
+import com.example.walkingdogapp.datamodel.WalkDate
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.datamodel.WalkInfo
 import com.google.android.material.tabs.TabLayoutMediator
 
 
@@ -36,7 +32,7 @@ class MyPageFragment : Fragment() {
     private val myViewModel: UserInfoViewModel by activityViewModels()
     private lateinit var userInfo: UserInfo
     private lateinit var totalwalkInfo: WalkInfo
-    private lateinit var walkdates: List<Walkdate>
+    private lateinit var walkdates: List<WalkDate>
     private lateinit var mainactivity: MainActivity
 
     private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -73,7 +69,7 @@ class MyPageFragment : Fragment() {
         _binding = FragmentMyPageBinding.inflate(inflater,container, false)
         userInfo = myViewModel.userinfo.value ?: UserInfo()
         totalwalkInfo = myViewModel.totalwalkinfo.value ?: WalkInfo()
-        walkdates = myViewModel.walkDates.value ?: listOf<Walkdate>()
+        walkdates = myViewModel.walkDates.value ?: listOf<WalkDate>()
 
         binding.apply {
             btnSetting.setOnClickListener {

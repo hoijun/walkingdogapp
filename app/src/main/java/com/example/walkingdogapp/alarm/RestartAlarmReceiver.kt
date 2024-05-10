@@ -3,7 +3,7 @@ package com.example.walkingdogapp.alarm
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.example.walkingdogapp.userinfo.LocalUserDatabase
+import com.example.walkingdogapp.database.LocalUserDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

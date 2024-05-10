@@ -12,11 +12,11 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.DateDialogBinding
+import com.example.walkingdogapp.datamodel.WalkDate
 import com.example.walkingdogapp.deco.SelectedMonthDecorator
 import com.example.walkingdogapp.deco.ToDayDecorator
 import com.example.walkingdogapp.deco.WalkDayDecorator
-import com.example.walkingdogapp.userinfo.Walkdate
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 
@@ -25,7 +25,7 @@ class DateDialog : DialogFragment() {
     private val binding get() = _binding!!
     private var walkdates = mutableListOf<CalendarDay>()
     private val myViewModel: UserInfoViewModel by activityViewModels()
-    private var walkdatelist = listOf<Walkdate>()
+    private var walkdatelist = listOf<WalkDate>()
 
     fun interface OnDateClickListener {
         fun onDateClick(date: String)
@@ -36,7 +36,7 @@ class DateDialog : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         walkdatelist = myViewModel.walkDates.value?: listOf()
-        for (date: Walkdate in walkdatelist) {
+        for (date: WalkDate in walkdatelist) {
             val dayinfo = date.day.split("-")
             walkdates.add(
                 CalendarDay.from(

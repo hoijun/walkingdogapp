@@ -12,7 +12,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.example.walkingdogapp.databinding.SettingalarmDialogBinding
-import com.example.walkingdogapp.userinfo.AlarmDataModel
+import com.example.walkingdogapp.datamodel.AlarmDataModel
 import java.util.Calendar
 
 class SettingAlarmDialog : DialogFragment() {

@@ -1,4 +1,4 @@
-package com.example.walkingdogapp.userinfo
+package com.example.walkingdogapp.datamodel
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao

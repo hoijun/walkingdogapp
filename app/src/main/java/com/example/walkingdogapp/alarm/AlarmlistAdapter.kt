@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingdogapp.databinding.AlarmlistItemBinding
-import com.example.walkingdogapp.userinfo.AlarmDataModel
+import com.example.walkingdogapp.datamodel.AlarmDataModel
 import java.util.Calendar
 
 class AlarmlistAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerView.Adapter<AlarmlistAdapter.AlarmitemlistViewHolder>() {
@@ -94,7 +94,6 @@ class AlarmlistAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerVi
                 checkBox.setOnClickListener {
                     onItemClickListener?.onItemClickInSelectMode(alarmList[bindingAdapterPosition])
                     toggleSelection(alarmList[bindingAdapterPosition])
-                    Log.d("savepoint", "aaaa")
                 }
 
                 Onoff.isChecked = alarm.alarmOn

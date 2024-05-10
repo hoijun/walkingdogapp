@@ -1,9 +1,8 @@
-package com.example.walkingdogapp.userinfo
+package com.example.walkingdogapp.viewmodel
 
 import android.Manifest
 import android.app.Application
 import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
 import android.net.Uri
@@ -15,6 +14,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.walkingdogapp.album.GalleryImgInfo
+import com.example.walkingdogapp.datamodel.AlarmDataModel
+import com.example.walkingdogapp.datamodel.DogInfo
+import com.example.walkingdogapp.datamodel.UserInfo
+import com.example.walkingdogapp.datamodel.WalkInfo
+import com.example.walkingdogapp.datamodel.WalkDate
+import com.example.walkingdogapp.repository.UserInfoRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
@@ -26,7 +31,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
     private val _dogsinfo = MutableLiveData<List<DogInfo>>()
     private val _userinfo = MutableLiveData<UserInfo>()
     private val _totalwalkinfo = MutableLiveData<WalkInfo>()
-    private val _walkDates = MutableLiveData<List<Walkdate>>()
+    private val _walkDates = MutableLiveData<List<WalkDate>>()
     private val _collectioninfo = MutableLiveData<HashMap<String, Boolean>>()
     private val _dogsimg = MutableLiveData<HashMap<String, Uri>>()
 
@@ -49,7 +54,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
     val totalwalkinfo: LiveData<WalkInfo>
         get() = _totalwalkinfo
 
-    val walkDates: LiveData<List<Walkdate>>
+    val walkDates: LiveData<List<WalkDate>>
         get() = _walkDates
 
     val collectioninfo: LiveData<HashMap<String, Boolean>>
@@ -77,7 +82,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
         _totalwalkinfo.value = totalwalkInfo
     }
 
-    fun savewalkdates(walkDates: List<Walkdate>) {
+    fun savewalkdates(walkDates: List<WalkDate>) {
         _walkDates.value = walkDates
     }
 
@@ -127,7 +132,6 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
     fun getCurrentAddress(coord: LatLng, callback: (String) -> Unit) {
         val geocoder = Geocoder(application, Locale.getDefault())
         if (Build.VERSION.SDK_INT < 33) {
-            Log.d("SDK", "LESSTHAN33")
             try {
                 val addresses: MutableList<Address> = geocoder.getFromLocation(
                     coord.latitude,

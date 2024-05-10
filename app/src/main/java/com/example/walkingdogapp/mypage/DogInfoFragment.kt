@@ -14,9 +14,8 @@ import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentDogInfoBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
-import com.example.walkingdogapp.userinfo.DogInfo
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
-import com.example.walkingdogapp.userinfo.Walkdate
+import com.example.walkingdogapp.datamodel.DogInfo
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 
 class DogInfoFragment : Fragment() {
     private var _binding: FragmentDogInfoBinding? = null

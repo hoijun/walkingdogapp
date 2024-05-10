@@ -1,10 +1,13 @@
-package com.example.walkingdogapp.userinfo
+package com.example.walkingdogapp.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.walkingdogapp.datamodel.AlarmDao
+import com.example.walkingdogapp.datamodel.AlarmDataModel
+import com.example.walkingdogapp.datamodel.WeekListConverters
 
 @Database(entities = [AlarmDataModel::class], version = 1)
 @TypeConverters(WeekListConverters::class)
