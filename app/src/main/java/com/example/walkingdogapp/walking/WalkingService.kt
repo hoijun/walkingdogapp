@@ -27,6 +27,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.overlay.InfoWindow
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Timer
@@ -45,19 +46,22 @@ class WalkingService : Service() {
         val coordList = MutableLiveData<MutableList<LatLng>>()
         val isTracking = MutableLiveData<Boolean>()
         val walkTime = MutableLiveData<Int>()
+        var getCollectionItems = mutableListOf<String>()
         var walkingDogs = arrayListOf<String>()
+        var animalMarkers = mutableListOf<InfoWindow>()
         var walkDistance = 0f
         var startTime = ""
     }
 
     private fun postInitialValue() {
-        Log.d("savepoint", "aaaaa")
         isTracking.postValue(false)
         walkTime.postValue(0)
         coordList.postValue(mutableListOf())
         totalTime = 0
         miscount = 0
         walkingDogs = arrayListOf()
+        getCollectionItems = mutableListOf()
+        animalMarkers = mutableListOf<InfoWindow>()
         walkDistance = 0f
         startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
     }

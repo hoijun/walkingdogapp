@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -16,8 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.ActivityRegisterUserBinding
-import com.example.walkingdogapp.userinfo.DogInfo
-import com.example.walkingdogapp.userinfo.UserInfo
+import com.example.walkingdogapp.datamodel.UserInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -25,9 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 
 class RegisterUserActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterUserBinding

@@ -2,8 +2,6 @@ package com.example.walkingdogapp.mainhome
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.ActivityManager
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,7 +9,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,9 +23,8 @@ import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.alarm.SettingAlarmFragment
 import com.example.walkingdogapp.databinding.FragmentHomeBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.example.walkingdogapp.walking.WalkingActivity
-import com.example.walkingdogapp.walking.WalkingService
 import com.google.android.material.tabs.TabLayoutMediator
 
 class HomeFragment : Fragment() {

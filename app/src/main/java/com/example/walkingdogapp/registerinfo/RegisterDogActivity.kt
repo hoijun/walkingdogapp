@@ -2,13 +2,11 @@ package com.example.walkingdogapp.registerinfo
 
 import android.Manifest
 import android.app.DatePickerDialog
-import android.content.ContentResolver
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -32,7 +30,7 @@ import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.ActivityRegisterDogBinding
-import com.example.walkingdogapp.userinfo.DogInfo
+import com.example.walkingdogapp.datamodel.DogInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -41,17 +39,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.InputStream
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import kotlin.math.log10
 
 
 class RegisterDogActivity : AppCompatActivity() {

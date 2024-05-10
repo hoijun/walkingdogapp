@@ -1,6 +1,5 @@
 package com.example.walkingdogapp.alarm
 
-import android.app.AlarmManager
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -10,13 +9,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_DEFAULT
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.SplashActivity
-import com.example.walkingdogapp.userinfo.UserInfoRepository
+import com.example.walkingdogapp.repository.UserInfoRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

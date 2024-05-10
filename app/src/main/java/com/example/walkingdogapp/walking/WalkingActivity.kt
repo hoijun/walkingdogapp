@@ -34,10 +34,10 @@ import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
-import com.example.walkingdogapp.userinfo.WalkInfo
-import com.example.walkingdogapp.userinfo.WalkLatLng
-import com.example.walkingdogapp.userinfo.saveWalkdate
+import com.example.walkingdogapp.datamodel.SaveWalkDate
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.datamodel.WalkInfo
+import com.example.walkingdogapp.datamodel.WalkLatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -74,7 +74,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mynavermap: NaverMap
     private lateinit var walkViewModel: UserInfoViewModel
     private var db = FirebaseDatabase.getInstance()
-
     private val auth = FirebaseAuth.getInstance()
 
     private var coordList = mutableListOf<LatLng>()
@@ -84,7 +83,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var trackingCamera: CameraUpdate
     private var trackingCameraMode = true // 지도의 화면이 자동으로 사용자에 위치에 따라 움직이는 지
 
-    private var getCollectionItems = mutableListOf<String>()
     private var collectionResources = listOf(
         R.drawable.collection_001,
         R.drawable.collection_002,
@@ -98,9 +96,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         R.drawable.collection_010,
         R.drawable.collection_011
     )
-    private var collectionImgViews = mutableListOf<ImageView>()
 
-    private var animalMarkers = mutableListOf<InfoWindow>()
+    private var collectionImgViews = mutableListOf<ImageView>()
 
     private val cameraPermission = arrayOf(Manifest.permission.CAMERA)
     private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -119,7 +116,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private var selectedDogs = arrayListOf<String>()
 
     // 뒤로 가기
-    private val BackPressCallback = object : OnBackPressedCallback(true) {
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             selectStopWalk()
         }
@@ -150,8 +147,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             goHome()
         }
 
-
-        setcolletionImageView()
+        setCollectionImageView()
 
         val mapFragment: MapFragment = supportFragmentManager.findFragmentById(R.id.map_fragment) as MapFragment?
             ?: MapFragment.newInstance().also {
@@ -160,7 +156,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mapFragment.getMapAsync(this)
 
-        this.onBackPressedDispatcher.addCallback(this, BackPressCallback)
+        this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         // 트래킹 모드 여부 확인 및 여부에 따른 버튼과 텍스트 변경
         WalkingService.isTracking.observe(this) {
@@ -179,7 +175,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         // 버튼 이벤트 설정
         binding.apply {
             btnSave.setOnClickListener {
-                Log.d("savepoint", WalkingService.walkingDogs.toString())
                 selectStopWalk()
             }
 
@@ -229,6 +224,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
+        this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
             if (ContextCompat.checkSelfPermission(
                     this,
@@ -270,8 +266,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         trackingPath.width = 15
         trackingPath.color = Color.YELLOW
 
-        randomMarker()
-
         walkViewModel.currentCoord.observe(this) {
             val firstCamera = CameraUpdate.scrollAndZoomTo(LatLng(it.latitude, it.longitude),
                 16.0)
@@ -296,15 +290,15 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
 
                 val markersToRemove = mutableListOf<InfoWindow>()
-                for (marker in animalMarkers) { // 마커 특정 거리 이상일 경우 제거
+                for (marker in WalkingService.animalMarkers) { // 마커 특정 거리 이상일 경우 제거
                     if (marker.position.distanceTo(coordList.last()) > 400) {
                         Log.d("coor", "clear")
                         marker.map = null
                         markersToRemove.add(marker)
                     }
                 }
-                animalMarkers.removeAll(markersToRemove)
-                
+                WalkingService.animalMarkers.removeAll(markersToRemove)
+
                 if (coordList.size > 1) {
                     trackingPath.map = null
                     trackingPath.coords = coordList // 이동 경로 그림
@@ -316,6 +310,24 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
+        if (WalkingService.animalMarkers.isEmpty()) {
+            randomMarker()
+        }
+
+        if (WalkingService.animalMarkers.isNotEmpty()) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                delay(5000)
+                for (animalMarker in WalkingService.animalMarkers) {
+                    animalMarker.adapter =  object : InfoWindow.DefaultViewAdapter(this@WalkingActivity) {
+                        override fun getContentView(p0: InfoWindow): View {
+                            return collectionImgViews[animalMarker.tag.toString().toInt()]
+                        }
+                    }
+                    animalMarker.map = mynavermap
+                }
+            }
+        }
+
         WalkingService.walkTime.observe(this) {
             val minutes = it / 60
             val seconds = it % 60
@@ -323,7 +335,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun setcolletionImageView() {
+    private fun setCollectionImageView() {
         for(imgRes in collectionResources) {
             val imgView = ImageView(this)
             imgView.layoutParams = ViewGroup.LayoutParams(120, 120)
@@ -338,7 +350,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             while (isWalkingServiceRunning()) {
                 repeat(2) {
                     if (coordList.isNotEmpty()) {
-                        if (animalMarkers.size < 6) { // 마커의 갯수 상한선
+                        if (WalkingService.animalMarkers.size < 6) { // 마커의 갯수 상한선
                             val randomCoord = getRandomCoord(coordList.last(), 300)
                             val randomNumber = kotlin.random.Random.nextInt(1, 12)
                             val animalMarker = InfoWindow()
@@ -354,15 +366,15 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             animalMarker.tag = String.format("%03d", randomNumber)
                             animalMarker.setOnClickListener {
                                 if (coordList.last().distanceTo(animalMarker.position) < 20) {
-                                    getCollectionItems.add(animalMarker.tag.toString())
+                                    WalkingService.getCollectionItems.add(animalMarker.tag.toString())
                                     animalMarker.map = null
-                                    animalMarkers.remove(animalMarker)
+                                    WalkingService.animalMarkers.remove(animalMarker)
                                 }
                                 true
                             }
                             animalMarker.position = randomCoord
                             animalMarker.map = mynavermap
-                            animalMarkers.add(animalMarker) // 일단 오류
+                            WalkingService.animalMarkers.add(animalMarker)
                         }
                     }
                 }
@@ -456,7 +468,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         setSaveScreen()
                         saveWalkInfo(
                             WalkingService.walkDistance, WalkingService.walkTime.value!!,
-                            WalkingService.coordList.value!!, WalkingService.walkingDogs)
+                            WalkingService.coordList.value!!, WalkingService.walkingDogs, WalkingService.getCollectionItems.toMutableSet().toList())
                     }
                 }
             }
@@ -467,7 +479,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // 거리 및 시간 저장, 날짜: 시간 별로 산책 기록 저장
-    private fun saveWalkInfo(distance: Float, time: Int, coords: List<LatLng>, walkDogs: List<String>) {
+    private fun saveWalkInfo(distance: Float, time: Int, coords: List<LatLng>, walkDogs: List<String>, collections: List<String>) {
         val uid = auth.currentUser?.uid
         val userRef = db.getReference("Users").child("$uid")
 
@@ -481,13 +493,15 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 val totalWalk = snapshot.child("totalWalkInfo").getValue(WalkInfo::class.java)
                 val indivisualWalks = hashMapOf<String, WalkInfo?>().also {
                     for (name in walkDogs) {
-                        it[name] = snapshot.child("dog").child(name).child("walkInfo").getValue(WalkInfo::class.java)
+                        it[name] = snapshot.child("dog").child(name).child("walkInfo").getValue(
+                            WalkInfo::class.java)
                     }
                 }
+
                 var error = false
 
                 lifecycleScope.launch {
-                    val totalwalkJob = async(Dispatchers.IO) {
+                    val totalWalkJob = async(Dispatchers.IO) {
                         try {
                             if (totalWalk != null) {
                                 userRef.child("totalWalkInfo").setValue(WalkInfo(totalWalk.totaldistance + distance,totalWalk.totaltime + time)).await()
@@ -500,13 +514,17 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                     }
 
-                    val indivisualwalkJob = async(Dispatchers.IO) {
+                    val indivisualWalkJob = async(Dispatchers.IO) {
                         try {
                             for(dogName in walkDogs) {
                                 if (indivisualWalks[dogName] != null) {
-                                    userRef.child("dog").child(dogName).child("walkInfo").setValue(WalkInfo(indivisualWalks[dogName]!!.totaldistance + distance, indivisualWalks[dogName]!!.totaltime + time)).await()
+                                    userRef.child("dog").child(dogName).child("walkInfo").setValue(
+                                        WalkInfo(indivisualWalks[dogName]!!.totaldistance + distance, indivisualWalks[dogName]!!.totaltime + time)
+                                    ).await()
                                 } else {
-                                    userRef.child("dog").child(dogName).child("walkInfo").setValue(WalkInfo(distance, time)).await()
+                                    userRef.child("dog").child(dogName).child("walkInfo").setValue(
+                                        WalkInfo(distance, time)
+                                    ).await()
                                 }
                             }
                         } catch (e: Exception) {
@@ -516,20 +534,20 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     val saveWalkdateJob = async(Dispatchers.IO) {
                         try {
-                            val savecoords = mutableListOf<WalkLatLng>()
+                            val saveCoords = mutableListOf<WalkLatLng>()
                             for (coord in coords) {
-                                savecoords.add(WalkLatLng(coord.latitude, coord.longitude))
+                                saveCoords.add(WalkLatLng(coord.latitude, coord.longitude))
                             }
-                            userRef.child("walkdates").child(walkDateinfo).setValue(saveWalkdate(distance, time, savecoords, walkDogs)).await()
+                            userRef.child("walkdates").child(walkDateinfo).setValue(SaveWalkDate(distance, time, saveCoords, walkDogs, collections)).await()
                         } catch (e: Exception) {
                             error = true
                         }
                     }
 
-                    val collectionInfojob = async(Dispatchers.IO) {
+                    val collectionInfoJob = async(Dispatchers.IO) {
                         try {
                             val update = mutableMapOf<String, Any>()
-                            for (item in getCollectionItems) {
+                            for (item in WalkingService.getCollectionItems) {
                                 update[item] = true
                             }
                             userRef.child("collection").updateChildren(update).await()
@@ -538,10 +556,10 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                     }
 
-                    totalwalkJob.await()
-                    indivisualwalkJob.await()
+                    totalWalkJob.await()
+                    indivisualWalkJob.await()
                     saveWalkdateJob.await()
-                    collectionInfojob.await()
+                    collectionInfoJob.await()
 
                     if (error) {
                         Toast.makeText(this@WalkingActivity, "산책 기록 저장 실패", Toast.LENGTH_SHORT)

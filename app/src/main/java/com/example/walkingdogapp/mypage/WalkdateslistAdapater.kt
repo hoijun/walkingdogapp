@@ -3,13 +3,13 @@ package com.example.walkingdogapp.mypage
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.walkingdogapp.userinfo.Walkdate
 import com.example.walkingdogapp.databinding.WalkdateslistItemBinding
+import com.example.walkingdogapp.datamodel.WalkDate
 
-class WalkdateslistAdapater(private val dates: List<Walkdate>): RecyclerView.Adapter<WalkdateslistAdapater.WalkdateslistViewHolder>() {
+class WalkdateslistAdapater(private val dates: List<WalkDate>): RecyclerView.Adapter<WalkdateslistAdapater.WalkdateslistViewHolder>() {
 
     fun interface OnItemClickListener {
-        fun onItemClick(date: Walkdate)
+        fun onItemClick(date: WalkDate)
     }
 
     var itemClickListener : OnItemClickListener? = null
@@ -31,12 +31,12 @@ class WalkdateslistAdapater(private val dates: List<Walkdate>): RecyclerView.Ada
                 itemClickListener?.onItemClick(dates[bindingAdapterPosition])
             }
         }
-        fun bind(walkdate: Walkdate) {
+        fun bind(walkDate: WalkDate) {
             binding.apply {
-                starttime.text = walkdate.startTime
-                val kmdistance = "%.1f".format(walkdate.distance / 1000.0)
+                starttime.text = walkDate.startTime
+                val kmdistance = "%.1f".format(walkDate.distance / 1000.0)
                 distance.text = "${kmdistance}km"
-                time.text = "${(walkdate.time / 60)}분"
+                time.text = "${(walkDate.time / 60)}분"
             }
         }
     }

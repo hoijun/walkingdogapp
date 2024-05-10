@@ -1,6 +1,9 @@
-package com.example.walkingdogapp.userinfo
+package com.example.walkingdogapp.repository
 
 import android.app.Application
+import com.example.walkingdogapp.datamodel.AlarmDao
+import com.example.walkingdogapp.datamodel.AlarmDataModel
+import com.example.walkingdogapp.database.LocalUserDatabase
 
 class UserInfoRepository(application: Application) {
     private val alarmDao: AlarmDao

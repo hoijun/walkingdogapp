@@ -14,7 +14,7 @@ import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentDetailPictureBinding
-import com.example.walkingdogapp.userinfo.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
