@@ -38,8 +38,9 @@ class ManageDogsFragment : Fragment() {
     ): View {
         _binding = FragmentManageDogsBinding.inflate(inflater,container, false)
         val dogsList = myViewModel.dogsinfo.value?: listOf()
-        val manageDogListAdapter = ManageDogListAdapter(dogsList, requireContext(), myViewModel)
-        manageDogListAdapter.onitemClickListener = ManageDogListAdapter.OnitemClickListener {
+
+        val manageDogListAdapter = ManageDogListAdapter(requireContext(), myViewModel)
+        manageDogListAdapter.onItemClickListener = ManageDogListAdapter.OnItemClickListener {
             val dogInfoFragment = DogInfoFragment().apply {
                 val bundle = Bundle()
                 bundle.putSerializable("doginfo", it)

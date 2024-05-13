@@ -135,7 +135,7 @@ class CollectionFragment : Fragment() {
                     openSearching.setImageResource(com.google.android.material.R.drawable.material_ic_menu_arrow_up_black_24dp)
                 } else {
                     collectionSearch.visibility = View.GONE
-                    openSearching.setImageResource(android.R.drawable.ic_menu_search)
+                    openSearching.setImageResource(R.drawable.search)
                 }
             }
 

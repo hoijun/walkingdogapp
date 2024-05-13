@@ -18,7 +18,7 @@ import com.example.walkingdogapp.datamodel.AlarmDataModel
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.datamodel.WalkInfo
-import com.example.walkingdogapp.datamodel.WalkDate
+import com.example.walkingdogapp.datamodel.WalkRecord
 import com.example.walkingdogapp.repository.UserInfoRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -31,7 +31,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
     private val _dogsinfo = MutableLiveData<List<DogInfo>>()
     private val _userinfo = MutableLiveData<UserInfo>()
     private val _totalwalkinfo = MutableLiveData<WalkInfo>()
-    private val _walkDates = MutableLiveData<List<WalkDate>>()
+    private val _walkDates = MutableLiveData<List<WalkRecord>>()
     private val _collectioninfo = MutableLiveData<HashMap<String, Boolean>>()
     private val _dogsimg = MutableLiveData<HashMap<String, Uri>>()
 
@@ -54,7 +54,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
     val totalwalkinfo: LiveData<WalkInfo>
         get() = _totalwalkinfo
 
-    val walkDates: LiveData<List<WalkDate>>
+    val walkDates: LiveData<List<WalkRecord>>
         get() = _walkDates
 
     val collectioninfo: LiveData<HashMap<String, Boolean>>
@@ -82,7 +82,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
         _totalwalkinfo.value = totalwalkInfo
     }
 
-    fun savewalkdates(walkDates: List<WalkDate>) {
+    fun savewalkdates(walkDates: List<WalkRecord>) {
         _walkDates.value = walkDates
     }
 

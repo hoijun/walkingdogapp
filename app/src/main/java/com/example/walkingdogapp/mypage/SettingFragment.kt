@@ -106,15 +106,11 @@ class SettingFragment : Fragment() {
                 }
             }
 
-            settingAlarm.setOnClickListener {
-
-            }
-
             settingInquiry.setOnClickListener {
 
             }
 
-            settingAppinfo.setOnClickListener {
+            settingPrivacyPolicy.setOnClickListener {
 
             }
 

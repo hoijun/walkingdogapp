@@ -20,7 +20,7 @@ import com.example.walkingdogapp.album.GalleryFragment
 import com.example.walkingdogapp.databinding.FragmentMyPageBinding
 import com.example.walkingdogapp.registerinfo.RegisterUserActivity
 import com.example.walkingdogapp.datamodel.UserInfo
-import com.example.walkingdogapp.datamodel.WalkDate
+import com.example.walkingdogapp.datamodel.WalkRecord
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.example.walkingdogapp.datamodel.WalkInfo
 import com.google.android.material.tabs.TabLayoutMediator
@@ -32,7 +32,7 @@ class MyPageFragment : Fragment() {
     private val myViewModel: UserInfoViewModel by activityViewModels()
     private lateinit var userInfo: UserInfo
     private lateinit var totalwalkInfo: WalkInfo
-    private lateinit var walkdates: List<WalkDate>
+    private lateinit var walkdates: List<WalkRecord>
     private lateinit var mainactivity: MainActivity
 
     private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -69,7 +69,7 @@ class MyPageFragment : Fragment() {
         _binding = FragmentMyPageBinding.inflate(inflater,container, false)
         userInfo = myViewModel.userinfo.value ?: UserInfo()
         totalwalkInfo = myViewModel.totalwalkinfo.value ?: WalkInfo()
-        walkdates = myViewModel.walkDates.value ?: listOf<WalkDate>()
+        walkdates = myViewModel.walkDates.value ?: listOf<WalkRecord>()
 
         binding.apply {
             btnSetting.setOnClickListener {
@@ -118,10 +118,10 @@ class MyPageFragment : Fragment() {
                 menuUsername.text = "${userInfo.name} 님"
             }
 
-            menuDistance.text = getString(R.string.totaldistance, totalwalkInfo.totaldistance / 1000.0)
+            menuDistance.text = getString(R.string.totaldistance, totalwalkInfo.distance / 1000.0)
             menuDogsCount.text = "${myViewModel.dogsinfo.value?.size}마리"
-            walkDistance.text = getString(R.string.totaldistance, totalwalkInfo.totaldistance / 1000.0)
-            walkTime.text =  "${(totalwalkInfo.totaltime / 60)}분"
+            walkDistance.text = getString(R.string.totaldistance, totalwalkInfo.distance / 1000.0)
+            walkTime.text =  "${(totalwalkInfo.time / 60)}분"
             walkCount.text = "${walkdates.size}회"
             
         }

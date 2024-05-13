@@ -24,7 +24,7 @@ import com.example.walkingdogapp.mypage.ManageDogsFragment
 import com.example.walkingdogapp.mypage.MyPageFragment
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.UserInfo
-import com.example.walkingdogapp.datamodel.WalkDate
+import com.example.walkingdogapp.datamodel.WalkRecord
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.example.walkingdogapp.datamodel.WalkInfo
 import com.example.walkingdogapp.datamodel.WalkLatLng
@@ -234,13 +234,13 @@ class MainActivity : AppCompatActivity() {
                 val walkDateDeferred = suspendCoroutine { continuation ->
                     userRef.child("walkdates").addListenerForSingleValueEvent(object: ValueEventListener{
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            val dates = mutableListOf<WalkDate>()
+                            val walkRecords = mutableListOf<WalkRecord>()
                             if (snapshot.exists()) {
                                 for (dateData in snapshot.children) {
-                                    val dateInfos = dateData.key.toString().split(" ")
-                                    dates.add(
-                                        WalkDate(
-                                            dateInfos[0], dateInfos[1], dateInfos[2],
+                                    val walkDay = dateData.key.toString().split(" ")
+                                    walkRecords.add(
+                                        WalkRecord(
+                                            walkDay[0], walkDay[1], walkDay[2],
                                             dateData.child("distance")
                                                 .getValue(Float::class.java)!!,
                                             dateData.child("time").getValue(Int::class.java)!!,
@@ -251,11 +251,11 @@ class MainActivity : AppCompatActivity() {
                                     )
                                 }
                             }
-                            continuation.resume(dates)
+                            continuation.resume(walkRecords)
                         }
 
                         override fun onCancelled(error: DatabaseError) {
-                            continuation.resume(listOf<WalkDate>())
+                            continuation.resume(listOf<WalkRecord>())
                         }
                     })
                 }

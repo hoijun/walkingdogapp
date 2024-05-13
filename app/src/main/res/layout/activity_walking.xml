@@ -32,12 +32,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_percent="1.0">
-
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/map_fragment"
-                android:name="com.naver.maps.map.MapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
         </FrameLayout>
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -46,7 +40,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="30dp"
             android:layout_marginEnd="15dp"
-            android:src="@drawable/naver_icon"
+            android:src="@drawable/mylocation"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -156,7 +150,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/view1"
                     app:layout_constraintWidth_percent="1.0"
-                    app:srcCompat="@android:drawable/ic_menu_edit" />
+                    app:srcCompat="@drawable/pencil" />
 
                 <TextView
                     android:id="@+id/text_save"
@@ -202,7 +196,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/view2"
                     app:layout_constraintWidth_percent="1.0"
-                    app:srcCompat="@android:drawable/ic_media_pause" />
+                    app:srcCompat="@drawable/pause" />
 
                 <TextView
                     android:id="@+id/text_isTracking"
@@ -246,7 +240,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/view5"
                     app:layout_constraintWidth_percent="1.0"
-                    app:srcCompat="@android:drawable/ic_menu_camera" />
+                    app:srcCompat="@drawable/camera" />
 
                 <View
                     android:id="@+id/view6"

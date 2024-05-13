@@ -34,7 +34,6 @@ import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
-import com.example.walkingdogapp.datamodel.SaveWalkDate
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.example.walkingdogapp.datamodel.WalkInfo
 import com.example.walkingdogapp.datamodel.WalkLatLng
@@ -68,6 +67,14 @@ import java.util.Random
 import kotlin.math.cos
 import kotlin.math.sin
 
+
+data class SaveWalkDate (
+    val distance: Float = 0.0f,
+    val time: Int = 0,
+    val coords: List<WalkLatLng> = listOf<WalkLatLng>(),
+    val dogs: List<String>,
+    val collections: List<String>
+) // 산책 한 후 저장 할 때 쓰는 클래스
 
 class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityWalkingBinding
@@ -149,9 +156,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         setCollectionImageView()
 
-        val mapFragment: MapFragment = supportFragmentManager.findFragmentById(R.id.map_fragment) as MapFragment?
+        val mapFragment: MapFragment = supportFragmentManager.findFragmentById(R.id.Map) as MapFragment?
             ?: MapFragment.newInstance().also {
-                supportFragmentManager.beginTransaction().add(R.id.map_fragment, it).commit()
+                supportFragmentManager.beginTransaction().add(R.id.Map, it).commit()
         }
 
         mapFragment.getMapAsync(this)
@@ -164,10 +171,10 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             binding.apply {
                 if (isTracking) {
                     textIsTracking.text = "산책중지"
-                    btnStart.setImageResource(android.R.drawable.ic_media_pause)
+                    btnStart.setImageResource(R.drawable.pause)
                 } else {
                     textIsTracking.text = "산책시작"
-                    btnStart.setImageResource(android.R.drawable.ic_media_play)
+                    btnStart.setImageResource(R.drawable.play)
                 }
             }
         }
@@ -210,14 +217,14 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             CameraUpdate.scrollAndZoomTo(coordList.last(), 16.0)
                                 .animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
                         mynavermap.moveCamera(trackingCamera)
-                        trackingCameraModeOnBtn.setImageResource(com.nhn.android.oauth.R.drawable.naver_icon)
+                        trackingCameraModeOnBtn.setImageResource(R.drawable.mylocation)
                     }
                     return@setOnClickListener
                 }
 
                 // 현재 위치 따라가기 였을 경우
                 trackingCameraMode = false
-                trackingCameraModeOnBtn.setImageResource(R.drawable.waitimage)
+                trackingCameraModeOnBtn.setImageResource(R.drawable.location_disabled)
             }
         }
     }
@@ -453,12 +460,12 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun selectStopWalk() {
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("산책 그만 할까요?")
+        builder.setTitle("산책 그만 할까요?\n(10분 및 300m 이상 산책 시 기록 저장 가능)")
 
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    if (WalkingService.walkDistance < 300 || WalkingService.walkTime.value!! < 300) {
+                    if (WalkingService.walkDistance < 300 || WalkingService.walkTime.value!! < 600) {
                         Toast.makeText(this, "거리 또는 시간이 너무 부족해요!",Toast.LENGTH_SHORT).show()
                         stopWalkingService()
                         goHome()
@@ -504,7 +511,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     val totalWalkJob = async(Dispatchers.IO) {
                         try {
                             if (totalWalk != null) {
-                                userRef.child("totalWalkInfo").setValue(WalkInfo(totalWalk.totaldistance + distance,totalWalk.totaltime + time)).await()
+                                userRef.child("totalWalkInfo").setValue(WalkInfo(totalWalk.distance + distance,totalWalk.time + time)).await()
                             } else {
                                 userRef.child("totalWalkInfo").setValue(WalkInfo(distance, time))
                                     .await()
@@ -519,7 +526,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             for(dogName in walkDogs) {
                                 if (indivisualWalks[dogName] != null) {
                                     userRef.child("dog").child(dogName).child("walkInfo").setValue(
-                                        WalkInfo(indivisualWalks[dogName]!!.totaldistance + distance, indivisualWalks[dogName]!!.totaltime + time)
+                                        WalkInfo(indivisualWalks[dogName]!!.distance + distance, indivisualWalks[dogName]!!.time + time)
                                     ).await()
                                 } else {
                                     userRef.child("dog").child(dogName).child("walkInfo").setValue(
