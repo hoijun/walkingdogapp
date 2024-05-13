@@ -18,7 +18,7 @@ import com.example.walkingdogapp.databinding.WriteDialogBinding
 class DoglistDialog : DialogFragment(){
     private var _binding: DoglistDialogBinding? = null
     private val binding get() = _binding!!
-    private val dogs = listOf("직접 입력", "말티즈", "푸들", "포메라니안", "믹스견", "치와와", "시츄", "골든리트리버", "진돗개", "불독", "비글", "닥스훈트", "허스키", "a", "b", "c")
+    private val dogs = listOf("직접 입력", "말티즈", "푸들", "포메라니안", "믹스견", "치와와", "시츄", "골든리트리버", "진돗개", "불독", "비글", "닥스훈트", "허스키")
 
     fun interface OnClickItemListener {
         fun onClickItem(text: String)

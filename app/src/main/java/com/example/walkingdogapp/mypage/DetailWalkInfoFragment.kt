@@ -1,5 +1,6 @@
 package com.example.walkingdogapp.mypage
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -12,7 +13,8 @@ import androidx.fragment.app.Fragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentDetailWalkInfoBinding
-import com.example.walkingdogapp.datamodel.WalkDate
+import com.example.walkingdogapp.datamodel.DogInfo
+import com.example.walkingdogapp.datamodel.WalkRecord
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
@@ -28,7 +30,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
     private var walkPath = PathOverlay()
     private lateinit var camera : CameraUpdate
     private var day = listOf<String>()
-    private var dateinfo = WalkDate()
+    private var walkRecord = WalkRecord()
 
     private lateinit var mainactivity: MainActivity
     private val callback = object : OnBackPressedCallback(true) {
@@ -43,36 +45,40 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
         mainactivity.binding.menuBn.visibility = View.GONE
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
         val mapFragment: MapFragment =
-            childFragmentManager.findFragmentById(R.id.map_fragment) as MapFragment?
+            childFragmentManager.findFragmentById(R.id.Map) as MapFragment?
                 ?: MapFragment.newInstance().also {
-                    childFragmentManager.beginTransaction().add(R.id.map_fragment, it).commit()
+                    childFragmentManager.beginTransaction().add(R.id.Map, it).commit()
                 }
         mapFragment.getMapAsync(this)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDetailWalkInfoBinding.inflate(inflater,container, false)
 
-        dateinfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable("selectdate", WalkDate::class.java)?: WalkDate()
+        walkRecord = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable("selectDateRecord", WalkRecord::class.java)?: WalkRecord()
         } else {
-            (arguments?.getSerializable("selectdate") ?: WalkDate()) as WalkDate
+            (arguments?.getSerializable("selectDateRecord") ?: WalkRecord()) as WalkRecord
         }
 
         binding.apply {
             btnGoMypage.setOnClickListener {
                 goWalkInfo()
             }
-            day = dateinfo.day.split("-")
+            day = walkRecord.day.split("-")
             walkday.text = "${day[0]}년 ${day[1]}월 ${day[2]}일"
-            walkstart.text = dateinfo.startTime
-            walkend.text = dateinfo.endTime
-            val kmdistance = "%.1f".format(dateinfo.distance / 1000.0)
-            walkdistance.text = "${kmdistance}km"
-            walktime.text = "${(dateinfo.time / 60)}분"
+            walkstart.text = walkRecord.startTime
+            walkend.text = walkRecord.endTime
+            val kmDistance = "%.1f".format(walkRecord.distance / 1000.0)
+            walkdistance.text = "${kmDistance}km"
+            walktime.text = "${(walkRecord.time / 60)}분"
+
+            WalkingDogs.text = walkRecord.dogs.joinToString(", ")
+            Collections.text = walkRecord.collections.joinToString(", ")
         }
         return binding.root
     }
@@ -91,31 +97,39 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
         this.mynavermap = map
         mynavermap.uiSettings.isRotateGesturesEnabled = false
         mynavermap.uiSettings.isCompassEnabled = false
-
+        mynavermap.uiSettings.isScrollGesturesEnabled = false
         mynavermap.uiSettings.isZoomControlEnabled = false
+
+        binding.zoom.map = mynavermap
 
         walkPath.width = 15
         walkPath.color = Color.YELLOW
 
-        val walkcoords = mutableListOf<LatLng>()
+        val walkCoords = mutableListOf<LatLng>()
 
-        for (coord in dateinfo.coords) {
-            walkcoords.add(LatLng(coord.latititude, coord.longtitude))
+        for (coord in walkRecord.coords) {
+            walkCoords.add(LatLng(coord.latitude, coord.longitude))
         }
 
-        if (walkcoords.isNotEmpty()) {
+        if (walkCoords.isNotEmpty()) {
             camera =
-                CameraUpdate.scrollAndZoomTo(walkcoords[walkcoords.size / 2], 16.0) //
+                CameraUpdate.scrollAndZoomTo(walkCoords[walkCoords.size / 2], 16.0) //
             mynavermap.moveCamera(camera)
 
-            walkPath.coords = walkcoords
+            walkPath.coords = walkCoords
             walkPath.map = mynavermap
         }
     }
 
     private fun goWalkInfo() {
+        val selectDog = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable("selectDog", DogInfo::class.java)?: DogInfo()
+        } else {
+            (arguments?.getSerializable("selectDog") ?: DogInfo()) as DogInfo
+        }
         val bundle = Bundle()
-        bundle.putStringArrayList("selectdate", day as ArrayList<String>)
+        bundle.putStringArrayList("selectDateRecord", day as ArrayList<String>)
+        bundle.putSerializable("selectDog", selectDog)
         val walkInfoFragment = WalkInfoFragment().apply {
             arguments = bundle
         }

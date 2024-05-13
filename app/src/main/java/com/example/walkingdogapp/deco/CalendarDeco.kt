@@ -49,13 +49,13 @@ class SelectedMonthDecorator(private val selectedMonth : Int): DayViewDecorator 
 
 
 // 산책 날짜에 점 표시
-class WalkDayDecorator(private val walkdays : List<CalendarDay>): DayViewDecorator {
+class WalkDayDecorator(private val walkDays : List<CalendarDay>): DayViewDecorator {
     override fun shouldDecorate(day: CalendarDay?): Boolean {
-        return walkdays.contains(day)
+        return walkDays.contains(day)
     }
 
     override fun decorate(view: DayViewFacade) {
-        view.addSpan(DotSpan(12F, Color.parseColor("#FFA500")))
+        view.addSpan(DotSpan(10F, Color.BLACK))
     }
 }
 

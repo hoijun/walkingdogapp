@@ -78,9 +78,9 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val mapFragment: MapFragment =
-            childFragmentManager.findFragmentById(R.id.map_fragment) as MapFragment?
+            childFragmentManager.findFragmentById(R.id.Map) as MapFragment?
                 ?: MapFragment.newInstance().also {
-                    childFragmentManager.beginTransaction().add(R.id.map_fragment, it).commit()
+                    childFragmentManager.beginTransaction().add(R.id.Map, it).commit()
                 }
         mapFragment.getMapAsync(this)
     }

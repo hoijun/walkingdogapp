@@ -43,7 +43,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.1"
-                app:srcCompat="@android:drawable/ic_menu_revert" />
+                app:srcCompat="@drawable/undo" />
 
             <TextView
                 android:id="@+id/remove_btn"
@@ -73,7 +73,7 @@
                 android:id="@+id/register_image"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:src="@drawable/ic_launcher_background"
+                android:src="@drawable/waitimage"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.135"
                 app:layout_constraintStart_toStartOf="parent"

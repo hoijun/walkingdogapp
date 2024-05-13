@@ -42,7 +42,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.1"
-                app:srcCompat="@android:drawable/ic_menu_revert" />
+                app:srcCompat="@drawable/undo" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -77,6 +77,7 @@
             android:layout_height="120dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/roundstyle"
+            android:elevation="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/setting_middle1"
@@ -140,42 +141,6 @@
             app:layout_constraintTop_toBottomOf="@+id/setting_middle2"
             app:layout_constraintWidth_percent="0.825">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/setting_alarm"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="10sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.2"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:id="@+id/alarm"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:gravity="center|start"
-                    android:text="알람 설정"
-                    android:textColor="@color/black"
-                    android:textSize="17sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.9" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:gravity="center"
-                    android:text="  〉"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/alarm"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.1" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/setting_inquiry"
@@ -183,9 +148,9 @@
                 android:layout_height="0dp"
                 android:layout_marginStart="10sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.2"
+                app:layout_constraintHeight_percent="0.25"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/setting_alarm">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
                     android:id="@+id/inquiry"
@@ -215,21 +180,21 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/setting_appinfo"
+                android:id="@+id/setting_PrivacyPolicy"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="10sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.2"
+                app:layout_constraintHeight_percent="0.25"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/setting_inquiry">
 
                 <TextView
-                    android:id="@+id/appinfo"
+                    android:id="@+id/privacyPolicy"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center|start"
-                    android:text="앱 정보"
+                    android:text="개인정보처리방침"
                     android:textColor="@color/black"
                     android:textSize="17sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -246,7 +211,7 @@
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/appinfo"
+                    app:layout_constraintStart_toEndOf="@+id/privacyPolicy"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintWidth_percent="0.1" />
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -257,9 +222,9 @@
                 android:layout_height="0dp"
                 android:layout_marginStart="10sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.2"
+                app:layout_constraintHeight_percent="0.25"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/setting_appinfo">
+                app:layout_constraintTop_toBottomOf="@+id/setting_PrivacyPolicy">
 
                 <TextView
                     android:id="@+id/termofservice"
@@ -294,7 +259,7 @@
                 android:layout_height="0dp"
                 android:layout_marginStart="10sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.2"
+                app:layout_constraintHeight_percent="0.25"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/setting_termsofservice">
 

@@ -11,13 +11,12 @@ import com.example.walkingdogapp.databinding.ManagedoglistItemBinding
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 
-class ManageDogListAdapter(private val dogsList: List<DogInfo>, private val context: Context, private val viewModel: UserInfoViewModel): RecyclerView.Adapter<ManageDogListAdapter.ManageDogListViewHolder>() {
-
-    fun interface OnitemClickListener {
-        fun onitemClick(dog: DogInfo)
+class ManageDogListAdapter(private val context: Context, private val viewModel: UserInfoViewModel): RecyclerView.Adapter<ManageDogListAdapter.ManageDogListViewHolder>() {
+    fun interface OnItemClickListener {
+        fun onItemClick(dog: DogInfo)
     }
 
-    var onitemClickListener: OnitemClickListener? = null
+    var onItemClickListener: OnItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ManageDogListViewHolder {
         val binding =
@@ -25,9 +24,9 @@ class ManageDogListAdapter(private val dogsList: List<DogInfo>, private val cont
         return ManageDogListViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = dogsList.size
+    override fun getItemCount(): Int = viewModel.dogsinfo.value?.size ?: 0
     override fun onBindViewHolder(holder: ManageDogListViewHolder, position: Int) {
-        holder.bind(dogsList[position])
+        holder.bind(viewModel.dogsinfo.value?.get(position) ?: DogInfo())
     }
 
     inner class ManageDogListViewHolder(private val binding: ManagedoglistItemBinding) :
@@ -44,7 +43,7 @@ class ManageDogListAdapter(private val dogsList: List<DogInfo>, private val cont
                 }
 
                 root.setOnClickListener {
-                    onitemClickListener?.onitemClick(dog)
+                    onItemClickListener?.onItemClick(dog)
                 }
             }
         }

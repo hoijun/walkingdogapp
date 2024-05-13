@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingdogapp.databinding.WalkdateslistItemBinding
-import com.example.walkingdogapp.datamodel.WalkDate
+import com.example.walkingdogapp.datamodel.WalkRecord
 
-class WalkdateslistAdapater(private val dates: List<WalkDate>): RecyclerView.Adapter<WalkdateslistAdapater.WalkdateslistViewHolder>() {
+class WalkDatesListAdapter(private val walkRecordList: List<WalkRecord>): RecyclerView.Adapter<WalkDatesListAdapter.WalkdateslistViewHolder>() {
 
     fun interface OnItemClickListener {
-        fun onItemClick(date: WalkDate)
+        fun onItemClick(date: WalkRecord)
     }
 
     var itemClickListener : OnItemClickListener? = null
@@ -18,25 +18,24 @@ class WalkdateslistAdapater(private val dates: List<WalkDate>): RecyclerView.Ada
         return WalkdateslistViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = dates.size
+    override fun getItemCount(): Int = walkRecordList.size
 
     override fun onBindViewHolder(holder: WalkdateslistViewHolder, position: Int) {
-        holder.bind(dates[position])
+        holder.bind(walkRecordList[position])
     }
 
     inner class WalkdateslistViewHolder(private val binding: WalkdateslistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
-                itemClickListener?.onItemClick(dates[bindingAdapterPosition])
+                itemClickListener?.onItemClick(walkRecordList[bindingAdapterPosition])
             }
         }
-        fun bind(walkDate: WalkDate) {
+        fun bind(walkRecord: WalkRecord) {
             binding.apply {
-                starttime.text = walkDate.startTime
-                val kmdistance = "%.1f".format(walkDate.distance / 1000.0)
-                distance.text = "${kmdistance}km"
-                time.text = "${(walkDate.time / 60)}분"
+                starttime.text = walkRecord.startTime
+                distance.text = "${"%.1f".format(walkRecord.distance / 1000.0)}km"
+                time.text = "${(walkRecord.time / 60)}분"
             }
         }
     }

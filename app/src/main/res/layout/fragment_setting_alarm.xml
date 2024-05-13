@@ -24,7 +24,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_percent="0.1"
-            app:srcCompat="@android:drawable/ic_menu_revert" />
+            app:srcCompat="@drawable/undo" />
 
         <TextView
             android:layout_width="0dp"
@@ -49,7 +49,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_percent="0.1"
-            android:src="@android:drawable/ic_menu_add"/>
+            android:src="@drawable/add"/>
 
         <TextView
             android:id="@+id/btn_alarmremove"
