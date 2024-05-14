@@ -77,7 +77,6 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             walkdistance.text = "${kmDistance}km"
             walktime.text = "${(walkRecord.time / 60)}분"
 
-            WalkingDogs.text = walkRecord.dogs.joinToString(", ")
             Collections.text = walkRecord.collections.joinToString(", ")
         }
         return binding.root
@@ -111,7 +110,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             walkCoords.add(LatLng(coord.latitude, coord.longitude))
         }
 
-        if (walkCoords.isNotEmpty()) {
+        if (walkCoords.size > 2) {
             camera =
                 CameraUpdate.scrollAndZoomTo(walkCoords[walkCoords.size / 2], 16.0) //
             mynavermap.moveCamera(camera)

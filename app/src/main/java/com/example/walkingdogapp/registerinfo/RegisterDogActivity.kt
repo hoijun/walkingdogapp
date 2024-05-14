@@ -31,6 +31,8 @@ import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.ActivityRegisterDogBinding
 import com.example.walkingdogapp.datamodel.DogInfo
+import com.example.walkingdogapp.datamodel.WalkRecord
+import com.example.walkingdogapp.walking.SaveWalkDate
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -54,7 +56,7 @@ class RegisterDogActivity : AppCompatActivity() {
     private val storage = FirebaseStorage.getInstance()
     private var imguri: Uri? = null
 
-    private val BackPressCallback = object : OnBackPressedCallback(true) {
+    private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             selectgoMain()
         }
@@ -86,17 +88,23 @@ class RegisterDogActivity : AppCompatActivity() {
         binding = ActivityRegisterDogBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        this.onBackPressedDispatcher.addCallback(this, BackPressCallback)
+        this.onBackPressedDispatcher.addCallback(this, backPressCallback)
 
 
         val uid = auth.currentUser?.uid
         val userRef = db.getReference("Users")
-        val storgeRef = storage.getReference("$uid")
+        val storageRef = storage.getReference("$uid")
 
         val userdogInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra("doginfo", DogInfo::class.java)
         } else {
             intent.getSerializableExtra("doginfo") as DogInfo?
+        }
+
+        val walkRecords = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableArrayListExtra("walkRecord", WalkRecord::class.java) ?: arrayListOf()
+        } else {
+            intent.getParcelableArrayListExtra("walkRecord") ?: arrayListOf()
         }
 
         doginfo = userdogInfo?: DogInfo()
@@ -252,16 +260,39 @@ class RegisterDogActivity : AppCompatActivity() {
                 val listener = DialogInterface.OnClickListener { _, ans ->
                     when (ans) {
                         DialogInterface.BUTTON_POSITIVE -> {
+                            var error = false
                             binding.settingscreen.visibility = View.INVISIBLE
                             binding.waitImage.visibility = View.VISIBLE
                             lifecycleScope.launch { // 강아지 정보 등록
-                                val doginfoJob = async(Dispatchers.IO) {
+                                val dogInfoJob = async(Dispatchers.IO) {
                                     try {
                                         if(beforeName != "") { // 수정하는 경우
                                             userRef.child("$uid").child("dog").child(beforeName).removeValue().await()
                                         }
                                         userRef.child("$uid").child("dog").child(doginfo.name).setValue(doginfo).await()
                                     } catch (e: Exception) {
+                                        error = true
+                                        return@async
+                                    }
+                                }
+
+                                dogInfoJob.await()
+
+                                if (error) {
+                                    return@launch
+                                }
+
+
+                                val walkRecordJob = async(Dispatchers.IO) {
+                                    try {
+                                        for(walkRecord in walkRecords) {
+                                            val day = walkRecord.day + " " + walkRecord.startTime + " " + walkRecord.endTime
+                                            userRef.child("$uid").child("dog").child(doginfo.name).child("walkdates").child(day)
+                                                .setValue(SaveWalkDate(walkRecord.distance, walkRecord.time, walkRecord.coords, walkRecord.collections))
+                                                .await()
+                                        }
+                                    }  catch (e: Exception) {
+                                        error = true
                                         return@async
                                     }
                                 }
@@ -269,7 +300,7 @@ class RegisterDogActivity : AppCompatActivity() {
                                 val uploadJob = launch(Dispatchers.IO) {
                                     try {
                                         if (imguri != null) {
-                                            storgeRef.child("images").child(doginfo.name)
+                                            storageRef.child("images").child(doginfo.name)
                                                 .putFile(imguri!!).await()
                                         } else {
                                             if (MainActivity.dogUriList[beforeName] != null) {
@@ -289,11 +320,12 @@ class RegisterDogActivity : AppCompatActivity() {
                                                         }
                                                 }
 
-                                                storgeRef.child("images").child(doginfo.name)
+                                                storageRef.child("images").child(doginfo.name)
                                                     .putFile(tempUri).await()
                                             }
                                         }
                                     } catch (e: Exception) {
+                                        error = true
                                         return@launch
                                     }
                                 }
@@ -307,16 +339,27 @@ class RegisterDogActivity : AppCompatActivity() {
                                         }
 
                                         if (!MainActivity.dogNameList.contains(doginfo.name)) {
-                                            storgeRef.child("images").child(beforeName).delete()
+                                            storageRef.child("images").child(beforeName).delete()
                                                 .await()
                                         }
                                     } catch (e: Exception) {
+                                        error = true
                                         return@launch
                                     }
                                 }
 
-                                doginfoJob.await()
+                                walkRecordJob.await()
+
+                                if (error) {
+                                    return@launch
+                                }
+
                                 deleteJob.join()
+                                goMain()
+                            }
+
+                            if(error) {
+                                Toast.makeText(this@RegisterDogActivity, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
                                 goMain()
                             }
                         }
@@ -335,7 +378,7 @@ class RegisterDogActivity : AppCompatActivity() {
                     when (ans) {
                         DialogInterface.BUTTON_POSITIVE -> {
                             lifecycleScope.launch { // 강아지 정보 등록
-                                val removedoginfoJob = async(Dispatchers.IO) {
+                                val removeDogInfoJob = async(Dispatchers.IO) {
                                     try {
                                         userRef.child("$uid").child("dog").child(beforeName).removeValue()
                                             .await()
@@ -344,10 +387,10 @@ class RegisterDogActivity : AppCompatActivity() {
                                     }
                                 }
 
-                                val removedogimgJob = launch(Dispatchers.IO) {
+                                val removeDogImgJob = launch(Dispatchers.IO) {
                                     try {
                                         if (MainActivity.dogUriList[beforeName] != null) {
-                                            storgeRef.child("images").child(beforeName).delete()
+                                            storageRef.child("images").child(beforeName).delete()
                                                 .await()
                                         }
                                     } catch (e: Exception) {
@@ -355,8 +398,8 @@ class RegisterDogActivity : AppCompatActivity() {
                                     }
                                 }
 
-                                removedoginfoJob.await()
-                                removedogimgJob.join()
+                                removeDogInfoJob.await()
+                                removeDogImgJob.join()
                                 goMain()
                             }
                         }

@@ -31,7 +31,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
     private val _dogsinfo = MutableLiveData<List<DogInfo>>()
     private val _userinfo = MutableLiveData<UserInfo>()
     private val _totalwalkinfo = MutableLiveData<WalkInfo>()
-    private val _walkDates = MutableLiveData<List<WalkRecord>>()
+    private val _walkDates = MutableLiveData<HashMap<String, MutableList<WalkRecord>>>()
     private val _collectioninfo = MutableLiveData<HashMap<String, Boolean>>()
     private val _dogsimg = MutableLiveData<HashMap<String, Uri>>()
 
@@ -54,7 +54,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
     val totalwalkinfo: LiveData<WalkInfo>
         get() = _totalwalkinfo
 
-    val walkDates: LiveData<List<WalkRecord>>
+    val walkDates: LiveData<HashMap<String, MutableList<WalkRecord>>>
         get() = _walkDates
 
     val collectioninfo: LiveData<HashMap<String, Boolean>>
@@ -82,7 +82,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
         _totalwalkinfo.value = totalwalkInfo
     }
 
-    fun savewalkdates(walkDates: List<WalkRecord>) {
+    fun savewalkdates(walkDates: HashMap<String, MutableList<WalkRecord>>) {
         _walkDates.value = walkDates
     }
 

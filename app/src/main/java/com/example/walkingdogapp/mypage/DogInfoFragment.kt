@@ -15,6 +15,7 @@ import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentDogInfoBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.datamodel.DogInfo
+import com.example.walkingdogapp.datamodel.WalkRecord
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 
 class DogInfoFragment : Fragment() {
@@ -66,7 +67,9 @@ class DogInfoFragment : Fragment() {
 
             btnSettingdog.setOnClickListener {
                 val registerDogIntent = Intent(requireContext(), RegisterDogActivity::class.java)
+                val walkRecordArrayList: ArrayList<WalkRecord> = (myViewModel.walkDates.value?.get(userdogInfo.name) ?: mutableListOf()) as ArrayList<WalkRecord>
                 registerDogIntent.putExtra("doginfo", userdogInfo)
+                registerDogIntent.putParcelableArrayListExtra("walkRecord", walkRecordArrayList)
                 startActivity(registerDogIntent)
             }
 

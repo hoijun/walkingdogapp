@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +25,7 @@ import com.example.walkingdogapp.datamodel.WalkRecord
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.example.walkingdogapp.datamodel.WalkInfo
 import com.google.android.material.tabs.TabLayoutMediator
+import com.prolificinteractive.materialcalendarview.CalendarDay
 
 
 class MyPageFragment : Fragment() {
@@ -32,7 +34,7 @@ class MyPageFragment : Fragment() {
     private val myViewModel: UserInfoViewModel by activityViewModels()
     private lateinit var userInfo: UserInfo
     private lateinit var totalwalkInfo: WalkInfo
-    private lateinit var walkdates: List<WalkRecord>
+    private var walkdates = mutableListOf<WalkRecord>()
     private lateinit var mainactivity: MainActivity
 
     private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -60,6 +62,15 @@ class MyPageFragment : Fragment() {
         mainactivity = requireActivity() as MainActivity
         mainactivity.binding.menuBn.visibility = View.VISIBLE
         MainActivity.preFragment = "Mypage"  // 다른 액티비티로 이동 할 때 마이페이지에서 이동을 표시
+
+        val walkRecordList = myViewModel.walkDates.value?: hashMapOf()
+        for(dog in MainActivity.dogNameList) {
+            for(date in walkRecordList[dog] ?: listOf()) {
+                walkdates.add(date)
+            }
+        }
+
+        walkdates = walkdates.toMutableSet().toMutableList()
     }
 
     override fun onCreateView(
@@ -69,7 +80,6 @@ class MyPageFragment : Fragment() {
         _binding = FragmentMyPageBinding.inflate(inflater,container, false)
         userInfo = myViewModel.userinfo.value ?: UserInfo()
         totalwalkInfo = myViewModel.totalwalkinfo.value ?: WalkInfo()
-        walkdates = myViewModel.walkDates.value ?: listOf<WalkRecord>()
 
         binding.apply {
             btnSetting.setOnClickListener {
