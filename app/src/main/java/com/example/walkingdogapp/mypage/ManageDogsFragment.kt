@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentManageDogsBinding
+import com.example.walkingdogapp.datamodel.WalkRecord
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 

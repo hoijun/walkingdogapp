@@ -28,6 +28,7 @@ import com.example.walkingdogapp.datamodel.WalkRecord
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.example.walkingdogapp.datamodel.WalkInfo
 import com.example.walkingdogapp.datamodel.WalkLatLng
+import com.example.walkingdogapp.walking.SaveWalkDate
 import com.example.walkingdogapp.walking.WalkingActivity
 import com.example.walkingdogapp.walking.WalkingService
 import com.google.firebase.auth.FirebaseAuth
@@ -232,32 +233,36 @@ class MainActivity : AppCompatActivity() {
 
                 // 강아지 산책 정보
                 val walkDateDeferred = suspendCoroutine { continuation ->
-                    userRef.child("walkdates").addListenerForSingleValueEvent(object: ValueEventListener{
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            val walkRecords = mutableListOf<WalkRecord>()
-                            if (snapshot.exists()) {
-                                for (dateData in snapshot.children) {
-                                    val walkDay = dateData.key.toString().split(" ")
-                                    walkRecords.add(
-                                        WalkRecord(
-                                            walkDay[0], walkDay[1], walkDay[2],
-                                            dateData.child("distance")
-                                                .getValue(Float::class.java)!!,
-                                            dateData.child("time").getValue(Int::class.java)!!,
-                                            dateData.child("coords").getValue<List<WalkLatLng>>() ?: listOf<WalkLatLng>(),
-                                            dateData.child("dogs").getValue<List<String>>() ?: listOf<String>(),
-                                            dateData.child("collections").getValue<List<String>>() ?: listOf<String>()
+                    val dogsWalkRecord = HashMap<String, MutableList<WalkRecord>>()
+                    for(dog in dogNameList) {
+                        userRef.child("dog").child(dog).child("walkdates").addListenerForSingleValueEvent(object: ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                val walkRecords = mutableListOf<WalkRecord>()
+                                if (snapshot.exists()) {
+                                    for (dateData in snapshot.children) {
+                                        val walkDay = dateData.key.toString().split(" ")
+                                        walkRecords.add(
+                                            WalkRecord(
+                                                walkDay[0], walkDay[1], walkDay[2],
+                                                dateData.child("distance")
+                                                    .getValue(Float::class.java)!!,
+                                                dateData.child("time").getValue(Int::class.java)!!,
+                                                dateData.child("coords").getValue<List<WalkLatLng>>() ?: listOf<WalkLatLng>(),
+                                                dateData.child("collections").getValue<List<String>>() ?: listOf<String>()
+                                            )
                                         )
-                                    )
+                                    }
+                                    dogsWalkRecord[dog] = walkRecords
                                 }
                             }
-                            continuation.resume(walkRecords)
-                        }
 
-                        override fun onCancelled(error: DatabaseError) {
-                            continuation.resume(listOf<WalkRecord>())
-                        }
-                    })
+                            override fun onCancelled(error: DatabaseError) {
+                                dogsWalkRecord[dog] = mutableListOf()
+                            }
+                        })
+                    }
+
+                    continuation.resume(dogsWalkRecord)
                 }
 
                 val collectionDeferred = async(Dispatchers.IO) {
@@ -305,6 +310,7 @@ class MainActivity : AppCompatActivity() {
                 mainviewmodel.savecollectionInfo(collection)
                 mainviewmodel.savedogsImg(profileUriDeferred)
                 dogUriList = profileUriDeferred
+
 
                 binding.waitImage.visibility = View.GONE
 

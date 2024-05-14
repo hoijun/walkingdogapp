@@ -44,11 +44,12 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/WalkInfo_scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
         android:scrollbars="none"
-        app:layout_constraintHeight_percent="0.93"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dogInfo_layout">
 
         <LinearLayout
@@ -167,14 +168,16 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/walkinfo_recyclerviewLayout"
                 android:layout_width="match_parent"
-                android:layout_height="300dp">
+                android:layout_height="200dp">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/walkinfo_recyclerview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/roundstyle5" />
+                    android:background="@drawable/roundstyle5"
+                    android:overScrollMode="never" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

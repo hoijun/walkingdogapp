@@ -72,7 +72,6 @@ data class SaveWalkDate (
     val distance: Float = 0.0f,
     val time: Int = 0,
     val coords: List<WalkLatLng> = listOf<WalkLatLng>(),
-    val dogs: List<String>,
     val collections: List<String>
 ) // 산책 한 후 저장 할 때 쓰는 클래스
 
@@ -460,12 +459,12 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun selectStopWalk() {
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("산책 그만 할까요?\n(10분 및 300m 이상 산책 시 기록 저장 가능)")
+        builder.setTitle("산책 그만 할까요?\n(10분 및 300m 이상 산책 시 기록 가능)")
 
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    if (WalkingService.walkDistance < 300 || WalkingService.walkTime.value!! < 600) {
+                    if (false) {
                         Toast.makeText(this, "거리 또는 시간이 너무 부족해요!",Toast.LENGTH_SHORT).show()
                         stopWalkingService()
                         goHome()
@@ -486,14 +485,14 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // 거리 및 시간 저장, 날짜: 시간 별로 산책 기록 저장
-    private fun saveWalkInfo(distance: Float, time: Int, coords: List<LatLng>, walkDogs: List<String>, collections: List<String>) {
+    private fun saveWalkInfo(distance: Float, time: Int, coords: List<LatLng>, walkDogs: ArrayList<String>, collections: List<String>) {
         val uid = auth.currentUser?.uid
         val userRef = db.getReference("Users").child("$uid")
 
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 endTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
-                val walkDateinfo =
+                val walkDateInfo =
                     LocalDateTime.now()
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " " + startTime + " " + endTime
 
@@ -539,13 +538,17 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                     }
 
-                    val saveWalkdateJob = async(Dispatchers.IO) {
+                    val saveWalkDateJob = async(Dispatchers.IO) {
                         try {
                             val saveCoords = mutableListOf<WalkLatLng>()
                             for (coord in coords) {
                                 saveCoords.add(WalkLatLng(coord.latitude, coord.longitude))
                             }
-                            userRef.child("walkdates").child(walkDateinfo).setValue(SaveWalkDate(distance, time, saveCoords, walkDogs, collections)).await()
+                            for (dog in walkDogs) {
+                                userRef.child("dog").child(dog).child("walkdates").child(walkDateInfo)
+                                    .setValue(SaveWalkDate(distance, time, saveCoords, collections))
+                                    .await()
+                            }
                         } catch (e: Exception) {
                             error = true
                         }
@@ -565,7 +568,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     totalWalkJob.await()
                     indivisualWalkJob.await()
-                    saveWalkdateJob.await()
+                    saveWalkDateJob.await()
                     collectionInfoJob.await()
 
                     if (error) {

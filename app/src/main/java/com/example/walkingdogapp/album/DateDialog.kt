@@ -4,12 +4,14 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.DateDialogBinding
 import com.example.walkingdogapp.datamodel.WalkRecord
@@ -25,7 +27,6 @@ class DateDialog : DialogFragment() {
     private val binding get() = _binding!!
     private var walkdates = mutableListOf<CalendarDay>()
     private val myViewModel: UserInfoViewModel by activityViewModels()
-    private var walkRecordList = listOf<WalkRecord>()
 
     fun interface OnDateClickListener {
         fun onDateClick(date: String)
@@ -35,17 +36,21 @@ class DateDialog : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        walkRecordList = myViewModel.walkDates.value?: listOf()
-        for (date: WalkRecord in walkRecordList) {
-            val dayInfo = date.day.split("-")
-            walkdates.add(
-                CalendarDay.from(
-                    dayInfo[0].toInt(),
-                    dayInfo[1].toInt(),
-                    dayInfo[2].toInt()
-                )
-            ) // 산책한 날 얻음
+        val walkRecordList = myViewModel.walkDates.value?: hashMapOf()
+        for(dog in MainActivity.dogNameList) {
+            for(date in walkRecordList[dog]!!) {
+                val dayInfo = date.day.split("-")
+                walkdates.add(
+                    CalendarDay.from(
+                        dayInfo[0].toInt(),
+                        dayInfo[1].toInt(),
+                        dayInfo[2].toInt()
+                    )
+                ) // 산책한 날 얻음
+            }
         }
+
+        walkdates = walkdates.toMutableSet().toMutableList()
     }
 
     override fun onCreateView(

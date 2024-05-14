@@ -1,9 +1,11 @@
 package com.example.walkingdogapp.mypage
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
@@ -80,6 +82,7 @@ class WalkInfoFragment : Fragment() { // 수정
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -97,16 +100,40 @@ class WalkInfoFragment : Fragment() { // 수정
             dogsWalkRecordMap[dog] = DogsWalkRecord()
         }
 
+        setDogsWalkDate()
+
         binding.apply {
             btnGoMypage.setOnClickListener {
                 goMypage()
+            }
+
+            walkinfoRecyclerviewLayout.setOnTouchListener { _, event ->
+                Log.d("savepoint", "aaa")
+                when(event.action) {
+                    MotionEvent.ACTION_UP -> {
+                        WalkInfoScrollView.requestDisallowInterceptTouchEvent(false)
+                        true
+                    }
+
+                    MotionEvent.ACTION_MOVE -> {
+                        WalkInfoScrollView.requestDisallowInterceptTouchEvent(true)
+                        false
+                    }
+
+                    MotionEvent.ACTION_DOWN -> {
+                        WalkInfoScrollView.requestDisallowInterceptTouchEvent(true)
+                        false
+                    }
+
+                    else -> true
+                }
             }
 
             val spacingItemDecoration = HorizonSpacingItemDecoration(myViewModel.dogsinfo.value?.size ?: 0, Constant.dpTopx(10f, requireContext()))
             val walkInfoDogListAdapter = WalkInfoDogListAdapter(requireContext(), myViewModel).also {
                 it.onItemClickListener = WalkInfoDogListAdapter.OnItemClickListener { selectedDogInfo ->
                     selectedDog = selectedDogInfo
-                    dogInfoWalkCount.text = "산책 횟수: ${dogsWalkRecordMap[selectedDogInfo.name]?.walkDateList?.size ?: 0}회"
+                    dogInfoWalkCount.text = "산책 횟수: ${dogsWalkRecordMap[selectedDog.name]?.walkDateList?.size ?: 0}회"
                     dogInfoDogName.text = selectedDogInfo.name + "의 산책 기록"
                     dogInfoWalkDistance.text = "산책 거리: ${"%.1f".format(selectedDogInfo.walkInfo.distance / 1000.0)}km"
                     dogInfoWalkTime.text = "산책 시간: ${selectedDogInfo.walkInfo.time/60}분"
@@ -167,15 +194,15 @@ class WalkInfoFragment : Fragment() { // 수정
             }
 
             if (MainActivity.dogNameList.isNotEmpty()) {
-                setDogsWalkDate()
                 if (selectedDog == DogInfo()) {
                     selectedDog = myViewModel.dogsinfo.value!![0]
                 }
 
-                dogInfoWalkCount.text = "산책 횟수: ${dogsWalkRecordMap[selectedDog.name]?.walkDateList?.size ?: 0}회"
+                dogInfoWalkCount.text = "산책 횟수: ${myViewModel.walkDates.value?.get(selectedDog.name)?.size ?: 0}회"
                 dogInfoDogName.text = selectedDog.name + "의 산책 기록"
                 dogInfoWalkDistance.text = "산책 거리: ${"%.1f".format(selectedDog.walkInfo.distance / 1000.0)}km"
                 dogInfoWalkTime.text = "산책 시간: ${selectedDog.walkInfo.time/60}분"
+
                 if (myViewModel.dogsimg.value?.get(selectedDog.name) != null) {
                     Glide.with(requireContext()).load(myViewModel.dogsimg.value?.get(selectedDog.name))
                         .format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(dogsInfoImg)
@@ -251,11 +278,16 @@ class WalkInfoFragment : Fragment() { // 수정
         _binding = null
     }
 
+    private fun goMypage() {
+        mainactivity.changeFragment(MyPageFragment())
+    }
+
     private fun setDogsWalkDate() {
-        for (walkRecord: WalkRecord in myViewModel.walkDates.value ?: listOf<WalkRecord>()) {
-            val dayInfo = walkRecord.day.split("-")
-            for (dog in walkRecord.dogs) {
-                val walkRecordFirstSelectedDay = mutableListOf<WalkRecord>()
+        for (dog in MainActivity.dogNameList) {
+            val walkRecordFirstSelectedDay = mutableListOf<WalkRecord>()
+            for (walkRecord: WalkRecord in myViewModel.walkDates.value?.get(dog)
+                ?: mutableListOf()) {
+                val dayInfo = walkRecord.day.split("-")
                 if (selectedDay.date.toString() == walkRecord.day) {
                     walkRecordFirstSelectedDay.add(walkRecord)
                 }
@@ -272,10 +304,7 @@ class WalkInfoFragment : Fragment() { // 수정
                 dogsWalkRecordMap[dog]?.walkRecordList?.add(walkRecord)
             }
         }
-    }
 
-    private fun goMypage() {
-        mainactivity.changeFragment(MyPageFragment())
     }
 
     private fun goDetail(walkRecord: WalkRecord) {
