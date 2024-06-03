@@ -87,11 +87,11 @@ class SettingAlarmDialog : DialogFragment() {
                     hour.toString() + String.format("%02d", minute)
                 }
 
-                code += if (weeksTocode(weeks) == "") {
+                code += if (weeksToCode(weeks) == "") {
                     Toast.makeText(requireContext(), "요일을 선택 해주세요!", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 } else {
-                    weeksTocode(weeks)
+                    weeksToCode(weeks)
                 }
 
                 if (alarmInfo != null) {
@@ -148,7 +148,7 @@ class SettingAlarmDialog : DialogFragment() {
         }
     }
 
-    private fun weeksTocode(weeks: Array<Boolean>): String {
+    private fun weeksToCode(weeks: Array<Boolean>): String {
         var code = ""
         for (i: Int in weeks.indices) {
             if (weeks[i]) {
@@ -172,4 +172,5 @@ class SettingAlarmDialog : DialogFragment() {
 
         return code
     }
+
 }

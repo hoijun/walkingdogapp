@@ -44,6 +44,5 @@
             app:layout_constraintStart_toEndOf="@+id/viewm"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/delete" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

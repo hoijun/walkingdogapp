@@ -6,7 +6,12 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
 @SuppressLint("CustomSplashScreen")
@@ -27,19 +32,23 @@ class SplashActivity : AppCompatActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
+
         setContentView(R.layout.activity_splash)
         this.onBackPressedDispatcher.addCallback(this, callback)
 
-        auth = FirebaseAuth.getInstance()
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(1000)
+            auth = FirebaseAuth.getInstance()
 
-        loginInfo = getSharedPreferences("setting", MODE_PRIVATE)
-        val loginId = loginInfo.getString("id", null)
-        val loginPassword = loginInfo.getString("password", null)
-        if (loginId != null && loginPassword != null) {
-            signinFirebase(loginId, loginPassword)
-        }
-        else {
-            startLogin()
+            loginInfo = getSharedPreferences("setting", MODE_PRIVATE)
+            val loginId = loginInfo.getString("id", null)
+            val loginPassword = loginInfo.getString("password", null)
+            if (loginId != null && loginPassword != null) {
+                signinFirebase(loginId, loginPassword)
+            } else {
+                startLogin()
+            }
         }
     }
 

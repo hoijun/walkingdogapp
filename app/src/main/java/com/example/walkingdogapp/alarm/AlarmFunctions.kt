@@ -6,14 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
-import com.example.walkingdogapp.registerinfo.DoglistDialog
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
 
 class AlarmFunctions(private val context: Context?) {
     private lateinit var pendingIntent: PendingIntent

@@ -93,8 +93,7 @@ class SettingFragment : Fragment() {
                                 requireContext(),
                                 "로그아웃 실패 $error",
                                 Toast.LENGTH_SHORT
-                            )
-                                .show()
+                            ).show()
                         } else {
                             auth.signOut()
                             goLogin()
@@ -179,7 +178,7 @@ class SettingFragment : Fragment() {
                                     goLogin()
                                     removeAlarms()
                                 }
-                                UserApiClient.instance.unlink { error ->
+                                UserApiClient.instance.unlink {
                                     goLogin()
                                     removeAlarms()
                                 }

@@ -110,7 +110,7 @@ class CollectionFragment : Fragment() {
         val gridListManager = GridLayoutManager(requireContext(), 3)
         val adaptar = CollectionlistAdaptar(collections, requireContext())
         adaptar.itemClickListener = CollectionlistAdaptar.OnItemClickListener { collection ->
-            if (collection.collectionImg != R.drawable.waitimage) {
+            if (myViewModel.collectioninfo.value?.get(collection.collectionNum) == true) {
                 val detailCollectionDialog = DetailCollectionDialog().apply {
                     val bundle = Bundle()
                     bundle.putSerializable("collectionInfo", collection)
