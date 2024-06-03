@@ -464,7 +464,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    if (false) {
+                    if (WalkingService.walkDistance < 300 || WalkingService.walkTime.value!! < 600) {
                         Toast.makeText(this, "거리 또는 시간이 너무 부족해요!",Toast.LENGTH_SHORT).show()
                         stopWalkingService()
                         goHome()

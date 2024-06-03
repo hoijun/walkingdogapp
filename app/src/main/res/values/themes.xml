@@ -1,12 +1,17 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.WalkingDogApp" parent="Theme.AppCompat.DayNight.DarkActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="Theme.WalkingDogApp" parent="Base.Theme.WalkingDogApp" />
+
+    <style name="AppTheme.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_transparent</item>
+        <item name="postSplashScreenTheme">@style/Theme.WalkingDogApp</item>
+    </style>
 
     <!-- 달력 안의 숫자들에 적용되는 스타일 -->
     <style name="CalenderViewDateCustomText" parent="android:TextAppearance.DeviceDefault.Medium">

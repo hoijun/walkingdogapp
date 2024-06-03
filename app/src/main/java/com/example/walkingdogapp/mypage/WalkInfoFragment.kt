@@ -33,6 +33,7 @@ import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
     data class DogsWalkRecord(
         val walkDateList: MutableList<CalendarDay> = mutableListOf(),
         var walkRecordFirstSelectedDay: MutableList<WalkRecord> = mutableListOf(),
+        var walkRecordToday: MutableList<WalkRecord> = mutableListOf(),
         var walkRecordList: MutableList<WalkRecord> = mutableListOf()
     )
 
@@ -93,12 +94,8 @@ class WalkInfoFragment : Fragment() { // 수정
         val dayDecorator = DayDecorator(requireContext())
         val sundayDecorator = SundayDecorator()
         val saturdayDecorator = SaturdayDecorator()
-        var selectedMonthDecorator = SelectedMonthDecorator(CalendarDay.today().month)
+        var selectedMonthDecorator = SelectedMonthDecorator(selectedDay.month)
         var walkDayDecorator = WalkDayDecorator(listOf())
-
-        for(dog in MainActivity.dogNameList) {
-            dogsWalkRecordMap[dog] = DogsWalkRecord()
-        }
 
         setDogsWalkDate()
 
@@ -107,8 +104,7 @@ class WalkInfoFragment : Fragment() { // 수정
                 goMypage()
             }
 
-            walkinfoRecyclerviewLayout.setOnTouchListener { _, event ->
-                Log.d("savepoint", "aaa")
+            walkinfoRecyclerviewLayout.setOnTouchListener { _, event -> // 리사이클러 뷰, 스크롤 뷰 스크롤 겹침 방지
                 when(event.action) {
                     MotionEvent.ACTION_UP -> {
                         WalkInfoScrollView.requestDisallowInterceptTouchEvent(false)
@@ -129,7 +125,6 @@ class WalkInfoFragment : Fragment() { // 수정
                 }
             }
 
-            val spacingItemDecoration = HorizonSpacingItemDecoration(myViewModel.dogsinfo.value?.size ?: 0, Constant.dpTopx(10f, requireContext()))
             val walkInfoDogListAdapter = WalkInfoDogListAdapter(requireContext(), myViewModel).also {
                 it.onItemClickListener = WalkInfoDogListAdapter.OnItemClickListener { selectedDogInfo ->
                     selectedDog = selectedDogInfo
@@ -149,7 +144,6 @@ class WalkInfoFragment : Fragment() { // 수정
                     walkcalendar.addDecorators(walkDayDecorator)
 
                     val selectedDayWalkRecordList = mutableListOf<WalkRecord>()
-                    Log.d("savepoint", selectedDay.toString())
 
                     for(walkRecord in dogsWalkRecordMap[selectedDogInfo.name]?.walkRecordList ?: listOf()) {
                         if (walkRecord.day == selectedDay.date.toString()) {
@@ -165,6 +159,7 @@ class WalkInfoFragment : Fragment() { // 수정
                 }
             }
 
+            val spacingItemDecoration = HorizonSpacingItemDecoration(myViewModel.dogsinfo.value?.size ?: 0, Constant.dpTopx(10f, requireContext())) // 리사이클러뷰 아이템 간격
             selectDogsRecyclerView.addItemDecoration(spacingItemDecoration)
             selectDogsRecyclerView.adapter = walkInfoDogListAdapter
             selectDogsRecyclerView.layoutManager = LinearLayoutManager(context).apply {
@@ -242,8 +237,9 @@ class WalkInfoFragment : Fragment() { // 수정
                 walkcalendar.invalidateDecorators() // 데코 초기화
                 if (date.month == CalendarDay.today().month) {
                     walkcalendar.selectedDate = CalendarDay.today() // 현재 달로 바꿀 때 마다 현재 날짜 표시
+                    selectedDay = walkcalendar.selectedDate!!
                     adapter = WalkDatesListAdapter(
-                        dogsWalkRecordMap[selectedDog.name]?.walkRecordFirstSelectedDay ?: listOf()
+                        dogsWalkRecordMap[selectedDog.name]?.walkRecordToday ?: listOf()
                     )
 
                 } else {
@@ -284,12 +280,19 @@ class WalkInfoFragment : Fragment() { // 수정
 
     private fun setDogsWalkDate() {
         for (dog in MainActivity.dogNameList) {
+            dogsWalkRecordMap[dog] = DogsWalkRecord()
+
             val walkRecordFirstSelectedDay = mutableListOf<WalkRecord>()
+            val walkRecordToday = mutableListOf<WalkRecord>()
             for (walkRecord: WalkRecord in myViewModel.walkDates.value?.get(dog)
                 ?: mutableListOf()) {
                 val dayInfo = walkRecord.day.split("-")
                 if (selectedDay.date.toString() == walkRecord.day) {
                     walkRecordFirstSelectedDay.add(walkRecord)
+                }
+
+                if(CalendarDay.today().date.toString() == walkRecord.day) {
+                    walkRecordToday.add(walkRecord)
                 }
 
                 dogsWalkRecordMap[dog]?.walkDateList?.add(
@@ -301,6 +304,7 @@ class WalkInfoFragment : Fragment() { // 수정
                 ) // 산책한 날 얻음
 
                 dogsWalkRecordMap[dog]?.walkRecordFirstSelectedDay = walkRecordFirstSelectedDay
+                dogsWalkRecordMap[dog]?.walkRecordToday = walkRecordToday
                 dogsWalkRecordMap[dog]?.walkRecordList?.add(walkRecord)
             }
         }

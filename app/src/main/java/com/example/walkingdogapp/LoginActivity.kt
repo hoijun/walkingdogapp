@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.databinding.ActivityLoginBinding
 import com.example.walkingdogapp.datamodel.UserInfo
@@ -98,16 +99,11 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         auth = FirebaseAuth.getInstance()
-
         loginInfo = getSharedPreferences("setting", MODE_PRIVATE)
-        val loginId = loginInfo.getString("id", null)
-        val loginPassword = loginInfo.getString("password", null)
-        if (loginId != null && loginPassword != null) {
-            signinFirebase(loginId, loginPassword)
-        }
 
         binding.apply {
             KakaoLogin.setOnClickListener {
