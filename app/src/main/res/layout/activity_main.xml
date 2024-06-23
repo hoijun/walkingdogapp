@@ -7,18 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/wait_image"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:src="@drawable/waitimage"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.6"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.6" />
-
     <FrameLayout
         android:id="@+id/screen_fl"
         android:layout_width="0dp"
@@ -39,5 +27,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/screen_fl"
         app:labelVisibilityMode="labeled"
+        app:itemBackground="@color/white"
         app:menu="@menu/bottom_navigation_menu"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

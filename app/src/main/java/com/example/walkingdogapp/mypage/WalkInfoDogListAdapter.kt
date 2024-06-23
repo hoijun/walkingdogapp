@@ -24,17 +24,17 @@ class WalkInfoDogListAdapter(private val context: Context, private val viewModel
         return WalkInfoDogListViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = viewModel.dogsinfo.value?.size ?: 0
+    override fun getItemCount(): Int = viewModel.dogsInfo.value?.size ?: 0
 
     override fun onBindViewHolder(holder: WalkInfoDogListViewHolder, position: Int) {
-        holder.bind(viewModel.dogsinfo.value?.get(position) ?: DogInfo())
+        holder.bind(viewModel.dogsInfo.value?.get(position) ?: DogInfo())
     }
 
     inner class WalkInfoDogListViewHolder(private val binding: WalkinfodoglistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(dog: DogInfo) {
-            if (viewModel.dogsimg.value?.get(dog.name) != null) {
-                Glide.with(context).load(viewModel.dogsimg.value?.get(dog.name))
+            if (viewModel.dogsImg.value?.get(dog.name) != null) {
+                Glide.with(context).load(viewModel.dogsImg.value?.get(dog.name))
                     .format(DecodeFormat.PREFER_RGB_565).override(100, 100).into(binding.WalkInfoDogImg)
             }
 

@@ -6,25 +6,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingdogapp.databinding.WalkdateslistItemBinding
 import com.example.walkingdogapp.datamodel.WalkRecord
 
-class WalkDatesListAdapter(private val walkRecordList: List<WalkRecord>): RecyclerView.Adapter<WalkDatesListAdapter.WalkdateslistViewHolder>() {
+class WalkDatesListAdapter(private val walkRecordList: List<WalkRecord>): RecyclerView.Adapter<WalkDatesListAdapter.WalkDatesListViewHolder>() {
 
     fun interface OnItemClickListener {
         fun onItemClick(date: WalkRecord)
     }
 
     var itemClickListener : OnItemClickListener? = null
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalkdateslistViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalkDatesListViewHolder {
         val binding = WalkdateslistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return WalkdateslistViewHolder(binding)
+        return WalkDatesListViewHolder(binding)
     }
 
     override fun getItemCount(): Int = walkRecordList.size
 
-    override fun onBindViewHolder(holder: WalkdateslistViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: WalkDatesListViewHolder, position: Int) {
         holder.bind(walkRecordList[position])
     }
 
-    inner class WalkdateslistViewHolder(private val binding: WalkdateslistItemBinding) :
+    inner class WalkDatesListViewHolder(private val binding: WalkdateslistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
@@ -33,9 +33,7 @@ class WalkDatesListAdapter(private val walkRecordList: List<WalkRecord>): Recycl
         }
         fun bind(walkRecord: WalkRecord) {
             binding.apply {
-                starttime.text = walkRecord.startTime
-                distance.text = "${"%.1f".format(walkRecord.distance / 1000.0)}km"
-                time.text = "${(walkRecord.time / 60)}분"
+                walkRecordInfo = walkRecord
             }
         }
     }

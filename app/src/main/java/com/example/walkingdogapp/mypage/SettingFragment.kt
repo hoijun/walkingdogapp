@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.LoginActivity
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.WriteDialog
@@ -35,19 +36,17 @@ import kotlinx.coroutines.tasks.await
 class SettingFragment : Fragment() {
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
-    private val myViewModel: UserInfoViewModel by activityViewModels()
-    private lateinit var userInfo: UserInfo
+    private val userDataViewModel: UserInfoViewModel by activityViewModels()
+    private lateinit var user: UserInfo
     private lateinit var mainactivity: MainActivity
     private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
     private val auth = FirebaseAuth.getInstance()
-    private val storage = FirebaseStorage.getInstance()
-    private var db = FirebaseDatabase.getInstance()
 
     private lateinit var loginInfo: android.content.SharedPreferences
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            goMypage()
+            goMyPage()
         }
     }
 
@@ -58,7 +57,7 @@ class SettingFragment : Fragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
 
-        userInfo = myViewModel.userinfo.value ?: UserInfo()
+        user = userDataViewModel.userInfo.value ?: UserInfo()
     }
 
     override fun onCreateView(
@@ -68,13 +67,13 @@ class SettingFragment : Fragment() {
         _binding = FragmentSettingBinding.inflate(inflater, container, false)
         binding.apply {
             btnGoMypage.setOnClickListener {
-                goMypage()
+                goMyPage()
             }
 
-            username.text = "${userInfo.name} 님"
+            userInfo = user
 
             logoutbtn.setOnClickListener {
-                if (userInfo.email.contains("naver.com")) { // 네이버로 로그인 했을 경우
+                if (user.email.contains("naver.com")) { // 네이버로 로그인 했을 경우
                     try {
                         NaverIdLoginSDK.logout()
                         auth.signOut()
@@ -86,7 +85,7 @@ class SettingFragment : Fragment() {
                         Toast.makeText(requireContext(), "로그아웃 실패 $e", Toast.LENGTH_SHORT)
                             .show()
                     }
-                } else if (userInfo.email.contains("kakao.com")) { // 카카오로 로그인 했을 경우
+                } else if (user.email.contains("kakao.com")) { // 카카오로 로그인 했을 경우
                     UserApiClient.instance.logout { error ->
                         if (error != null) {
                             Toast.makeText(
@@ -120,7 +119,7 @@ class SettingFragment : Fragment() {
             settingWithdrawal.setOnClickListener {
                 val writeDialog = WriteDialog()
                 writeDialog.clickYesListener = WriteDialog.OnClickYesListener { writeText ->
-                    if (userInfo.email != writeText) {
+                    if (user.email != writeText) {
                         Toast.makeText(
                             requireContext(),
                             "정확한 이메일을 입력해 주세요!",
@@ -129,17 +128,19 @@ class SettingFragment : Fragment() {
                         return@OnClickYesListener
                     } // 이메일 올바르게 입력x
 
+                    val loadingDialogFragment = LoadingDialogFragment()
+                    loadingDialogFragment.show(requireActivity().supportFragmentManager, "loading")
+
                     lifecycleScope.launch {
-                        if (userInfo.email.contains("naver.com")) { // 네이버로 로그인 했을 경우
-                            binding.settingscreen.visibility = View.INVISIBLE
-                            binding.waitImage.visibility = View.VISIBLE
-                            if (removeUserInfo()) { // 유저 정보가 올바르게 지워 졌을 경우
+                        if (user.email.contains("naver.com")) { // 네이버로 로그인 했을 경우
+                            if (userDataViewModel.removeAccount()) { // 유저 정보가 올바르게 지워 졌을 경우
                                 try {
                                     auth.currentUser?.delete()
                                 } catch (e: Exception) {
-                                    goLogin()
-                                    removeAlarms()
+                                    completeDeleteAccount()
+                                    loadingDialogFragment.dismiss()
                                 }
+
                                 NidOAuthLogin().callDeleteTokenApi(object :
                                     OAuthLoginCallback {
                                     override fun onError(errorCode: Int, message: String) {
@@ -150,13 +151,13 @@ class SettingFragment : Fragment() {
                                         httpStatus: Int,
                                         message: String
                                     ) {
-                                        goLogin()
-                                        removeAlarms()
+                                        completeDeleteAccount()
+                                        loadingDialogFragment.dismiss()
                                     }
 
                                     override fun onSuccess() {
-                                        goLogin()
-                                        removeAlarms()
+                                        completeDeleteAccount()
+                                        loadingDialogFragment.dismiss()
                                     }
                                 })
                             } else { // 유저 정보가 올바르게 지워지지 않았을 경우
@@ -165,22 +166,19 @@ class SettingFragment : Fragment() {
                                     "탈퇴가 재대로 안됐어요..",
                                     Toast.LENGTH_SHORT
                                 ).show()
-                                binding.settingscreen.visibility = View.VISIBLE
-                                binding.waitImage.visibility = View.INVISIBLE
+                                loadingDialogFragment.dismiss()
                             }
-                        } else if (userInfo.email.contains("kakao.com")) { // 카카오로 로그인 했을 경우
-                            binding.settingscreen.visibility = View.INVISIBLE
-                            binding.waitImage.visibility = View.VISIBLE
-                            if (removeUserInfo()) {
+                        } else if (user.email.contains("kakao.com")) { // 카카오로 로그인 했을 경우
+                            if (userDataViewModel.removeAccount()) {
                                 try {
                                     auth.currentUser?.delete()
                                 } catch (e: Exception) {
-                                    goLogin()
-                                    removeAlarms()
+                                    completeDeleteAccount()
+                                    loadingDialogFragment.dismiss()
                                 }
                                 UserApiClient.instance.unlink {
-                                    goLogin()
-                                    removeAlarms()
+                                    completeDeleteAccount()
+                                    loadingDialogFragment.dismiss()
                                 }
                             } else { // 유저 정보가 올바르게 지워지지 않았을 경우
                                 Toast.makeText(
@@ -188,8 +186,7 @@ class SettingFragment : Fragment() {
                                     "탈퇴가 재대로 안됐어요..",
                                     Toast.LENGTH_SHORT
                                 ).show()
-                                binding.settingscreen.visibility = View.VISIBLE
-                                binding.waitImage.visibility = View.INVISIBLE
+                                loadingDialogFragment.dismiss()
                             }
                         }
                     }
@@ -213,7 +210,7 @@ class SettingFragment : Fragment() {
         _binding = null
     }
 
-    private fun goMypage() {
+    private fun goMyPage() {
         mainactivity.changeFragment(MyPageFragment())
     }
 
@@ -232,54 +229,18 @@ class SettingFragment : Fragment() {
         MainActivity.preFragment = "Home" // 로그아웃 바로 후에 홈 부터 시작하기 위함
     }
 
-    private suspend fun removeUserInfo(): Boolean {
-        var error = false
-        val uid = auth.currentUser?.uid
-        val storgeRef = storage.getReference("$uid").child("images")
-        val userRef = db.getReference("Users").child("$uid")
-        val result = lifecycleScope.async(Dispatchers.IO) {
-            val deleteprofileJob = async(Dispatchers.IO) {
-                try {
-                   storgeRef.listAll().addOnSuccessListener { listResult ->
-                       listResult.items.forEach { item ->
-                           item.delete()
-                       }
-                   }
-                } catch (e: Exception) {
-                    Log.d("savepoint", e.message.toString())
-                    error = true
-                }
-            }
-
-            deleteprofileJob.await()
-
-            if(error) {
-                return@async false
-            }
-
-            val deleteInfoJob = async(Dispatchers.IO) {
-                try {
-                    userRef.removeValue().await()
-                } catch (e: Exception) {
-                    Log.d("savepoint", e.message.toString())
-                    error = true
-                }
-            }
-
-            deleteInfoJob.await()
-
-            return@async !error
-        }
-        return result.await()
-    }
-
     private fun removeAlarms() {
         val alarmFunctions = AlarmFunctions(requireContext())
         coroutineScope.launch {
-            for (alarm in myViewModel.getAlarmList()) {
+            for (alarm in userDataViewModel.getAlarmList()) {
                 alarmFunctions.cancelAlarm(alarm.alarm_code)
-                myViewModel.deleteAlarm(alarm)
+                userDataViewModel.deleteAlarm(alarm)
             }
         }
+    }
+
+    private fun completeDeleteAccount() {
+        removeAlarms()
+        goLogin()
     }
 }

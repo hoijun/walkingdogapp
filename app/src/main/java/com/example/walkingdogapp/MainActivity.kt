@@ -49,17 +49,14 @@ import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
-    private lateinit var mainviewmodel: UserInfoViewModel
+    private lateinit var userInfoViewModel: UserInfoViewModel
+    private lateinit var loadingDialogFragment: LoadingDialogFragment
     private val locationPermissionRequestCode = 1000
     private val permissions = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION,
     )
-    private var backPressedTime : Long = 0
-
-    private val auth = FirebaseAuth.getInstance()
-    private val db = Firebase.database
-    private val storage = FirebaseStorage.getInstance()
+    private var backPressedTime: Long = 0
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -84,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if(preFragment == "Mypage") {
+        if (preFragment == "Mypage") {
             binding.menuBn.selectedItemId = R.id.navigation_mypage
         } // 다른 액티비티로 마이페이지에서 변경 했었을 경우, 다시 되돌아 올 때 바텀바의 표시를 마이페이지로 변경
 
@@ -98,11 +95,15 @@ class MainActivity : AppCompatActivity() {
             startActivity(walkingIntent)
         }
 
+        loadingDialogFragment = LoadingDialogFragment()
+        loadingDialogFragment.show(this.supportFragmentManager, "loading")
 
-        mainviewmodel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
+        userInfoViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
+
+        getUserInfo()
 
         // 화면 전환
-        binding.menuBn.run {
+        binding.menuBn.apply {
             setOnItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.navigation_home -> {
@@ -126,15 +127,19 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-        }
-    }
 
-    fun changeFragment(fragment: Fragment) {
-        supportFragmentManager
-            .beginTransaction()
-            .replace(binding.screenFl.id, fragment)
-            .commitAllowingStateLoss()
-        binding.menuBn.visibility = View.VISIBLE
+            setOnItemReselectedListener { item ->
+                when (item.itemId) {
+                    R.id.navigation_home -> { }
+
+                    R.id.navigation_collection -> { }
+
+                    R.id.navigation_albummap -> { }
+
+                    else -> { }
+                }
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -145,15 +150,45 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             locationPermissionRequestCode -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mainviewmodel.getLastLocation()
-                    getUserInfo()
-                } else {
-                    getUserInfo()
+                    userInfoViewModel.getLastLocation()
                 }
                 return
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    private fun getUserInfo() {
+        userInfoViewModel.successGetData.observe(this) {
+            try {
+                loadingDialogFragment.dismiss()
+                dogUriList = userInfoViewModel.dogsImg.value ?: hashMapOf()
+            } catch (_: Exception) {
+
+            } finally {
+                when (preFragment) {
+                    "Mypage" -> {
+                        changeFragment(MyPageFragment())
+                    }
+
+                    "Home" -> {
+                        changeFragment(HomeFragment())
+                    }
+
+                    else -> {
+                        changeFragment(ManageDogsFragment())
+                    }
+                }
+            }
+        }
+    }
+
+    fun changeFragment(fragment: Fragment) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(binding.screenFl.id, fragment)
+            .commitAllowingStateLoss()
+        binding.menuBn.visibility = View.VISIBLE
     }
 
     // 산책 진행 여부
@@ -168,176 +203,5 @@ class MainActivity : AppCompatActivity() {
             return false
         }
         return false
-    }
-
-    private fun getUserInfo() {
-        val uid = auth.currentUser?.uid
-        val userRef = db.getReference("Users").child("$uid")
-        val storageRef = storage.getReference("$uid").child("images")
-        lifecycleScope.launch {
-            try { // 강아지 정보
-                val dogsDeferred = suspendCoroutine { continuation ->
-                    userRef.child("dog").addListenerForSingleValueEvent(object: ValueEventListener{
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            val dogsList = mutableListOf<DogInfo>()
-                            val dogNames = mutableListOf<String>()
-                            if (snapshot.exists()) {
-                                for (dogInfo in snapshot.children) {
-                                    dogsList.add(
-                                        DogInfo(
-                                            dogInfo.child("name").getValue(String::class.java)!!,
-                                            dogInfo.child("breed").getValue(String::class.java)!!,
-                                            dogInfo.child("gender").getValue(String::class.java)!!,
-                                            dogInfo.child("birth").getValue(String::class.java)!!,
-                                            dogInfo.child("neutering")
-                                                .getValue(String::class.java)!!,
-                                            dogInfo.child("vaccination")
-                                                .getValue(String::class.java)!!,
-                                            dogInfo.child("weight").getValue(Int::class.java)!!,
-                                            dogInfo.child("feature").getValue(String::class.java)!!,
-                                            dogInfo.child("creationTime").getValue(Long::class.java)!!,
-                                            dogInfo.child("walkInfo").getValue(WalkInfo::class.java)!!
-                                        )
-                                    )
-                                    dogNames.add(dogInfo.child("name").getValue(String::class.java)!!)
-                                }
-                            }
-                            dogNameList = dogNames
-                            continuation.resume(dogsList.sortedBy { it.creationTime })
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            continuation.resume(listOf<DogInfo>())
-                        }
-                    })
-                }
-
-                // 유저 정보
-                val userDeferred = async(Dispatchers.IO) {
-                    try {
-                        userRef.child("user").get().await().getValue(UserInfo::class.java)
-                            ?: UserInfo()
-                    } catch (e: Exception) {
-                        UserInfo()
-                    }
-                }
-
-                val totalWalkDeferred = async(Dispatchers.IO) {
-                    try {
-                        userRef.child("totalWalkInfo").get().await().getValue(WalkInfo::class.java)
-                            ?: WalkInfo()
-                    } catch (e: Exception) {
-                        WalkInfo()
-                    }
-                }
-
-                // 강아지 산책 정보
-                val walkDateDeferred = suspendCoroutine { continuation ->
-                    val dogsWalkRecord = HashMap<String, MutableList<WalkRecord>>()
-                    for(dog in dogNameList) {
-                        userRef.child("dog").child(dog).child("walkdates").addListenerForSingleValueEvent(object: ValueEventListener {
-                            override fun onDataChange(snapshot: DataSnapshot) {
-                                val walkRecords = mutableListOf<WalkRecord>()
-                                if (snapshot.exists()) {
-                                    for (dateData in snapshot.children) {
-                                        val walkDay = dateData.key.toString().split(" ")
-                                        walkRecords.add(
-                                            WalkRecord(
-                                                walkDay[0], walkDay[1], walkDay[2],
-                                                dateData.child("distance")
-                                                    .getValue(Float::class.java)!!,
-                                                dateData.child("time").getValue(Int::class.java)!!,
-                                                dateData.child("coords").getValue<List<WalkLatLng>>() ?: listOf<WalkLatLng>(),
-                                                dateData.child("collections").getValue<List<String>>() ?: listOf<String>()
-                                            )
-                                        )
-                                    }
-                                    dogsWalkRecord[dog] = walkRecords
-                                }
-                            }
-
-                            override fun onCancelled(error: DatabaseError) {
-                                dogsWalkRecord[dog] = mutableListOf()
-                            }
-                        })
-                    }
-
-                    continuation.resume(dogsWalkRecord)
-                }
-
-                val collectionDeferred = async(Dispatchers.IO) {
-                    try {
-                        userRef.child("collection").get().await().getValue<HashMap<String, Boolean>>() ?: Constant.item_whether
-                    } catch (e: Exception) {
-                        Constant.item_whether
-                    }
-                }
-
-                // 강아지 프로필 사진
-                val profileUriDeferred = suspendCoroutine { continuation ->
-                    try {
-                        val dogImgs = HashMap<String, Uri>()
-                        var downloadCount = 0
-                        var imgCount: Int
-                        storageRef.listAll().addOnSuccessListener { listResult ->
-                            imgCount = listResult.items.size
-                            if (imgCount == 0) {
-                                continuation.resume(HashMap<String, Uri>())
-                            }
-                            listResult.items.forEach { item ->
-                                item.downloadUrl.addOnSuccessListener { uri ->
-                                    downloadCount++
-                                    dogImgs[item.name] = uri
-
-                                    if(imgCount == downloadCount) {
-                                        continuation.resume(dogImgs)
-                                    }
-                                }
-                            }
-                        }
-                    } catch (e: Exception) {
-                        continuation.resume(HashMap<String, Uri>())
-                    }
-                }
-
-                val user = userDeferred.await()
-                val totalWalk = totalWalkDeferred.await()
-                val collection = collectionDeferred.await()
-                mainviewmodel.savedogsInfo(dogsDeferred)
-                mainviewmodel.saveuserInfo(user)
-                mainviewmodel.savetotalwalkInfo(totalWalk)
-                mainviewmodel.savewalkdates(walkDateDeferred)
-                mainviewmodel.savecollectionInfo(collection)
-                mainviewmodel.savedogsImg(profileUriDeferred)
-                dogUriList = profileUriDeferred
-
-
-                binding.waitImage.visibility = View.GONE
-
-                when (preFragment) {
-                    "Mypage" -> {
-                        changeFragment(MyPageFragment())
-                    }
-                    "Home" -> {
-                        changeFragment(HomeFragment())
-                    }
-                    else -> {
-                        changeFragment(ManageDogsFragment())
-                    }
-                }
-            } catch (e: Exception) {
-                when (preFragment) {
-                    "Mypage" -> {
-                        changeFragment(MyPageFragment())
-                    }
-                    "Home" -> {
-                        changeFragment(HomeFragment())
-                    }
-                    else -> {
-                        changeFragment(ManageDogsFragment())
-                    }
-                }
-            }
-        }
     }
 }

@@ -30,7 +30,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val myViewModel: UserInfoViewModel by activityViewModels()
+    private val userInfoViewModel: UserInfoViewModel by activityViewModels()
     private lateinit var builder: AlertDialog.Builder
     private lateinit var mainactivity: MainActivity
     private val selectedDogList = mutableListOf<String>()
@@ -52,20 +52,21 @@ class HomeFragment : Fragment() {
         MainActivity.preFragment = "Home" // 다른 액티비티로 이동 할 때 홈에서 이동을 표시
         builder = AlertDialog.Builder(requireContext())
 
-        // 좌표 -> 현재 위치 주소
-        myViewModel.currentCoord.observe(viewLifecycleOwner) {
-            myViewModel.getCurrentAddress(myViewModel.currentCoord.value!!) {
-                binding.textLocation.text = it
-            }
+        // 현재 위치 주소
+        userInfoViewModel.currentRegion.observe(viewLifecycleOwner) {
+            binding.textLocation.text = it
         }
 
         binding.apply {
+            viewmodel = userInfoViewModel
+            lifecycleOwner = requireActivity()
+
             btnAlarm.setOnClickListener {
                 mainactivity.changeFragment(SettingAlarmFragment())
             }
 
-            val dogsList = myViewModel.dogsinfo.value?: listOf()
-            val homeDogListAdapter = HomeDogListAdapter(dogsList, requireContext(), myViewModel)
+            val dogsList = userInfoViewModel.dogsInfo.value?: listOf()
+            val homeDogListAdapter = HomeDogListAdapter(dogsList, userInfoViewModel.dogsImg.value ?: hashMapOf())
             homeDogListAdapter.onClickDogListener = HomeDogListAdapter.OnClickDogListener { dogName ->
                 if(selectedDogList.contains(dogName)) {
                     selectedDogList.remove(dogName)
@@ -80,11 +81,12 @@ class HomeFragment : Fragment() {
                     selectedDogs.text = "${selected} 선택 중..."
                 }
             }
+
             homeDogsViewPager.adapter = homeDogListAdapter
             TabLayoutMediator(homeDogsIndicator, homeDogsViewPager) { _, _ -> }.attach()
 
             btnWalk.setOnClickListener {
-                if (myViewModel.dogsinfo.value?.isEmpty() == true) {
+                if (dogsList.isEmpty()) {
                     builder.setTitle("산책을 하기 위해 \n강아지 정보를 입력 해주세요!")
                     val listener = DialogInterface.OnClickListener { _, ans ->
                         when (ans) {

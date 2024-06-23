@@ -2,7 +2,6 @@ package com.example.walkingdogapp.album
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,11 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.databinding.GallerylistItemBinding
-import com.naver.maps.geometry.LatLng
-import okhttp3.internal.notifyAll
 
-class GalleryitemlistAdaptar(private val imgList: MutableList<GalleryImgInfo>, private val context: Context) : RecyclerView.Adapter<GalleryitemlistAdaptar.AlbumMapitemlistViewHolder>() {
-
+class GalleryItemListAdapter(private val imgList: MutableList<GalleryImgInfo>) : RecyclerView.Adapter<GalleryItemListAdapter.AlbumMapItemListViewHolder>() {
+    private lateinit var context: Context
     interface OnItemClickListener {
         fun onItemClick(imgNum: Int)
         fun onItemLongClick(imgUri: Uri)
@@ -25,18 +22,19 @@ class GalleryitemlistAdaptar(private val imgList: MutableList<GalleryImgInfo>, p
     private var selectMode = false
     var itemClickListener : OnItemClickListener? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumMapitemlistViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumMapItemListViewHolder {
         val binding = GallerylistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return AlbumMapitemlistViewHolder(binding)
+        context = parent.context
+        return AlbumMapItemListViewHolder(binding)
     }
 
     override fun getItemCount(): Int = imgList.size
 
-    override fun onBindViewHolder(holder: AlbumMapitemlistViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: AlbumMapItemListViewHolder, position: Int) {
         holder.bind(imgList[position])
     }
 
-    inner class AlbumMapitemlistViewHolder(private val binding: GallerylistItemBinding) :
+    inner class AlbumMapItemListViewHolder(private val binding: GallerylistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {

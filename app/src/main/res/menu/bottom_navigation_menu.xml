@@ -2,14 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/navigation_home"
+        android:icon="@drawable/home"
         android:title="홈" />
     <item
         android:id="@+id/navigation_collection"
+        android:icon="@drawable/collections"
         android:title="내 도감" />
     <item
         android:id="@+id/navigation_albummap"
+        android:icon="@drawable/mapalbum"
         android:title="지도 앨범" />
     <item
         android:id="@+id/navigation_mypage"
+        android:icon="@drawable/user"
         android:title="마이페이지"/>
 </menu>

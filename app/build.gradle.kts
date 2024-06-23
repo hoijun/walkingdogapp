@@ -7,6 +7,7 @@ plugins {
     id("com.google.gms.google-services")
     id("kotlin-parcelize")
     id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.kapt")
 }
 
 val properties = Properties().apply {
@@ -54,8 +55,10 @@ android {
         }
         buildFeatures {
             viewBinding = true
+            dataBinding = true
             buildConfig = true
         }
+
         create("benchmark") {
             initWith(buildTypes.getByName("release"))
             signingConfig = signingConfigs.getByName("debug")
@@ -112,6 +115,7 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.9.0")
     implementation("androidx.media:media:1.7.0")
     implementation("androidx.room:room-runtime:2.6.1")
+    androidTestImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")

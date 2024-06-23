@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,28 +15,26 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.R
 import com.example.walkingdogapp.album.GalleryFragment
 import com.example.walkingdogapp.databinding.FragmentMyPageBinding
-import com.example.walkingdogapp.registerinfo.RegisterUserActivity
 import com.example.walkingdogapp.datamodel.UserInfo
-import com.example.walkingdogapp.datamodel.WalkRecord
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.example.walkingdogapp.datamodel.WalkInfo
+import com.example.walkingdogapp.datamodel.WalkRecord
+import com.example.walkingdogapp.registerinfo.RegisterUserActivity
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.google.android.material.tabs.TabLayoutMediator
-import com.prolificinteractive.materialcalendarview.CalendarDay
 
 
 class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
     private val binding get() = _binding!!
-    private val myViewModel: UserInfoViewModel by activityViewModels()
+    private val userDataViewModel: UserInfoViewModel by activityViewModels()
     private lateinit var userInfo: UserInfo
-    private lateinit var totalwalkInfo: WalkInfo
+    private lateinit var totalWalkInfo: WalkInfo
     private var walkdates = mutableListOf<WalkRecord>()
     private lateinit var mainactivity: MainActivity
 
-    private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
     } else {
         arrayOf(
@@ -50,7 +47,7 @@ class MyPageFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { storagePermission ->
             when (storagePermission) {
                 true -> {
-                    binding.numpictures.text = "${getAlbumImageCount()}개"
+                    binding.countImg = getAlbumImageCount()
                 }
 
                 false -> return@registerForActivityResult
@@ -63,7 +60,7 @@ class MyPageFragment : Fragment() {
         mainactivity.binding.menuBn.visibility = View.VISIBLE
         MainActivity.preFragment = "Mypage"  // 다른 액티비티로 이동 할 때 마이페이지에서 이동을 표시
 
-        val walkRecordList = myViewModel.walkDates.value?: hashMapOf()
+        val walkRecordList = userDataViewModel.walkDates.value?: hashMapOf()
         for(dog in MainActivity.dogNameList) {
             for(date in walkRecordList[dog] ?: listOf()) {
                 walkdates.add(date)
@@ -78,17 +75,19 @@ class MyPageFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMyPageBinding.inflate(inflater,container, false)
-        userInfo = myViewModel.userinfo.value ?: UserInfo()
-        totalwalkInfo = myViewModel.totalwalkinfo.value ?: WalkInfo()
+        totalWalkInfo = userDataViewModel.totalWalkInfo.value ?: WalkInfo()
 
         binding.apply {
+            viewmodel = userDataViewModel
+            lifecycleOwner = requireActivity()
+
             btnSetting.setOnClickListener {
                 mainactivity.changeFragment(SettingFragment())
             }
 
-            val dogsList = myViewModel.dogsinfo.value ?: listOf()
-            val mypageDogListAdapter = MypageDogListAdapter(dogsList, requireContext(), myViewModel)
-            mypageDogListAdapter.onitemClickListener = MypageDogListAdapter.OnitemClickListener {
+            val dogsList = userDataViewModel.dogsInfo.value ?: listOf()
+            val myPageDogListAdapter = MyPageDogListAdapter(dogsList)
+            myPageDogListAdapter.onItemClickListener = MyPageDogListAdapter.OnItemClickListener {
                 val dogInfoFragment = DogInfoFragment().apply {
                     val bundle = Bundle()
                     bundle.putSerializable("doginfo", it)
@@ -98,7 +97,7 @@ class MyPageFragment : Fragment() {
                 mainactivity.changeFragment(dogInfoFragment)
             }
 
-            mypageDogsViewPager.adapter = mypageDogListAdapter
+            mypageDogsViewPager.adapter = myPageDogListAdapter
             TabLayoutMediator(mypageDogsIndicator, mypageDogsViewPager) { _, _ -> }.attach()
 
             managedoginfoBtn.setOnClickListener {
@@ -113,7 +112,7 @@ class MyPageFragment : Fragment() {
             }
 
             managepicturesBtn.setOnClickListener {
-                if (checkPermission(storegePermission)) {
+                if (checkPermission(storagePermission)) {
                     mainactivity.changeFragment(GalleryFragment())
                 } else {
                     Toast.makeText(requireContext(), "갤러리 이용을 위해 권한을 모두 허용 해주세요!", Toast.LENGTH_SHORT).show()
@@ -123,25 +122,14 @@ class MyPageFragment : Fragment() {
             menuWalkinfo.setOnClickListener {
                 mainactivity.changeFragment(WalkInfoFragment())
             }
-
-            if(userInfo.name != "") {
-                menuUsername.text = "${userInfo.name} 님"
-            }
-
-            menuDistance.text = getString(R.string.totaldistance, totalwalkInfo.distance / 1000.0)
-            menuDogsCount.text = "${myViewModel.dogsinfo.value?.size}마리"
-            walkDistance.text = getString(R.string.totaldistance, totalwalkInfo.distance / 1000.0)
-            walkTime.text =  "${(totalwalkInfo.time / 60)}분"
-            walkCount.text = "${walkdates.size}회"
-            
         }
         return binding.root
     }
 
     override fun onStart() {
         super.onStart()
-        if (checkPermission(storegePermission)) {
-            binding.numpictures.text = "${getAlbumImageCount()}개"
+        if (checkPermission(storagePermission)) {
+            binding.countImg = getAlbumImageCount()
         }
     }
 

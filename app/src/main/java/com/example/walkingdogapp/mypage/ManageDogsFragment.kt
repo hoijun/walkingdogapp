@@ -38,9 +38,9 @@ class ManageDogsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentManageDogsBinding.inflate(inflater,container, false)
-        val dogsList = myViewModel.dogsinfo.value?: listOf()
+        val dogsList = myViewModel.dogsInfo.value?: listOf()
 
-        val manageDogListAdapter = ManageDogListAdapter(requireContext(), myViewModel)
+        val manageDogListAdapter = ManageDogListAdapter(dogsList)
         manageDogListAdapter.onItemClickListener = ManageDogListAdapter.OnItemClickListener {
             val dogInfoFragment = DogInfoFragment().apply {
                 val bundle = Bundle()
@@ -52,10 +52,7 @@ class ManageDogsFragment : Fragment() {
         }
 
         binding.apply {
-            if (dogsList.size > 2) {
-                btnAddDog.visibility = View.GONE
-            }
-
+            countDog = dogsList.size
             DogsRecyclerView.adapter = manageDogListAdapter
 
             btnAddDog.setOnClickListener {

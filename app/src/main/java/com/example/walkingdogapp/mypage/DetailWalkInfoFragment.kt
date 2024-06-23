@@ -69,15 +69,11 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             btnGoMypage.setOnClickListener {
                 goWalkInfo()
             }
-            day = walkRecord.day.split("-")
-            walkday.text = "${day[0]}년 ${day[1]}월 ${day[2]}일"
-            walkstart.text = walkRecord.startTime
-            walkend.text = walkRecord.endTime
-            val kmDistance = "%.1f".format(walkRecord.distance / 1000.0)
-            walkdistance.text = "${kmDistance}km"
-            walktime.text = "${(walkRecord.time / 60)}분"
 
-            Collections.text = walkRecord.collections.joinToString(", ")
+            day = walkRecord.day.split("-")
+            walkDay = day
+            walkRecordInfo = walkRecord
+            collections = walkRecord.collections.joinToString(", ")
         }
         return binding.root
     }
