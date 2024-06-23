@@ -20,6 +20,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.walkingdogapp.Constant
@@ -38,12 +39,10 @@ class GalleryFragment : Fragment() {
     private val myViewModel: UserInfoViewModel by activityViewModels()
     private val imgInfos = mutableListOf<GalleryImgInfo>()
     private val removeImgList = mutableListOf<Uri>()
-    private var adaptar: GalleryitemlistAdaptar? = null
-    private var isFragmentSwitched = false
     private lateinit var itemDecoration: GridSpacingItemDecoration
-    private var selectMode = false
+    private var selectMode = MutableLiveData(false)
 
-    private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
     } else {
         arrayOf(
@@ -56,8 +55,7 @@ class GalleryFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { storagePermission ->
             when (storagePermission) {
                 true -> {
-                    getAlbumImage()
-                    setRecyclerView()
+                    setGallery()
                     binding.galleryRecyclerview.addItemDecoration(itemDecoration)
                 }
 
@@ -67,8 +65,8 @@ class GalleryFragment : Fragment() {
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if(!selectMode) {
-                goMypage()
+            if(!selectMode.value!!) {
+                goMyPage()
             } else {
                 unSelectMode()
             }
@@ -78,7 +76,7 @@ class GalleryFragment : Fragment() {
     private val launcher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
         when(result.resultCode) {
             Activity.RESULT_OK -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                udpateRecyclerView()
+                updateRecyclerView()
                 unSelectMode()
                 Toast.makeText(requireContext(), "사진을 삭제 했습니다.", Toast.LENGTH_SHORT).show()
             }
@@ -90,7 +88,7 @@ class GalleryFragment : Fragment() {
         mainactivity = requireActivity() as MainActivity
         mainactivity.binding.menuBn.visibility = View.GONE
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
-        itemDecoration = GridSpacingItemDecoration(3, Constant.dpTopx(15f, requireContext()))
+        itemDecoration = GridSpacingItemDecoration(3, Constant.dpToPx(15f, requireContext()))
     }
 
     override fun onCreateView(
@@ -98,16 +96,19 @@ class GalleryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentGalleryBinding.inflate(inflater, container, false)
-        if (checkPermission(storegePermission)) {
-            getAlbumImage()
-            setRecyclerView()
+        if (checkPermission(storagePermission)) {
+            setGallery()
         }
+
         binding.apply {
+            isSelectMode = selectMode
+            lifecycleOwner = requireActivity()
+
             btnBack.setOnClickListener {
-                goMypage()
+                goMyPage()
             }
 
-            imgremoveBtn.setOnClickListener {
+            imgRemoveBtn.setOnClickListener {
                 try {
                     if (removeImgList.isEmpty()) {
                         unSelectMode()
@@ -128,7 +129,7 @@ class GalleryFragment : Fragment() {
                                     for (uri in removeImgList) {
                                         requireActivity().contentResolver.delete(uri, null, null)
                                     }
-                                    udpateRecyclerView()
+                                    updateRecyclerView()
                                     unSelectMode()
                                 }
                             }
@@ -149,8 +150,8 @@ class GalleryFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        if (checkPermission(storegePermission)) {
-            udpateRecyclerView()
+        if (checkPermission(storagePermission)) {
+            updateRecyclerView()
         }
         binding.galleryRecyclerview.addItemDecoration(itemDecoration)
     }
@@ -164,7 +165,6 @@ class GalleryFragment : Fragment() {
         super.onStop()
         unSelectMode()
         binding.galleryRecyclerview.removeItemDecoration(itemDecoration)
-        isFragmentSwitched = false
     }
 
     override fun onDestroyView() {
@@ -172,20 +172,24 @@ class GalleryFragment : Fragment() {
         _binding = null
     }
 
+    private fun setGallery() {
+        getAlbumImage()
+        setRecyclerView()
+    }
+
     private fun setRecyclerView() {
         binding.apply {
-            galleryRecyclerview.visibility = View.VISIBLE
             val itemAnimator = DefaultItemAnimator()
             itemAnimator.supportsChangeAnimations = false
             galleryRecyclerview.itemAnimator = itemAnimator
+
             val imgNum = arguments?.getInt("select", 0) ?: 0
-            adaptar = GalleryitemlistAdaptar(imgInfos, requireContext())
-            adaptar!!.itemClickListener = object : GalleryitemlistAdaptar.OnItemClickListener {
+            val adapter = GalleryItemListAdapter(imgInfos)
+            adapter.itemClickListener = object : GalleryItemListAdapter.OnItemClickListener {
                 override fun onItemClick(imgNum: Int) {
-                    if(!selectMode) {
+                    if(!selectMode.value!!) {
                         val bundle = Bundle()
                         bundle.putInt("select", imgNum)
-                        isFragmentSwitched = true
                         val detailPictureFragment = DetailPictureFragment().apply {
                             arguments = bundle
                         }
@@ -194,8 +198,7 @@ class GalleryFragment : Fragment() {
                 }
 
                 override fun onItemLongClick(imgUri: Uri) {
-                    imgremoveBtn.visibility = View.VISIBLE
-                    selectMode = true
+                    selectMode.value = true
                     if (removeImgList.contains(imgUri)) {
                         removeImgList.remove(imgUri)
                     } else {
@@ -214,7 +217,7 @@ class GalleryFragment : Fragment() {
             }
             galleryRecyclerview.layoutManager = GridLayoutManager(requireContext(), 3)
             galleryRecyclerview.scrollToPosition(imgNum)
-            galleryRecyclerview.adapter = adaptar
+            galleryRecyclerview.adapter = adapter
         }
     }
 
@@ -243,7 +246,7 @@ class GalleryFragment : Fragment() {
                 val contentUri = Uri.withAppendedPath(uri, imagePath)
                 imgInfos.add(GalleryImgInfo(contentUri, imageTitle, Constant.convertLongToTime(SimpleDateFormat("yyyy년 MM월 dd일 HH:mm"), imageDate)))
             }
-            myViewModel.savealbumImgs(imgInfos)
+            myViewModel.saveAlbumImgs(imgInfos)
         }
     }
 
@@ -262,24 +265,23 @@ class GalleryFragment : Fragment() {
     }
 
     private fun unSelectMode() {
-        selectMode = false
-        binding.imgremoveBtn.visibility = View.GONE
+        selectMode.value = false
         removeImgList.clear()
-        adaptar?.unselectMode()
+        (binding.galleryRecyclerview.adapter as GalleryItemListAdapter).unselectMode()
     }
 
-    private fun goMypage() {
+    private fun goMyPage() {
         mainactivity.changeFragment(MyPageFragment())
     }
 
-    private fun udpateRecyclerView() {
+    private fun updateRecyclerView() {
         val iterator = imgInfos.iterator()
         while (iterator.hasNext()) {
             val img = iterator.next()
             if (!Constant.isImageExists(img.uri, requireActivity())) {
                 val index = imgInfos.indexOf(img)
                 iterator.remove()
-                adaptar?.notifyItemRemoved(index)
+                (binding.galleryRecyclerview.adapter as GalleryItemListAdapter).notifyItemRemoved(index)
             }
         }
     }

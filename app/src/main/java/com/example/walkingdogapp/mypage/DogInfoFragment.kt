@@ -48,7 +48,7 @@ class DogInfoFragment : Fragment() {
     ): View {
         _binding = FragmentDogInfoBinding.inflate(inflater,container, false)
 
-        val userdogInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val userDogInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable("doginfo", DogInfo::class.java)?: DogInfo()
         } else {
             (arguments?.getSerializable("doginfo") ?: DogInfo()) as DogInfo
@@ -57,6 +57,7 @@ class DogInfoFragment : Fragment() {
         beforepage = arguments?.getString("before", "mypage")?: "mypage"
 
         binding.apply {
+            dogInfo = userDogInfo
             btnBack.setOnClickListener {
                 if(beforepage == "mypage") {
                     goMypage()
@@ -67,23 +68,14 @@ class DogInfoFragment : Fragment() {
 
             btnSettingdog.setOnClickListener {
                 val registerDogIntent = Intent(requireContext(), RegisterDogActivity::class.java)
-                val walkRecordArrayList: ArrayList<WalkRecord> = (myViewModel.walkDates.value?.get(userdogInfo.name) ?: mutableListOf()) as ArrayList<WalkRecord>
-                registerDogIntent.putExtra("doginfo", userdogInfo)
+                val walkRecordArrayList: ArrayList<WalkRecord> = (myViewModel.walkDates.value?.get(userDogInfo.name) ?: mutableListOf()) as ArrayList<WalkRecord>
+                registerDogIntent.putExtra("doginfo", userDogInfo)
                 registerDogIntent.putParcelableArrayListExtra("walkRecord", walkRecordArrayList)
                 startActivity(registerDogIntent)
             }
 
-            doginfoName.text = userdogInfo.name
-            doginfoBirth.text = userdogInfo.birth
-            doginfoBreed.text = userdogInfo.breed
-            doginfoGender.text = userdogInfo.gender
-            doginfoNeutering.text = userdogInfo.neutering
-            doginfoVaccination.text = userdogInfo.vaccination
-            doginfoWeight.text = userdogInfo.weight.toString()
-            doginfoFeature.text = userdogInfo.feature
-
-            if (myViewModel.dogsimg.value?.get(userdogInfo.name) != null) {
-                Glide.with(requireContext()).load(myViewModel.dogsimg.value?.get(userdogInfo.name))
+            if (myViewModel.dogsImg.value?.get(userDogInfo.name) != null) {
+                Glide.with(requireContext()).load(myViewModel.dogsImg.value?.get(userDogInfo.name))
                     .format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(doginfoImage)
             }
         }

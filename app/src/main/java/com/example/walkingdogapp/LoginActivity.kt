@@ -38,6 +38,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.database
     private var backPressedTime : Long = 0
+    private val loadingDialogFragment = LoadingDialogFragment()
 
     private val kakaoLoginCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
         if (error != null) {
@@ -261,11 +262,9 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setLoginIngView(loginIng: Boolean) {
         if (loginIng) {
-            binding.loginscreen.visibility = View.INVISIBLE
-            binding.waitImage.visibility = View.VISIBLE
+            loadingDialogFragment.show(this.supportFragmentManager, "loading")
         } else {
-            binding.loginscreen.visibility = View.VISIBLE
-            binding.waitImage.visibility = View.INVISIBLE
+            loadingDialogFragment.dismiss()
         }
     }
 }

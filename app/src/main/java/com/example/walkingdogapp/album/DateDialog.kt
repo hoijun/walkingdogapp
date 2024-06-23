@@ -62,6 +62,7 @@ class DateDialog : DialogFragment() {
         val todayDecorator = ToDayDecorator(requireContext(), CalendarDay.today())
         var selectedMonthDecorator = SelectedMonthDecorator(CalendarDay.today().month)
         val walkDayDecorator = WalkDayDecorator(walkdates) // 산책한 날 표시
+
         binding.apply {
             walkcalendar.addDecorators(walkDayDecorator, selectedMonthDecorator, todayDecorator)
             walkcalendar.setTitleFormatter { day -> // 년 월 표시 변경
@@ -75,18 +76,19 @@ class DateDialog : DialogFragment() {
                     .append(calendarHeaderElements[1]).append("월")
                 calendarHeaderBuilder.toString()
             }
+
             walkcalendar.setWeekDayFormatter(ArrayWeekDayFormatter(requireContext().resources.getTextArray(R.array.custom_weekdays)))
             walkcalendar.state().edit().setMaximumDate(CalendarDay.today()).commit() // 최대 날짜 설정
 
             walkcalendar.selectedDate = CalendarDay.today() // 오늘 날짜
 
-            walkcalendar.setOnDateChangedListener { widget, date, selected ->
+            walkcalendar.setOnDateChangedListener { _, date, _ ->
                 dateClickListener?.onDateClick(date.date.toString())
                 dismiss()
                 return@setOnDateChangedListener
             }
 
-            walkcalendar.setOnMonthChangedListener { widget, date -> // 달 바꿀때
+            walkcalendar.setOnMonthChangedListener { _, date -> // 달 바꿀때
                 walkcalendar.removeDecorators()
                 walkcalendar.invalidateDecorators() // 데코 초기화
                 if (date.month == CalendarDay.today().month) {
@@ -100,9 +102,13 @@ class DateDialog : DialogFragment() {
         }
 
         isCancelable = true
-        resizeDialog()
         this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        resizeDialog()
     }
 
     override fun onDestroy() {

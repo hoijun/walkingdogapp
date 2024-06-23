@@ -1,98 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginStart="20dp"
-    android:layout_marginEnd="20dp"
-    android:layout_marginBottom="20dp"
-    android:layout_marginTop="15dp"
-    android:background="@drawable/roundstyle"
-    android:elevation="10dp"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="dogInfo"
+            type="com.example.walkingdogapp.datamodel.DogInfo" />
+
+        <variable
+            name="dogAge"
+            type="Integer" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/menu_dogInfo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintWidth_percent="0.925">
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/roundstyle"
+        android:elevation="10dp">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/menu_dogimg"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/menu_dogInfo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_percent="0.925">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/menu_dogimg"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="15dp"
+                android:src="@drawable/waitimage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHeight_percent="0.6"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHeight_percent="0.6"
+                app:layout_constraintStart_toEndOf="@+id/menu_dogimg"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.4">
+
+                <TextView
+                    android:id="@+id/menu_dogname"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center|start"
+                    android:text="@{dogInfo.name}"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHeight_percent="0.65"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/menu_dogfeature"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center|start"
+                    android:text="@{String.format(`%d살 / %dkg / %s`, dogAge, dogInfo.weight, dogInfo.breed)}"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHeight_percent="0.35"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/menu_dogname" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginEnd="15dp"
+                android:gravity="center"
+                android:text="  〉"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.5"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.125" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/mypageAddDog_btn"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="15dp"
-            android:src="@drawable/waitimage"
+            android:src="@drawable/add"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHeight_percent="0.6"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_percent="0.2" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHeight_percent="0.6"
-            app:layout_constraintStart_toEndOf="@+id/menu_dogimg"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.4">
-            <TextView
-                android:id="@+id/menu_dogname"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center|start"
-                android:text="털뭉치"
-                android:textColor="@color/black"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.65"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/menu_dogfeature"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center|start"
-                android:text="..."
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.35"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/menu_dogname" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="15dp"
-            android:gravity="center"
-            android:text="  〉"
-            android:textColor="@color/black"
-            android:textSize="25sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.5"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.125" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <ImageView
-        android:id="@+id/mypageAddDog_btn"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:src="@drawable/add"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.2" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -2,6 +2,7 @@ package com.example.walkingdogapp.mypage
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,27 +10,30 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.MypagedoglistItemBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 
-class MypageDogListAdapter(private val dogsList: List<DogInfo>, private val context: Context, private val viewModel: UserInfoViewModel): RecyclerView.Adapter<MypageDogListAdapter.MypageDogListViewHolder>() {
+class MyPageDogListAdapter(private val dogsList: List<DogInfo>): RecyclerView.Adapter<MyPageDogListAdapter.MyPageDogListViewHolder>() {
+    private lateinit var context: Context
 
-    fun interface OnitemClickListener {
-        fun onitemClick(dog: DogInfo)
+    fun interface OnItemClickListener {
+        fun onItemClick(dog: DogInfo)
     }
 
-    var onitemClickListener: OnitemClickListener? = null
+    var onItemClickListener: OnItemClickListener? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MypageDogListViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyPageDogListViewHolder {
         val binding =
             MypagedoglistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return MypageDogListViewHolder(binding)
+        context = parent.context
+        return MyPageDogListViewHolder(binding)
     }
 
     override fun getItemCount(): Int = if(dogsList.size == 3) 3 else dogsList.size + 1
-    override fun onBindViewHolder(holder: MypageDogListViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MyPageDogListViewHolder, position: Int) {
         if (position == dogsList.size) {
             holder.bind()
             return
@@ -37,8 +41,9 @@ class MypageDogListAdapter(private val dogsList: List<DogInfo>, private val cont
         holder.bind(dogsList[position])
     }
 
-    inner class MypageDogListViewHolder(private val binding: MypagedoglistItemBinding) :
+    inner class MyPageDogListViewHolder(private val binding: MypagedoglistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
         fun bind() {
             binding.apply {
                 menuDogInfo.visibility = View.GONE
@@ -52,15 +57,15 @@ class MypageDogListAdapter(private val dogsList: List<DogInfo>, private val cont
         fun bind(dog: DogInfo) {
             binding.apply {
                 mypageAddDogBtn.visibility = View.GONE
-                menuDogname.text = dog.name
-                menuDogfeature.text =
-                    "${Constant.getAge(dog.birth)}살/ ${dog.weight}kg / ${dog.breed}"
-                if (viewModel.dogsimg.value?.get(dog.name) != null) {
-                    Glide.with(context).load(viewModel.dogsimg.value?.get(dog.name))
+                dogInfo = dog
+                dogAge = Constant.getAge(dog.birth)
+
+                if (MainActivity.dogUriList[dog.name] != null) {
+                    Glide.with(context).load(MainActivity.dogUriList[dog.name])
                         .format(DecodeFormat.PREFER_RGB_565).override(100, 100).into(menuDogimg)
                 }
                 root.setOnClickListener {
-                    onitemClickListener?.onitemClick(dog)
+                    onItemClickListener?.onItemClick(dog)
                 }
             }
         }

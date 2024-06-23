@@ -9,9 +9,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.ImageView
+import androidx.databinding.BindingAdapter
 import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.walkingdogapp.databinding.DetailcollectionDialogBinding
+import com.example.walkingdogapp.datamodel.CollectionInfo
+
 class DetailCollectionDialog: DialogFragment() {
     private var _binding: DetailcollectionDialogBinding? = null
     private val binding get() = _binding!!
@@ -29,14 +34,10 @@ class DetailCollectionDialog: DialogFragment() {
         }
 
         binding.apply {
-            Glide.with(requireContext()).load(collectionInfo.collectionImg).into(collectionImg)
-            collectionNumber.text = collectionInfo.collectionNum
-            collectionName.text = collectionInfo.collectionName
-            collectionText.text = collectionInfo.collectionText
+            collection = collectionInfo
         }
 
         this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        resizeDialog()
         return binding.root
     }
 
@@ -45,10 +46,23 @@ class DetailCollectionDialog: DialogFragment() {
         _binding = null
     }
 
+    override fun onResume() {
+        super.onResume()
+        resizeDialog()
+    }
+
     private fun resizeDialog() {
         val params: ViewGroup.LayoutParams? = this.dialog?.window?.attributes
         val deviceWidth = Resources.getSystem().displayMetrics.widthPixels
         params?.width = (deviceWidth * 0.8).toInt()
         this.dialog?.window?.attributes = params as WindowManager.LayoutParams
+    }
+
+    object DialogImageViewBindingAdapter {
+        @BindingAdapter("DialogItemImgResId")
+        @JvmStatic
+        fun loadImage(v: ImageView, resId: Int) {
+            Glide.with(v.context).load(resId).centerInside().into(v)
+        }
     }
 }

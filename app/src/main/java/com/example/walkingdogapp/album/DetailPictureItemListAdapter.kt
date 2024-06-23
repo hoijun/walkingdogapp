@@ -1,7 +1,6 @@
 package com.example.walkingdogapp.album
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -10,30 +9,30 @@ import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.request.target.Target
 import com.example.walkingdogapp.databinding.DetailpicturelistItemBinding
 
-class DetailPictureitemlistAdapter(private val imgList: List<GalleryImgInfo>, private val context: Context) : RecyclerView.Adapter<DetailPictureitemlistAdapter.DetailimglistItemlistViewHolder>(){
+class DetailPictureItemListAdapter(private val imgList: List<GalleryImgInfo>, private val context: Context) : RecyclerView.Adapter<DetailPictureItemListAdapter.DetailPictureItemListViewHolder>(){
 
     fun interface OnClickItemListener {
-        fun onCilickItem(imgInfo: GalleryImgInfo)
+        fun onClickItem(imgInfo: GalleryImgInfo)
     }
 
     var onClickItemListener: OnClickItemListener? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailimglistItemlistViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailPictureItemListViewHolder {
         val binding = DetailpicturelistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DetailimglistItemlistViewHolder(binding)
+        return DetailPictureItemListViewHolder(binding)
     }
 
     override fun getItemCount(): Int = imgList.size
 
-    override fun onBindViewHolder(holder: DetailimglistItemlistViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: DetailPictureItemListViewHolder, position: Int) {
         holder.bind(imgList[position])
     }
 
-    inner class DetailimglistItemlistViewHolder(private val binding: DetailpicturelistItemBinding) :
+    inner class DetailPictureItemListViewHolder(private val binding: DetailpicturelistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
-                onClickItemListener?.onCilickItem(imgList[bindingAdapterPosition])
+                onClickItemListener?.onClickItem(imgList[bindingAdapterPosition])
             }
         }
 

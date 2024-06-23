@@ -1,22 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="collectionItem"
+            type="com.example.walkingdogapp.datamodel.CollectionInfo" />
+    </data>
+
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="2dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_marginBottom="2dp">
 
     <ImageView
         android:id="@+id/collection_img"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:translationZ="90dp"
         android:scaleType="fitXY"
+        android:src="@drawable/ic_launcher_background"
+        android:translationZ="90dp"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintDimensionRatio="1:1"
-        android:src="@drawable/ic_launcher_background" />
+        app:CollectionItemImgResId="@{collectionItem.collectionResId}"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -24,42 +33,43 @@
         android:layout_marginTop="-25dp"
         android:background="@drawable/roundstyle3"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/collection_img" >
+        app:layout_constraintTop_toBottomOf="@id/collection_img">
 
         <TextView
             android:id="@+id/collection_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="001"
+            android:layout_marginTop="30dp"
             android:gravity="center"
-            android:textStyle="bold"
+            android:text="@{collectionItem.collectionNum}"
             android:textColor="@color/black"
             android:textSize="14sp"
-            android:layout_marginTop="30dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/collection_Name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="양치하는 곰돌이"
+            android:layout_marginTop="2.5dp"
             android:gravity="center"
-            android:textStyle="bold"
+            android:text="@{collectionItem.collectionName}"
             android:textColor="@color/black"
             android:textSize="14sp"
-            android:layout_marginTop="2.5dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/collection_number"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/collection_number" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="16.5dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/collection_Name"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/collection_Name" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

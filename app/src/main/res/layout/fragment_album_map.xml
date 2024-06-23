@@ -1,99 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".album.AlbumMapFragment">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <FrameLayout
-        android:id="@+id/Map"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-    </FrameLayout>
+    <data>
+        <import type="android.view.View" />
 
-    <Button
-        android:id="@+id/btn_selectDate"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:text="날짜 선택"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:textSize="15sp"
-        android:gravity="center"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="15dp"
-        android:visibility="gone"
-        app:layout_constraintWidth_percent="0.3"
-        app:layout_constraintHeight_percent="0.08"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <variable
+            name="isStoragePermitted"
+            type="Boolean" />
 
-    <TextView
-        android:id="@+id/selectdate"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:textSize="14sp"
-        android:gravity="center"
-        android:visibility="gone"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="5dp"
-        app:layout_constraintWidth_percent="0.3"
-        app:layout_constraintHeight_percent="0.05"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_selectDate" />
+        <variable
+            name="isImgExisted"
+            type="Boolean" />
+
+        <variable
+            name="selectDay"
+            type="androidx.lifecycle.MutableLiveData&lt;String>" />
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.15"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Map">
+        android:layout_height="match_parent"
+        tools:context=".album.AlbumMapFragment">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/img_recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"
+        <FrameLayout
+            android:id="@+id/Map"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.85"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <Button
-            android:id="@+id/permission_btn"
+            android:id="@+id/btn_selectDate"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:text="이미지 권한을 모두 허용으로 해주세요."
-            android:textStyle="bold"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            android:gravity="center"
+            android:text="날짜 선택"
             android:textColor="@color/black"
             android:textSize="15sp"
-            app:layout_constraintWidth_percent="0.8"
-            app:layout_constraintHeight_percent="0.5"
+            android:textStyle="bold"
+            android:visibility="@{isStoragePermitted ? View.VISIBLE : View.GONE}"
+            app:layout_constraintHeight_percent="0.08"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintWidth_percent="0.3" />
 
         <TextView
-            android:id="@+id/text_selectday"
+            android:id="@+id/selectDate_Text"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:text="위에서 날짜를 선택해주세요!"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:textSize="16sp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="5dp"
+            android:text="@{selectDay}"
             android:gravity="center"
-            android:visibility="gone"
-            app:layout_constraintWidth_percent="0.8"
-            app:layout_constraintHeight_percent="0.5"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="@{isStoragePermitted ? View.VISIBLE : View.GONE}"
+            app:layout_constraintHeight_percent="0.05"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/btn_selectDate"
+            app:layout_constraintWidth_percent="0.3" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.15"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Map">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/img_RecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{!selectDay.empty &amp;&amp; isImgExisted ? View.VISIBLE : View.GONE}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/permission_btn"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:text="이미지 권한을 모두 허용으로 해주세요."
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:visibility="@{isStoragePermitted ? View.GONE : View.VISIBLE}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.8" />
+
+            <TextView
+                android:id="@+id/text_SelectDay"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text='@{!selectDay.empty ? "사진이 없어요!" : "날짜를 선택해주세요!"}'
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="@{!selectDay.empty &amp;&amp; isImgExisted ? View.GONE : View.VISIBLE}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.8" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

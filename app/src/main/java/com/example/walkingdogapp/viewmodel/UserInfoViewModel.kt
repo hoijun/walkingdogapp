@@ -23,79 +23,76 @@ import com.example.walkingdogapp.repository.UserInfoRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Locale
 
 
 class UserInfoViewModel(private val application: Application) : AndroidViewModel(application) {
-    private val _dogsinfo = MutableLiveData<List<DogInfo>>()
-    private val _userinfo = MutableLiveData<UserInfo>()
-    private val _totalwalkinfo = MutableLiveData<WalkInfo>()
+    private val repository = UserInfoRepository(application)
+    private val _dogsInfo = MutableLiveData<List<DogInfo>>()
+    private val _userInfo = MutableLiveData<UserInfo>()
+    private val _totalWalkInfo = MutableLiveData<WalkInfo>()
     private val _walkDates = MutableLiveData<HashMap<String, MutableList<WalkRecord>>>()
-    private val _collectioninfo = MutableLiveData<HashMap<String, Boolean>>()
-    private val _dogsimg = MutableLiveData<HashMap<String, Uri>>()
+    private val _collectionInfo = MutableLiveData<HashMap<String, Boolean>>()
+    private val _dogsImg = MutableLiveData<HashMap<String, Uri>>()
+    private val _successGetData = MutableLiveData<Boolean>()
 
     private val _currentCoord = MutableLiveData<LatLng>()
+    private val _currentRegion = MutableLiveData<String>()
     private val _albumImgs = MutableLiveData<List<GalleryImgInfo>>()
-    private val repository = UserInfoRepository(application)
 
     private var fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(application)
     private lateinit var address : List<String>
 
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+            repository.observeUser(
+                _dogsInfo,
+                _userInfo,
+                _totalWalkInfo,
+                _walkDates,
+                _collectionInfo,
+                _dogsImg,
+                _successGetData
+            )
+        }
+    }
+
     val currentCoord: LiveData<LatLng>
         get() = _currentCoord
 
-    val dogsinfo: LiveData<List<DogInfo>>
-        get() = _dogsinfo
+    val dogsInfo: LiveData<List<DogInfo>>
+        get() = _dogsInfo
 
-    val userinfo: LiveData<UserInfo>
-        get() = _userinfo
+    val userInfo: LiveData<UserInfo>
+        get() = _userInfo
 
-    val totalwalkinfo: LiveData<WalkInfo>
-        get() = _totalwalkinfo
+    val totalWalkInfo: LiveData<WalkInfo>
+        get() = _totalWalkInfo
 
     val walkDates: LiveData<HashMap<String, MutableList<WalkRecord>>>
         get() = _walkDates
 
-    val collectioninfo: LiveData<HashMap<String, Boolean>>
-        get() = _collectioninfo
+    val collectionInfo: LiveData<HashMap<String, Boolean>>
+        get() = _collectionInfo
 
     val albumImgs: LiveData<List<GalleryImgInfo>>
         get() = _albumImgs
 
-    val dogsimg: LiveData<HashMap<String, Uri>>
-        get() = _dogsimg
+    val dogsImg: LiveData<HashMap<String, Uri>>
+        get() = _dogsImg
 
-    private fun upadateLocateInfo(input: LatLng) {
-        _currentCoord.value = input
-    }
+    val currentRegion: LiveData<String>
+        get() = _currentRegion
 
-    fun savedogsInfo(dogsinfo: List<DogInfo>) {
-        _dogsinfo.value = dogsinfo
-    }
+    val successGetData: LiveData<Boolean>
+        get() = _successGetData
 
-    fun saveuserInfo(userInfo: UserInfo) {
-        _userinfo.value = userInfo
-    }
-
-    fun savetotalwalkInfo(totalwalkInfo: WalkInfo) {
-        _totalwalkinfo.value = totalwalkInfo
-    }
-
-    fun savewalkdates(walkDates: HashMap<String, MutableList<WalkRecord>>) {
-        _walkDates.value = walkDates
-    }
-
-    fun savecollectionInfo(collectioninfo: HashMap<String, Boolean>){
-        _collectioninfo.value = collectioninfo
-    }
-
-    fun savealbumImgs(albumImgs: List<GalleryImgInfo>) {
+    fun saveAlbumImgs(albumImgs: List<GalleryImgInfo>) {
         _albumImgs.value = albumImgs
-    }
-
-    fun savedogsImg(dogsImg: HashMap<String, Uri>) {
-        _dogsimg.value = dogsImg
     }
 
     fun deleteAlarm(alarm: AlarmDataModel) {
@@ -110,8 +107,16 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
         return repository.getAll()
     }
 
-    fun onOffAlarm(alarm: AlarmDataModel, ischecked: Boolean) {
-        repository.onOffAlarm(alarm.alarm_code, ischecked)
+    fun onOffAlarm(alarm: AlarmDataModel, isChecked: Boolean) {
+        repository.onOffAlarm(alarm.alarm_code, isChecked)
+    }
+
+    suspend fun removeAccount() : Boolean{
+        return repository.removeAccount()
+    }
+
+    private fun updateLocateInfo(input: LatLng) {
+        _currentCoord.value = input
     }
 
 
@@ -122,25 +127,26 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
         ) {
             fusedLocationProviderClient.lastLocation.addOnSuccessListener {
                 if (it != null) {
-                    upadateLocateInfo(LatLng(it.latitude, it.longitude))
+                    updateLocateInfo(LatLng(it.latitude, it.longitude))
+                    getCurrentAddress(LatLng(it.latitude, it.longitude))
                 }
             }
         }
     }
 
     // 현재 좌표를 주소로 변경
-    fun getCurrentAddress(coord: LatLng, callback: (String) -> Unit) {
+    private fun getCurrentAddress(coord: LatLng) {
         val geocoder = Geocoder(application, Locale.getDefault())
-        if (Build.VERSION.SDK_INT < 33) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             try {
                 val addresses: MutableList<Address> = geocoder.getFromLocation(
                     coord.latitude,
                     coord.longitude, 7)!!
                 address = addresses[0].getAddressLine(0).split(" ").takeLast(3)
                 val nameofLoc = address[0] + " " + address[1]
-                callback(nameofLoc)
+                _currentRegion.postValue(nameofLoc)
             } catch(e: IOException) {
-                callback("지역")
+                _currentRegion.postValue("")
             }
         } else {
             geocoder.getFromLocation(coord.latitude, coord.longitude,
@@ -151,11 +157,11 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
                     address = addresses[0].getAddressLine(0).split(" ").takeLast(3)
                     val nameofLoc = address[0] + " " + address[1]
                     Log.d("locate", "get locate")
-                    callback(nameofLoc)
+                    _currentRegion.postValue(nameofLoc)
                 }
                 override fun onError(errorMessage: String?) {
                     super.onError(errorMessage)
-                    callback("지역")
+                    _currentRegion.postValue("")
                 }
             })
         }

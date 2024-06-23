@@ -26,7 +26,6 @@ class DetailPictureFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var mainactivity: MainActivity
     private val myViewModel: UserInfoViewModel by activityViewModels()
-    private lateinit var adaptar: DetailPictureitemlistAdapter
     private var imgList = mutableListOf<GalleryImgInfo>()
     private var bottomSheetFragment: BottomSheetDialogFragment? = null
 
@@ -50,8 +49,8 @@ class DetailPictureFragment : Fragment() {
         val imgNum = arguments?.getInt("select", 0) ?: 0
         binding.apply {
             imgList = (myViewModel.albumImgs.value?: mutableListOf()).toMutableList()
-            adaptar = DetailPictureitemlistAdapter( imgList, requireContext())
-            adaptar.onClickItemListener = DetailPictureitemlistAdapter.OnClickItemListener { imgInfo ->
+            val adapter = DetailPictureItemListAdapter( imgList, requireContext())
+            adapter.onClickItemListener = DetailPictureItemListAdapter.OnClickItemListener { imgInfo ->
                 bottomSheetFragment = GalleryBottomSheetFragment().apply {
                     val bundle = Bundle()
                     bundle.putString("date", imgInfo.date)
@@ -62,13 +61,13 @@ class DetailPictureFragment : Fragment() {
                     onDeleteImgListener = GalleryBottomSheetFragment.OnDeleteImgListener {
                         try {
                             removePicture(detailViewpager2.currentItem)
-                            if (adaptar.itemCount > 0) {
+                            if (adapter.itemCount > 0) {
                                 if (detailViewpager2.currentItem == 0) {
                                     detailViewpager2.setCurrentItem(
                                         detailViewpager2.currentItem,
                                         true
                                     )
-                                } else if (detailViewpager2.currentItem <= adaptar.itemCount - 1) {
+                                } else if (detailViewpager2.currentItem <= adapter.itemCount - 1) {
                                     detailViewpager2.setCurrentItem(
                                         detailViewpager2.currentItem - 1,
                                         true
@@ -82,9 +81,9 @@ class DetailPictureFragment : Fragment() {
                         }
                     }
                 }
-                bottomSheetFragment?.show(requireActivity().supportFragmentManager, "bottomsheet")
+                bottomSheetFragment?.show(requireActivity().supportFragmentManager, "bottomSheet")
             }
-            detailViewpager2.adapter = adaptar
+            detailViewpager2.adapter = adapter
             detailViewpager2.orientation = ViewPager2.ORIENTATION_HORIZONTAL
             detailViewpager2.setCurrentItem(imgNum, false)
         }
@@ -97,31 +96,29 @@ class DetailPictureFragment : Fragment() {
         while (iterator.hasNext()) {
             val img = iterator.next()
             if(!Constant.isImageExists(img.uri, requireActivity())) {
-                lifecycleScope.launch {
+                lifecycleScope.launch(Dispatchers.Main) {
                     val index = imgList.indexOf(img)
+                    val recyclerViewAdapter = binding.detailViewpager2.adapter as DetailPictureItemListAdapter
                     iterator.remove()
-                    adaptar.notifyItemRemoved(index)
-                    withContext(Dispatchers.Main) {
-                        binding.apply {
-                            if (adaptar.itemCount > 0 && detailViewpager2.currentItem == index) {
-                                if (detailViewpager2.currentItem == 0) {
-                                    detailViewpager2.setCurrentItem(
-                                        detailViewpager2.currentItem,
-                                        false
-                                    )
-                                } else if (detailViewpager2.currentItem <= adaptar.itemCount - 1) {
-                                    detailViewpager2.setCurrentItem(
-                                        detailViewpager2.currentItem - 1,
-                                        false
-                                    )
-                                }
-                            } else if (adaptar.itemCount == 0) {
-                                mainactivity.changeFragment(GalleryFragment())
-
+                    recyclerViewAdapter.notifyItemRemoved(index)
+                    binding.apply {
+                        if (recyclerViewAdapter.itemCount > 0 && detailViewpager2.currentItem == index) {
+                            if (detailViewpager2.currentItem == 0) {
+                                detailViewpager2.setCurrentItem(
+                                    detailViewpager2.currentItem,
+                                    false
+                                )
+                            } else if (detailViewpager2.currentItem <= recyclerViewAdapter.itemCount - 1) {
+                                detailViewpager2.setCurrentItem(
+                                    detailViewpager2.currentItem - 1,
+                                    false
+                                )
                             }
+                        } else if (recyclerViewAdapter.itemCount == 0) {
+                            mainactivity.changeFragment(GalleryFragment())
                         }
-                        bottomSheetFragment?.dismiss()
                     }
+                    bottomSheetFragment?.dismiss()
                 }
             }
         }
@@ -148,6 +145,6 @@ class DetailPictureFragment : Fragment() {
 
     private fun removePicture(position: Int) {
         imgList.removeAt(position)
-        adaptar.notifyItemRemoved(position)
+        (binding.detailViewpager2.adapter as DetailPictureItemListAdapter).notifyItemRemoved(position)
     }
 }

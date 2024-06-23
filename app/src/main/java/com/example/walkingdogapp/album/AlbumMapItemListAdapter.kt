@@ -10,7 +10,8 @@ import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.databinding.AlbummapItemBinding
 import com.naver.maps.geometry.LatLng
 
-class AlbumMapitemlistAdaptar(private val imginfoList: MutableList<AlbumMapImgInfo>, private val context: Context): RecyclerView.Adapter<AlbumMapitemlistAdaptar.AlbumMapitemlistViewHolder>() {
+class AlbumMapItemListAdapter(private val imgInfoList: MutableList<AlbumMapImgInfo>): RecyclerView.Adapter<AlbumMapItemListAdapter.AlbumMapItemListViewHolder>() {
+    private lateinit var context: Context
 
     fun interface OnItemClickListener {
         fun onItemClick(latLng: LatLng, tag: Int)
@@ -18,22 +19,23 @@ class AlbumMapitemlistAdaptar(private val imginfoList: MutableList<AlbumMapImgIn
 
     var itemClickListener : OnItemClickListener? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumMapitemlistViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumMapItemListViewHolder {
         val binding = AlbummapItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return AlbumMapitemlistViewHolder(binding)
+        context = parent.context
+        return AlbumMapItemListViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = imginfoList.size
+    override fun getItemCount(): Int = imgInfoList.size
 
-    override fun onBindViewHolder(holder: AlbumMapitemlistViewHolder, position: Int) {
-        holder.bind(imginfoList[position].uri)
+    override fun onBindViewHolder(holder: AlbumMapItemListViewHolder, position: Int) {
+        holder.bind(imgInfoList[position].uri)
     }
 
-    inner class AlbumMapitemlistViewHolder(private val binding: AlbummapItemBinding) :
+    inner class AlbumMapItemListViewHolder(private val binding: AlbummapItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
-                itemClickListener?.onItemClick(imginfoList[bindingAdapterPosition].latLng, imginfoList[bindingAdapterPosition].tag)
+                itemClickListener?.onItemClick(imgInfoList[bindingAdapterPosition].latLng, imgInfoList[bindingAdapterPosition].tag)
             }
         }
         fun bind(img: Uri) {

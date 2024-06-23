@@ -57,7 +57,7 @@ class GalleryBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         binding.apply {
-            imgDate.text = date
+            day = date
             removeimg.setOnClickListener {
                 imgUri?.also {
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
