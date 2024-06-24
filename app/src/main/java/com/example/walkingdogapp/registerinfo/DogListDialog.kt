@@ -1,7 +1,5 @@
 package com.example.walkingdogapp.registerinfo
 
-import android.app.Dialog
-import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,13 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.walkingdogapp.WriteDialog
 import com.example.walkingdogapp.databinding.DoglistDialogBinding
-import com.example.walkingdogapp.databinding.WriteDialogBinding
 
-class DoglistDialog : DialogFragment(){
+class DogListDialog : DialogFragment(){
     private var _binding: DoglistDialogBinding? = null
     private val binding get() = _binding!!
     private val dogs = listOf("직접 입력", "말티즈", "푸들", "포메라니안", "믹스견", "치와와", "시츄", "골든리트리버", "진돗개", "불독", "비글", "닥스훈트", "허스키")
@@ -33,9 +29,9 @@ class DoglistDialog : DialogFragment(){
         _binding = DoglistDialogBinding.inflate(inflater, container, false)
         val dialogRecyclerView = binding.dialogRecyclerView
         dialogRecyclerView.layoutManager = LinearLayoutManager(context)
-        val adaptar = DoglistAdpatar(dogs)
-        adaptar.itemClickListener =
-            DoglistAdpatar.OnItemClickListener { name ->
+        val adapter = DogListAdapter(dogs)
+        adapter.itemClickListener =
+            DogListAdapter.OnItemClickListener { name ->
                 if(name == "직접 입력") {
                     val writeDogDialog = WriteDialog()
                     writeDogDialog.clickYesListener = WriteDialog.OnClickYesListener { text ->
@@ -51,10 +47,14 @@ class DoglistDialog : DialogFragment(){
                 }
                 dismiss()
             }
-        dialogRecyclerView.adapter = adaptar
-        resizeDialog()
+        dialogRecyclerView.adapter = adapter
         this.dialog?.setCanceledOnTouchOutside(true)
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        resizeDialog()
     }
 
     override fun onDestroy() {

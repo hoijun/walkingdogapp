@@ -30,7 +30,7 @@ class SettingAlarmFragment : Fragment() {
     private lateinit var mainactivity: MainActivity
     private var removeAlarmList = mutableListOf<AlarmDataModel>()
     private var alarmList = mutableListOf<AlarmDataModel>()
-    private var adaptar: AlarmlistAdapter? = null
+    private var adaptar: AlarmListAdapter? = null
     private var selectMode = false
 
     private val callback = object : OnBackPressedCallback(true) {
@@ -95,9 +95,9 @@ class SettingAlarmFragment : Fragment() {
 
             coroutineScope.launch {
                 alarmList = myViewModel.getAlarmList().sortedBy { alarmTimeToString(it.time).toInt() }.toMutableList()
-                adaptar = AlarmlistAdapter(alarmList)
+                adaptar = AlarmListAdapter(alarmList)
                 withContext(Dispatchers.Main) {
-                    adaptar?.onItemClickListener = object : AlarmlistAdapter.OnItemClickListener {
+                    adaptar?.onItemClickListener = object : AlarmListAdapter.OnItemClickListener {
                         override fun onItemClick(alarm: AlarmDataModel) {
                             val settingAlarmDialog = SettingAlarmDialog().apply {
                                 val bundle = Bundle()
@@ -171,10 +171,10 @@ class SettingAlarmFragment : Fragment() {
 
                         override fun onSwitchCheckedChangeListener(
                             alarm: AlarmDataModel,
-                            ischecked: Boolean
+                            isChecked: Boolean
                         ) {
                             coroutineScope.launch {
-                                if (ischecked) {
+                                if (isChecked) {
                                     val calendar = Calendar.getInstance().apply {
                                         val today = get(Calendar.DATE)
                                         timeInMillis = alarm.time
@@ -192,8 +192,8 @@ class SettingAlarmFragment : Fragment() {
                                 } else {
                                     alarmFunctions.cancelAlarm(alarm.alarm_code)
                                 }
-                                alarmList[alarmList.indexOf(alarm)].alarmOn = ischecked
-                                myViewModel.onOffAlarm(alarm, ischecked)
+                                alarmList[alarmList.indexOf(alarm)].alarmOn = isChecked
+                                myViewModel.onOffAlarm(alarm, isChecked)
                             }
                         }
                     }

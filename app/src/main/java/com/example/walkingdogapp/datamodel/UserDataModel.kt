@@ -17,7 +17,7 @@ data class DogInfo(
     var birth: String = "",
     var neutering: String = "",
     var vaccination: String = "",
-    var weight: Int = 0,
+    var weight: String = "",
     var feature: String = "",
     var creationTime: Long = 0,
     var walkInfo: WalkInfo = WalkInfo()

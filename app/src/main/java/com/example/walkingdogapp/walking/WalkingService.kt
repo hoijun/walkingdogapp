@@ -33,7 +33,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Timer
 import kotlin.concurrent.timer
 
-
 class WalkingService : Service() {
     private lateinit var locationRequest: LocationRequest
     private  var fusedLocationProviderClient: FusedLocationProviderClient? = null
@@ -47,9 +46,9 @@ class WalkingService : Service() {
         val isTracking = MutableLiveData<Boolean>()
         val walkTime = MutableLiveData<Int>()
         var getCollectionItems = mutableListOf<String>()
-        var walkingDogs = arrayListOf<String>()
+        var walkingDogs = MutableLiveData<ArrayList<String>>()
         var animalMarkers = mutableListOf<InfoWindow>()
-        var walkDistance = 0f
+        var walkDistance = MutableLiveData<Float>()
         var startTime = ""
     }
 
@@ -59,10 +58,10 @@ class WalkingService : Service() {
         coordList.postValue(mutableListOf())
         totalTime = 0
         miscount = 0
-        walkingDogs = arrayListOf()
+        walkingDogs.postValue(arrayListOf())
         getCollectionItems = mutableListOf()
         animalMarkers = mutableListOf<InfoWindow>()
-        walkDistance = 0f
+        walkDistance.postValue(0f)
         startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
     }
 
@@ -88,12 +87,15 @@ class WalkingService : Service() {
                             add(pos)
                             coordList.postValue(this)
                             miscount = 0
-                            Log.d("current coord", "$pos")
                         }
                         if (coordList.value!!.size > 1) { // 거리 증가
-                            walkDistance += coordList.value!!.last()
-                                .distanceTo(coordList.value!![coordList.value!!.size - 2]).toFloat()
-                            Log.d("current coord", "distance: $walkDistance")
+                            walkDistance.postValue(
+                                walkDistance.value?.plus(
+                                    coordList.value!!.last()
+                                        .distanceTo(coordList.value!![coordList.value!!.size - 2])
+                                        .toFloat()
+                                )
+                            )
                         }
                     }
                 }
@@ -116,7 +118,7 @@ class WalkingService : Service() {
             if (action != null) {
                 when(action) {
                     Constant.ACTION_START_Walking_SERVICE -> {
-                        walkingDogs = intent.getStringArrayListExtra("selectedDogs")?: arrayListOf()
+                        walkingDogs.postValue(intent.getStringArrayListExtra("selectedDogs")?: arrayListOf())
                         startLocationService()
                     }
 

@@ -306,13 +306,14 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
-                    android:text='@{viewmodel.walkDates.size() + "회"}'
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     app:layout_constraintHeight_percent="0.33"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="1" />
+                    app:layout_constraintWidth_percent="1"
+                    app:walkDates="@{viewmodel.walkDates}"
+                    app:dogs="@{viewmodel.dogsInfo}"/>
 
                 <TextView
                     android:id="@+id/walk_distance"

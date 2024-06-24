@@ -2,18 +2,18 @@ package com.example.walkingdogapp.mainhome
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
+import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.HomedoglistItemBinding
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 
-class HomeDogListAdapter(private val dogsList: List<DogInfo>, private val dogsImg: HashMap<String, Uri>): RecyclerView.Adapter<HomeDogListAdapter.HomeDogListViewHolder>() {
+class HomeDogListAdapter(private val dogsList: List<DogInfo>): RecyclerView.Adapter<HomeDogListAdapter.HomeDogListViewHolder>() {
     lateinit var context: Context
 
     fun interface OnClickDogListener {
@@ -41,11 +41,10 @@ class HomeDogListAdapter(private val dogsList: List<DogInfo>, private val dogsIm
         RecyclerView.ViewHolder(binding.root) {
         fun bind(dog: DogInfo) {
             binding.apply {
-                dogCheckBox.background = null
+                dogInfo = dog
                 homeAddDogBtn.visibility = View.GONE
-                homeDogName.text = dog.name
-                if (dogsImg[dog.name] != null) {
-                    Glide.with(context).load(dogsImg[dog.name])
+                if (MainActivity.dogUriList[dog.name] != null) {
+                    Glide.with(context).load(MainActivity.dogUriList[dog.name])
                         .format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(homeDogImage)
                 }
 

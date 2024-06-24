@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="android.view.View"/>
         <variable
             name="dogInfo"
             type="com.example.walkingdogapp.datamodel.DogInfo" />
@@ -73,7 +72,7 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center|start"
-                    android:text="@{String.format(`%d살 / %dkg / %s`, dogAge, dogInfo.weight, dogInfo.breed)}"
+                    android:text="@{String.format(`%d살 / %skg / %s`, dogAge, dogInfo.weight, dogInfo.breed)}"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
