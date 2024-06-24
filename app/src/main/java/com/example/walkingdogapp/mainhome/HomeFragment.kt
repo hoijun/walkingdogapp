@@ -52,21 +52,17 @@ class HomeFragment : Fragment() {
         MainActivity.preFragment = "Home" // 다른 액티비티로 이동 할 때 홈에서 이동을 표시
         builder = AlertDialog.Builder(requireContext())
 
-        // 현재 위치 주소
-        userInfoViewModel.currentRegion.observe(viewLifecycleOwner) {
-            binding.textLocation.text = it
-        }
-
         binding.apply {
             viewmodel = userInfoViewModel
             lifecycleOwner = requireActivity()
+            selectedDogs = selectedDogList.joinToString(", ")
 
             btnAlarm.setOnClickListener {
                 mainactivity.changeFragment(SettingAlarmFragment())
             }
 
             val dogsList = userInfoViewModel.dogsInfo.value?: listOf()
-            val homeDogListAdapter = HomeDogListAdapter(dogsList, userInfoViewModel.dogsImg.value ?: hashMapOf())
+            val homeDogListAdapter = HomeDogListAdapter(dogsList)
             homeDogListAdapter.onClickDogListener = HomeDogListAdapter.OnClickDogListener { dogName ->
                 if(selectedDogList.contains(dogName)) {
                     selectedDogList.remove(dogName)
@@ -74,12 +70,7 @@ class HomeFragment : Fragment() {
                     selectedDogList.add(dogName)
                 }
 
-                if(selectedDogList.isEmpty()) {
-                    selectedDogs.text = "같이 산책할 강아지를 체크 해주세요!"
-                } else {
-                    val selected = selectedDogList.joinToString(", ")
-                    selectedDogs.text = "${selected} 선택 중..."
-                }
+                selectedDogs = selectedDogList.joinToString(", ")
             }
 
             homeDogsViewPager.adapter = homeDogListAdapter
@@ -125,8 +116,7 @@ class HomeFragment : Fragment() {
                                 // 권한 창으로 이동
                                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                intent.data =
-                                    Uri.fromParts("package", requireContext().packageName, null)
+                                intent.data = Uri.fromParts("package", requireContext().packageName, null)
                                 startActivity(intent)
                             }
                         }

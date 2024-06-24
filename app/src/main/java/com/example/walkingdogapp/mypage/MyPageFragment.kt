@@ -9,27 +9,30 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.album.GalleryFragment
 import com.example.walkingdogapp.databinding.FragmentMyPageBinding
+import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.datamodel.WalkInfo
 import com.example.walkingdogapp.datamodel.WalkRecord
 import com.example.walkingdogapp.registerinfo.RegisterUserActivity
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.google.android.material.tabs.TabLayoutMediator
+import com.prolificinteractive.materialcalendarview.CalendarDay
 
 
 class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
     private val binding get() = _binding!!
     private val userDataViewModel: UserInfoViewModel by activityViewModels()
-    private lateinit var userInfo: UserInfo
     private lateinit var totalWalkInfo: WalkInfo
     private var walkdates = mutableListOf<WalkRecord>()
     private lateinit var mainactivity: MainActivity
@@ -107,7 +110,7 @@ class MyPageFragment : Fragment() {
 
             modifyuserinfoBtn.setOnClickListener {
                 val registerUserIntent = Intent(requireContext(), RegisterUserActivity::class.java)
-                registerUserIntent.putExtra("userinfo", userInfo)
+                registerUserIntent.putExtra("userinfo", userDataViewModel.userInfo.value)
                 startActivity(registerUserIntent)
             }
 
@@ -172,5 +175,20 @@ class MyPageFragment : Fragment() {
             }
         }
         return count
+    }
+
+    object MyPageBindingAdapter {
+        @BindingAdapter("walkDates", "dogs")
+        @JvmStatic
+        fun setWalkCountText(textView: TextView, walkDates: HashMap<String, MutableList<WalkRecord>>, dogs: List<DogInfo>) {
+            val totalWalk = mutableListOf<WalkRecord>()
+            for(dog in dogs) {
+                totalWalk.addAll(walkDates.get(dog.name) ?: mutableListOf())
+            }
+
+            val counts = totalWalk.groupingBy { it }.eachCount()
+
+            textView.text = counts.size.toString() + "회"
+        }
     }
 }

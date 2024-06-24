@@ -21,7 +21,7 @@ class ManageDogsFragment : Fragment() {
     private lateinit var mainactivity: MainActivity
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            goMypage()
+            goMyPage()
         }
     }
 
@@ -61,7 +61,7 @@ class ManageDogsFragment : Fragment() {
             }
 
             btnBack.setOnClickListener {
-                goMypage()
+                goMyPage()
             }
         }
         return binding.root
@@ -77,7 +77,7 @@ class ManageDogsFragment : Fragment() {
         _binding = null
     }
 
-    private fun goMypage() {
+    private fun goMyPage() {
         mainactivity.changeFragment(MyPageFragment())
     }
 }

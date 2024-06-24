@@ -1,15 +1,15 @@
 package com.example.walkingdogapp.alarm
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingdogapp.databinding.AlarmlistItemBinding
 import com.example.walkingdogapp.datamodel.AlarmDataModel
 import java.util.Calendar
 
-class AlarmlistAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerView.Adapter<AlarmlistAdapter.AlarmitemlistViewHolder>() {
+class AlarmListAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerView.Adapter<AlarmListAdapter.AlarmItemListViewHolder>() {
 
     interface OnItemClickListener {
         fun onItemClick(alarm: AlarmDataModel)
@@ -17,7 +17,7 @@ class AlarmlistAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerVi
         fun onItemClickInSelectMode(alarm: AlarmDataModel)
         fun onSwitchCheckedChangeListener(
             alarm: AlarmDataModel,
-            ischecked: Boolean
+            isChecked: Boolean
         )
     }
 
@@ -25,19 +25,19 @@ class AlarmlistAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerVi
     private val selectedItems = mutableListOf<AlarmDataModel>()
     var onItemClickListener: OnItemClickListener? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlarmitemlistViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlarmItemListViewHolder {
         val binding =
             AlarmlistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return AlarmitemlistViewHolder(binding)
+        return AlarmItemListViewHolder(binding)
     }
 
     override fun getItemCount(): Int = alarmList.size
 
-    override fun onBindViewHolder(holder: AlarmitemlistViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: AlarmItemListViewHolder, position: Int) {
         holder.bind(alarmList[position])
     }
 
-    inner class AlarmitemlistViewHolder(private val binding: AlarmlistItemBinding) :
+    inner class AlarmItemListViewHolder(private val binding: AlarmlistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
@@ -58,37 +58,36 @@ class AlarmlistAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerVi
         }
 
         fun bind(alarm: AlarmDataModel) {
-            val infos = getAlarmInfo(alarm)
+            val alarmInfos = getAlarmInfo(alarm)
             var time = ""
-            val hour = infos[0].toInt()
+            val hour = alarmInfos[0].toInt()
             binding.apply {
+                isSelectMode = selectMode
                 if (hour > 12) {
-                    ampm.text = "오후"
+                    alarmAmPm = "오후"
                     time += (hour - 12).toString()
                 } else if (hour == 12) {
-                    ampm.text = "오후"
-                    time += infos[0]
+                    alarmAmPm = "오후"
+                    time += alarmInfos[0]
                 } else if (hour == 0) {
-                    ampm.text = "오전"
+                    alarmAmPm = "오전"
                     time += "12"
                 } else {
-                    ampm.text = "오전"
-                    time += infos[0]
+                    alarmAmPm = "오전"
+                    time += alarmInfos[0]
                 }
 
-                time += ":${infos[1]}"
+                time += ":${alarmInfos[1]}"
 
-                alarmtime.text = time
+                alarmTime = time
 
-                week.text = infos[2]
+                week.text = alarmInfos[2]
 
                 if (selectMode) {
-                    checkBox.visibility = View.VISIBLE
+                    isSelectMode = selectMode
                     checkBox.isChecked = selectedItems.contains(alarmList[bindingAdapterPosition])
-                    Onoff.visibility = View.GONE
                 } else {
-                    checkBox.visibility = View.GONE
-                    Onoff.visibility = View.VISIBLE
+                    isSelectMode = selectMode
                 }
 
                 checkBox.setOnClickListener {

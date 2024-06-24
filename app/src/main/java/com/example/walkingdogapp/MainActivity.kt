@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -15,36 +14,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.album.AlbumMapFragment
 import com.example.walkingdogapp.collection.CollectionFragment
 import com.example.walkingdogapp.databinding.ActivityMainBinding
 import com.example.walkingdogapp.mainhome.HomeFragment
 import com.example.walkingdogapp.mypage.ManageDogsFragment
 import com.example.walkingdogapp.mypage.MyPageFragment
-import com.example.walkingdogapp.datamodel.DogInfo
-import com.example.walkingdogapp.datamodel.UserInfo
-import com.example.walkingdogapp.datamodel.WalkRecord
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
-import com.example.walkingdogapp.datamodel.WalkInfo
-import com.example.walkingdogapp.datamodel.WalkLatLng
-import com.example.walkingdogapp.walking.SaveWalkDate
 import com.example.walkingdogapp.walking.WalkingActivity
 import com.example.walkingdogapp.walking.WalkingService
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.getValue
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
@@ -81,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (preFragment == "Mypage") {
+        if (preFragment == "Mypage" || preFragment == "Manage") {
             binding.menuBn.selectedItemId = R.id.navigation_mypage
         } // 다른 액티비티로 마이페이지에서 변경 했었을 경우, 다시 되돌아 올 때 바텀바의 표시를 마이페이지로 변경
 

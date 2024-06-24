@@ -48,7 +48,7 @@ class SettingAlarmDialog : DialogFragment() {
             timepicker.minute = setCalendar.get(Calendar.MINUTE)
 
             alarmInfo?.also {
-                setWeeks(it)
+                weeks = alarmInfo.weeks.toList()
             }
 
             exist.setOnClickListener {
@@ -134,18 +134,6 @@ class SettingAlarmDialog : DialogFragment() {
         val deviceWidth = Resources.getSystem().displayMetrics.widthPixels
         params?.width = (deviceWidth * 0.99).toInt()
         this.dialog?.window?.attributes = params as WindowManager.LayoutParams
-    }
-
-    private fun setWeeks(alarm: AlarmDataModel) {
-        val weeks = alarm.weeks
-        binding.apply {
-            val weeksButton = listOf(sunday, monday, tuesday, wednesday, thursday, friday, saturday)
-            for (i: Int in weeks.indices) {
-                if (weeks[i]) {
-                    weeksButton[i].isChecked = true
-                }
-            }
-        }
     }
 
     private fun weeksToCode(weeks: Array<Boolean>): String {

@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:gravity="center|start"
-                android:text="@{String.format(`%d살 / %dkg / %s`, dogAge, dogInfo.weight, dogInfo.breed)}"
+                android:text="@{String.format(`%d살 / %skg / %s`, dogAge, dogInfo.weight, dogInfo.breed)}"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 app:layout_constraintHeight_percent="0.35"

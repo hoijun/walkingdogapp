@@ -111,6 +111,22 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
         repository.onOffAlarm(alarm.alarm_code, isChecked)
     }
 
+    suspend fun updateUserInfo(userInfo: UserInfo) {
+       repository.updateUserInfo(userInfo)
+    }
+
+    suspend fun updateDogInfo(dogInfo: DogInfo, beforeName: String, imgUri: Uri?, walkRecords: ArrayList<WalkRecord>): Boolean {
+        return repository.updateDogInfo(dogInfo, beforeName, imgUri, walkRecords)
+    }
+
+    suspend fun removeDogInfo(beforeName: String) {
+        repository.removeDogInfo(beforeName)
+    }
+
+    suspend fun saveWalkInfo(walkDogs: ArrayList<String>, startTime: String, distance: Float, time: Int, coords: List<com.naver.maps.geometry.LatLng>, collections: List<String>): Boolean {
+        return repository.saveWalkInfo(walkDogs, startTime, distance, time, coords, collections)
+    }
+
     suspend fun removeAccount() : Boolean{
         return repository.removeAccount()
     }

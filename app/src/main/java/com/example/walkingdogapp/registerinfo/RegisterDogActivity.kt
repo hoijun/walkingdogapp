@@ -15,8 +15,9 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
-import android.view.View
 import android.webkit.MimeTypeMap
+import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,41 +25,42 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.databinding.BindingAdapter
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.ActivityRegisterDogBinding
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.WalkRecord
-import com.example.walkingdogapp.walking.SaveWalkDate
+import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 
 class RegisterDogActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterDogBinding
-    private lateinit var doginfo: DogInfo
+    private var dogInfo = DogInfo()
     private val auth = FirebaseAuth.getInstance()
     private val db = Firebase.database
     private val storage = FirebaseStorage.getInstance()
     private var imguri: Uri? = null
+    private lateinit var userInfoViewModel: UserInfoViewModel
 
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            selectgoMain()
+            selectGoMain()
         }
     }
 
@@ -68,14 +70,14 @@ class RegisterDogActivity : AppCompatActivity() {
         }
         if (uri != null && getExtension(uri) == "jpg") {
             imguri = pressImage(uri,this)
-            Log.d("PhotoPickerAAA", "Selected URI: $uri")
-            binding.registerImage.setImageURI(uri)
+            Glide.with(this@RegisterDogActivity).load(uri)
+                .format(DecodeFormat.PREFER_RGB_565).override(100, 100).into(binding.registerImage)
         } else {
             return@registerForActivityResult
         }
     }
 
-    private val storegePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
     } else {
         arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -90,12 +92,13 @@ class RegisterDogActivity : AppCompatActivity() {
 
         this.onBackPressedDispatcher.addCallback(this, backPressCallback)
 
+        userInfoViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
 
         val uid = auth.currentUser?.uid
         val userRef = db.getReference("Users")
         val storageRef = storage.getReference("$uid")
 
-        val userdogInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val userDogInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra("doginfo", DogInfo::class.java)
         } else {
             intent.getSerializableExtra("doginfo") as DogInfo?
@@ -107,88 +110,56 @@ class RegisterDogActivity : AppCompatActivity() {
             intent.getParcelableArrayListExtra("walkRecord") ?: arrayListOf()
         }
 
-        doginfo = userdogInfo?: DogInfo()
-        val beforeName = doginfo.name
+        dogInfo = userDogInfo?: DogInfo()
+        val beforeName = dogInfo.name
 
-        if (doginfo.creationTime == 0L) {
-            doginfo.creationTime = System.currentTimeMillis()
+        if (dogInfo.creationTime == 0L) {
+            dogInfo.creationTime = System.currentTimeMillis()
         }
 
 
         binding.apply {
+            dog = dogInfo
+
             if (MainActivity.dogUriList[beforeName] != null) {
                 Glide.with(this@RegisterDogActivity).load(MainActivity.dogUriList[beforeName])
                     .format(DecodeFormat.PREFER_RGB_565).override(100, 100).into(registerImage)
             }
 
-            if (doginfo.name != "") {
-                removeBtn.visibility = View.VISIBLE
-
-                editName.setText(doginfo.name)
-                editName.setSelection(doginfo.name.length)
-
-                editWeight.setText(doginfo.weight.toString())
-                editFeature.setText(doginfo.feature)
-
-                editBreed.text = doginfo.breed
-                editBirth.text = doginfo.birth
-
-                when (doginfo.gender) {
-                    "남" -> btnDogismale.setBackgroundColor(Color.DKGRAY)
-                    "여" -> btnDogisfemale.setBackgroundColor(Color.DKGRAY)
-                }
-
-                when (doginfo.neutering) {
-                    "예" -> btnNeuteryes.setBackgroundColor(Color.DKGRAY)
-                    "아니요" -> btnNeuterno.setBackgroundColor(Color.DKGRAY)
-                }
-
-                when (doginfo.vaccination) {
-                    "예" -> btnVaccyes.setBackgroundColor(Color.DKGRAY)
-                    "아니요" -> btnVaccno.setBackgroundColor(Color.DKGRAY)
-                }
-            }
-
             btnDogismale.setOnClickListener {
-                doginfo.gender = btnDogismale.text.toString()
-                btnDogismale.setBackgroundColor(Color.DKGRAY)
-                btnDogisfemale.setBackgroundColor(Color.GRAY)
+                dogInfo.gender = "남"
+                dog = dogInfo
             }
             btnDogisfemale.setOnClickListener {
-                doginfo.gender = btnDogisfemale.text.toString()
-                btnDogisfemale.setBackgroundColor(Color.DKGRAY)
-                btnDogismale.setBackgroundColor(Color.GRAY)
+                dogInfo.gender = "여"
+                dog = dogInfo
             }
 
             btnNeuteryes.setOnClickListener {
-                doginfo.neutering = btnNeuteryes.text.toString()
-                btnNeuteryes.setBackgroundColor(Color.DKGRAY)
-                btnNeuterno.setBackgroundColor(Color.GRAY)
+                dogInfo.neutering = "예"
+                dog = dogInfo
             }
             btnNeuterno.setOnClickListener {
-                doginfo.neutering = btnNeuterno.text.toString()
-                btnNeuterno.setBackgroundColor(Color.DKGRAY)
-                btnNeuteryes.setBackgroundColor(Color.GRAY)
+                dogInfo.neutering = "아니요"
+                dog = dogInfo
             }
 
             btnVaccyes.setOnClickListener {
-                doginfo.vaccination = btnVaccyes.text.toString()
-                btnVaccyes.setBackgroundColor(Color.DKGRAY)
-                btnVaccno.setBackgroundColor(Color.GRAY)
+                dogInfo.vaccination = "예"
+                dog = dogInfo
             }
             btnVaccno.setOnClickListener {
-                doginfo.vaccination = btnVaccno.text.toString()
-                btnVaccno.setBackgroundColor(Color.DKGRAY)
-                btnVaccyes.setBackgroundColor(Color.GRAY)
+                dogInfo.vaccination = "아니요"
+                dog = dogInfo
             }
 
             editBreed.setOnClickListener {
-                showDoglist()
+                showDogList()
             }
 
             editBirth.setOnClickListener {
                 val cal = Calendar.getInstance()
-                val dateCallback = DatePickerDialog.OnDateSetListener { view, year, month, day ->
+                val dateCallback = DatePickerDialog.OnDateSetListener { _, year, month, day ->
                     val birth = "${year}/${month + 1}/${day}"
                     if (Constant.getAge(birth) == -1) {
                         Toast.makeText(
@@ -198,28 +169,29 @@ class RegisterDogActivity : AppCompatActivity() {
                         ).show()
                         return@OnDateSetListener
                     }
-                    doginfo.birth = birth
-                    binding.editBirth.text = birth
+                    dogInfo.birth = birth
+                    dog = dogInfo
                 }
-                val datepicker = DatePickerDialog(
+
+                val datePicker = DatePickerDialog(
                     this@RegisterDogActivity,
                     dateCallback,
                     cal.get(Calendar.YEAR),
                     cal.get(Calendar.MONTH),
                     cal.get(Calendar.DAY_OF_MONTH)
                 )
-                datepicker.datePicker.maxDate = cal.timeInMillis
-                datepicker.show()
+                datePicker.datePicker.maxDate = cal.timeInMillis
+                datePicker.show()
             }
 
             registerImage.setOnClickListener {
-                if (checkPermission(storegePermission, storageCode)) {
+                if (checkPermission(storagePermission, storageCode)) {
                     pickMedia.launch("image/jpeg")
                 }
             }
 
             registerDog.setOnClickListener {
-                doginfo.apply {
+                dogInfo.apply {
                     if (editName.text.toString() == "" || editBreed.text == "" || editBirth.text == "" || editWeight.text.toString() == ""
                         || gender == "" || neutering == "" || vaccination == ""
                     ) {
@@ -231,12 +203,8 @@ class RegisterDogActivity : AppCompatActivity() {
                     }
                 }
 
-                doginfo.name = editName.text.toString()
-                doginfo.weight = editWeight.text.toString().toInt()
-                doginfo.feature = editFeature.text.toString()
-
-                if (beforeName != doginfo.name) {
-                    if (MainActivity.dogNameList.contains(doginfo.name)) {
+                if (beforeName != dogInfo.name) {
+                    if (MainActivity.dogNameList.contains(dogInfo.name)) {
                         Toast.makeText(
                             this@RegisterDogActivity,
                             "같은 이름의 강아지가 있어요!",
@@ -260,107 +228,18 @@ class RegisterDogActivity : AppCompatActivity() {
                 val listener = DialogInterface.OnClickListener { _, ans ->
                     when (ans) {
                         DialogInterface.BUTTON_POSITIVE -> {
-                            var error = false
-                            binding.settingscreen.visibility = View.INVISIBLE
-                            binding.waitImage.visibility = View.VISIBLE
+                            val loadingDialogFragment = LoadingDialogFragment()
+                            loadingDialogFragment.show(this@RegisterDogActivity.supportFragmentManager, "loading")
                             lifecycleScope.launch { // 강아지 정보 등록
-                                val dogInfoJob = async(Dispatchers.IO) {
-                                    try {
-                                        if(beforeName != "") { // 수정하는 경우
-                                            userRef.child("$uid").child("dog").child(beforeName).removeValue().await()
-                                        }
-                                        userRef.child("$uid").child("dog").child(doginfo.name).setValue(doginfo).await()
-                                    } catch (e: Exception) {
-                                        error = true
-                                        return@async
+                                withContext(Dispatchers.Main) {
+                                    val onFailed = userInfoViewModel.updateDogInfo(dogInfo, beforeName, imguri, walkRecords)
+                                    loadingDialogFragment.dismiss()
+                                    if (onFailed) {
+                                        Toast.makeText(this@RegisterDogActivity, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                                        goMain()
                                     }
+                                    goMain()
                                 }
-
-                                dogInfoJob.await()
-
-                                if (error) {
-                                    return@launch
-                                }
-
-
-                                val walkRecordJob = async(Dispatchers.IO) {
-                                    try {
-                                        for(walkRecord in walkRecords) {
-                                            val day = walkRecord.day + " " + walkRecord.startTime + " " + walkRecord.endTime
-                                            userRef.child("$uid").child("dog").child(doginfo.name).child("walkdates").child(day)
-                                                .setValue(SaveWalkDate(walkRecord.distance, walkRecord.time, walkRecord.coords, walkRecord.collections))
-                                                .await()
-                                        }
-                                    }  catch (e: Exception) {
-                                        error = true
-                                        return@async
-                                    }
-                                }
-
-                                val uploadJob = launch(Dispatchers.IO) {
-                                    try {
-                                        if (imguri != null) {
-                                            storageRef.child("images").child(doginfo.name)
-                                                .putFile(imguri!!).await()
-                                        } else {
-                                            if (MainActivity.dogUriList[beforeName] != null) {
-                                                val tempUri = suspendCoroutine { continuation ->
-                                                    val tempFile = File.createTempFile(
-                                                        "temp",
-                                                        ".jpg",
-                                                        this@RegisterDogActivity.cacheDir
-                                                    )
-                                                    storage.getReferenceFromUrl(MainActivity.dogUriList[beforeName].toString())
-                                                        .getStream { _, inputStream ->
-                                                            val outputStream =
-                                                                FileOutputStream(tempFile)
-                                                            inputStream.copyTo(outputStream)
-                                                            val tempFileUri = Uri.fromFile(tempFile)
-                                                            continuation.resume(tempFileUri)
-                                                        }
-                                                }
-
-                                                storageRef.child("images").child(doginfo.name)
-                                                    .putFile(tempUri).await()
-                                            }
-                                        }
-                                    } catch (e: Exception) {
-                                        error = true
-                                        return@launch
-                                    }
-                                }
-
-                                uploadJob.join()
-
-                                val deleteJob = launch(Dispatchers.IO) {
-                                    try {
-                                        if (beforeName == "") {
-                                            return@launch
-                                        }
-
-                                        if (!MainActivity.dogNameList.contains(doginfo.name)) {
-                                            storageRef.child("images").child(beforeName).delete()
-                                                .await()
-                                        }
-                                    } catch (e: Exception) {
-                                        error = true
-                                        return@launch
-                                    }
-                                }
-
-                                walkRecordJob.await()
-
-                                if (error) {
-                                    return@launch
-                                }
-
-                                deleteJob.join()
-                                goMain()
-                            }
-
-                            if(error) {
-                                Toast.makeText(this@RegisterDogActivity, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
-                                goMain()
                             }
                         }
                     }
@@ -377,30 +256,15 @@ class RegisterDogActivity : AppCompatActivity() {
                 val listener = DialogInterface.OnClickListener { _, ans ->
                     when (ans) {
                         DialogInterface.BUTTON_POSITIVE -> {
+                            val loadingDialogFragment = LoadingDialogFragment()
+                            loadingDialogFragment.show(this@RegisterDogActivity.supportFragmentManager, "loading")
+
                             lifecycleScope.launch { // 강아지 정보 등록
-                                val removeDogInfoJob = async(Dispatchers.IO) {
-                                    try {
-                                        userRef.child("$uid").child("dog").child(beforeName).removeValue()
-                                            .await()
-                                    } catch (e: Exception) {
-                                        return@async
-                                    }
+                                userInfoViewModel.removeDogInfo(beforeName)
+                                withContext(Dispatchers.Main) {
+                                    loadingDialogFragment.dismiss()
+                                    goMain()
                                 }
-
-                                val removeDogImgJob = launch(Dispatchers.IO) {
-                                    try {
-                                        if (MainActivity.dogUriList[beforeName] != null) {
-                                            storageRef.child("images").child(beforeName).delete()
-                                                .await()
-                                        }
-                                    } catch (e: Exception) {
-                                        return@launch
-                                    }
-                                }
-
-                                removeDogInfoJob.await()
-                                removeDogImgJob.join()
-                                goMain()
                             }
                         }
                     }
@@ -411,7 +275,7 @@ class RegisterDogActivity : AppCompatActivity() {
             }
 
             btnBack.setOnClickListener {
-                selectgoMain()
+                selectGoMain()
             }
         }
     }
@@ -437,7 +301,7 @@ class RegisterDogActivity : AppCompatActivity() {
         return Uri.fromFile(tempFile)
     }
 
-    private fun selectgoMain() {
+    private fun selectGoMain() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("나가시겠어요?")
         val listener = DialogInterface.OnClickListener { _, ans ->
@@ -460,11 +324,11 @@ class RegisterDogActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun showDoglist() {
-        val dialog = DoglistDialog()
-        dialog.onClickItemListener = DoglistDialog.OnClickItemListener {
+    private fun showDogList() {
+        val dialog = DogListDialog()
+        dialog.onClickItemListener = DogListDialog.OnClickItemListener {
             binding.editBreed.text = it
-            doginfo.breed = it
+            dogInfo.breed = it
         }
         dialog.show(supportFragmentManager, "doglist")
     }
@@ -518,5 +382,43 @@ class RegisterDogActivity : AppCompatActivity() {
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    object RegisterDogBindingAdapter {
+        @BindingAdapter("dogGender")
+        @JvmStatic
+        fun setGenderBackground(btn: Button, gender: String) {
+            if(gender == btn.text) {
+                btn.setBackgroundColor(Color.parseColor("#ff444444"))
+            } else {
+                btn.setBackgroundColor(Color.parseColor("#ff888888"))
+            }
+        }
+
+        @BindingAdapter("dogNeutering")
+        @JvmStatic
+        fun setNeuteringBackground(btn: Button, neutering: String) {
+            if(neutering == btn.text) {
+                btn.setBackgroundColor(Color.parseColor("#ff444444"))
+            } else {
+                btn.setBackgroundColor(Color.parseColor("#ff888888"))
+            }
+        }
+
+        @BindingAdapter("dogVaccination")
+        @JvmStatic
+        fun setVaccinationBackground(btn: Button, vaccination: String) {
+            if(vaccination == btn.text) {
+                btn.setBackgroundColor(Color.parseColor("#ff444444"))
+            } else {
+                btn.setBackgroundColor(Color.parseColor("#ff888888"))
+            }
+        }
+
+        @BindingAdapter("dogNameLength")
+        @JvmStatic
+        fun setSelection(editText: EditText, length: Int) {
+            editText.setSelection(length)
+        }
     }
 }
