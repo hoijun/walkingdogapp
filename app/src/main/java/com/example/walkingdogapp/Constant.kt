@@ -29,7 +29,7 @@ class Constant {
         const val ACTION_STOP_Walking_Tracking = "stopWalkingTracking"
 
         val item_whether = HashMap<String, Boolean>().apply {
-            for (num: Int in 1..11) {
+            for (num: Int in 1..24) {
                 put(String.format("%03d", num), false)
             }
         }

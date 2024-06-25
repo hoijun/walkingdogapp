@@ -91,6 +91,8 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
     val successGetData: LiveData<Boolean>
         get() = _successGetData
 
+    fun isSuccessGetData(): Boolean = successGetData.value!!
+
     fun saveAlbumImgs(albumImgs: List<GalleryImgInfo>) {
         _albumImgs.value = albumImgs
     }
@@ -109,6 +111,21 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
 
     fun onOffAlarm(alarm: AlarmDataModel, isChecked: Boolean) {
         repository.onOffAlarm(alarm.alarm_code, isChecked)
+    }
+
+    fun observeUser() {
+        CoroutineScope(Dispatchers.IO).launch {
+            repository.observeUser(
+                _dogsInfo,
+                _userInfo,
+                _totalWalkInfo,
+                _walkDates,
+                _collectionInfo,
+                _dogsImg,
+                _successGetData
+            )
+        }
+        getLastLocation()
     }
 
     suspend fun updateUserInfo(userInfo: UserInfo) {

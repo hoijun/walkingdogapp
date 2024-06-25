@@ -12,6 +12,7 @@ import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.databinding.FragmentDogInfoBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.datamodel.DogInfo
@@ -22,7 +23,7 @@ class DogInfoFragment : Fragment() {
     private var _binding: FragmentDogInfoBinding? = null
     private val binding get() = _binding!!
 
-    private val myViewModel: UserInfoViewModel by activityViewModels()
+    private val userDataViewModel: UserInfoViewModel by activityViewModels()
     private lateinit var mainactivity: MainActivity
     private var beforepage = ""
 
@@ -67,15 +68,18 @@ class DogInfoFragment : Fragment() {
             }
 
             btnSettingdog.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !userDataViewModel.isSuccessGetData()) {
+                    return@setOnClickListener
+                }
                 val registerDogIntent = Intent(requireContext(), RegisterDogActivity::class.java)
-                val walkRecordArrayList: ArrayList<WalkRecord> = (myViewModel.walkDates.value?.get(userDogInfo.name) ?: mutableListOf()) as ArrayList<WalkRecord>
+                val walkRecordArrayList: ArrayList<WalkRecord> = (userDataViewModel.walkDates.value?.get(userDogInfo.name) ?: mutableListOf()) as ArrayList<WalkRecord>
                 registerDogIntent.putExtra("doginfo", userDogInfo)
                 registerDogIntent.putParcelableArrayListExtra("walkRecord", walkRecordArrayList)
                 startActivity(registerDogIntent)
             }
 
-            if (myViewModel.dogsImg.value?.get(userDogInfo.name) != null) {
-                Glide.with(requireContext()).load(myViewModel.dogsImg.value?.get(userDogInfo.name))
+            if (userDataViewModel.dogsImg.value?.get(userDogInfo.name) != null) {
+                Glide.with(requireContext()).load(userDataViewModel.dogsImg.value?.get(userDogInfo.name))
                     .format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(doginfoImage)
             }
         }

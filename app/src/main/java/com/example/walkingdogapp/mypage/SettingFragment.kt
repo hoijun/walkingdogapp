@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.LoginActivity
 import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.WriteDialog
 import com.example.walkingdogapp.alarm.AlarmFunctions
 import com.example.walkingdogapp.databinding.FragmentSettingBinding
@@ -73,6 +74,9 @@ class SettingFragment : Fragment() {
             userInfo = user
 
             logoutbtn.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !userDataViewModel.isSuccessGetData()) {
+                    return@setOnClickListener
+                }
                 if (user.email.contains("naver.com")) { // 네이버로 로그인 했을 경우
                     try {
                         NaverIdLoginSDK.logout()
@@ -117,6 +121,9 @@ class SettingFragment : Fragment() {
             }
 
             settingWithdrawal.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !userDataViewModel.isSuccessGetData()) {
+                    return@setOnClickListener
+                }
                 val writeDialog = WriteDialog()
                 writeDialog.clickYesListener = WriteDialog.OnClickYesListener { writeText ->
                     if (user.email != writeText) {

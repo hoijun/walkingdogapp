@@ -55,10 +55,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         override fun onFailure(httpStatus: Int, message: String) {
-            val errorCode = NaverIdLoginSDK.getLastErrorCode().code
-            val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
             setLoginIngView(false)
-            Log.e("test", "$errorCode $errorDescription")
         }
 
         override fun onSuccess() {
@@ -108,15 +105,20 @@ class LoginActivity : AppCompatActivity() {
 
         binding.apply {
             KakaoLogin.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(this@LoginActivity)) {
+                    return@setOnClickListener
+                }
                 try {
                     loginKakao()
                     setLoginIngView(true)
                 } catch (e: Exception) {
                     e.message?.let { it1 -> Log.d("error", it1) }
-                    setLoginIngView(false)
                 }
             }
             NaverLogin.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(this@LoginActivity)) {
+                    return@setOnClickListener
+                }
                 NaverIdLoginSDK.authenticate(this@LoginActivity, naverLoginCallback)
                 setLoginIngView(true)
             }
@@ -148,6 +150,8 @@ class LoginActivity : AppCompatActivity() {
                 Log.e(TAG, "로그인 성공 ${token.accessToken}")
                 loginApp("kakao")
             }
+
+            setLoginIngView(false)
         }
     }
 
@@ -175,7 +179,7 @@ class LoginActivity : AppCompatActivity() {
             if (!it.isSuccessful) {
                 if (it.exception is FirebaseAuthUserCollisionException) {
                     //이미 가입된 이메일일 경우
-                    signinFirebase(myEmail, password)
+                    signInFirebase(myEmail, password)
                 } else {
                     //예외메세지가 있다면 출력
                     //에러가 났다거나 서버가 연결이 실패했다거나
@@ -231,7 +235,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun signinFirebase(email: String, password: String) {
+    private fun signInFirebase(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {  //통신 완료가 된 후 무슨일을 할지
                 task ->
             if (task.isSuccessful) {

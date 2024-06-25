@@ -8,15 +8,21 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
+import com.example.walkingdogapp.collection.CollectionListAdapter
 import com.example.walkingdogapp.databinding.FragmentManageDogsBinding
 import com.example.walkingdogapp.datamodel.WalkRecord
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ManageDogsFragment : Fragment() {
     private var _binding: FragmentManageDogsBinding? = null
-    private val myViewModel: UserInfoViewModel by activityViewModels()
+    private val userDataViewModel: UserInfoViewModel by activityViewModels()
     private val binding get() = _binding!!
     private lateinit var mainactivity: MainActivity
     private val callback = object : OnBackPressedCallback(true) {
@@ -38,7 +44,7 @@ class ManageDogsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentManageDogsBinding.inflate(inflater,container, false)
-        val dogsList = myViewModel.dogsInfo.value?: listOf()
+        val dogsList = userDataViewModel.dogsInfo.value?: listOf()
 
         val manageDogListAdapter = ManageDogListAdapter(dogsList)
         manageDogListAdapter.onItemClickListener = ManageDogListAdapter.OnItemClickListener {
@@ -55,7 +61,30 @@ class ManageDogsFragment : Fragment() {
             countDog = dogsList.size
             DogsRecyclerView.adapter = manageDogListAdapter
 
+            refresh.apply {
+                setOnChildScrollUpCallback { _, _ ->
+                    if ((DogsRecyclerView.adapter as ManageDogListAdapter).itemCount == 0) {
+                        val firstRecyclerViewItem =
+                            (DogsRecyclerView.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+                        return@setOnChildScrollUpCallback firstRecyclerViewItem != 0
+                    }
+                    false
+                }
+
+                this.setOnRefreshListener {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        userDataViewModel.observeUser()
+                    }
+                }
+                userDataViewModel.successGetData.observe(requireActivity()) {
+                    refresh.isRefreshing = false
+                }
+            }
+
             btnAddDog.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !userDataViewModel.isSuccessGetData()) {
+                    return@setOnClickListener
+                }
                 val registerDogIntent = Intent(requireContext(), RegisterDogActivity::class.java)
                 startActivity(registerDogIntent)
             }

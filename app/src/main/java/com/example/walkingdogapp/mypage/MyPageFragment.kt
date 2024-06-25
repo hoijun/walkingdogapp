@@ -12,21 +12,25 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.viewpager2.widget.ViewPager2
 import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.album.GalleryFragment
 import com.example.walkingdogapp.databinding.FragmentMyPageBinding
 import com.example.walkingdogapp.datamodel.DogInfo
-import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.datamodel.WalkInfo
 import com.example.walkingdogapp.datamodel.WalkRecord
 import com.example.walkingdogapp.registerinfo.RegisterUserActivity
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.google.android.material.tabs.TabLayoutMediator
-import com.prolificinteractive.materialcalendarview.CalendarDay
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MyPageFragment : Fragment() {
@@ -63,6 +67,14 @@ class MyPageFragment : Fragment() {
         mainactivity.binding.menuBn.visibility = View.VISIBLE
         MainActivity.preFragment = "Mypage"  // 다른 액티비티로 이동 할 때 마이페이지에서 이동을 표시
 
+        if (!NetworkManager.checkNetworkState(requireContext())) {
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("인터넷을 연결해주세요!")
+            builder.setPositiveButton("네", null)
+            builder.setCancelable(false)
+            builder.show()
+        }
+
         val walkRecordList = userDataViewModel.walkDates.value?: hashMapOf()
         for(dog in MainActivity.dogNameList) {
             for(date in walkRecordList[dog] ?: listOf()) {
@@ -84,13 +96,37 @@ class MyPageFragment : Fragment() {
             viewmodel = userDataViewModel
             lifecycleOwner = requireActivity()
 
+            refresh.apply {
+                this.setOnRefreshListener {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        userDataViewModel.observeUser()
+                    }
+                }
+                userDataViewModel.successGetData.observe(requireActivity()) {
+                    refresh.isRefreshing = false
+                }
+            }
+
+            mypageDogsViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageScrollStateChanged(state: Int) {
+                    super.onPageScrollStateChanged(state)
+                    refresh.setEnabled(state == ViewPager2.SCROLL_STATE_IDLE)
+                }
+            })
+
             btnSetting.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(requireContext())) {
+                    return@setOnClickListener
+                }
                 mainactivity.changeFragment(SettingFragment())
             }
 
             val dogsList = userDataViewModel.dogsInfo.value ?: listOf()
-            val myPageDogListAdapter = MyPageDogListAdapter(dogsList)
+            val myPageDogListAdapter = MyPageDogListAdapter(dogsList, userDataViewModel.isSuccessGetData())
             myPageDogListAdapter.onItemClickListener = MyPageDogListAdapter.OnItemClickListener {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !userDataViewModel.isSuccessGetData()) {
+                    return@OnItemClickListener
+                }
                 val dogInfoFragment = DogInfoFragment().apply {
                     val bundle = Bundle()
                     bundle.putSerializable("doginfo", it)
@@ -104,11 +140,17 @@ class MyPageFragment : Fragment() {
             TabLayoutMediator(mypageDogsIndicator, mypageDogsViewPager) { _, _ -> }.attach()
 
             managedoginfoBtn.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(requireContext())) {
+                    return@setOnClickListener
+                }
                 val manageDogsFragment = ManageDogsFragment()
                 mainactivity.changeFragment(manageDogsFragment)
             }
 
             modifyuserinfoBtn.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !userDataViewModel.isSuccessGetData()) {
+                    return@setOnClickListener
+                }
                 val registerUserIntent = Intent(requireContext(), RegisterUserActivity::class.java)
                 registerUserIntent.putExtra("userinfo", userDataViewModel.userInfo.value)
                 startActivity(registerUserIntent)
@@ -123,6 +165,9 @@ class MyPageFragment : Fragment() {
             }
 
             menuWalkinfo.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !userDataViewModel.isSuccessGetData()) {
+                    return@setOnClickListener
+                }
                 mainactivity.changeFragment(WalkInfoFragment())
             }
         }
@@ -180,15 +225,17 @@ class MyPageFragment : Fragment() {
     object MyPageBindingAdapter {
         @BindingAdapter("walkDates", "dogs")
         @JvmStatic
-        fun setWalkCountText(textView: TextView, walkDates: HashMap<String, MutableList<WalkRecord>>, dogs: List<DogInfo>) {
-            val totalWalk = mutableListOf<WalkRecord>()
-            for(dog in dogs) {
-                totalWalk.addAll(walkDates.get(dog.name) ?: mutableListOf())
+        fun setWalkCountText(textView: TextView, walkDates: HashMap<String, MutableList<WalkRecord>>?, dogs: List<DogInfo>?) {
+            if (walkDates != null && dogs != null) {
+                val totalWalk = mutableListOf<WalkRecord>()
+                for (dog in dogs) {
+                    totalWalk.addAll(walkDates.get(dog.name) ?: mutableListOf())
+                }
+
+                val counts = totalWalk.groupingBy { it }.eachCount()
+
+                textView.text = counts.size.toString() + "회"
             }
-
-            val counts = totalWalk.groupingBy { it }.eachCount()
-
-            textView.text = counts.size.toString() + "회"
         }
     }
 }

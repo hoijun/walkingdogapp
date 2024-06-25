@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -25,6 +26,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.deco.HorizonSpacingItemDecoration
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentAlbumMapBinding
@@ -47,11 +50,12 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     private var _binding: FragmentAlbumMapBinding? = null
     private val binding get() = _binding!!
     private val imgInfos = mutableListOf<AlbumMapImgInfo>()
-    private val myViewModel: UserInfoViewModel by activityViewModels()
+    private val userDataViewModel: UserInfoViewModel by activityViewModels()
 
     private lateinit var mynavermap: NaverMap
     private lateinit var camera : CameraUpdate
     private var markers = mutableListOf<InfoWindow>()
+    private lateinit var mainactivity: MainActivity
 
     private lateinit var itemDecoration: HorizonSpacingItemDecoration
 
@@ -80,6 +84,18 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                     childFragmentManager.beginTransaction().add(R.id.Map, it).commit()
                 }
         mapFragment.getMapAsync(this)
+
+        if (!NetworkManager.checkNetworkState(requireContext())) {
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("인터넷을 연결해주세요!")
+            builder.setPositiveButton("네", null)
+            builder.setCancelable(false)
+            builder.show()
+        }
+
+        MainActivity.preFragment = "AlbumMap"
+        mainactivity = requireActivity() as MainActivity
+        mainactivity.binding.menuBn.visibility = View.VISIBLE
     }
 
     override fun onCreateView(
@@ -95,6 +111,17 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             selectDay = selectday
             lifecycleOwner = requireActivity()
 
+            refresh.apply {
+                this.setOnRefreshListener {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        userDataViewModel.observeUser()
+                    }
+                }
+                userDataViewModel.successGetData.observe(requireActivity()) {
+                    refresh.isRefreshing = false
+                }
+            }
+
             permissionBtn.setOnClickListener {
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -103,6 +130,9 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             }
 
             btnSelectDate.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(requireContext())) {
+                    return@setOnClickListener
+                }
                 val dialog = DateDialog()
                 dialog.dateClickListener = DateDialog.OnDateClickListener { date ->
                     lifecycleScope.launch(Dispatchers.Main) {
@@ -262,15 +292,16 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(map: NaverMap) {
         this.mynavermap = map
-        mynavermap.uiSettings.isRotateGesturesEnabled = false
-        mynavermap.uiSettings.isCompassEnabled = false
-
+        mynavermap.uiSettings.setAllGesturesEnabled(false)
         mynavermap.uiSettings.isZoomControlEnabled = false
+
+        binding.zoom.map = mynavermap
+
         if(imgInfos.isNotEmpty()) {
             moveCamera(imgInfos[0].latLng, CameraAnimation.None)
         } else {
-            myViewModel.currentCoord.value?.let {
-                val coord = myViewModel.currentCoord.value!!
+            userDataViewModel.currentCoord.value?.let {
+                val coord = userDataViewModel.currentCoord.value!!
                 moveCamera(LatLng(coord.latitude, coord.longitude), CameraAnimation.None)
             }
         }

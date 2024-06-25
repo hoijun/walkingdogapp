@@ -19,15 +19,22 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.viewpager2.widget.ViewPager2
+import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.alarm.SettingAlarmFragment
 import com.example.walkingdogapp.databinding.FragmentHomeBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.example.walkingdogapp.walking.WalkingActivity
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class HomeFragment : Fragment() {
+
+class HomeFragment() : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val userInfoViewModel: UserInfoViewModel by activityViewModels()
@@ -41,12 +48,20 @@ class HomeFragment : Fragment() {
         ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.POST_NOTIFICATIONS), 999)
         mainactivity = requireActivity() as MainActivity
         mainactivity.binding.menuBn.visibility = View.VISIBLE
+
+        if (!NetworkManager.checkNetworkState(requireContext())) {
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("인터넷을 연결해주세요!")
+            builder.setPositiveButton("네", null)
+            builder.setCancelable(false)
+            builder.show()
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         MainActivity.preFragment = "Home" // 다른 액티비티로 이동 할 때 홈에서 이동을 표시
@@ -57,12 +72,33 @@ class HomeFragment : Fragment() {
             lifecycleOwner = requireActivity()
             selectedDogs = selectedDogList.joinToString(", ")
 
+            refresh.apply {
+                this.setOnRefreshListener {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        userInfoViewModel.observeUser()
+                    }
+                }
+                userInfoViewModel.successGetData.observe(requireActivity()) {
+                    refresh.isRefreshing = false
+                }
+            }
+
+            homeDogsViewPager.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+                override fun onPageScrollStateChanged(state: Int) {
+                    super.onPageScrollStateChanged(state)
+                    refresh.setEnabled(state == ViewPager2.SCROLL_STATE_IDLE)
+                }
+            })
+
             btnAlarm.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(requireContext())) {
+                    return@setOnClickListener
+                }
                 mainactivity.changeFragment(SettingAlarmFragment())
             }
 
             val dogsList = userInfoViewModel.dogsInfo.value?: listOf()
-            val homeDogListAdapter = HomeDogListAdapter(dogsList)
+            val homeDogListAdapter = HomeDogListAdapter(dogsList, userInfoViewModel.isSuccessGetData())
             homeDogListAdapter.onClickDogListener = HomeDogListAdapter.OnClickDogListener { dogName ->
                 if(selectedDogList.contains(dogName)) {
                     selectedDogList.remove(dogName)
@@ -77,11 +113,18 @@ class HomeFragment : Fragment() {
             TabLayoutMediator(homeDogsIndicator, homeDogsViewPager) { _, _ -> }.attach()
 
             btnWalk.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !userInfoViewModel.isSuccessGetData()) {
+                    return@setOnClickListener
+                }
+
                 if (dogsList.isEmpty()) {
                     builder.setTitle("산책을 하기 위해 \n강아지 정보를 입력 해주세요!")
                     val listener = DialogInterface.OnClickListener { _, ans ->
                         when (ans) {
                             DialogInterface.BUTTON_POSITIVE -> {
+                                if(!NetworkManager.checkNetworkState(requireContext()) || !userInfoViewModel.isSuccessGetData()) {
+                                    return@OnClickListener
+                                }
                                 val registerDogIntent =
                                     Intent(requireContext(), RegisterDogActivity::class.java)
                                 startActivity(registerDogIntent)

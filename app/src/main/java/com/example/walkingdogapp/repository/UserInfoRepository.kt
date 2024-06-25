@@ -10,6 +10,7 @@ import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.datamodel.AlarmDao
 import com.example.walkingdogapp.datamodel.AlarmDataModel
 import com.example.walkingdogapp.database.LocalUserDatabase
+import com.example.walkingdogapp.datamodel.CollectionInfo
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.datamodel.WalkInfo
@@ -26,6 +27,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.naver.maps.geometry.LatLng
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -36,6 +38,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -68,148 +71,156 @@ class UserInfoRepository(private val application: Application) {
             return
         }
 
+        if (successGetData.value == true) {
+            successGetData.postValue(true)
+        }
+
+        var isError = AtomicBoolean(false)
+        val dogsInfoDeferred = CompletableDeferred<List<DogInfo>>()
+        val userDeferred = CompletableDeferred<UserInfo>()
+        val totalWalkDeferred = CompletableDeferred<WalkInfo>()
+        val walkDateDeferred = CompletableDeferred<HashMap<String, MutableList<WalkRecord>>>()
+        val collectionDeferred = CompletableDeferred<HashMap<String, Boolean>>()
+        val profileUriDeferred = CompletableDeferred<HashMap<String, Uri>>()
+
+
         try {
-            val dogsDeferred = suspendCoroutine { continuation ->
-                userRef.child("dog").addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val dogsList = mutableListOf<DogInfo>()
-                        val dogNames = mutableListOf<String>()
-                        if (snapshot.exists()) {
-                            for (dogInfo in snapshot.children) {
-                                dogsList.add(
-                                    DogInfo(
-                                        dogInfo.child("name").getValue(String::class.java)!!,
-                                        dogInfo.child("breed").getValue(String::class.java)!!,
-                                        dogInfo.child("gender").getValue(String::class.java)!!,
-                                        dogInfo.child("birth").getValue(String::class.java)!!,
-                                        dogInfo.child("neutering")
-                                            .getValue(String::class.java)!!,
-                                        dogInfo.child("vaccination")
-                                            .getValue(String::class.java)!!,
-                                        dogInfo.child("weight").getValue(String::class.java)!!,
-                                        dogInfo.child("feature").getValue(String::class.java)!!,
-                                        dogInfo.child("creationTime").getValue(Long::class.java)!!,
-                                        dogInfo.child("walkInfo").getValue(WalkInfo::class.java)!!
-                                    )
+            userRef.child("dog").addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val dogsList = mutableListOf<DogInfo>()
+                    val dogNames = mutableListOf<String>()
+                    if (snapshot.exists()) {
+                        for (dogInfo in snapshot.children) {
+                            dogsList.add(
+                                DogInfo(
+                                    dogInfo.child("name").getValue(String::class.java)!!,
+                                    dogInfo.child("breed").getValue(String::class.java)!!,
+                                    dogInfo.child("gender").getValue(String::class.java)!!,
+                                    dogInfo.child("birth").getValue(String::class.java)!!,
+                                    dogInfo.child("neutering")
+                                        .getValue(String::class.java)!!,
+                                    dogInfo.child("vaccination")
+                                        .getValue(String::class.java)!!,
+                                    dogInfo.child("weight").getValue(String::class.java)!!,
+                                    dogInfo.child("feature").getValue(String::class.java)!!,
+                                    dogInfo.child("creationTime").getValue(Long::class.java)!!,
+                                    dogInfo.child("walkInfo").getValue(WalkInfo::class.java)!!
                                 )
-                                dogNames.add(dogInfo.child("name").getValue(String::class.java)!!)
-                            }
+                            )
+                            dogNames.add(dogInfo.child("name").getValue(String::class.java)!!)
                         }
-                        MainActivity.dogNameList = dogNames
-                        continuation.resume(dogsList.sortedBy { it.creationTime })
                     }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        continuation.resume(listOf<DogInfo>())
-                    }
-                })
-            }
-
-            val userDeferred = coroutineScope {
-                async(Dispatchers.IO) {
-                    try {
-                        userRef.child("user").get().await().getValue(UserInfo::class.java)
-                            ?: UserInfo()
-                    } catch (e: Exception) {
-                        UserInfo()
-                    }
+                    MainActivity.dogNameList = dogNames
+                    dogsInfoDeferred.complete(dogsList.sortedBy { it.creationTime })
                 }
-            }
 
-            val totalWalkDeferred = coroutineScope {
-                async(Dispatchers.IO) {
-                    try {
-                        userRef.child("totalWalkInfo").get().await().getValue(WalkInfo::class.java)
-                            ?: WalkInfo()
-                    } catch (e: Exception) {
-                        WalkInfo()
-                    }
+                override fun onCancelled(error: DatabaseError) {
+                    isError.set(true)
+                    dogsInfoDeferred.complete(listOf<DogInfo>())
                 }
+            })
+
+            userRef.child("user").get().addOnSuccessListener {
+                userDeferred.complete(it.getValue(UserInfo::class.java) ?: UserInfo())
+            }.addOnFailureListener {
+                isError.set(true)
+                userDeferred.complete(UserInfo())
             }
 
-            val walkDateDeferred = suspendCoroutine { continuation ->
-                val dogsWalkRecord = HashMap<String, MutableList<WalkRecord>>()
-                for (dog in MainActivity.dogNameList) {
-                    userRef.child("dog").child(dog).child("walkdates")
-                        .addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(snapshot: DataSnapshot) {
-                                val walkRecords = mutableListOf<WalkRecord>()
-                                if (snapshot.exists()) {
-                                    for (dateData in snapshot.children) {
-                                        val walkDay = dateData.key.toString().split(" ")
-                                        walkRecords.add(
-                                            WalkRecord(
-                                                walkDay[0], walkDay[1], walkDay[2],
-                                                dateData.child("distance")
-                                                    .getValue(Float::class.java)!!,
-                                                dateData.child("time").getValue(Int::class.java)!!,
-                                                dateData.child("coords")
-                                                    .getValue<List<WalkLatLng>>()
-                                                    ?: listOf<WalkLatLng>(),
-                                                dateData.child("collections")
-                                                    .getValue<List<String>>() ?: listOf<String>()
-                                            )
+            userRef.child("totalWalkInfo").get().addOnSuccessListener {
+                totalWalkDeferred.complete(it.getValue(WalkInfo::class.java) ?: WalkInfo())
+            }.addOnFailureListener {
+                isError.set(true)
+                totalWalkDeferred.complete(WalkInfo())
+            }
+
+            dogsInfo.postValue(dogsInfoDeferred.await())
+
+            val dogsWalkRecord = HashMap<String, MutableList<WalkRecord>>()
+            for (dog in MainActivity.dogNameList) {
+                userRef.child("dog").child(dog).child("walkdates")
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val walkRecords = mutableListOf<WalkRecord>()
+                            if (snapshot.exists()) {
+                                for (dateData in snapshot.children) {
+                                    val walkDay = dateData.key.toString().split(" ")
+                                    walkRecords.add(
+                                        WalkRecord(
+                                            walkDay[0], walkDay[1], walkDay[2],
+                                            dateData.child("distance")
+                                                .getValue(Float::class.java)!!,
+                                            dateData.child("time").getValue(Int::class.java)!!,
+                                            dateData.child("coords")
+                                                .getValue<List<WalkLatLng>>()
+                                                ?: listOf<WalkLatLng>(),
+                                            dateData.child("collections")
+                                                .getValue<List<String>>() ?: listOf<String>()
                                         )
-                                    }
-                                    dogsWalkRecord[dog] = walkRecords
+                                    )
                                 }
                             }
-
-                            override fun onCancelled(error: DatabaseError) {
-                                dogsWalkRecord[dog] = mutableListOf()
+                            dogsWalkRecord[dog] = walkRecords
+                            if(dogsWalkRecord.size == MainActivity.dogNameList.size) {
+                                walkDateDeferred.complete(dogsWalkRecord)
                             }
-                        })
-                }
+                        }
 
-                continuation.resume(dogsWalkRecord)
+                        override fun onCancelled(error: DatabaseError) {
+                            isError.set(true)
+                            dogsWalkRecord[dog] = mutableListOf()
+                            if(dogsWalkRecord.size == MainActivity.dogNameList.size) {
+                                walkDateDeferred.complete(dogsWalkRecord)
+                            }
+                        }
+                    })
             }
 
-            val collectionDeferred = coroutineScope {
-                async(Dispatchers.IO) {
-                    try {
-                        userRef.child("collection").get().await()
-                            .getValue<HashMap<String, Boolean>>() ?: Constant.item_whether
-                    } catch (e: Exception) {
-                        Constant.item_whether
-                    }
-                }
+            userRef.child("collection").get().addOnSuccessListener {
+                collectionDeferred.complete(it.getValue<HashMap<String, Boolean>>() ?: Constant.item_whether)
+            }.addOnFailureListener {
+                isError.set(true)
+                collectionDeferred.complete(Constant.item_whether)
             }
+
 
             // 강아지 프로필 사진
-            val profileUriDeferred = suspendCoroutine { continuation ->
-                try {
-                    val dogImgs = HashMap<String, Uri>()
-                    var downloadCount = 0
-                    var imgCount: Int
-                    storageRef.listAll().addOnSuccessListener { listResult ->
-                        imgCount = listResult.items.size
-                        if (imgCount == 0) {
-                            continuation.resume(HashMap<String, Uri>())
-                        }
-                        listResult.items.forEach { item ->
-                            item.downloadUrl.addOnSuccessListener { uri ->
-                                downloadCount++
-                                dogImgs[item.name] = uri
+            try {
+                val dogImgs = HashMap<String, Uri>()
+                var downloadCount = 0
+                var imgCount: Int
+                storageRef.listAll().addOnSuccessListener { listResult ->
+                    imgCount = listResult.items.size
+                    if (imgCount == 0) {
+                        profileUriDeferred.complete(HashMap<String, Uri>())
+                    }
+                    listResult.items.forEach { item ->
+                        item.downloadUrl.addOnSuccessListener { uri ->
+                            downloadCount++
+                            dogImgs[item.name] = uri
 
-                                if (imgCount == downloadCount) {
-                                    continuation.resume(dogImgs)
-                                }
+                            if (imgCount == downloadCount) {
+                                profileUriDeferred.complete(dogImgs)
                             }
                         }
                     }
-                } catch (e: Exception) {
-                    continuation.resume(HashMap<String, Uri>())
                 }
+            } catch (e: Exception) {
+                isError.set(true)
+                profileUriDeferred.complete(HashMap<String, Uri>())
             }
 
-            dogsInfo.postValue(dogsDeferred)
             userInfo.postValue(userDeferred.await())
             totalWalkInfo.postValue(totalWalkDeferred.await())
-            walkDates.postValue(walkDateDeferred)
+            walkDates.postValue(walkDateDeferred.await())
             collectionInfo.postValue(collectionDeferred.await())
-            dogsImg.postValue(profileUriDeferred)
+            dogsImg.postValue(profileUriDeferred.await())
 
-            successGetData.postValue(true)
+            if (!isError.get()) {
+                successGetData.postValue(true)
+            } else {
+                successGetData.postValue(false)
+            }
 
 
         } catch (e: Exception) {

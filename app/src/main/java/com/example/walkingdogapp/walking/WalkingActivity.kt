@@ -35,6 +35,7 @@ import com.bumptech.glide.Glide
 import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
@@ -100,7 +101,20 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         R.drawable.collection_008,
         R.drawable.collection_009,
         R.drawable.collection_010,
-        R.drawable.collection_011
+        R.drawable.collection_011,
+        R.drawable.collection_012,
+        R.drawable.collection_013,
+        R.drawable.collection_014,
+        R.drawable.collection_015,
+        R.drawable.collection_016,
+        R.drawable.collection_017,
+        R.drawable.collection_018,
+        R.drawable.collection_019,
+        R.drawable.collection_020,
+        R.drawable.collection_021,
+        R.drawable.collection_022,
+        R.drawable.collection_023,
+        R.drawable.collection_024
     )
 
     private var collectionImgViews = mutableListOf<ImageView>()
@@ -249,9 +263,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         mynavermap.uiSettings.isCompassEnabled = false
         mynavermap.uiSettings.isTiltGesturesEnabled = false
 
-        trackingMarker.icon = OverlayImage.fromResource(R.mipmap.ic_launcher_round)
-        trackingMarker.width = 100
-        trackingMarker.height = 100
+        trackingMarker.icon = OverlayImage.fromResource(R.drawable.walkicon)
+        trackingMarker.width = 200
+        trackingMarker.height = 200
         trackingMarker.anchor = PointF(0.5f, 0.5f)
 
         trackingPath.width = 15
@@ -322,8 +336,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setCollectionImageView() {
         for (imgRes in collectionResources) {
             val imgView = ImageView(this)
-            imgView.layoutParams = ViewGroup.LayoutParams(120, 120)
-            Glide.with(this).load(imgRes).override(100, 100).into(imgView)
+            imgView.layoutParams = ViewGroup.LayoutParams(200, 200)
+            Glide.with(this).load(imgRes).override(200, 200).into(imgView)
             collectionImgViews.add(imgView)
         }
     }
@@ -441,6 +455,10 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun selectStopWalk() {
+        if(!NetworkManager.checkNetworkState(this)) {
+            return
+        }
+
         val builder = AlertDialog.Builder(this)
         builder.setTitle("산책 그만 할까요?\n(10분 및 300m 이상 산책 시 기록 가능)")
 
