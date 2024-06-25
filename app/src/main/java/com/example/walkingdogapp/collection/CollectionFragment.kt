@@ -5,93 +5,46 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.deco.GridSpacingItemDecoration
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentCollectionBinding
 import com.example.walkingdogapp.datamodel.CollectionInfo
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class CollectionFragment : Fragment() {
     private var _binding: FragmentCollectionBinding? = null
     private val binding get() = _binding!!
-    private val myViewModel: UserInfoViewModel by activityViewModels()
+    private val userDataViewModel: UserInfoViewModel by activityViewModels()
     private lateinit var collections: List<CollectionInfo>
+    private lateinit var mainactivity: MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val collectionInfo = myViewModel.collectionInfo.value ?: Constant.item_whether
-        collections = listOf(
-            CollectionInfo(
-                "001",
-                "a",
-                "최애의 아이돌.",
-                if (collectionInfo["001"]!!) R.drawable.waitimage else R.drawable.ic_launcher_background,
-            ),
-            CollectionInfo(
-                "002",
-                "b",
-                "치킨 버거 패티",
-                if (collectionInfo["002"]!!) R.drawable.waitimage else R.drawable.ic_launcher_background,
-            ),
-            CollectionInfo(
-                "003",
-                "c",
-                "냥이 둘",
-                if (collectionInfo["003"]!!) R.drawable.waitimage else R.drawable.ic_launcher_background,
-            ),
-            CollectionInfo(
-                "004",
-                "d",
-                "마법 소녀 변신!",
-                if (collectionInfo["004"]!!) R.drawable.waitimage else R.drawable.ic_launcher_background,
-            ),
-            CollectionInfo(
-                "005",
-                "e",
-                "앉아 있는 채영",
-                if (collectionInfo["005"]!!) R.drawable.waitimage else R.drawable.ic_launcher_background,
-            ),
-            CollectionInfo(
-                "006",
-                "f",
-                "바이올린 연주 중인 규리",
-                if (collectionInfo["006"]!!) R.drawable.waitimage else R.drawable.ic_launcher_background,
-            ),
-            CollectionInfo(
-                "007",
-                "g",
-                "냥이 한입",
-                if (collectionInfo["007"]!!) R.drawable.waitimage else R.drawable.ic_launcher_background,
-            ),
-            CollectionInfo(
-                "008",
-                "h",
-                "빵빵즈가 간다!",
-                if (collectionInfo["008"]!!) R.drawable.waitimage else R.drawable.ic_launcher_background,
-            ),
-            CollectionInfo(
-                "009",
-                "i",
-                "모만타이!",
-                if (collectionInfo["009"]!!) R.drawable.waitimage else R.drawable.ic_launcher_background,
-            ),
-            CollectionInfo(
-                "010",
-                "j",
-                "울음 멈춰!",
-                if (collectionInfo["010"]!!) R.drawable.waitimage else R.drawable.ic_launcher_background,
-            ),
-            CollectionInfo(
-                "011",
-                "k",
-                "모만타이!",
-                if (collectionInfo["011"]!!) R.drawable.waitimage else R.drawable.ic_launcher_background,
-            )
-        )
+        val collectionInfo = userDataViewModel.collectionInfo.value ?: Constant.item_whether
+        setCollection(collectionInfo)
+
+        if (!NetworkManager.checkNetworkState(requireContext())) {
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("인터넷을 연결해주세요!")
+            builder.setPositiveButton("네", null)
+            builder.setCancelable(false)
+            builder.show()
+        }
+
+        MainActivity.preFragment = "Collection"
+        mainactivity = requireActivity() as MainActivity
+        mainactivity.binding.menuBn.visibility = View.VISIBLE
     }
 
     override fun onCreateView(
@@ -99,10 +52,11 @@ class CollectionFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCollectionBinding.inflate(inflater, container, false)
+
         val gridListManager = GridLayoutManager(requireContext(), 3)
         val adapter = CollectionListAdapter(collections)
         adapter.itemClickListener = CollectionListAdapter.OnItemClickListener { collection ->
-            if (myViewModel.collectionInfo.value?.get(collection.collectionNum) == true) {
+            if (userDataViewModel.collectionInfo.value?.get(collection.collectionNum) == true) {
                 val detailCollectionDialog = DetailCollectionDialog().apply {
                     val bundle = Bundle()
                     bundle.putSerializable("collectionInfo", collection)
@@ -116,6 +70,26 @@ class CollectionFragment : Fragment() {
         }
 
         binding.apply {
+            refresh.apply {
+                setOnChildScrollUpCallback { _, _ ->
+                    if((collectionRecyclerview.adapter as CollectionListAdapter).itemCount == 0) {
+                        val firstRecyclerViewItem = (collectionRecyclerview.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+                        return@setOnChildScrollUpCallback firstRecyclerViewItem != 0
+                    }
+
+                    false
+                }
+
+                this.setOnRefreshListener {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        userDataViewModel.observeUser()
+                    }
+                }
+                userDataViewModel.successGetData.observe(requireActivity()) {
+                    refresh.isRefreshing = false
+                }
+            }
+
             collectionRecyclerview.layoutManager = gridListManager
             collectionRecyclerview.addItemDecoration(GridSpacingItemDecoration(3, Constant.dpToPx(15f, requireContext())))
             collectionRecyclerview.adapter = adapter
@@ -150,5 +124,154 @@ class CollectionFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setCollection(collectionInfo: HashMap<String, Boolean>) {
+        collections = listOf(
+            CollectionInfo(
+                "001",
+                "하얀 양",
+                "귀찮아...",
+                if (collectionInfo.getOrDefault("001", false)) R.drawable.collection_001 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "002",
+                "꽃든 병아리",
+                "이거 가질래?",
+                if (collectionInfo.getOrDefault("002", false)) R.drawable.collection_002 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "003",
+                "사과모자 강아지",
+                "사과 냠",
+                if (collectionInfo.getOrDefault("003", false)) R.drawable.collection_003 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "004",
+                "양손 가득 원숭이",
+                "내려줘!",
+                if (collectionInfo.getOrDefault("004", false)) R.drawable.collection_004 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "005",
+                "우는 강아지",
+                "힝..",
+                if (collectionInfo.getOrDefault("005", false)) R.drawable.collection_005 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "006",
+                "시바견",
+                "시바",
+                if (collectionInfo.getOrDefault("006", false)) R.drawable.collection_006 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "007",
+                "노트북 하는 강아지",
+                "과제 힘들어..",
+                if (collectionInfo.getOrDefault("007", false)) R.drawable.collection_007 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "008",
+                "웃고있는 강아지",
+                "헤헤..",
+                if (collectionInfo.getOrDefault("008", false)) R.drawable.collection_008 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "009",
+                "양치하는 강아지",
+                "치카치카",
+                if (collectionInfo.getOrDefault("009", false)) R.drawable.collection_009 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "010",
+                "신난 코알라",
+                "시인나안다아",
+                if (collectionInfo.getOrDefault("010", false)) R.drawable.collection_010 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "011",
+                "신난 고양이",
+                "냥냥냥",
+                if (collectionInfo.getOrDefault("011", false)) R.drawable.collection_011 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "012",
+                "힘든 곰돌이",
+                "힘들어...",
+                if (collectionInfo.getOrDefault("012", false)) R.drawable.collection_012 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "013",
+                "하얀 강아지",
+                "멍멍!",
+                if (collectionInfo.getOrDefault("013", false)) R.drawable.collection_013 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "014",
+                "책 읽는 강아지",
+                "음....",
+                if (collectionInfo.getOrDefault("014", false)) R.drawable.collection_014 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "015",
+                "치킨 먹는 강아지",
+                "헤헤.. 맛있당",
+                if (collectionInfo.getOrDefault("015", false)) R.drawable.collection_015 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "016",
+                "귀여운 다람쥐",
+                "반갑습니다람쥐",
+                if (collectionInfo.getOrDefault("016", false)) R.drawable.collection_016 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "017",
+                "책 읽는 돼지",
+                "흡.. 휴",
+                if (collectionInfo.getOrDefault("017", false)) R.drawable.collection_017 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "018",
+                "행복한 곰돌이",
+                "치킨 맛있당",
+                if (collectionInfo.getOrDefault("018", false)) R.drawable.collection_018 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "019",
+                "일보는 강아지",
+                "저리가..",
+                if (collectionInfo.getOrDefault("019", false)) R.drawable.collection_019 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "020",
+                "귀여운 곰",
+                "데헷!",
+                if (collectionInfo.getOrDefault("020", false)) R.drawable.collection_020 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "021",
+                "핸드폰 하는 악어",
+                "뒹굴 뒹굴",
+                if (collectionInfo.getOrDefault("021", false)) R.drawable.collection_021 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "022",
+                "하트 강아지",
+                "이거 받아",
+                if (collectionInfo.getOrDefault("022", false)) R.drawable.collection_022 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "023",
+                "버블티 강아지",
+                "헤헤.. 시원해",
+                if (collectionInfo.getOrDefault("023", false)) R.drawable.collection_023 else R.drawable.waitimage
+            ),
+            CollectionInfo(
+                "024",
+                "튜브 토끼",
+                "신난당!",
+                if (collectionInfo.getOrDefault("024", false)) R.drawable.collection_024 else R.drawable.waitimage
+            )
+        )
     }
 }

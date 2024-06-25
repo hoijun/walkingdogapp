@@ -63,6 +63,12 @@ class MainActivity : AppCompatActivity() {
             binding.menuBn.selectedItemId = R.id.navigation_mypage
         } // 다른 액티비티로 마이페이지에서 변경 했었을 경우, 다시 되돌아 올 때 바텀바의 표시를 마이페이지로 변경
 
+        if (preFragment =="Collection")
+            binding.menuBn.selectedItemId = R.id.navigation_collection
+
+        if (preFragment =="AlbumMap")
+            binding.menuBn.selectedItemId = R.id.navigation_albummap
+
         // 위치 권한
         ActivityCompat.requestPermissions(this, permissions, locationPermissionRequestCode)
 
@@ -153,8 +159,16 @@ class MainActivity : AppCompatActivity() {
                         changeFragment(HomeFragment())
                     }
 
-                    else -> {
+                    "Manage" -> {
                         changeFragment(ManageDogsFragment())
+                    }
+
+                    "Collection" -> {
+                        changeFragment(CollectionFragment())
+                    }
+
+                    "AlbumMap" -> {
+                        changeFragment(AlbumMapFragment())
                     }
                 }
             }
@@ -166,7 +180,6 @@ class MainActivity : AppCompatActivity() {
             .beginTransaction()
             .replace(binding.screenFl.id, fragment)
             .commitAllowingStateLoss()
-        binding.menuBn.visibility = View.VISIBLE
     }
 
     // 산책 진행 여부

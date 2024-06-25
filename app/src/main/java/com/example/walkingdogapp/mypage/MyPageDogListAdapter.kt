@@ -2,7 +2,6 @@ package com.example.walkingdogapp.mypage
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,12 +10,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.databinding.MypagedoglistItemBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.datamodel.DogInfo
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 
-class MyPageDogListAdapter(private val dogsList: List<DogInfo>): RecyclerView.Adapter<MyPageDogListAdapter.MyPageDogListViewHolder>() {
+class MyPageDogListAdapter(private val dogsList: List<DogInfo>, private val successGetData: Boolean): RecyclerView.Adapter<MyPageDogListAdapter.MyPageDogListViewHolder>() {
     private lateinit var context: Context
 
     fun interface OnItemClickListener {
@@ -48,6 +47,9 @@ class MyPageDogListAdapter(private val dogsList: List<DogInfo>): RecyclerView.Ad
             binding.apply {
                 menuDogInfo.visibility = View.GONE
                 root.setOnClickListener {
+                    if (!NetworkManager.checkNetworkState(context) || !successGetData) {
+                        return@setOnClickListener
+                    }
                     val registerDogIntent = Intent(context, RegisterDogActivity::class.java)
                     context.startActivity(registerDogIntent)
                 }

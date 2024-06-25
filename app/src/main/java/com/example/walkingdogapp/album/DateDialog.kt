@@ -26,7 +26,7 @@ class DateDialog : DialogFragment() {
     private var _binding: DateDialogBinding? = null
     private val binding get() = _binding!!
     private var walkdates = mutableListOf<CalendarDay>()
-    private val myViewModel: UserInfoViewModel by activityViewModels()
+    private val userDataViewModel: UserInfoViewModel by activityViewModels()
 
     fun interface OnDateClickListener {
         fun onDateClick(date: String)
@@ -36,9 +36,9 @@ class DateDialog : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val walkRecordList = myViewModel.walkDates.value?: hashMapOf()
+        val walkRecordList = userDataViewModel.walkDates.value?: hashMapOf()
         for(dog in MainActivity.dogNameList) {
-            for(date in walkRecordList[dog]!!) {
+            for(date in walkRecordList[dog] ?: mutableListOf()) {
                 val dayInfo = date.day.split("-")
                 walkdates.add(
                     CalendarDay.from(

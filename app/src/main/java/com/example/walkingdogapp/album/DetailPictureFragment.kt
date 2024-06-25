@@ -25,7 +25,7 @@ class DetailPictureFragment : Fragment() {
     private var _binding: FragmentDetailPictureBinding? = null
     private val binding get() = _binding!!
     private lateinit var mainactivity: MainActivity
-    private val myViewModel: UserInfoViewModel by activityViewModels()
+    private val userDataViewModel: UserInfoViewModel by activityViewModels()
     private var imgList = mutableListOf<GalleryImgInfo>()
     private var bottomSheetFragment: BottomSheetDialogFragment? = null
 
@@ -48,7 +48,7 @@ class DetailPictureFragment : Fragment() {
         _binding = FragmentDetailPictureBinding.inflate(inflater, container, false)
         val imgNum = arguments?.getInt("select", 0) ?: 0
         binding.apply {
-            imgList = (myViewModel.albumImgs.value?: mutableListOf()).toMutableList()
+            imgList = (userDataViewModel.albumImgs.value?: mutableListOf()).toMutableList()
             val adapter = DetailPictureItemListAdapter( imgList, requireContext())
             adapter.onClickItemListener = DetailPictureItemListAdapter.OnClickItemListener { imgInfo ->
                 bottomSheetFragment = GalleryBottomSheetFragment().apply {

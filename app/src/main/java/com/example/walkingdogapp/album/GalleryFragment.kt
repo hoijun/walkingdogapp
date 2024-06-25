@@ -36,7 +36,7 @@ class GalleryFragment : Fragment() {
     private var _binding: FragmentGalleryBinding? = null
     private val binding get() = _binding!!
     private lateinit var mainactivity: MainActivity
-    private val myViewModel: UserInfoViewModel by activityViewModels()
+    private val userDataViewModel: UserInfoViewModel by activityViewModels()
     private val imgInfos = mutableListOf<GalleryImgInfo>()
     private val removeImgList = mutableListOf<Uri>()
     private lateinit var itemDecoration: GridSpacingItemDecoration
@@ -246,7 +246,7 @@ class GalleryFragment : Fragment() {
                 val contentUri = Uri.withAppendedPath(uri, imagePath)
                 imgInfos.add(GalleryImgInfo(contentUri, imageTitle, Constant.convertLongToTime(SimpleDateFormat("yyyy년 MM월 dd일 HH:mm"), imageDate)))
             }
-            myViewModel.saveAlbumImgs(imgInfos)
+            userDataViewModel.saveAlbumImgs(imgInfos)
         }
     }
 

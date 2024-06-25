@@ -23,7 +23,7 @@
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_marginStart="20dp"
-            android:src="@drawable/waitimage"
+            android:src="@drawable/collection_003"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

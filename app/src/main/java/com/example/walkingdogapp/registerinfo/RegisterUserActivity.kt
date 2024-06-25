@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.databinding.ActivityRegisterUserBinding
 import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
@@ -99,6 +100,9 @@ class RegisterUserActivity : AppCompatActivity() {
             }
 
             registerUser.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(this@RegisterUserActivity)) {
+                    return@setOnClickListener
+                }
                 userInfo.apply {
                     if (editName.text.toString() == "" || birth == "" || gender == "") {
                         val builder = AlertDialog.Builder(this@RegisterUserActivity)

@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentWalkInfoBinding
 import com.example.walkingdogapp.datamodel.DogInfo
@@ -129,6 +130,9 @@ class WalkInfoFragment : Fragment() { // 수정
 
             val walkInfoDogListAdapter = WalkInfoDogListAdapter(requireContext(), userDataViewModel).also {
                 it.onItemClickListener = WalkInfoDogListAdapter.OnItemClickListener { selectedDogInfo ->
+                    if(!NetworkManager.checkNetworkState(requireContext())) {
+                        return@OnItemClickListener
+                    }
                     selectedDog = selectedDogInfo
                     selectDogInfo = selectedDog
 
@@ -315,7 +319,7 @@ class WalkInfoFragment : Fragment() { // 수정
                 Glide.with(iv.context).load(viewModel.dogsImg.value?.get(selectedDog.name))
                     .format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(iv)
             } else {
-                Glide.with(iv.context).load(R.drawable.ic_launcher_background)
+                Glide.with(iv.context).load(R.drawable.collection_003)
                     .format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(iv)
             }
         }

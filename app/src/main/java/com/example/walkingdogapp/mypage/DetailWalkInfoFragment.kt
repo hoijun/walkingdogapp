@@ -90,9 +90,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
 
     override fun onMapReady(map: NaverMap) {
         this.mynavermap = map
-        mynavermap.uiSettings.isRotateGesturesEnabled = false
-        mynavermap.uiSettings.isCompassEnabled = false
-        mynavermap.uiSettings.isScrollGesturesEnabled = false
+        mynavermap.uiSettings.setAllGesturesEnabled(false)
         mynavermap.uiSettings.isZoomControlEnabled = false
 
         binding.zoom.map = mynavermap

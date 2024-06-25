@@ -33,6 +33,7 @@ import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.Constant
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.databinding.ActivityRegisterDogBinding
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.WalkRecord
@@ -191,6 +192,9 @@ class RegisterDogActivity : AppCompatActivity() {
             }
 
             registerDog.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(this@RegisterDogActivity)) {
+                    return@setOnClickListener
+                }
                 dogInfo.apply {
                     if (editName.text.toString() == "" || editBreed.text == "" || editBirth.text == "" || editWeight.text.toString() == ""
                         || gender == "" || neutering == "" || vaccination == ""
@@ -251,6 +255,9 @@ class RegisterDogActivity : AppCompatActivity() {
             }
 
             removeBtn.setOnClickListener {
+                if(!NetworkManager.checkNetworkState(this@RegisterDogActivity)) {
+                    return@setOnClickListener
+                }
                 val builder = AlertDialog.Builder(this@RegisterDogActivity)
                 builder.setTitle("정보를 삭제 하시겠어요?")
                 val listener = DialogInterface.OnClickListener { _, ans ->

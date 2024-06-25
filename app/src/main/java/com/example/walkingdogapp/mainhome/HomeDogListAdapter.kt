@@ -9,11 +9,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.databinding.HomedoglistItemBinding
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 
-class HomeDogListAdapter(private val dogsList: List<DogInfo>): RecyclerView.Adapter<HomeDogListAdapter.HomeDogListViewHolder>() {
+class HomeDogListAdapter(private val dogsList: List<DogInfo>, private val successGetData: Boolean): RecyclerView.Adapter<HomeDogListAdapter.HomeDogListViewHolder>() {
     lateinit var context: Context
 
     fun interface OnClickDogListener {
@@ -65,6 +66,9 @@ class HomeDogListAdapter(private val dogsList: List<DogInfo>): RecyclerView.Adap
             binding.apply {
                 homeDogLayout.visibility = View.GONE
                 homeAddDogBtn.setOnClickListener {
+                    if(!NetworkManager.checkNetworkState(context) || !successGetData) {
+                        return@setOnClickListener
+                    }
                     val registerDogIntent = Intent(context, RegisterDogActivity::class.java)
                     context.startActivity(registerDogIntent)
                 }
