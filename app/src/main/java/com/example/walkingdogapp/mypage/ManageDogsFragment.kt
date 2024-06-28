@@ -63,9 +63,8 @@ class ManageDogsFragment : Fragment() {
 
             refresh.apply {
                 setOnChildScrollUpCallback { _, _ ->
-                    if ((DogsRecyclerView.adapter as ManageDogListAdapter).itemCount == 0) {
-                        val firstRecyclerViewItem =
-                            (DogsRecyclerView.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+                    if ((DogsRecyclerView.adapter as ManageDogListAdapter).itemCount != 0) {
+                        val firstRecyclerViewItem = (DogsRecyclerView.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
                         return@setOnChildScrollUpCallback firstRecyclerViewItem != 0
                     }
                     false
