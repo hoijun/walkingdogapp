@@ -45,7 +45,6 @@ class HomeFragment() : Fragment() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.POST_NOTIFICATIONS), 999)
         mainactivity = requireActivity() as MainActivity
         mainactivity.binding.menuBn.visibility = View.VISIBLE
 
