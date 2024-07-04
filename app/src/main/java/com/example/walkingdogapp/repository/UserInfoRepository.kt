@@ -259,7 +259,7 @@ class UserInfoRepository(private val application: Application) {
         val userInfoUpdateJob = CoroutineScope(Dispatchers.IO).launch {
             val nameDeferred = async(Dispatchers.IO) {
                 try {
-                    userRef.child("name").setValue(userInfo.name).await()
+                    userRef.child("user").child("name").setValue(userInfo.name).await()
                 } catch (e: Exception) {
                     return@async
                 }
@@ -267,7 +267,7 @@ class UserInfoRepository(private val application: Application) {
 
             val genderDeferred = async(Dispatchers.IO) {
                 try {
-                    userRef.child("gender").setValue(userInfo.gender).await()
+                    userRef.child("user").child("gender").setValue(userInfo.gender).await()
                 } catch (e: Exception) {
                     return@async
                 }
@@ -275,7 +275,7 @@ class UserInfoRepository(private val application: Application) {
 
             val birthDeferred = async(Dispatchers.IO) {
                 try {
-                    userRef.child("birth").setValue(userInfo.birth).await()
+                    userRef.child("user").child("birth").setValue(userInfo.birth).await()
                 } catch (e: Exception) {
                     return@async
                 }
