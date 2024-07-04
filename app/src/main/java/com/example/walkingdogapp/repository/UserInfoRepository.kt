@@ -75,7 +75,7 @@ class UserInfoRepository(private val application: Application) {
             successGetData.postValue(true)
         }
 
-        var isError = AtomicBoolean(false)
+        val isError = AtomicBoolean(false)
         val dogsInfoDeferred = CompletableDeferred<List<DogInfo>>()
         val userDeferred = CompletableDeferred<UserInfo>()
         val totalWalkDeferred = CompletableDeferred<WalkInfo>()
@@ -137,43 +137,49 @@ class UserInfoRepository(private val application: Application) {
             dogsInfo.postValue(dogsInfoDeferred.await())
 
             val dogsWalkRecord = HashMap<String, MutableList<WalkRecord>>()
-            for (dog in MainActivity.dogNameList) {
-                userRef.child("dog").child(dog).child("walkdates")
-                    .addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            val walkRecords = mutableListOf<WalkRecord>()
-                            if (snapshot.exists()) {
-                                for (dateData in snapshot.children) {
-                                    val walkDay = dateData.key.toString().split(" ")
-                                    walkRecords.add(
-                                        WalkRecord(
-                                            walkDay[0], walkDay[1], walkDay[2],
-                                            dateData.child("distance")
-                                                .getValue(Float::class.java)!!,
-                                            dateData.child("time").getValue(Int::class.java)!!,
-                                            dateData.child("coords")
-                                                .getValue<List<WalkLatLng>>()
-                                                ?: listOf<WalkLatLng>(),
-                                            dateData.child("collections")
-                                                .getValue<List<String>>() ?: listOf<String>()
+
+            if (MainActivity.dogNameList.isEmpty()) {
+                walkDateDeferred.complete(dogsWalkRecord)
+            } else {
+
+                for (dog in MainActivity.dogNameList) {
+                    userRef.child("dog").child(dog).child("walkdates")
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                val walkRecords = mutableListOf<WalkRecord>()
+                                if (snapshot.exists()) {
+                                    for (dateData in snapshot.children) {
+                                        val walkDay = dateData.key.toString().split(" ")
+                                        walkRecords.add(
+                                            WalkRecord(
+                                                walkDay[0], walkDay[1], walkDay[2],
+                                                dateData.child("distance")
+                                                    .getValue(Float::class.java)!!,
+                                                dateData.child("time").getValue(Int::class.java)!!,
+                                                dateData.child("coords")
+                                                    .getValue<List<WalkLatLng>>()
+                                                    ?: listOf<WalkLatLng>(),
+                                                dateData.child("collections")
+                                                    .getValue<List<String>>() ?: listOf<String>()
+                                            )
                                         )
-                                    )
+                                    }
+                                }
+                                dogsWalkRecord[dog] = walkRecords
+                                if (dogsWalkRecord.size == MainActivity.dogNameList.size) {
+                                    walkDateDeferred.complete(dogsWalkRecord)
                                 }
                             }
-                            dogsWalkRecord[dog] = walkRecords
-                            if(dogsWalkRecord.size == MainActivity.dogNameList.size) {
-                                walkDateDeferred.complete(dogsWalkRecord)
-                            }
-                        }
 
-                        override fun onCancelled(error: DatabaseError) {
-                            isError.set(true)
-                            dogsWalkRecord[dog] = mutableListOf()
-                            if(dogsWalkRecord.size == MainActivity.dogNameList.size) {
-                                walkDateDeferred.complete(dogsWalkRecord)
+                            override fun onCancelled(error: DatabaseError) {
+                                isError.set(true)
+                                dogsWalkRecord[dog] = mutableListOf()
+                                if (dogsWalkRecord.size == MainActivity.dogNameList.size) {
+                                    walkDateDeferred.complete(dogsWalkRecord)
+                                }
                             }
-                        }
-                    })
+                        })
+                }
             }
 
             userRef.child("collection").get().addOnSuccessListener {
