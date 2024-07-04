@@ -230,6 +230,7 @@ class LoginActivity : AppCompatActivity() {
                 totalWalkInfoJob.await()
                 collectionInfoJob.await()
 
+                setLoginIngView(false)
                 startMain()
             }
         }

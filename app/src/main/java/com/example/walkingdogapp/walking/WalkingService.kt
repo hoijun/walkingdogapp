@@ -168,7 +168,7 @@ class WalkingService : Service() {
         val pendingIntent =
             PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_IMMUTABLE)
         builder = NotificationCompat.Builder(applicationContext, channelId)
-        builder.setSmallIcon(R.mipmap.ic_launcher)
+        builder.setSmallIcon(R.drawable.walkicon)
         builder.setContentTitle("털뭉치")
         builder.setDefaults(NotificationCompat.DEFAULT_ALL)
         builder.setContentText("산책중 이에요.")
