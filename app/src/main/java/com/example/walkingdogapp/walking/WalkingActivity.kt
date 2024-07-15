@@ -460,12 +460,12 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("산책 그만 할까요?\n(10분 및 300m 이상 산책 시 기록 가능)")
+        builder.setTitle("산책 그만 할까요?\n(5분 및 300m 이상 산책 시 기록 가능)")
 
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    if (WalkingService.walkDistance.value!! < 300 || WalkingService.walkTime.value!! < 600) {
+                    if (WalkingService.walkDistance.value!! < 300 && WalkingService.walkTime.value!! < 300) {
                         Toast.makeText(this, "거리 또는 시간이 너무 부족해요!", Toast.LENGTH_SHORT).show()
                         stopWalkingService()
                         goHome()
@@ -532,9 +532,20 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun startCamera() {
-        if(checkPermission(cameraPermission, cameraCode) && checkPermission(storagePermission, storageCode)) {
-            takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("지도 앨범에 사진을 추가하려면\n카메라 설정에서 위치 태그를 켜주세요!")
+
+        val listener = DialogInterface.OnClickListener { _, ans ->
+            when (ans) {
+                DialogInterface.BUTTON_POSITIVE -> {
+                    if(checkPermission(cameraPermission, cameraCode) && checkPermission(storagePermission, storageCode)) {
+                        takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+                    }
+                }
+            }
         }
+        builder.setPositiveButton("네", listener)
+        builder.show()
     }
 
     private fun takePhoto(intent: Intent) {
@@ -637,7 +648,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     builder.show()
                 } else {
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                        startCamera()
+                            takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
                     }
                 }
             }
@@ -659,7 +670,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     builder.setNegativeButton("아니오", null)
                     builder.show()
                 } else {
-                    startCamera()
+                    if(checkPermission(storagePermission, storageCode)) {
+                        takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+                    }
                 }
             }
         }
