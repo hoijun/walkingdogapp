@@ -460,7 +460,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("산책 그만 할까요?\n(5분 및 300m 이상 산책 시 기록 가능)")
+        builder.setTitle("산책 그만 할까요?\n(5분 또는 300m 이상 산책 시 기록 가능)")
 
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
