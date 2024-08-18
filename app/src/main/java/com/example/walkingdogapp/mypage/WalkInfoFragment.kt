@@ -15,7 +15,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.R
@@ -156,7 +156,7 @@ class WalkInfoFragment : Fragment() { // 수정
                 }
             }
 
-            val spacingItemDecoration = HorizonSpacingItemDecoration(userDataViewModel.dogsInfo.value?.size ?: 0, Constant.dpToPx(10f, requireContext())) // 리사이클러뷰 아이템 간격
+            val spacingItemDecoration = HorizonSpacingItemDecoration(userDataViewModel.dogsInfo.value?.size ?: 0, Utils.dpToPx(10f, requireContext())) // 리사이클러뷰 아이템 간격
             selectDogsRecyclerView.addItemDecoration(spacingItemDecoration)
             selectDogsRecyclerView.adapter = walkInfoDogListAdapter
             selectDogsRecyclerView.layoutManager = LinearLayoutManager(context).apply {

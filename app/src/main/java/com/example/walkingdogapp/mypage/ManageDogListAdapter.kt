@@ -6,11 +6,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.ManagedoglistItemBinding
 import com.example.walkingdogapp.datamodel.DogInfo
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 
 class ManageDogListAdapter(private val dogsList: List<DogInfo>): RecyclerView.Adapter<ManageDogListAdapter.ManageDogListViewHolder>() {
     private lateinit var context: Context
@@ -37,7 +36,7 @@ class ManageDogListAdapter(private val dogsList: List<DogInfo>): RecyclerView.Ad
         fun bind(dog: DogInfo) {
             binding.apply {
                 dogInfo = dog
-                dogAge = Constant.getAge(dog.birth)
+                dogAge = Utils.getAge(dog.birth)
 
                 if (MainActivity.dogUriList[dog.name] != null) {
                     Glide.with(context).load(MainActivity.dogUriList[dog.name])

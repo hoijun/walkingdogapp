@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.databinding.MypagedoglistItemBinding
@@ -60,7 +60,7 @@ class MyPageDogListAdapter(private val dogsList: List<DogInfo>, private val succ
             binding.apply {
                 mypageAddDogBtn.visibility = View.GONE
                 dogInfo = dog
-                dogAge = Constant.getAge(dog.birth)
+                dogAge = Utils.getAge(dog.birth)
 
                 if (MainActivity.dogUriList[dog.name] != null) {
                     Glide.with(context).load(MainActivity.dogUriList[dog.name])

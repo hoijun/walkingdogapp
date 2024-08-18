@@ -1,15 +1,18 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.login
 
 import android.content.ContentValues.TAG
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
+import com.example.walkingdogapp.Utils
+import com.example.walkingdogapp.LoadingDialogFragment
+import com.example.walkingdogapp.MainActivity
+import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.databinding.ActivityLoginBinding
 import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.datamodel.WalkInfo
@@ -30,14 +33,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import kotlin.system.exitProcess
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var loginInfo: android.content.SharedPreferences
+    private lateinit var loginInfo: SharedPreferences
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.database
-    private var backPressedTime : Long = 0
+    private var backPressedTime: Long = 0
     private val loadingDialogFragment = LoadingDialogFragment()
 
     private val kakaoLoginCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
@@ -64,11 +68,10 @@ class LoginActivity : AppCompatActivity() {
     }
     private val naverProfileCallback = object : NidProfileCallback<NidProfileResponse> {
         override fun onSuccess(result: NidProfileResponse) {
-            if(result.profile?.email == null || result.profile?.id == null) {
+            if (result.profile?.email == null || result.profile?.id == null) {
                 setLoginIngView(false)
                 return
             }
-            saveUser(result.profile!!.email!!, result.profile!!.id!!)
             signupFirebase(result.profile!!.email!!, result.profile!!.id!!)
         }
 
@@ -100,12 +103,12 @@ class LoginActivity : AppCompatActivity() {
 
         this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
-        auth = FirebaseAuth.getInstance()
         loginInfo = getSharedPreferences("setting", MODE_PRIVATE)
 
+        auth = FirebaseAuth.getInstance()
         binding.apply {
             KakaoLogin.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(this@LoginActivity)) {
+                if (!NetworkManager.checkNetworkState(this@LoginActivity)) {
                     return@setOnClickListener
                 }
                 try {
@@ -116,7 +119,7 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
             NaverLogin.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(this@LoginActivity)) {
+                if (!NetworkManager.checkNetworkState(this@LoginActivity)) {
                     return@setOnClickListener
                 }
                 NaverIdLoginSDK.authenticate(this@LoginActivity, naverLoginCallback)
@@ -163,7 +166,6 @@ class LoginActivity : AppCompatActivity() {
                     Log.e(TAG, "사용자 정보 요청 실패", error1)
                     setLoginIngView(false)
                 } else if (user?.kakaoAccount?.email != null) {
-                    saveUser(user.kakaoAccount!!.email!!, user.id.toString())
                     signupFirebase(user.kakaoAccount!!.email!!, user.id.toString())
                 } else if (user?.kakaoAccount?.email == null) {
                     setLoginIngView(false)
@@ -189,49 +191,117 @@ class LoginActivity : AppCompatActivity() {
                 return@addOnCompleteListener
             }
 
-            val uid = auth.currentUser?.uid
+            setLoginIngView(false)
 
-            val userRef = db.getReference("Users")
-            val userInfo = UserInfo(email = myEmail)
+            auth.currentUser?.delete()?.addOnCompleteListener {
+                val termsOfServiceDialog = TermOfServiceDialog()
+                termsOfServiceDialog.onClickYesListener =
+                    TermOfServiceDialog.OnClickYesListener { agree ->
+                        auth.createUserWithEmailAndPassword(myEmail, password)
+                            .addOnCompleteListener {
+                                if (agree) {
+                                    val uid = auth.currentUser?.uid
 
-            lifecycleScope.launch {
-                val userInfoJob = async(Dispatchers.IO) {
-                    try {
-                        userRef.child("$uid").child("user").setValue(userInfo).await()
-                    } catch (e: Exception) {
-                        Toast.makeText(this@LoginActivity, "로그인 실패", Toast.LENGTH_SHORT).show()
-                        setLoginIngView(false)
-                        return@async
+                                    val userRef = db.getReference("Users")
+                                    val userInfo = UserInfo(email = myEmail)
+                                    var error = false
+
+                                    setLoginIngView(true)
+                                    lifecycleScope.launch {
+                                        val userInfoJob = async(Dispatchers.IO) {
+                                            try {
+                                                userRef.child("$uid").child("user")
+                                                    .setValue(userInfo)
+                                                    .await()
+                                            } catch (e: Exception) {
+                                                error = true
+                                            }
+                                        }
+
+                                        if (error) {
+                                            withContext(Dispatchers.Main) {
+                                                toastFailSignUp()
+                                                setLoginIngView(false)
+                                                return@withContext
+                                            }
+                                            return@launch
+                                        }
+
+                                        val totalWalkInfoJob = async(Dispatchers.IO) {
+                                            try {
+                                                userRef.child("$uid").child("totalWalk")
+                                                    .setValue(WalkInfo()).await()
+                                            } catch (e: Exception) {
+                                                error = true
+                                            }
+                                        }
+
+                                        if (error) {
+                                            withContext(Dispatchers.Main) {
+                                                toastFailSignUp()
+                                                setLoginIngView(false)
+                                                return@withContext
+                                            }
+                                            return@launch
+                                        }
+
+                                        val collectionInfoJob = async(Dispatchers.IO) {
+                                            try {
+                                                userRef.child("$uid").child("collection")
+                                                    .setValue(Utils.item_whether)
+                                                    .await()
+                                            } catch (e: Exception) {
+                                                error = true
+                                            }
+                                        }
+
+                                        if (error) {
+                                            withContext(Dispatchers.Main) {
+                                                toastFailSignUp()
+                                                setLoginIngView(false)
+                                                return@withContext
+                                            }
+                                            return@launch
+                                        }
+
+                                        val termsOfServiceJob = async(Dispatchers.IO) {
+                                            try {
+                                                userRef.child("$uid").child("termsOfService")
+                                                    .setValue(true)
+                                                    .await()
+                                            } catch (e: Exception) {
+                                                error = true
+                                            }
+                                        }
+
+                                        if (error) {
+                                            withContext(Dispatchers.Main) {
+                                                toastFailSignUp()
+                                                setLoginIngView(false)
+                                                return@withContext
+                                            }
+                                            return@launch
+                                        }
+
+                                        userInfoJob.await()
+                                        totalWalkInfoJob.await()
+                                        collectionInfoJob.await()
+                                        termsOfServiceJob.await()
+
+                                        saveUser(myEmail, password)
+
+                                        setLoginIngView(false)
+                                        startMain()
+                                    }
+                                }
+                            }.addOnFailureListener {
+                                toastFailSignUp()
+                                setLoginIngView(false)
+                            }
                     }
-                }
-
-                val totalWalkInfoJob = async(Dispatchers.IO) {
-                    try {
-                        userRef.child("$uid").child("totalWalk").setValue(WalkInfo()).await()
-                    } catch (e: Exception) {
-                        Toast.makeText(this@LoginActivity, "로그인 실패", Toast.LENGTH_SHORT).show()
-                        setLoginIngView(false)
-                        return@async
-                    }
-                }
-
-                val collectionInfoJob = async(Dispatchers.IO) {
-                    try {
-                        userRef.child("$uid").child("collection").setValue(Constant.item_whether)
-                            .await()
-                    } catch (e: Exception) {
-                        Toast.makeText(this@LoginActivity, "로그인 실패", Toast.LENGTH_SHORT).show()
-                        setLoginIngView(false)
-                        return@async
-                    }
-                }
-
-                userInfoJob.await()
-                totalWalkInfoJob.await()
-                collectionInfoJob.await()
-
-                setLoginIngView(false)
-                startMain()
+                termsOfServiceDialog.show(supportFragmentManager, "terms")
+            }?.addOnFailureListener {
+                toastFailSignUp()
             }
         }
     }
@@ -271,5 +341,13 @@ class LoginActivity : AppCompatActivity() {
         } else {
             loadingDialogFragment.dismiss()
         }
+    }
+
+    private fun toastFailSignUp() {
+        Toast.makeText(
+            this@LoginActivity,
+            "회원가입 실패",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }

@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
-import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentDetailPictureBinding
@@ -18,7 +18,6 @@ import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class DetailPictureFragment : Fragment() {
@@ -95,7 +94,7 @@ class DetailPictureFragment : Fragment() {
         val iterator = imgList.iterator()
         while (iterator.hasNext()) {
             val img = iterator.next()
-            if(!Constant.isImageExists(img.uri, requireActivity())) {
+            if(!Utils.isImageExists(img.uri, requireActivity())) {
                 lifecycleScope.launch(Dispatchers.Main) {
                     val index = imgList.indexOf(img)
                     val recyclerViewAdapter = binding.detailViewpager2.adapter as DetailPictureItemListAdapter

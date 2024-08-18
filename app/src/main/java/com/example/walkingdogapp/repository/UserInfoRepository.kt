@@ -4,13 +4,12 @@ import android.app.Application
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.datamodel.AlarmDao
 import com.example.walkingdogapp.datamodel.AlarmDataModel
 import com.example.walkingdogapp.database.LocalUserDatabase
-import com.example.walkingdogapp.datamodel.CollectionInfo
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.datamodel.WalkInfo
@@ -31,7 +30,6 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.io.File
@@ -183,10 +181,10 @@ class UserInfoRepository(private val application: Application) {
             }
 
             userRef.child("collection").get().addOnSuccessListener {
-                collectionDeferred.complete(it.getValue<HashMap<String, Boolean>>() ?: Constant.item_whether)
+                collectionDeferred.complete(it.getValue<HashMap<String, Boolean>>() ?: Utils.item_whether)
             }.addOnFailureListener {
                 isError.set(true)
-                collectionDeferred.complete(Constant.item_whether)
+                collectionDeferred.complete(Utils.item_whether)
             }
 
 

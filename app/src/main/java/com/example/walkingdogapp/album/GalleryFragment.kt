@@ -23,7 +23,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentGalleryBinding
 import com.example.walkingdogapp.deco.GridSpacingItemDecoration
@@ -88,7 +88,7 @@ class GalleryFragment : Fragment() {
         mainactivity = requireActivity() as MainActivity
         mainactivity.binding.menuBn.visibility = View.GONE
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
-        itemDecoration = GridSpacingItemDecoration(3, Constant.dpToPx(15f, requireContext()))
+        itemDecoration = GridSpacingItemDecoration(3, Utils.dpToPx(15f, requireContext()))
     }
 
     override fun onCreateView(
@@ -244,7 +244,7 @@ class GalleryFragment : Fragment() {
                 val imageTitle: String = cursor.getString(columnIndexTitle)
                 val imageDate: Long = cursor.getLong(columnIndexDate)
                 val contentUri = Uri.withAppendedPath(uri, imagePath)
-                imgInfos.add(GalleryImgInfo(contentUri, imageTitle, Constant.convertLongToTime(SimpleDateFormat("yyyy년 MM월 dd일 HH:mm"), imageDate)))
+                imgInfos.add(GalleryImgInfo(contentUri, imageTitle, Utils.convertLongToTime(SimpleDateFormat("yyyy년 MM월 dd일 HH:mm"), imageDate)))
             }
             userDataViewModel.saveAlbumImgs(imgInfos)
         }
@@ -278,7 +278,7 @@ class GalleryFragment : Fragment() {
         val iterator = imgInfos.iterator()
         while (iterator.hasNext()) {
             val img = iterator.next()
-            if (!Constant.isImageExists(img.uri, requireActivity())) {
+            if (!Utils.isImageExists(img.uri, requireActivity())) {
                 val index = imgInfos.indexOf(img)
                 iterator.remove()
                 (binding.galleryRecyclerview.adapter as GalleryItemListAdapter).notifyItemRemoved(index)
