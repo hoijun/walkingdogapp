@@ -30,7 +30,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.NetworkManager
@@ -95,10 +95,6 @@ class RegisterDogActivity : AppCompatActivity() {
 
         userInfoViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
 
-        val uid = auth.currentUser?.uid
-        val userRef = db.getReference("Users")
-        val storageRef = storage.getReference("$uid")
-
         val userDogInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra("doginfo", DogInfo::class.java)
         } else {
@@ -162,7 +158,7 @@ class RegisterDogActivity : AppCompatActivity() {
                 val cal = Calendar.getInstance()
                 val dateCallback = DatePickerDialog.OnDateSetListener { _, year, month, day ->
                     val birth = "${year}/${month + 1}/${day}"
-                    if (Constant.getAge(birth) == -1) {
+                    if (Utils.getAge(birth) == -1) {
                         Toast.makeText(
                             this@RegisterDogActivity,
                             "올바른 생일을 입력 해주세요!",

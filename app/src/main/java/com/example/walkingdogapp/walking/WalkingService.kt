@@ -10,15 +10,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
-import android.os.Bundle
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
-import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -117,20 +115,20 @@ class WalkingService : Service() {
             val action = intent.action
             if (action != null) {
                 when(action) {
-                    Constant.ACTION_START_Walking_SERVICE -> {
+                    Utils.ACTION_START_Walking_SERVICE -> {
                         walkingDogs.postValue(intent.getStringArrayListExtra("selectedDogs")?: arrayListOf())
                         startLocationService()
                     }
 
-                    Constant.ACTION_STOP_Walking_SERVICE -> {
+                    Utils.ACTION_STOP_Walking_SERVICE -> {
                         stopLocationService()
                     }
 
-                    Constant.ACTION_START_Walking_Tracking -> {
+                    Utils.ACTION_START_Walking_Tracking -> {
                         startTracking()
                     }
 
-                    Constant.ACTION_STOP_Walking_Tracking -> {
+                    Utils.ACTION_STOP_Walking_Tracking -> {
                         stopTracking()
                     }
                 }
@@ -203,10 +201,10 @@ class WalkingService : Service() {
         isTracking.postValue(true)
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            startForeground(Constant.Walking_SERVICE_ID, builder.build())
+            startForeground(Utils.Walking_SERVICE_ID, builder.build())
         } else {
             startForeground(
-                Constant.Walking_SERVICE_ID,
+                Utils.Walking_SERVICE_ID,
                 builder.build(),
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
             )

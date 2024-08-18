@@ -25,7 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.deco.HorizonSpacingItemDecoration
@@ -41,7 +41,6 @@ import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.InfoWindow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -103,7 +102,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAlbumMapBinding.inflate(inflater, container, false)
-        itemDecoration = HorizonSpacingItemDecoration(3, Constant.dpToPx(12f, requireContext()))
+        itemDecoration = HorizonSpacingItemDecoration(3, Utils.dpToPx(12f, requireContext()))
 
         binding.apply {
             isStoragePermitted = false
@@ -207,7 +206,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             val columnIndexId: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             val columnIndexDate: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
             while (cursor.moveToNext()) {
-                val imageDate = Constant.convertLongToTime(SimpleDateFormat("yyyy-MM-dd"), cursor.getLong(columnIndexDate))
+                val imageDate = Utils.convertLongToTime(SimpleDateFormat("yyyy-MM-dd"), cursor.getLong(columnIndexDate))
                 val imagePath: String = cursor.getString(columnIndexId)
                 val contentUri = Uri.withAppendedPath(uri, imagePath)
                 val imgView = getMarkerImageView(contentUri)

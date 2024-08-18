@@ -4,11 +4,8 @@ import android.app.DatePickerDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
-import android.health.connect.datatypes.units.Length
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -18,20 +15,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.databinding.ActivityRegisterUserBinding
 import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 
@@ -76,7 +68,7 @@ class RegisterUserActivity : AppCompatActivity() {
                 val cal = Calendar.getInstance()
                 val dateCallback = DatePickerDialog.OnDateSetListener { _, year, month, day ->
                     val birth = "${year}/${month + 1}/${day}"
-                    if (Constant.getAge(birth) == -1) {
+                    if (Utils.getAge(birth) == -1) {
                         Toast.makeText(
                             this@RegisterUserActivity,
                             "올바른 생일을 입력 해주세요!",

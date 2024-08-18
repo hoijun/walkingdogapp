@@ -119,7 +119,6 @@ class SettingAlarmDialog : DialogFragment() {
         }
 
         isCancelable = true
-        resizeDialog()
         this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return binding.root
     }
@@ -127,6 +126,11 @@ class SettingAlarmDialog : DialogFragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        resizeDialog()
     }
 
     private fun resizeDialog() {

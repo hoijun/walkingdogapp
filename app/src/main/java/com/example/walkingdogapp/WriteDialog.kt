@@ -1,7 +1,5 @@
 package com.example.walkingdogapp
 
-import android.app.Dialog
-import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -38,7 +36,6 @@ class WriteDialog : DialogFragment() {
             }
         }
         isCancelable = false
-        resizeDialog()
         return binding.root
     }
 
@@ -47,11 +44,15 @@ class WriteDialog : DialogFragment() {
         _binding = null
     }
 
+    override fun onResume() {
+        super.onResume()
+        resizeDialog()
+    }
+
     private fun resizeDialog() {
         val params: ViewGroup.LayoutParams? = this.dialog?.window?.attributes
         val deviceWidth = Resources.getSystem().displayMetrics.widthPixels
         params?.width = (deviceWidth * 0.8).toInt()
         this.dialog?.window?.attributes = params as WindowManager.LayoutParams
     }
-
 }

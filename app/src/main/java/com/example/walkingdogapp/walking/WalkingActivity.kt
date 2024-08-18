@@ -32,20 +32,14 @@ import androidx.databinding.BindingAdapter
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
-import com.example.walkingdogapp.datamodel.WalkInfo
 import com.example.walkingdogapp.datamodel.WalkLatLng
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
@@ -57,16 +51,12 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.Random
 import kotlin.math.cos
@@ -416,7 +406,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             Log.d("WalkingService", "start")
             val serviceIntent = Intent(this, WalkingService::class.java)
             serviceIntent.putStringArrayListExtra("selectedDogs", ArrayList(selectedDogs))
-            serviceIntent.action = Constant.ACTION_START_Walking_SERVICE
+            serviceIntent.action = Utils.ACTION_START_Walking_SERVICE
             ContextCompat.startForegroundService(this, serviceIntent)
         }
     }
@@ -425,7 +415,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         if (isWalkingServiceRunning()) {
             Log.d("WalkingService", "stop")
             val serviceIntent = Intent(this, WalkingService::class.java)
-            serviceIntent.action = Constant.ACTION_STOP_Walking_SERVICE
+            serviceIntent.action = Utils.ACTION_STOP_Walking_SERVICE
             ContextCompat.startForegroundService(this, serviceIntent)
         }
     }
@@ -433,7 +423,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun startTracking() {
         if (isWalkingServiceRunning()) {
             val serviceIntent = Intent(this, WalkingService::class.java)
-            serviceIntent.action = Constant.ACTION_START_Walking_Tracking
+            serviceIntent.action = Utils.ACTION_START_Walking_Tracking
             startService(serviceIntent)
         }
     }
@@ -441,7 +431,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun stopTracking() {
         if (isWalkingServiceRunning()) {
             val serviceIntent = Intent(this, WalkingService::class.java)
-            serviceIntent.action = Constant.ACTION_STOP_Walking_Tracking
+            serviceIntent.action = Utils.ACTION_STOP_Walking_Tracking
             startService(serviceIntent)
         }
     }

@@ -2,16 +2,8 @@ package com.example.walkingdogapp
 
 import android.content.ContentResolver
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
-import android.os.Parcelable
-import android.provider.MediaStore
 import android.util.TypedValue
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -20,7 +12,7 @@ import java.util.Locale
 import kotlin.collections.HashMap
 
 
-class Constant {
+class Utils {
     companion object {
         const val Walking_SERVICE_ID = 175
         const val ACTION_START_Walking_SERVICE = "startWalkingService"

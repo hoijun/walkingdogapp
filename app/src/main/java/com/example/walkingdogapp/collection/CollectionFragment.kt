@@ -1,7 +1,6 @@
 package com.example.walkingdogapp.collection
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.walkingdogapp.Constant
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.deco.GridSpacingItemDecoration
@@ -31,7 +30,7 @@ class CollectionFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val collectionInfo = userDataViewModel.collectionInfo.value ?: Constant.item_whether
+        val collectionInfo = userDataViewModel.collectionInfo.value ?: Utils.item_whether
         setCollection(collectionInfo)
 
         if (!NetworkManager.checkNetworkState(requireContext())) {
@@ -91,7 +90,7 @@ class CollectionFragment : Fragment() {
             }
 
             collectionRecyclerview.layoutManager = gridListManager
-            collectionRecyclerview.addItemDecoration(GridSpacingItemDecoration(3, Constant.dpToPx(15f, requireContext())))
+            collectionRecyclerview.addItemDecoration(GridSpacingItemDecoration(3, Utils.dpToPx(15f, requireContext())))
             collectionRecyclerview.adapter = adapter
             collectionRecyclerview.itemAnimator = null
 

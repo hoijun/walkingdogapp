@@ -118,6 +118,7 @@ dependencies {
     implementation("androidx.media:media:1.7.0")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("com.android.identity:identity-credential-android:20231002")
+    implementation("androidx.activity:activity:1.9.1")
     androidTestImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
