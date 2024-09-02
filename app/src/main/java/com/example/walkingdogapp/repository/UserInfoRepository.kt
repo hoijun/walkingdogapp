@@ -81,7 +81,6 @@ class UserInfoRepository(private val application: Application) {
         val collectionDeferred = CompletableDeferred<HashMap<String, Boolean>>()
         val profileUriDeferred = CompletableDeferred<HashMap<String, Uri>>()
 
-
         try {
             userRef.child("dog").addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {

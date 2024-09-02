@@ -17,7 +17,6 @@ import kotlin.system.exitProcess
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
-    private lateinit var loginInfo: android.content.SharedPreferences
     private lateinit var auth: FirebaseAuth
     private var backPressedTime : Long = 0
     private val callback = object : OnBackPressedCallback(true) {
@@ -37,34 +36,35 @@ class SplashActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_splash)
         this.onBackPressedDispatcher.addCallback(this, callback)
+        auth = FirebaseAuth.getInstance()
 
         CoroutineScope(Dispatchers.Main).launch {
             delay(1000)
-            auth = FirebaseAuth.getInstance()
-
-            loginInfo = getSharedPreferences("setting", MODE_PRIVATE)
-            val loginId = loginInfo.getString("id", null)
-            val loginPassword = loginInfo.getString("password", null)
-            if (loginId != null && loginPassword != null) {
-                signinFirebase(loginId, loginPassword)
-            } else {
-                startLogin()
-            }
+            signInFirebase()
         }
     }
 
-    private fun signinFirebase(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener {  //통신 완료가 된 후 무슨일을 할지
-                    task ->
-                if (task.isSuccessful) {
-                    startMain()
-                } else {
-                    // 오류가 난 경우!
-                    startLogin()
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
-                }
+    private fun signInFirebase() {
+        try {
+            val currentUser = auth.currentUser
+            if (currentUser == null) {
+                startLogin()
+                return
             }
+
+            currentUser.getIdToken(true).addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    auth.signOut()
+                    startLogin()
+                    return@addOnCompleteListener
+                }
+
+                startMain()
+            }
+        } catch (e: Exception) {
+            startLogin()
+            Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun startMain() {
