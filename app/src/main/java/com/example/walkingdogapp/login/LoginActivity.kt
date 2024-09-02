@@ -2,17 +2,16 @@ package com.example.walkingdogapp.login
 
 import android.content.ContentValues.TAG
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.NetworkManager
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.databinding.ActivityLoginBinding
 import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.datamodel.WalkInfo
@@ -38,7 +37,6 @@ import kotlin.system.exitProcess
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var loginInfo: SharedPreferences
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.database
     private var backPressedTime: Long = 0
@@ -102,8 +100,6 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
-
-        loginInfo = getSharedPreferences("setting", MODE_PRIVATE)
 
         auth = FirebaseAuth.getInstance()
         binding.apply {
@@ -288,8 +284,6 @@ class LoginActivity : AppCompatActivity() {
                                         collectionInfoJob.await()
                                         termsOfServiceJob.await()
 
-                                        saveUser(myEmail, password)
-
                                         setLoginIngView(false)
                                         startMain()
                                     }
@@ -318,13 +312,6 @@ class LoginActivity : AppCompatActivity() {
                 setLoginIngView(false)
             }
         }
-    }
-
-    private fun saveUser(email: String, password: String) {
-        val editor = loginInfo.edit()
-        editor.putString("id",email)
-        editor.putString("password",password)
-        editor.apply()
     }
 
     private fun startMain() {
