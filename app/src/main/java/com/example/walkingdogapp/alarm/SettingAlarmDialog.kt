@@ -1,5 +1,6 @@
 package com.example.walkingdogapp.alarm
 
+import android.annotation.SuppressLint
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -29,6 +30,7 @@ class SettingAlarmDialog : DialogFragment() {
 
     var onAddAlarmListener: OnAddAlarmListener? = null
 
+    @SuppressLint("DefaultLocale")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

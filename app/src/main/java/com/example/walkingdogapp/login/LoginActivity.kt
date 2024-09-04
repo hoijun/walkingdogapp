@@ -64,6 +64,7 @@ class LoginActivity : AppCompatActivity() {
             loginApp("naver")
         }
     }
+
     private val naverProfileCallback = object : NidProfileCallback<NidProfileResponse> {
         override fun onSuccess(result: NidProfileResponse) {
             if (result.profile?.email == null || result.profile?.id == null) {
@@ -103,7 +104,7 @@ class LoginActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         binding.apply {
-            KakaoLogin.setOnClickListener {
+            KakaoLoginBtn.setOnClickListener {
                 if (!NetworkManager.checkNetworkState(this@LoginActivity)) {
                     return@setOnClickListener
                 }
@@ -114,12 +115,12 @@ class LoginActivity : AppCompatActivity() {
                     e.message?.let { it1 -> Log.d("error", it1) }
                 }
             }
-            NaverLogin.setOnClickListener {
+            NaverLoginBtn.setOnClickListener {
                 if (!NetworkManager.checkNetworkState(this@LoginActivity)) {
                     return@setOnClickListener
                 }
-                NaverIdLoginSDK.authenticate(this@LoginActivity, naverLoginCallback)
                 setLoginIngView(true)
+                NaverIdLoginSDK.authenticate(this@LoginActivity, naverLoginCallback)
             }
         }
     }
@@ -214,15 +215,6 @@ class LoginActivity : AppCompatActivity() {
                                             }
                                         }
 
-                                        if (error) {
-                                            withContext(Dispatchers.Main) {
-                                                toastFailSignUp()
-                                                setLoginIngView(false)
-                                                return@withContext
-                                            }
-                                            return@launch
-                                        }
-
                                         val totalWalkInfoJob = async(Dispatchers.IO) {
                                             try {
                                                 userRef.child("$uid").child("totalWalk")
@@ -230,15 +222,6 @@ class LoginActivity : AppCompatActivity() {
                                             } catch (e: Exception) {
                                                 error = true
                                             }
-                                        }
-
-                                        if (error) {
-                                            withContext(Dispatchers.Main) {
-                                                toastFailSignUp()
-                                                setLoginIngView(false)
-                                                return@withContext
-                                            }
-                                            return@launch
                                         }
 
                                         val collectionInfoJob = async(Dispatchers.IO) {
@@ -251,15 +234,6 @@ class LoginActivity : AppCompatActivity() {
                                             }
                                         }
 
-                                        if (error) {
-                                            withContext(Dispatchers.Main) {
-                                                toastFailSignUp()
-                                                setLoginIngView(false)
-                                                return@withContext
-                                            }
-                                            return@launch
-                                        }
-
                                         val termsOfServiceJob = async(Dispatchers.IO) {
                                             try {
                                                 userRef.child("$uid").child("termsOfService")
@@ -270,7 +244,18 @@ class LoginActivity : AppCompatActivity() {
                                             }
                                         }
 
+                                        userInfoJob.await()
+                                        totalWalkInfoJob.await()
+                                        collectionInfoJob.await()
+                                        termsOfServiceJob.await()
+
                                         if (error) {
+                                            try {
+                                                userRef.child("$uid").removeValue().await()
+                                            } catch (e: Exception) {
+                                                Log.d("savepoint", e.message.toString())
+                                            }
+                                            auth.currentUser?.delete()
                                             withContext(Dispatchers.Main) {
                                                 toastFailSignUp()
                                                 setLoginIngView(false)
@@ -278,11 +263,6 @@ class LoginActivity : AppCompatActivity() {
                                             }
                                             return@launch
                                         }
-
-                                        userInfoJob.await()
-                                        totalWalkInfoJob.await()
-                                        collectionInfoJob.await()
-                                        termsOfServiceJob.await()
 
                                         setLoginIngView(false)
                                         startMain()
@@ -326,7 +306,7 @@ class LoginActivity : AppCompatActivity() {
         if (loginIng) {
             loadingDialogFragment.show(this.supportFragmentManager, "loading")
         } else {
-            loadingDialogFragment.dismiss()
+            loadingDialogFragment.dismissAllowingStateLoss()
         }
     }
 

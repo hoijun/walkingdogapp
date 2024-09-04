@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".login.LoginActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,49 +17,123 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.35"
+            app:layout_constraintHeight_percent="0.4"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" >
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/collection_022"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintWidth_percent="0.6"
+                app:layout_constraintDimensionRatio="1:1"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
-            android:id="@+id/logintext"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:id="@+id/logintext1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="로그인"
+            android:text="소셜 로그인으로"
             android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textSize="30sp"
             android:textStyle="bold"
+            android:layout_marginTop="30dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.06"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view9"
-            app:layout_constraintWidth_percent="0.3" />
+            app:layout_constraintTop_toBottomOf="@+id/view9" />
 
-        <ImageView
-            android:id="@+id/Naver_Login"
+        <TextView
+            android:id="@+id/logintext2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="간편하게 산책하자!"
+            android:textColor="@color/black"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:layout_marginTop="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/logintext1" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/Naver_LoginBtn"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="40dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/naver_login"
+            android:background="@drawable/naverlogin_roundstyle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.07"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/logintext"
-            app:layout_constraintWidth_percent="0.75" />
+            app:layout_constraintTop_toBottomOf="@+id/logintext2"
+            app:layout_constraintWidth_percent="0.75">
 
-        <ImageView
-            android:id="@+id/Kakao_Login"
+            <ImageView
+                android:id="@+id/NaverIcon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/naver_symbol"
+                android:layout_marginStart="40dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/NaverText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="네이버로 시작하기"
+                android:textColor="@color/black"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:layout_marginStart="40dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/Kakao_LoginBtn"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="20dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/kakao_login"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/kakaologin_roundstyle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.07"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/Naver_Login"
-            app:layout_constraintWidth_percent="0.75" />
+            app:layout_constraintTop_toBottomOf="@+id/Naver_LoginBtn"
+            app:layout_constraintWidth_percent="0.75">
+
+            <ImageView
+                android:id="@+id/kakaoIcon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/kakao_symbol"
+                android:layout_marginStart="40dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/kakaoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="카카오로 시작하기"
+                android:textColor="@color/black"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:layout_marginStart="40dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -53,9 +53,6 @@ import java.util.Calendar
 class RegisterDogActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterDogBinding
     private var dogInfo = DogInfo()
-    private val auth = FirebaseAuth.getInstance()
-    private val db = Firebase.database
-    private val storage = FirebaseStorage.getInstance()
     private var imguri: Uri? = null
     private lateinit var userInfoViewModel: UserInfoViewModel
 
@@ -72,7 +69,7 @@ class RegisterDogActivity : AppCompatActivity() {
         if (uri != null && getExtension(uri) == "jpg") {
             imguri = pressImage(uri,this)
             Glide.with(this@RegisterDogActivity).load(uri)
-                .format(DecodeFormat.PREFER_RGB_565).override(100, 100).into(binding.registerImage)
+                .format(DecodeFormat.PREFER_RGB_565).override(150, 150).into(binding.registerImage)
         } else {
             return@registerForActivityResult
         }

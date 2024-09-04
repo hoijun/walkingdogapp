@@ -20,7 +20,6 @@ class TermOfServiceDialog: DialogFragment() {
     private var isCheckedFirst = false
     private var isCheckedSecond = false
     private var isCheckedThird = false
-    private val allChecked = false
 
     var onClickYesListener: OnClickYesListener? = null
     override fun onCreateView(
