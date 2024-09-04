@@ -144,7 +144,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
         return repository.saveWalkInfo(walkDogs, startTime, distance, time, coords, collections)
     }
 
-    suspend fun removeAccount() : Boolean{
+    suspend fun removeAccount() : Boolean {
         return repository.removeAccount()
     }
 

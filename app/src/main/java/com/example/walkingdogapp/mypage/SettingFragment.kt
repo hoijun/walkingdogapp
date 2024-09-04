@@ -38,8 +38,6 @@ class SettingFragment : Fragment() {
     private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
     private val auth = FirebaseAuth.getInstance()
 
-    private lateinit var loginInfo: android.content.SharedPreferences
-
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goMyPage()
@@ -216,17 +214,9 @@ class SettingFragment : Fragment() {
         mainactivity.changeFragment(MyPageFragment())
     }
 
-    private fun removeLoginInfo() {
-        loginInfo = mainactivity.getSharedPreferences("setting", AppCompatActivity.MODE_PRIVATE)
-        val editor = loginInfo.edit()
-        editor.remove("id")
-        editor.remove("password")
-        editor.apply()
-    }
-
     private fun goLogin() {
-        removeLoginInfo()
         val loginIntent = Intent(requireContext(), LoginActivity::class.java)
+        loginIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(loginIntent)
         MainActivity.preFragment = "Home" // 로그아웃 바로 후에 홈 부터 시작하기 위함
     }

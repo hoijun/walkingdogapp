@@ -138,7 +138,6 @@ class UserInfoRepository(private val application: Application) {
             if (MainActivity.dogNameList.isEmpty()) {
                 walkDateDeferred.complete(dogsWalkRecord)
             } else {
-
                 for (dog in MainActivity.dogNameList) {
                     userRef.child("dog").child(dog).child("walkdates")
                         .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -180,35 +179,39 @@ class UserInfoRepository(private val application: Application) {
             }
 
             userRef.child("collection").get().addOnSuccessListener {
-                collectionDeferred.complete(it.getValue<HashMap<String, Boolean>>() ?: Utils.item_whether)
+                collectionDeferred.complete(
+                    it.getValue<HashMap<String, Boolean>>() ?: Utils.item_whether
+                )
             }.addOnFailureListener {
                 isError.set(true)
                 collectionDeferred.complete(Utils.item_whether)
             }
 
-
             // 강아지 프로필 사진
-            try {
-                val dogImgs = HashMap<String, Uri>()
-                var downloadCount = 0
-                var imgCount: Int
-                storageRef.listAll().addOnSuccessListener { listResult ->
-                    imgCount = listResult.items.size
-                    if (imgCount == 0) {
-                        profileUriDeferred.complete(HashMap<String, Uri>())
-                    }
-                    listResult.items.forEach { item ->
-                        item.downloadUrl.addOnSuccessListener { uri ->
-                            downloadCount++
-                            dogImgs[item.name] = uri
-
-                            if (imgCount == downloadCount) {
-                                profileUriDeferred.complete(dogImgs)
-                            }
+            val dogImgs = HashMap<String, Uri>()
+            var downloadCount = 0
+            var imgCount: Int
+            storageRef.listAll().addOnSuccessListener { listResult ->
+                imgCount = listResult.items.size
+                if (imgCount == 0) {
+                    profileUriDeferred.complete(HashMap<String, Uri>())
+                }
+                listResult.items.forEach { item ->
+                    item.downloadUrl.addOnSuccessListener { uri ->
+                        downloadCount++
+                        dogImgs[item.name] = uri
+                        if (imgCount == downloadCount) {
+                            profileUriDeferred.complete(dogImgs)
+                        }
+                    }.addOnFailureListener {
+                        downloadCount++
+                        dogImgs[item.name] = Uri.EMPTY
+                        if (imgCount == downloadCount) {
+                            profileUriDeferred.complete(dogImgs)
                         }
                     }
                 }
-            } catch (e: Exception) {
+            }.addOnFailureListener {
                 isError.set(true)
                 profileUriDeferred.complete(HashMap<String, Uri>())
             }
@@ -316,8 +319,7 @@ class UserInfoRepository(private val application: Application) {
                 try {
                     for (walkRecord in walkRecords) {
                         val day = walkRecord.day + " " + walkRecord.startTime + " " + walkRecord.endTime
-                        userRef.child("dog").child(dogInfo.name).child("walkdates")
-                            .child(day)
+                        userRef.child("dog").child(dogInfo.name).child("walkdates").child(day)
                             .setValue(
                                 SaveWalkDate(
                                     walkRecord.distance,
@@ -325,8 +327,7 @@ class UserInfoRepository(private val application: Application) {
                                     walkRecord.coords,
                                     walkRecord.collections
                                 )
-                            )
-                            .await()
+                            ).await()
                     }
                 } catch (e: Exception) {
                     error = true
@@ -356,7 +357,6 @@ class UserInfoRepository(private val application: Application) {
                                         continuation.resume(tempFileUri)
                                     }
                             }
-
                             storageRef.child(dogInfo.name)
                                 .putFile(tempUri).await()
                         }
@@ -376,8 +376,7 @@ class UserInfoRepository(private val application: Application) {
                     }
 
                     if (!MainActivity.dogNameList.contains(dogInfo.name)) {
-                        storageRef.child(beforeName).delete()
-                            .await()
+                        storageRef.child(beforeName).delete().await()
                     }
                 } catch (e: Exception) {
                     error = true
@@ -434,7 +433,6 @@ class UserInfoRepository(private val application: Application) {
         val walkInfoUpdateJob = suspendCoroutine { continuation ->
             userRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-
                     val endTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
                     val walkDateInfo = LocalDateTime.now()
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " " + startTime + " " + endTime
