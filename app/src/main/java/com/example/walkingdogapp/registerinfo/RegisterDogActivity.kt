@@ -30,18 +30,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.NetworkManager
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.databinding.ActivityRegisterDogBinding
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.WalkRecord
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -117,7 +113,7 @@ class RegisterDogActivity : AppCompatActivity() {
 
             if (MainActivity.dogUriList[beforeName] != null) {
                 Glide.with(this@RegisterDogActivity).load(MainActivity.dogUriList[beforeName])
-                    .format(DecodeFormat.PREFER_RGB_565).override(100, 100).into(registerImage)
+                    .format(DecodeFormat.PREFER_RGB_565).override(150, 150).into(registerImage)
             }
 
             btnDogismale.setOnClickListener {

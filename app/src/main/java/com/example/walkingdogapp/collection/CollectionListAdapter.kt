@@ -2,24 +2,16 @@ package com.example.walkingdogapp.collection
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
-import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.CollectionlistItemBinding
 import com.example.walkingdogapp.datamodel.CollectionInfo
 
@@ -72,7 +64,9 @@ class CollectionListAdapter(private val collections: List<CollectionInfo>) : Rec
                     collections
                 } else {
                     // 입력한 값이 도감의 아이템과 관련 있을 경우
-                    collections.filter { it.collectionNum.contains(charString) || it.collectionName.contains(charString) }
+                    collections.filter {
+                        it.collectionNum.contains(charString) || it.collectionName.contains(charString)
+                    }
                 }
 
                 return FilterResults().apply { values = filteredList }
@@ -81,9 +75,11 @@ class CollectionListAdapter(private val collections: List<CollectionInfo>) : Rec
             @SuppressLint("NotifyDataSetChanged")
             @Suppress("UNCHECKED_CAST")
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
-                val oldSize = collectionInfos.size
+                // val oldSize = collectionInfos.size
                 collectionInfos = (results.values as List<CollectionInfo>)
-                val newSize = collectionInfos.size
+                Log.d("savepoint", collectionInfos.toString())
+                notifyDataSetChanged()
+                /* val newSize = collectionInfos.size
                 if (oldSize == newSize) {
                     notifyItemRangeChanged(0, newSize)
                 } else if (oldSize > newSize) {
@@ -92,7 +88,7 @@ class CollectionListAdapter(private val collections: List<CollectionInfo>) : Rec
                 } else {
                     notifyItemRangeChanged(0, oldSize)
                     notifyItemRangeInserted(oldSize, newSize - oldSize)
-                }
+                }*/
             }
         }
     }

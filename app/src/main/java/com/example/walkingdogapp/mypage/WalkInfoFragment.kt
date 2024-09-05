@@ -39,7 +39,6 @@ data class DogsWalkRecord(
         var walkRecordList: MutableList<WalkRecord> = mutableListOf()
     )
 
-// 매개 변수는 상세정보 프래그먼트로 부터 되돌아 올 때 상세정보를 보기 원했던 산책 날짜가 달력에 표시가 유지 되도록 하기 위함
 class WalkInfoFragment : Fragment() { // 수정
     private lateinit var mainActivity: MainActivity
     private var _binding: FragmentWalkInfoBinding? = null
@@ -230,7 +229,6 @@ class WalkInfoFragment : Fragment() { // 수정
                     adapter = WalkDatesListAdapter(
                         dogsWalkRecordMap[selectedDog.name]?.walkRecordToday ?: listOf()
                     )
-
                 } else {
                     adapter = WalkDatesListAdapter(listOf()) // 빈 리사이클러 뷰
                     walkcalendar.selectedDate = null
