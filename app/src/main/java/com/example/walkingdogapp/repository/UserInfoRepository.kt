@@ -519,7 +519,7 @@ class UserInfoRepository(private val application: Application) {
                         val collectionInfoJob = async(Dispatchers.IO) {
                             try {
                                 val update = mutableMapOf<String, Any>()
-                                for (item in WalkingService.getCollectionItems) {
+                                for (item in collections) {
                                     update[item] = true
                                 }
                                 userRef.child("collection").updateChildren(update).await()

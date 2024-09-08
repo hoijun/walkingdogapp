@@ -77,6 +77,7 @@ class MainActivity : AppCompatActivity() {
 
         if (isWalkingServiceRunning()) {
             val walkingIntent = Intent(this, WalkingActivity::class.java)
+            walkingIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(walkingIntent)
         }
 

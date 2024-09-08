@@ -38,6 +38,7 @@ import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
+import com.example.walkingdogapp.datamodel.CollectionInfo
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.example.walkingdogapp.datamodel.WalkLatLng
 import com.naver.maps.geometry.LatLng
@@ -80,34 +81,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var trackingCamera: CameraUpdate
     private var trackingCameraMode = true // 지도의 화면이 자동으로 사용자에 위치에 따라 움직이는 지
 
-    private var collectionResources = listOf(
-        R.drawable.collection_001,
-        R.drawable.collection_002,
-        R.drawable.collection_003,
-        R.drawable.collection_004,
-        R.drawable.collection_005,
-        R.drawable.collection_006,
-        R.drawable.collection_007,
-        R.drawable.collection_008,
-        R.drawable.collection_009,
-        R.drawable.collection_010,
-        R.drawable.collection_011,
-        R.drawable.collection_012,
-        R.drawable.collection_013,
-        R.drawable.collection_014,
-        R.drawable.collection_015,
-        R.drawable.collection_016,
-        R.drawable.collection_017,
-        R.drawable.collection_018,
-        R.drawable.collection_019,
-        R.drawable.collection_020,
-        R.drawable.collection_021,
-        R.drawable.collection_022,
-        R.drawable.collection_023,
-        R.drawable.collection_024
-    )
-
-    private var collectionImgViews = mutableListOf<ImageView>()
+    private var collectionImgViews = hashMapOf<String, ImageView>()
 
     private val cameraPermission = arrayOf(Manifest.permission.CAMERA)
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -126,6 +100,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var startTime = ""
     private var selectedDogs = arrayListOf<String>()
+    private var collectionsMap = hashMapOf<String, CollectionInfo>()
 
     // 뒤로 가기
     private val backPressedCallback = object : OnBackPressedCallback(true) {
@@ -146,7 +121,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding = ActivityWalkingBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        // 보류
+        this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
         userInfoViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
         userInfoViewModel.getLastLocation()
 
@@ -160,7 +135,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             goHome()
         }
 
-        setCollectionImageView()
+        collectionsMap = setCollectionMap()
+        setCollectionImageView(collectionsMap)
 
         val mapFragment: MapFragment =
             supportFragmentManager.findFragmentById(R.id.Map) as MapFragment?
@@ -169,8 +145,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
 
         mapFragment.getMapAsync(this)
-
-        this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         // 버튼 이벤트 설정
         binding.apply {
@@ -213,6 +187,20 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 // 현재 위치 따라가기 였을 경우
                 trackingCameraMode = false
                 isTrackingCameraMode = trackingCameraMode
+            }
+
+            currentCollections.setOnClickListener {
+                val currentCollections = arrayListOf<CollectionInfo>()
+                WalkingService.getCollectionItems.toMutableSet().toList().forEach {
+                    currentCollections.add(collectionsMap[it]?: CollectionInfo())
+                }
+                val collectionListDialog = CurrentCollectionsDialog().apply {
+                    arguments = Bundle().apply {
+                        putParcelableArrayList("currentCollections", currentCollections)
+                    }
+                }
+
+                collectionListDialog.show(supportFragmentManager, "collectionList")
             }
         }
     }
@@ -303,32 +291,57 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-        if (WalkingService.animalMarkers.isEmpty()) {
+        if (WalkingService.animalMarkers.isEmpty() && WalkingService.getCollectionItems.isEmpty()) {
             randomMarker()
         }
 
-        if (WalkingService.animalMarkers.isNotEmpty()) {
+        if (WalkingService.animalMarkers.isNotEmpty() || WalkingService.getCollectionItems.isNotEmpty()) {
             lifecycleScope.launch(Dispatchers.Main) {
                 delay(5000)
                 for (animalMarker in WalkingService.animalMarkers) {
                     animalMarker.adapter =
                         object : InfoWindow.DefaultViewAdapter(this@WalkingActivity) {
                             override fun getContentView(p0: InfoWindow): View {
-                                return collectionImgViews[animalMarker.tag.toString().toInt()]
+                                return collectionImgViews[animalMarker.tag.toString()]!!
                             }
                         }
+
+                    animalMarker.setOnClickListener {
+                        if (coordList.last().distanceTo(animalMarker.position) < 20) {
+                            val tag = animalMarker.tag.toString()
+                            WalkingService.getCollectionItems.add(tag)
+                            animalMarker.map = null
+                            WalkingService.animalMarkers.remove(animalMarker)
+
+                            val getCollectionDialog = GetCollectionDialog().apply {
+                                arguments = Bundle().apply {
+                                    putParcelable(
+                                        "getCollection",
+                                        collectionsMap[tag] ?: CollectionInfo()
+                                    )
+                                }
+                            }
+                            getCollectionDialog.show(
+                                supportFragmentManager,
+                                "getCollection"
+                            )
+                        }
+                        true
+                    }
                     animalMarker.map = mynavermap
                 }
+                delay(285000)
+                randomMarker()
             }
         }
     }
 
-    private fun setCollectionImageView() {
-        for (imgRes in collectionResources) {
+    private fun setCollectionImageView(collectionsMap: HashMap<String, CollectionInfo>) {
+        collectionsMap.forEach { (key, value) ->
             val imgView = ImageView(this)
             imgView.layoutParams = ViewGroup.LayoutParams(200, 200)
-            Glide.with(this).load(imgRes).override(200, 200).into(imgView)
-            collectionImgViews.add(imgView)
+            Glide.with(this).load(value.collectionResId).override(200, 200).into(imgView)
+            collectionImgViews[key] = imgView
         }
     }
 
@@ -340,27 +353,42 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     if (coordList.isNotEmpty()) {
                         if (WalkingService.animalMarkers.size < 6) { // 마커의 갯수 상한선
                             val randomCoord = getRandomCoord(coordList.last(), 300)
-                            val randomNumber = kotlin.random.Random.nextInt(1, 12)
+                            val randomNumber = kotlin.random.Random.nextInt(1, 24)
+                            val randomKey = String.format("%03d", randomNumber)
                             val animalMarker = InfoWindow()
-                            if (collectionImgViews[randomNumber - 1].parent != null) {
-                                ((collectionImgViews[randomNumber - 1].parent) as ViewGroup).removeView(
-                                    collectionImgViews[randomNumber - 1]
+                            if (collectionImgViews[randomKey]!!.parent != null) {
+                                ((collectionImgViews[randomKey]!!.parent) as ViewGroup).removeView(
+                                    collectionImgViews[randomKey]
                                 )
                             }
 
                             animalMarker.adapter =
                                 object : InfoWindow.DefaultViewAdapter(this@WalkingActivity) {
                                     override fun getContentView(p0: InfoWindow): View {
-                                        return collectionImgViews[randomNumber - 1]
+                                        return collectionImgViews[randomKey]!!
                                     }
                                 }
 
-                            animalMarker.tag = String.format("%03d", randomNumber)
+                            animalMarker.tag = randomKey
                             animalMarker.setOnClickListener {
                                 if (coordList.last().distanceTo(animalMarker.position) < 20) {
-                                    WalkingService.getCollectionItems.add(animalMarker.tag.toString())
+                                    val tag = animalMarker.tag.toString()
+                                    WalkingService.getCollectionItems.add(tag)
                                     animalMarker.map = null
                                     WalkingService.animalMarkers.remove(animalMarker)
+
+                                    val getCollectionDialog = GetCollectionDialog().apply {
+                                        arguments = Bundle().apply {
+                                            putParcelable(
+                                                "getCollection",
+                                                collectionsMap[tag] ?: CollectionInfo()
+                                            )
+                                        }
+                                    }
+                                    getCollectionDialog.show(
+                                        supportFragmentManager,
+                                        "getCollection"
+                                    )
                                 }
                                 true
                             }
@@ -697,5 +725,154 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 Glide.with(iv.context).load(R.drawable.location_disabled).into(iv)
             }
         }
+    }
+
+    private fun setCollectionMap(): HashMap<String, CollectionInfo> {
+        return hashMapOf(
+            "001" to CollectionInfo(
+                "001",
+                "하얀 양",
+                "귀찮아...",
+                R.drawable.collection_001
+            ),
+            "002" to CollectionInfo(
+                "002",
+                "꽃든 병아리",
+                "이거 가질래?",
+                R.drawable.collection_002
+            ),
+            "003" to CollectionInfo(
+                "003",
+                "사과모자 강아지",
+                "사과 냠",
+                R.drawable.collection_003
+            ),
+            "004" to CollectionInfo(
+                "004",
+                "양손 가득 원숭이",
+                "내려줘!",
+                R.drawable.collection_004
+            ),
+            "005" to CollectionInfo(
+                "005",
+                "우는 강아지",
+                "힝..",
+                R.drawable.collection_005
+            ),
+            "006" to CollectionInfo(
+                "006",
+                "시바견",
+                "시바",
+                R.drawable.collection_006
+            ),
+            "007" to CollectionInfo(
+                "007",
+                "노트북 하는 강아지",
+                "과제 힘들어..",
+                R.drawable.collection_007
+            ),
+            "008" to CollectionInfo(
+                "008",
+                "웃고있는 강아지",
+                "헤헤..",
+                R.drawable.collection_008
+            ),
+            "009" to CollectionInfo(
+                "009",
+                "양치하는 강아지",
+                "치카치카",
+                R.drawable.collection_009
+            ),
+            "010" to CollectionInfo(
+                "010",
+                "신난 코알라",
+                "시인나안다아",
+                R.drawable.collection_010
+            ),
+            "011" to CollectionInfo(
+                "011",
+                "신난 고양이",
+                "냥냥냥",
+                R.drawable.collection_011
+            ),
+            "012" to CollectionInfo(
+                "012",
+                "힘든 곰돌이",
+                "힘들어...",
+                R.drawable.collection_012
+            ),
+            "013" to CollectionInfo(
+                "013",
+                "하얀 강아지",
+                "멍멍!",
+                R.drawable.collection_013
+            ),
+            "014" to CollectionInfo(
+                "014",
+                "책 읽는 강아지",
+                "음....",
+                R.drawable.collection_014
+            ),
+            "015" to CollectionInfo(
+                "015",
+                "치킨 먹는 강아지",
+                "헤헤.. 맛있당",
+                R.drawable.collection_015
+            ),
+            "016" to CollectionInfo(
+                "016",
+                "귀여운 다람쥐",
+                "반갑습니다람쥐",
+                R.drawable.collection_016
+            ),
+            "017" to CollectionInfo(
+                "017",
+                "책 읽는 돼지",
+                "흡.. 휴",
+                R.drawable.collection_017
+            ),
+            "018" to CollectionInfo(
+                "018",
+                "행복한 곰돌이",
+                "치킨 맛있당",
+                R.drawable.collection_018
+            ),
+            "019" to CollectionInfo(
+                "019",
+                "일보는 강아지",
+                "저리가..",
+                R.drawable.collection_019
+            ),
+            "020" to CollectionInfo(
+                "020",
+                "귀여운 곰",
+                "데헷!",
+                R.drawable.collection_020
+            ),
+            "021" to CollectionInfo(
+                "021",
+                "핸드폰 하는 악어",
+                "뒹굴 뒹굴",
+                R.drawable.collection_021
+            ),
+            "022" to CollectionInfo(
+                "022",
+                "하트 강아지",
+                "이거 받아",
+                R.drawable.collection_022
+            ),
+            "023" to CollectionInfo(
+                "023",
+                "버블티 강아지",
+                "헤헤.. 시원해",
+                R.drawable.collection_023
+            ),
+            "024" to CollectionInfo(
+                "024",
+                "튜브 토끼",
+                "신난당!",
+                R.drawable.collection_024
+            )
+        )
     }
 }

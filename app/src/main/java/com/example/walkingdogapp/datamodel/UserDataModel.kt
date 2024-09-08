@@ -40,4 +40,10 @@ data class WalkRecord(
 
 data class WalkLatLng(val latitude: Double = 0.0, val longitude: Double = 0.0) : Serializable
 
-data class CollectionInfo(val collectionNum: String = "000", val collectionName: String = "", val collectionText: String = "", val collectionResId: Int = 0) : Serializable
+@kotlinx.parcelize.Parcelize
+data class CollectionInfo(
+    val collectionNum: String = "000",
+    val collectionName: String = "",
+    val collectionText: String = "",
+    val collectionResId: Int = 0
+) : Serializable, Parcelable

@@ -44,6 +44,17 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:isTrackingCameraMode="@{isTrackingCameraMode}"/>
 
+            <ImageView
+                android:id="@+id/current_Collections"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="15dp"
+                android:src="@drawable/collections"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/trackingCameraModeOnBtn"
+                app:tint="@color/black" />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"
                 android:layout_height="0dp"
