@@ -31,7 +31,7 @@ class CollectionFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val collectionInfo = userDataViewModel.collectionInfo.value ?: Utils.item_whether
-        setCollection(collectionInfo)
+        collections = setCollection(collectionInfo)
 
         if (!NetworkManager.checkNetworkState(requireContext())) {
             val builder = AlertDialog.Builder(requireContext())
@@ -51,7 +51,6 @@ class CollectionFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCollectionBinding.inflate(inflater, container, false)
-
         val gridListManager = GridLayoutManager(requireContext(), 3)
         val adapter = CollectionListAdapter(collections)
         adapter.itemClickListener = CollectionListAdapter.OnItemClickListener { collection ->
@@ -125,8 +124,8 @@ class CollectionFragment : Fragment() {
         _binding = null
     }
 
-    private fun setCollection(collectionInfo: HashMap<String, Boolean>) {
-        collections = listOf(
+    private fun setCollection(collectionInfo: HashMap<String, Boolean>): List<CollectionInfo> {
+        return listOf(
             CollectionInfo(
                 "001",
                 "하얀 양",

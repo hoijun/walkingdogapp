@@ -1,6 +1,8 @@
 package com.example.walkingdogapp.registerinfo
 
 import android.content.res.Resources
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -54,6 +56,7 @@ class DogListDialog : DialogFragment(){
             }
         dialogRecyclerView.adapter = adapter
         this.dialog?.setCanceledOnTouchOutside(true)
+        this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return binding.root
     }
 
@@ -73,9 +76,6 @@ class DogListDialog : DialogFragment(){
         val deviceHeight = Resources.getSystem().displayMetrics.heightPixels
         params?.width = (deviceWidth * 0.8).toInt()
         params?.height = (deviceHeight * 0.7).toInt()
-        val layoutParams= binding.dialogRecyclerView.layoutParams
-        layoutParams.width = (deviceWidth * 0.66).toInt()
-        binding.dialogRecyclerView.layoutParams = layoutParams
         this.dialog?.window?.attributes = params as WindowManager.LayoutParams
     }
 }

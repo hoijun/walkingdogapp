@@ -1,4 +1,4 @@
-package com.example.walkingdogapp.collection
+package com.example.walkingdogapp.walking
 
 import android.content.res.Resources
 import android.graphics.Color
@@ -9,15 +9,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.ImageView
-import androidx.databinding.BindingAdapter
 import androidx.fragment.app.DialogFragment
-import com.bumptech.glide.Glide
-import com.example.walkingdogapp.databinding.DetailcollectionDialogBinding
+import androidx.recyclerview.widget.GridLayoutManager
+import com.example.walkingdogapp.Utils
+import com.example.walkingdogapp.databinding.CurrentcollectionsDialogBinding
 import com.example.walkingdogapp.datamodel.CollectionInfo
+import com.example.walkingdogapp.deco.GridSpacingItemDecoration
 
-class DetailCollectionDialog: DialogFragment() {
-    private var _binding: DetailcollectionDialogBinding? = null
+class CurrentCollectionsDialog: DialogFragment() {
+    private var _binding: CurrentcollectionsDialogBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -25,15 +25,21 @@ class DetailCollectionDialog: DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = DetailcollectionDialogBinding.inflate(inflater, container, false)
-        val collectionInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable("collectionInfo", CollectionInfo::class.java)?: CollectionInfo()
+        _binding = CurrentcollectionsDialogBinding.inflate(inflater, container, false)
+        val currentCollections = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelableArrayList("currentCollections", CollectionInfo::class.java)?: arrayListOf()
         } else {
-            (arguments?.getSerializable("collectionInfo") ?: CollectionInfo()) as CollectionInfo
+            arguments?.getParcelableArrayList("currentCollections") ?: arrayListOf<CollectionInfo>()
         }
 
-        binding.collection = collectionInfo
+        val adapter = CurrentCollectionItemListAdapter(currentCollections)
+        val itemDecoration = GridSpacingItemDecoration(3, Utils.dpToPx(20f, requireContext()))
 
+        binding.apply {
+            getCollectionRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+            getCollectionRecyclerView.addItemDecoration(itemDecoration)
+            getCollectionRecyclerView.adapter = adapter
+        }
 
         this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return binding.root
@@ -54,13 +60,5 @@ class DetailCollectionDialog: DialogFragment() {
         val deviceWidth = Resources.getSystem().displayMetrics.widthPixels
         params?.width = (deviceWidth * 0.8).toInt()
         this.dialog?.window?.attributes = params as WindowManager.LayoutParams
-    }
-
-    object DialogImageViewBindingAdapter {
-        @BindingAdapter("DialogItemImgResId")
-        @JvmStatic
-        fun loadImage(v: ImageView, resId: Int) {
-            Glide.with(v.context).load(resId).centerInside().into(v)
-        }
     }
 }

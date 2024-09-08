@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.databinding.GallerylistItemBinding
 
-class GalleryItemListAdapter(private val imgList: MutableList<GalleryImgInfo>) : RecyclerView.Adapter<GalleryItemListAdapter.AlbumMapItemListViewHolder>() {
+class GalleryItemListAdapter(private val imgList: MutableList<GalleryImgInfo>): RecyclerView.Adapter<GalleryItemListAdapter.AlbumMapItemListViewHolder>() {
     private lateinit var context: Context
     interface OnItemClickListener {
         fun onItemClick(imgNum: Int)
