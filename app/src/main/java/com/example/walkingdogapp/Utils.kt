@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.util.TypedValue
+import com.example.walkingdogapp.datamodel.CollectionInfo
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -64,5 +65,155 @@ class Utils {
             }
             return false // 이미지가 존재하지 않음
         }
+
+        fun setCollectionMap(): HashMap<String, CollectionInfo> {
+            return hashMapOf(
+                "001" to CollectionInfo(
+                    "001",
+                    "하얀 양",
+                    "귀찮아...",
+                    R.drawable.collection_001
+                ),
+                "002" to CollectionInfo(
+                    "002",
+                    "꽃든 병아리",
+                    "이거 가질래?",
+                    R.drawable.collection_002
+                ),
+                "003" to CollectionInfo(
+                    "003",
+                    "사과모자 강아지",
+                    "사과 냠",
+                    R.drawable.collection_003
+                ),
+                "004" to CollectionInfo(
+                    "004",
+                    "양손 가득 원숭이",
+                    "내려줘!",
+                    R.drawable.collection_004
+                ),
+                "005" to CollectionInfo(
+                    "005",
+                    "우는 강아지",
+                    "힝..",
+                    R.drawable.collection_005
+                ),
+                "006" to CollectionInfo(
+                    "006",
+                    "시바견",
+                    "시바",
+                    R.drawable.collection_006
+                ),
+                "007" to CollectionInfo(
+                    "007",
+                    "노트북 하는 강아지",
+                    "과제 힘들어..",
+                    R.drawable.collection_007
+                ),
+                "008" to CollectionInfo(
+                    "008",
+                    "웃고있는 강아지",
+                    "헤헤..",
+                    R.drawable.collection_008
+                ),
+                "009" to CollectionInfo(
+                    "009",
+                    "양치하는 강아지",
+                    "치카치카",
+                    R.drawable.collection_009
+                ),
+                "010" to CollectionInfo(
+                    "010",
+                    "신난 코알라",
+                    "시인나안다아",
+                    R.drawable.collection_010
+                ),
+                "011" to CollectionInfo(
+                    "011",
+                    "신난 고양이",
+                    "냥냥냥",
+                    R.drawable.collection_011
+                ),
+                "012" to CollectionInfo(
+                    "012",
+                    "힘든 곰돌이",
+                    "힘들어...",
+                    R.drawable.collection_012
+                ),
+                "013" to CollectionInfo(
+                    "013",
+                    "하얀 강아지",
+                    "멍멍!",
+                    R.drawable.collection_013
+                ),
+                "014" to CollectionInfo(
+                    "014",
+                    "책 읽는 강아지",
+                    "음....",
+                    R.drawable.collection_014
+                ),
+                "015" to CollectionInfo(
+                    "015",
+                    "치킨 먹는 강아지",
+                    "헤헤.. 맛있당",
+                    R.drawable.collection_015
+                ),
+                "016" to CollectionInfo(
+                    "016",
+                    "귀여운 다람쥐",
+                    "반갑습니다람쥐",
+                    R.drawable.collection_016
+                ),
+                "017" to CollectionInfo(
+                    "017",
+                    "책 읽는 돼지",
+                    "흡.. 휴",
+                    R.drawable.collection_017
+                ),
+                "018" to CollectionInfo(
+                    "018",
+                    "행복한 곰돌이",
+                    "치킨 맛있당",
+                    R.drawable.collection_018
+                ),
+                "019" to CollectionInfo(
+                    "019",
+                    "일보는 강아지",
+                    "저리가..",
+                    R.drawable.collection_019
+                ),
+                "020" to CollectionInfo(
+                    "020",
+                    "귀여운 곰",
+                    "데헷!",
+                    R.drawable.collection_020
+                ),
+                "021" to CollectionInfo(
+                    "021",
+                    "핸드폰 하는 악어",
+                    "뒹굴 뒹굴",
+                    R.drawable.collection_021
+                ),
+                "022" to CollectionInfo(
+                    "022",
+                    "하트 강아지",
+                    "이거 받아",
+                    R.drawable.collection_022
+                ),
+                "023" to CollectionInfo(
+                    "023",
+                    "버블티 강아지",
+                    "헤헤.. 시원해",
+                    R.drawable.collection_023
+                ),
+                "024" to CollectionInfo(
+                    "024",
+                    "튜브 토끼",
+                    "신난당!",
+                    R.drawable.collection_024
+                )
+            )
+        }
+
     }
 }
