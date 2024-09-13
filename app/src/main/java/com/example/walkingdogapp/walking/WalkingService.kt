@@ -33,8 +33,8 @@ import kotlin.concurrent.timer
 
 class WalkingService : Service() {
     private lateinit var locationRequest: LocationRequest
-    private  var fusedLocationProviderClient: FusedLocationProviderClient? = null
     private lateinit var builder : NotificationCompat.Builder
+    private var fusedLocationProviderClient: FusedLocationProviderClient? = null
     private var walkTimer: Timer? = Timer()
     private var miscount = 0
     private var totalTime = 0
@@ -71,21 +71,17 @@ class WalkingService : Service() {
                     if (location != null) {
                         val pos = LatLng(location.latitude, location.longitude)
                         // 위치 업데이트 간의 거리가 클 경우 업데이트 안함 및 이 상황이 1번일 경우는 통과
-                        if (coordList.value!!.isNotEmpty() &&
-                            coordList.value!!.last().distanceTo(pos) > 5f &&
-                            miscount < 1)
-                        {
+                        if (coordList.value!!.isNotEmpty() && coordList.value!!.last().distanceTo(pos) > 5f && miscount < 1) {
                             miscount++
-                            Log.d(
-                                "miscount", "$miscount"
-                            )
                             return
                         }
+
                         coordList.value!!.apply {
                             add(pos)
                             coordList.postValue(this)
                             miscount = 0
                         }
+
                         if (coordList.value!!.size > 1) { // 거리 증가
                             walkDistance.postValue(
                                 walkDistance.value?.plus(
@@ -218,8 +214,8 @@ class WalkingService : Service() {
         startTimer()
         fusedLocationProviderClient?.requestLocationUpdates(locationRequest,
             locationCallback,
-            Looper.getMainLooper()) // 위치 업데이트 재개
-        Log.d("current coord", "Start Tracking")
+            Looper.getMainLooper()
+        ) // 위치 업데이트 재개
     }
 
     private fun stopTracking() {

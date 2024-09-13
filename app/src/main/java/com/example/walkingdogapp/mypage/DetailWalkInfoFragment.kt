@@ -9,11 +9,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
+import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.databinding.FragmentDetailWalkInfoBinding
+import com.example.walkingdogapp.datamodel.CollectionInfo
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.WalkRecord
+import com.example.walkingdogapp.deco.GridSpacingItemDecoration
+import com.example.walkingdogapp.walking.CurrentCollectionItemListAdapter
+import com.example.walkingdogapp.walking.WalkingService
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
@@ -64,6 +70,14 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             (arguments?.getSerializable("selectDateRecord") ?: WalkRecord()) as WalkRecord
         }
 
+        val collectionsMap = Utils.setCollectionMap()
+        val currentCollections = arrayListOf<CollectionInfo>()
+        val itemDecoration = GridSpacingItemDecoration(3, Utils.dpToPx(20f, requireContext()))
+        walkRecord.collections.toList().forEach {
+            currentCollections.add(collectionsMap[it]?: CollectionInfo())
+        }
+
+
         binding.apply {
             btnGoMypage.setOnClickListener {
                 goWalkInfo()
@@ -72,7 +86,12 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             day = walkRecord.day.split("-")
             walkDay = day
             walkRecordInfo = walkRecord
-            collections = walkRecord.collections.joinToString(", ")
+
+            val collectionAdapter = CurrentCollectionItemListAdapter(currentCollections)
+            getCollectionRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+            getCollectionRecyclerView.addItemDecoration(itemDecoration)
+            getCollectionRecyclerView.adapter = collectionAdapter
+            getCollectionRecyclerView.isNestedScrollingEnabled = false
         }
         return binding.root
     }
