@@ -1,4 +1,4 @@
-package com.example.walkingdogapp.termOfService
+package com.example.walkingdogapp.mypage
 
 import android.annotation.SuppressLint
 import android.os.Bundle

@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import com.example.walkingdogapp.databinding.TermofserviceDialogBinding
-import com.example.walkingdogapp.termOfService.PrivacyWebViewActivity
+import com.example.walkingdogapp.mypage.PrivacyWebViewActivity
 
 class TermOfServiceDialog: DialogFragment() {
     private var _binding: TermofserviceDialogBinding? = null
