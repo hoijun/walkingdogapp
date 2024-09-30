@@ -21,7 +21,6 @@ import com.example.walkingdogapp.WriteDialog
 import com.example.walkingdogapp.alarm.AlarmFunctions
 import com.example.walkingdogapp.databinding.FragmentSettingBinding
 import com.example.walkingdogapp.datamodel.UserInfo
-import com.example.walkingdogapp.termOfService.PrivacyWebViewActivity
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.kakao.sdk.user.UserApiClient
@@ -125,6 +124,13 @@ class SettingFragment : Fragment() {
             settingTermofLocation.setOnClickListener {
                 val intent = Intent(requireContext(), PrivacyWebViewActivity::class.java).apply {
                     putExtra("uri", "https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EC%9C%84%EC%B9%98-%EA%B8%B0%EB%B0%98-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80")
+                }
+                startActivity(intent)
+            }
+
+            settingCopyright.setOnClickListener {
+                val intent = Intent(requireContext(), PrivacyWebViewActivity::class.java).apply {
+                    putExtra("uri", "https://velog.io/@ghlwns10/%EC%A0%80%EC%9E%91%EA%B6%8C-%EC%B6%9C%EC%B2%98")
                 }
                 startActivity(intent)
             }

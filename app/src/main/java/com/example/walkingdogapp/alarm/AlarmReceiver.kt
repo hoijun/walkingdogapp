@@ -74,7 +74,7 @@ class AlarmReceiver: BroadcastReceiver() {
             )
         }
 
-        val notification = builder.setSmallIcon(R.drawable.walkicon).setContentTitle("털뭉치")
+        val notification = builder.setSmallIcon(R.drawable.appicon).setContentTitle("털뭉치")
             .setDefaults(NotificationCompat.DEFAULT_ALL).setContentText("산책 할 시간 이에요!")
             .setContentIntent(pendingIntent).setAutoCancel(true).setOngoing(false).setPriority(
                 PRIORITY_DEFAULT
