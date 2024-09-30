@@ -43,6 +43,9 @@
         android:theme="@style/Theme.WalkingDogApp"
         tools:targetApi="31">
         <activity
+            android:name=".termOfService.PrivacyWebViewActivity"
+            android:exported="false" />
+        <activity
             android:name=".AgreeToTermsOfUseActivity"
             android:exported="false" />
         <activity
@@ -60,6 +63,7 @@
             android:theme="@style/AppTheme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -89,7 +93,7 @@
         <activity
             android:name=".login.LoginActivity"
             android:exported="true"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".walking.WalkingService"
@@ -137,7 +141,7 @@
         <receiver
             android:name=".alarm.AlarmReceiver"
             android:enabled="true"
-            android:exported="false"></receiver>
+            android:exported="false" />
         <receiver
             android:name=".alarm.RestartAlarmReceiver"
             android:enabled="true"

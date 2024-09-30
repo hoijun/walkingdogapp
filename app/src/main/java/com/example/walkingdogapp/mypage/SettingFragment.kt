@@ -1,13 +1,15 @@
 package com.example.walkingdogapp.mypage
 
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -19,6 +21,7 @@ import com.example.walkingdogapp.WriteDialog
 import com.example.walkingdogapp.alarm.AlarmFunctions
 import com.example.walkingdogapp.databinding.FragmentSettingBinding
 import com.example.walkingdogapp.datamodel.UserInfo
+import com.example.walkingdogapp.termOfService.PrivacyWebViewActivity
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.kakao.sdk.user.UserApiClient
@@ -102,15 +105,28 @@ class SettingFragment : Fragment() {
             }
 
             settingInquiry.setOnClickListener {
-
+                sendEmail(requireActivity())
             }
 
             settingPrivacyPolicy.setOnClickListener {
-
+                val intent = Intent(requireContext(), PrivacyWebViewActivity::class.java).apply {
+                    putExtra("uri", "https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4-%EC%B2%98%EB%A6%AC-%EB%B0%A9%EC%B9%A8#")
+                }
+                startActivity(intent)
             }
 
             settingTermsofservice.setOnClickListener {
+                val intent = Intent(requireContext(), PrivacyWebViewActivity::class.java).apply {
+                    putExtra("uri", "https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80")
+                }
+                startActivity(intent)
+            }
 
+            settingTermofLocation.setOnClickListener {
+                val intent = Intent(requireContext(), PrivacyWebViewActivity::class.java).apply {
+                    putExtra("uri", "https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EC%9C%84%EC%B9%98-%EA%B8%B0%EB%B0%98-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80")
+                }
+                startActivity(intent)
             }
 
             settingWithdrawal.setOnClickListener {
@@ -208,6 +224,28 @@ class SettingFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun sendEmail(context: Context) {
+        val emailSelectorIntent = Intent(Intent.ACTION_SENDTO).apply {
+            setData(Uri.parse("mailto:"))
+        }
+
+        val emailIntent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_EMAIL, arrayOf("ghlwns10@naver.com"))
+            putExtra(Intent.EXTRA_SUBJECT, "문의 제목")
+            putExtra(Intent.EXTRA_TEXT, "문의 내용을 여기에 작성하세요.")
+
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            setSelector(emailSelectorIntent)
+        }
+
+        try {
+            context.startActivity(emailIntent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(context, "이메일 앱을 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun goMyPage() {
