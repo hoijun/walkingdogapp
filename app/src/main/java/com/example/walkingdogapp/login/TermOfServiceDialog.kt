@@ -112,14 +112,14 @@ class TermOfServiceDialog: DialogFragment() {
 
             toUseServiceDetail.setOnClickListener {
                 val intent = Intent(requireContext(), PrivacyWebViewActivity::class.java).apply {
-                    putExtra("uri", "https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4-%EC%B2%98%EB%A6%AC-%EB%B0%A9%EC%B9%A8#")
+                    putExtra("uri", "https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80")
                 }
                 startActivity(intent)
             }
 
             toUserInfoServiceDetail.setOnClickListener {
                 val intent = Intent(requireContext(), PrivacyWebViewActivity::class.java).apply {
-                    putExtra("uri", "https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80")
+                    putExtra("uri", "https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4-%EC%B2%98%EB%A6%AC-%EB%B0%A9%EC%B9%A8#")
                 }
                 startActivity(intent)
             }
