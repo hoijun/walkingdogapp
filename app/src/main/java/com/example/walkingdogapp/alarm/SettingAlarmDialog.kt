@@ -138,7 +138,7 @@ class SettingAlarmDialog : DialogFragment() {
     private fun resizeDialog() {
         val params: ViewGroup.LayoutParams? = this.dialog?.window?.attributes
         val deviceWidth = Resources.getSystem().displayMetrics.widthPixels
-        params?.width = (deviceWidth * 0.99).toInt()
+        params?.width = (deviceWidth * 0.8).toInt()
         this.dialog?.window?.attributes = params as WindowManager.LayoutParams
     }
 

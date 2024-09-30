@@ -1,5 +1,6 @@
 package com.example.walkingdogapp.login
 
+import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import com.example.walkingdogapp.databinding.TermofserviceDialogBinding
+import com.example.walkingdogapp.termOfService.PrivacyWebViewActivity
 
 class TermOfServiceDialog: DialogFragment() {
     private var _binding: TermofserviceDialogBinding? = null
@@ -86,6 +88,8 @@ class TermOfServiceDialog: DialogFragment() {
                 }
             }
 
+
+
             allCheck.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     useService.isChecked = true
@@ -104,6 +108,27 @@ class TermOfServiceDialog: DialogFragment() {
                         setTextColor(Color.parseColor("#D3D3D3"))
                     }
                 }
+            }
+
+            toUseServiceDetail.setOnClickListener {
+                val intent = Intent(requireContext(), PrivacyWebViewActivity::class.java).apply {
+                    putExtra("uri", "https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4-%EC%B2%98%EB%A6%AC-%EB%B0%A9%EC%B9%A8#")
+                }
+                startActivity(intent)
+            }
+
+            toUserInfoServiceDetail.setOnClickListener {
+                val intent = Intent(requireContext(), PrivacyWebViewActivity::class.java).apply {
+                    putExtra("uri", "https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80")
+                }
+                startActivity(intent)
+            }
+
+            toLocationServiceDetail.setOnClickListener {
+                val intent = Intent(requireContext(), PrivacyWebViewActivity::class.java).apply {
+                    putExtra("uri", "https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EC%9C%84%EC%B9%98-%EA%B8%B0%EB%B0%98-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80")
+                }
+                startActivity(intent)
             }
 
             cancelButton.setOnClickListener {
