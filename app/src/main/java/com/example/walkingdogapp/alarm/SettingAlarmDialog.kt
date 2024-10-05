@@ -19,9 +19,6 @@ import java.util.Calendar
 class SettingAlarmDialog : DialogFragment() {
     private var _binding: SettingalarmDialogBinding? = null
     private val binding get() = _binding!!
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     interface OnAddAlarmListener {
         fun onAddAlarm(alarm: AlarmDataModel)

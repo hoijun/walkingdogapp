@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
+
         <variable
             name="dog"
             type="com.example.walkingdogapp.datamodel.DogInfo" />
@@ -16,10 +18,6 @@
         android:layout_height="match_parent"
         tools:context=".registerinfo.RegisterDogActivity">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/settingscreen"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/register_top"
@@ -61,7 +59,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.87"
+                app:layout_constraintHeight_percent="0.83"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/register_top">
 
@@ -162,8 +160,8 @@
                     android:background="@null"
                     android:gravity="center|start"
                     android:hint="이름을 입력 해주세요"
-                    android:text="@={dog.name}"
                     android:maxLength="10"
+                    android:text="@={dog.name}"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     app:dogNameLength="@{dog.name.length()}"
@@ -208,34 +206,33 @@
                     android:id="@+id/btn_dogismale"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:background="#ff888888"
                     android:gravity="center"
                     android:text="남"
                     android:textColor="@color/white"
                     android:textSize="15sp"
                     android:textStyle="bold"
+
+                    app:dogGender="@{dog.gender}"
                     app:layout_constraintHeight_percent="0.08"
                     app:layout_constraintStart_toEndOf="@+id/view15"
                     app:layout_constraintTop_toBottomOf="@id/view14"
-                    app:layout_constraintWidth_percent="0.25"
-                    app:dogGender="@{dog.gender}"/>
+                    app:layout_constraintWidth_percent="0.25" />
 
                 <Button
                     android:id="@+id/btn_dogisfemale"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginStart="4dp"
-                    android:background="#ff888888"
+                    android:layout_marginStart="10dp"
                     android:gravity="center"
                     android:text="여"
                     android:textColor="@color/white"
                     android:textSize="15sp"
                     android:textStyle="bold"
+                    app:dogGender="@{dog.gender}"
                     app:layout_constraintHeight_percent="0.08"
                     app:layout_constraintStart_toEndOf="@+id/btn_dogismale"
                     app:layout_constraintTop_toBottomOf="@id/view14"
-                    app:layout_constraintWidth_percent="0.25"
-                    app:dogGender="@{dog.gender}"/>
+                    app:layout_constraintWidth_percent="0.25" />
 
                 <TextView
                     android:id="@+id/birth"
@@ -311,34 +308,32 @@
                     android:id="@+id/btn_neuteryes"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:background="#ff888888"
                     android:gravity="center"
                     android:text="예"
                     android:textColor="@color/white"
                     android:textSize="15sp"
                     android:textStyle="bold"
+                    app:dogNeutering="@{dog.neutering}"
                     app:layout_constraintHeight_percent="0.08"
                     app:layout_constraintStart_toEndOf="@+id/view18"
                     app:layout_constraintTop_toBottomOf="@id/view17"
-                    app:layout_constraintWidth_percent="0.25"
-                    app:dogNeutering="@{dog.neutering}"/>
+                    app:layout_constraintWidth_percent="0.25" />
 
                 <Button
                     android:id="@+id/btn_neuterno"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginStart="4dp"
-                    android:background="#ff888888"
+                    android:layout_marginStart="10dp"
                     android:gravity="center"
                     android:text="아니요"
                     android:textColor="@color/white"
                     android:textSize="15sp"
                     android:textStyle="bold"
+                    app:dogNeutering="@{dog.neutering}"
                     app:layout_constraintHeight_percent="0.08"
                     app:layout_constraintStart_toEndOf="@+id/btn_neuteryes"
                     app:layout_constraintTop_toBottomOf="@id/view17"
-                    app:layout_constraintWidth_percent="0.25"
-                    app:dogNeutering="@{dog.neutering}"/>
+                    app:layout_constraintWidth_percent="0.25" />
 
                 <TextView
                     android:id="@+id/vaccination"
@@ -376,34 +371,32 @@
                     android:id="@+id/btn_vaccyes"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:background="#ff888888"
                     android:gravity="center"
                     android:text="예"
                     android:textColor="@color/white"
                     android:textSize="15sp"
                     android:textStyle="bold"
+                    app:dogVaccination="@{dog.vaccination}"
                     app:layout_constraintHeight_percent="0.08"
                     app:layout_constraintStart_toEndOf="@+id/view20"
                     app:layout_constraintTop_toBottomOf="@id/view19"
-                    app:layout_constraintWidth_percent="0.25"
-                    app:dogVaccination="@{dog.vaccination}"/>
+                    app:layout_constraintWidth_percent="0.25" />
 
                 <Button
                     android:id="@+id/btn_vaccno"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginStart="4dp"
-                    android:background="#ff888888"
+                    android:layout_marginStart="10dp"
                     android:gravity="center"
                     android:text="아니요"
                     android:textColor="@color/white"
                     android:textSize="15sp"
                     android:textStyle="bold"
+                    app:dogVaccination="@{dog.vaccination}"
                     app:layout_constraintHeight_percent="0.08"
                     app:layout_constraintStart_toEndOf="@+id/btn_neuteryes"
                     app:layout_constraintTop_toBottomOf="@id/view19"
-                    app:layout_constraintWidth_percent="0.25"
-                    app:dogVaccination="@{dog.vaccination}"/>
+                    app:layout_constraintWidth_percent="0.25" />
 
                 <TextView
                     android:id="@+id/weight"
@@ -436,9 +429,9 @@
                     android:digits="0123456789"
                     android:gravity="center|start"
                     android:hint="무게를 입력 해주세요"
-                    android:text="@={dog.weight}"
                     android:inputType="number"
                     android:maxLength="2"
+                    android:text="@={dog.weight}"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     app:layout_constraintHeight_percent="0.1"
@@ -486,30 +479,19 @@
                     app:layout_constraintWidth_percent="0.6" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <Button
+                android:id="@+id/register_dog"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="55dp"
+                android:background="@drawable/btn_roundstyle"
+                android:backgroundTint="#e4e4e4"
+                android:gravity="center"
+                android:text="등록"
+                android:textSize="15sp"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.07"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/register_middle">
-
-                <Button
-                    android:id="@+id/register_dog"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:gravity="center"
-                    android:text="등록"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0"
-                    app:layout_constraintWidth_percent="0.3" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintTop_toBottomOf="@+id/register_middle"
+                app:layout_constraintWidth_percent="0.5" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

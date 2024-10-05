@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.ImageDecoder
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -33,6 +34,7 @@ import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.NetworkManager
+import com.example.walkingdogapp.R
 import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.databinding.ActivityRegisterDogBinding
 import com.example.walkingdogapp.datamodel.DogInfo
@@ -381,34 +383,32 @@ class RegisterDogActivity : AppCompatActivity() {
     }
 
     object RegisterDogBindingAdapter {
+        private fun setButtonBackground(btn: Button, state: String) {
+            val color = if (state == btn.text.toString()) "#ff444444" else "#ff888888"
+            val shape = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = 10f * btn.resources.displayMetrics.density  // 10dp를 픽셀로 변환
+                setColor(Color.parseColor(color))
+            }
+            btn.background = shape
+        }
+
         @BindingAdapter("dogGender")
         @JvmStatic
         fun setGenderBackground(btn: Button, gender: String) {
-            if(gender == btn.text) {
-                btn.setBackgroundColor(Color.parseColor("#ff444444"))
-            } else {
-                btn.setBackgroundColor(Color.parseColor("#ff888888"))
-            }
+            setButtonBackground(btn, gender)
         }
 
         @BindingAdapter("dogNeutering")
         @JvmStatic
         fun setNeuteringBackground(btn: Button, neutering: String) {
-            if(neutering == btn.text) {
-                btn.setBackgroundColor(Color.parseColor("#ff444444"))
-            } else {
-                btn.setBackgroundColor(Color.parseColor("#ff888888"))
-            }
+            setButtonBackground(btn, neutering)
         }
 
         @BindingAdapter("dogVaccination")
         @JvmStatic
         fun setVaccinationBackground(btn: Button, vaccination: String) {
-            if(vaccination == btn.text) {
-                btn.setBackgroundColor(Color.parseColor("#ff444444"))
-            } else {
-                btn.setBackgroundColor(Color.parseColor("#ff888888"))
-            }
+            setButtonBackground(btn, vaccination)
         }
 
         @BindingAdapter("dogNameLength")
