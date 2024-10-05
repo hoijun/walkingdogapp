@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
@@ -19,6 +20,7 @@ import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.NetworkManager
+import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.ActivityRegisterUserBinding
 import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.viewmodel.UserInfoViewModel
@@ -167,12 +169,15 @@ class RegisterUserActivity : AppCompatActivity() {
         @BindingAdapter("userGender")
         @JvmStatic
         fun setBackground(btn: Button, gender: String) {
-            if(gender == btn.text) {
-                btn.setBackgroundColor(Color.parseColor("#ff444444"))
-            } else {
-                btn.setBackgroundColor(Color.parseColor("#ff888888"))
+            val color = if (gender == btn.text.toString()) "#ff444444" else "#ff888888"
+            val shape = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = 10f * btn.resources.displayMetrics.density  // 10dp를 픽셀로 변환
+                setColor(Color.parseColor(color))
             }
+            btn.background = shape
         }
+
         @BindingAdapter("userNameLength")
         @JvmStatic
         fun setSelection(editText: EditText, length: Int) {
