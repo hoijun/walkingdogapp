@@ -12,14 +12,13 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
-import com.example.walkingdogapp.Utils
+import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.databinding.FragmentDetailWalkInfoBinding
 import com.example.walkingdogapp.datamodel.CollectionInfo
 import com.example.walkingdogapp.datamodel.DogInfo
-import com.example.walkingdogapp.datamodel.WalkRecord
-import com.example.walkingdogapp.deco.GridSpacingItemDecoration
+import com.example.walkingdogapp.datamodel.WalkDateInfo
+import com.example.walkingdogapp.utils.utils.GridSpacingItemDecoration
 import com.example.walkingdogapp.walking.CurrentCollectionItemListAdapter
-import com.example.walkingdogapp.walking.WalkingService
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
@@ -35,7 +34,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
     private var walkPath = PathOverlay()
     private lateinit var camera : CameraUpdate
     private var day = listOf<String>()
-    private var walkRecord = WalkRecord()
+    private var walkDateInfo = WalkDateInfo()
 
     private lateinit var mainactivity: MainActivity
     private val callback = object : OnBackPressedCallback(true) {
@@ -64,16 +63,16 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
     ): View {
         _binding = FragmentDetailWalkInfoBinding.inflate(inflater,container, false)
 
-        walkRecord = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable("selectDateRecord", WalkRecord::class.java)?: WalkRecord()
+        walkDateInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable("selectDateRecord", WalkDateInfo::class.java)?: WalkDateInfo()
         } else {
-            (arguments?.getSerializable("selectDateRecord") ?: WalkRecord()) as WalkRecord
+            (arguments?.getSerializable("selectDateRecord") ?: WalkDateInfo()) as WalkDateInfo
         }
 
         val collectionsMap = Utils.setCollectionMap()
         val currentCollections = arrayListOf<CollectionInfo>()
         val itemDecoration = GridSpacingItemDecoration(3, Utils.dpToPx(20f, requireContext()))
-        walkRecord.collections.toList().forEach {
+        walkDateInfo.collections.toList().forEach {
             currentCollections.add(collectionsMap[it]?: CollectionInfo())
         }
 
@@ -85,9 +84,9 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
                 goWalkInfo()
             }
 
-            day = walkRecord.day.split("-")
+            day = walkDateInfo.day.split("-")
             walkDay = day
-            walkRecordInfo = walkRecord
+            walkRecordInfo = walkDateInfo
 
             val collectionAdapter = if (currentCollections.isEmpty()) CurrentCollectionItemListAdapter(emptyCollections) else CurrentCollectionItemListAdapter(currentCollections)
             getCollectionRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
@@ -120,7 +119,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
 
         val walkCoords = mutableListOf<LatLng>()
 
-        for (coord in walkRecord.coords) {
+        for (coord in walkDateInfo.coords) {
             walkCoords.add(LatLng(coord.latitude, coord.longitude))
         }
 

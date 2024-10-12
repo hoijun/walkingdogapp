@@ -19,14 +19,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.NetworkManager
+import com.example.walkingdogapp.utils.utils.NetworkManager
 import com.example.walkingdogapp.album.GalleryFragment
 import com.example.walkingdogapp.databinding.FragmentMyPageBinding
 import com.example.walkingdogapp.datamodel.DogInfo
-import com.example.walkingdogapp.datamodel.WalkInfo
-import com.example.walkingdogapp.datamodel.WalkRecord
+import com.example.walkingdogapp.datamodel.TotalWalkInfo
+import com.example.walkingdogapp.datamodel.WalkDateInfo
 import com.example.walkingdogapp.registerinfo.RegisterUserActivity
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.MainViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,9 +36,9 @@ import kotlinx.coroutines.launch
 class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
     private val binding get() = _binding!!
-    private val userDataViewModel: UserInfoViewModel by activityViewModels()
-    private lateinit var totalWalkInfo: WalkInfo
-    private var walkdates = mutableListOf<WalkRecord>()
+    private val mainViewModel: MainViewModel by activityViewModels()
+    private lateinit var totalWalkInfo: TotalWalkInfo
+    private var walkdates = mutableListOf<WalkDateInfo>()
     private lateinit var mainactivity: MainActivity
 
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -75,7 +75,7 @@ class MyPageFragment : Fragment() {
             builder.show()
         }
 
-        val walkRecordList = userDataViewModel.walkDates.value?: hashMapOf()
+        val walkRecordList = mainViewModel.walkDates.value?: hashMapOf()
         for(dog in MainActivity.dogNameList) {
             for(date in walkRecordList[dog] ?: listOf()) {
                 walkdates.add(date)
@@ -90,19 +90,19 @@ class MyPageFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMyPageBinding.inflate(inflater,container, false)
-        totalWalkInfo = userDataViewModel.totalWalkInfo.value ?: WalkInfo()
+        totalWalkInfo = mainViewModel.totalWalkInfo.value ?: TotalWalkInfo()
 
         binding.apply {
-            viewmodel = userDataViewModel
+            viewmodel = mainViewModel
             lifecycleOwner = requireActivity()
 
             refresh.apply {
                 this.setOnRefreshListener {
                     CoroutineScope(Dispatchers.IO).launch {
-                        userDataViewModel.observeUser()
+                        mainViewModel.observeUser()
                     }
                 }
-                userDataViewModel.successGetData.observe(requireActivity()) {
+                mainViewModel.successGetData.observe(requireActivity()) {
                     refresh.isRefreshing = false
                 }
             }
@@ -121,10 +121,10 @@ class MyPageFragment : Fragment() {
                 mainactivity.changeFragment(SettingFragment())
             }
 
-            val dogsList = userDataViewModel.dogsInfo.value ?: listOf()
-            val myPageDogListAdapter = MyPageDogListAdapter(dogsList, userDataViewModel.isSuccessGetData())
+            val dogsList = mainViewModel.dogsInfo.value ?: listOf()
+            val myPageDogListAdapter = MyPageDogListAdapter(dogsList, mainViewModel.isSuccessGetData())
             myPageDogListAdapter.onItemClickListener = MyPageDogListAdapter.OnItemClickListener {
-                if(!NetworkManager.checkNetworkState(requireContext()) || !userDataViewModel.isSuccessGetData()) {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
                     return@OnItemClickListener
                 }
                 val dogInfoFragment = DogInfoFragment().apply {
@@ -148,11 +148,11 @@ class MyPageFragment : Fragment() {
             }
 
             modifyuserinfoBtn.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(requireContext()) || !userDataViewModel.isSuccessGetData()) {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }
                 val registerUserIntent = Intent(requireContext(), RegisterUserActivity::class.java)
-                registerUserIntent.putExtra("userinfo", userDataViewModel.userInfo.value)
+                registerUserIntent.putExtra("userinfo", mainViewModel.userInfo.value)
                 startActivity(registerUserIntent)
             }
 
@@ -165,7 +165,7 @@ class MyPageFragment : Fragment() {
             }
 
             menuWalkinfo.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(requireContext()) || !userDataViewModel.isSuccessGetData()) {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }
                 mainactivity.changeFragment(WalkInfoFragment())
@@ -225,9 +225,9 @@ class MyPageFragment : Fragment() {
     object MyPageBindingAdapter {
         @BindingAdapter("walkDates", "dogs")
         @JvmStatic
-        fun setWalkCountText(textView: TextView, walkDates: HashMap<String, MutableList<WalkRecord>>?, dogs: List<DogInfo>?) {
+        fun setWalkCountText(textView: TextView, walkDates: HashMap<String, MutableList<WalkDateInfo>>?, dogs: List<DogInfo>?) {
             if (walkDates != null && dogs != null) {
-                val totalWalk = mutableListOf<WalkRecord>()
+                val totalWalk = mutableListOf<WalkDateInfo>()
                 for (dog in dogs) {
                     totalWalk.addAll(walkDates.get(dog.name) ?: mutableListOf())
                 }

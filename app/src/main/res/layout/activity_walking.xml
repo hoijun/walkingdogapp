@@ -6,7 +6,7 @@
     <data>
         <variable
             name="WalkingService"
-            type="com.example.walkingdogapp.walking.WalkingService.Companion" />
+            type="com.example.walkingdogapp.walking.WalkingService" />
 
         <variable
             name="isTrackingCameraMode"

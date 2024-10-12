@@ -16,12 +16,12 @@ import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.login.LoginActivity
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.NetworkManager
+import com.example.walkingdogapp.utils.utils.NetworkManager
 import com.example.walkingdogapp.WriteDialog
 import com.example.walkingdogapp.alarm.AlarmFunctions
 import com.example.walkingdogapp.databinding.FragmentSettingBinding
 import com.example.walkingdogapp.datamodel.UserInfo
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.MainViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 class SettingFragment : Fragment() {
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
-    private val userDataViewModel: UserInfoViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var user: UserInfo
     private lateinit var mainactivity: MainActivity
     private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
@@ -53,7 +53,7 @@ class SettingFragment : Fragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
 
-        user = userDataViewModel.userInfo.value ?: UserInfo()
+        user = mainViewModel.userInfo.value ?: UserInfo()
     }
 
     override fun onCreateView(
@@ -69,7 +69,7 @@ class SettingFragment : Fragment() {
             userInfo = user
 
             logoutbtn.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(requireContext()) || !userDataViewModel.isSuccessGetData()) {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }
                 if (user.email.contains("naver.com")) { // 네이버로 로그인 했을 경우
@@ -136,7 +136,7 @@ class SettingFragment : Fragment() {
             }
 
             settingWithdrawal.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(requireContext()) || !userDataViewModel.isSuccessGetData()) {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }
                 val writeDialog = WriteDialog()
@@ -155,7 +155,7 @@ class SettingFragment : Fragment() {
 
                     lifecycleScope.launch {
                         if (user.email.contains("naver.com")) { // 네이버로 로그인 했을 경우
-                            if (userDataViewModel.removeAccount()) { // 유저 정보가 올바르게 지워 졌을 경우
+                            if (mainViewModel.removeAccount()) { // 유저 정보가 올바르게 지워 졌을 경우
                                 try {
                                     auth.currentUser?.delete()
                                 } catch (e: Exception) {
@@ -191,7 +191,7 @@ class SettingFragment : Fragment() {
                                 loadingDialogFragment.dismiss()
                             }
                         } else if (user.email.contains("kakao.com")) { // 카카오로 로그인 했을 경우
-                            if (userDataViewModel.removeAccount()) {
+                            if (mainViewModel.removeAccount()) {
                                 try {
                                     auth.currentUser?.delete()
                                 } catch (e: Exception) {
@@ -268,9 +268,9 @@ class SettingFragment : Fragment() {
     private fun removeAlarms() {
         val alarmFunctions = AlarmFunctions(requireContext())
         coroutineScope.launch {
-            for (alarm in userDataViewModel.getAlarmList()) {
+            for (alarm in mainViewModel.getAlarmList()) {
                 alarmFunctions.cancelAlarm(alarm.alarm_code)
-                userDataViewModel.deleteAlarm(alarm)
+                mainViewModel.deleteAlarm(alarm)
             }
         }
     }

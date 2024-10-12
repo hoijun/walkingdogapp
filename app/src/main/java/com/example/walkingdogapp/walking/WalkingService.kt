@@ -9,6 +9,7 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
@@ -16,7 +17,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
-import com.example.walkingdogapp.Utils
+import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -32,6 +33,7 @@ import java.util.Timer
 import kotlin.concurrent.timer
 
 class WalkingService : Service() {
+    private var binder = LocalBinder()
     private lateinit var locationRequest: LocationRequest
     private lateinit var builder : NotificationCompat.Builder
     private var fusedLocationProviderClient: FusedLocationProviderClient? = null
@@ -39,26 +41,28 @@ class WalkingService : Service() {
     private var miscount = 0
     private var totalTime = 0
 
-    companion object {
-        val coordList = MutableLiveData<MutableList<LatLng>>()
-        val isTracking = MutableLiveData<Boolean>()
-        val walkTime = MutableLiveData<Int>()
-        var getCollectionItems = mutableListOf<String>()
-        var walkingDogs = MutableLiveData<ArrayList<String>>()
-        var animalMarkers = mutableListOf<InfoWindow>()
-        var walkDistance = MutableLiveData<Float>()
-        var startTime = ""
+    val coordList = MutableLiveData<MutableList<LatLng>>()
+    val isTracking = MutableLiveData<Boolean>()
+    val walkTime = MutableLiveData<Int>()
+    var getCollectionItems = mutableListOf<String>()
+    var walkingDogs = MutableLiveData<ArrayList<String>>()
+    var animalMarkers = mutableListOf<InfoWindow>()
+    var walkDistance = MutableLiveData<Float>()
+    var startTime = ""
+
+    inner class LocalBinder: Binder() {
+        fun getService(): WalkingService = this@WalkingService
     }
 
     private fun postInitialValue() {
-        isTracking.postValue(false)
+        isTracking.postValue(true)
         walkTime.postValue(0)
         coordList.postValue(mutableListOf())
         totalTime = 0
         miscount = 0
         walkingDogs.postValue(arrayListOf())
         getCollectionItems = mutableListOf()
-        animalMarkers = mutableListOf<InfoWindow>()
+        animalMarkers = mutableListOf()
         walkDistance.postValue(0f)
         startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
     }
@@ -97,13 +101,8 @@ class WalkingService : Service() {
         }
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        postInitialValue()
-    }
-
-    override fun onBind(intent: Intent): IBinder? {
-        return null
+    override fun onBind(intent: Intent): IBinder {
+        return binder
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -112,6 +111,7 @@ class WalkingService : Service() {
             if (action != null) {
                 when(action) {
                     Utils.ACTION_START_Walking_SERVICE -> {
+                        postInitialValue()
                         walkingDogs.postValue(intent.getStringArrayListExtra("selectedDogs")?: arrayListOf())
                         startLocationService()
                     }
@@ -181,7 +181,6 @@ class WalkingService : Service() {
             notificationManager.createNotificationChannel(notificationChannel)
         }
 
-
         locationRequest = LocationRequest.Builder(2500)
             .setMinUpdateIntervalMillis(2500)
             .setMaxUpdateDelayMillis(2500)
@@ -193,8 +192,6 @@ class WalkingService : Service() {
             locationCallback,
             Looper.getMainLooper()
         )
-
-        isTracking.postValue(true)
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             startForeground(Utils.Walking_SERVICE_ID, builder.build())

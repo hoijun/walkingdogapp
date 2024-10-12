@@ -1,10 +1,9 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.utils.utils
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import androidx.appcompat.app.AlertDialog
 
 class NetworkManager {
     companion object {

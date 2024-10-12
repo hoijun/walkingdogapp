@@ -23,12 +23,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.walkingdogapp.Utils
+import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentGalleryBinding
-import com.example.walkingdogapp.deco.GridSpacingItemDecoration
+import com.example.walkingdogapp.utils.utils.GridSpacingItemDecoration
+import com.example.walkingdogapp.datamodel.GalleryImgInfo
 import com.example.walkingdogapp.mypage.MyPageFragment
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
 
 
@@ -36,7 +37,7 @@ class GalleryFragment : Fragment() {
     private var _binding: FragmentGalleryBinding? = null
     private val binding get() = _binding!!
     private lateinit var mainactivity: MainActivity
-    private val userDataViewModel: UserInfoViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val imgInfos = mutableListOf<GalleryImgInfo>()
     private val removeImgList = mutableListOf<Uri>()
     private lateinit var itemDecoration: GridSpacingItemDecoration
@@ -246,7 +247,7 @@ class GalleryFragment : Fragment() {
                 val contentUri = Uri.withAppendedPath(uri, imagePath)
                 imgInfos.add(GalleryImgInfo(contentUri, imageTitle, Utils.convertLongToTime(SimpleDateFormat("yyyy년 MM월 dd일 HH:mm"), imageDate)))
             }
-            userDataViewModel.saveAlbumImgs(imgInfos)
+            mainViewModel.saveAlbumImgs(imgInfos)
         }
     }
 

@@ -2,6 +2,7 @@ package com.example.walkingdogapp.viewmodel
 
 import android.Manifest
 import android.app.Application
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
@@ -13,29 +14,36 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.walkingdogapp.album.GalleryImgInfo
+import androidx.lifecycle.ViewModel
+import com.example.walkingdogapp.datamodel.GalleryImgInfo
 import com.example.walkingdogapp.datamodel.AlarmDataModel
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.UserInfo
-import com.example.walkingdogapp.datamodel.WalkInfo
-import com.example.walkingdogapp.datamodel.WalkRecord
+import com.example.walkingdogapp.datamodel.TotalWalkInfo
+import com.example.walkingdogapp.datamodel.WalkDateInfo
 import com.example.walkingdogapp.repository.UserInfoRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Locale
+import javax.inject.Inject
 
-
-class UserInfoViewModel(private val application: Application) : AndroidViewModel(application) {
-    private val repository = UserInfoRepository(application)
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val repository: UserInfoRepository,
+    private val fusedLocationProviderClient: FusedLocationProviderClient
+) : ViewModel() {
     private val _dogsInfo = MutableLiveData<List<DogInfo>>()
     private val _userInfo = MutableLiveData<UserInfo>()
-    private val _totalWalkInfo = MutableLiveData<WalkInfo>()
-    private val _walkDates = MutableLiveData<HashMap<String, MutableList<WalkRecord>>>()
+    private val _totalTotalWalkInfo = MutableLiveData<TotalWalkInfo>()
+    private val _walkDates = MutableLiveData<HashMap<String, MutableList<WalkDateInfo>>>()
     private val _collectionInfo = MutableLiveData<HashMap<String, Boolean>>()
     private val _dogsImg = MutableLiveData<HashMap<String, Uri>>()
     private val _successGetData = MutableLiveData<Boolean>()
@@ -44,7 +52,6 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
     private val _currentRegion = MutableLiveData<String>()
     private val _albumImgs = MutableLiveData<List<GalleryImgInfo>>()
 
-    private var fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(application)
     private lateinit var address : List<String>
 
     init {
@@ -52,7 +59,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
             repository.observeUser(
                 _dogsInfo,
                 _userInfo,
-                _totalWalkInfo,
+                _totalTotalWalkInfo,
                 _walkDates,
                 _collectionInfo,
                 _dogsImg,
@@ -70,10 +77,10 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
     val userInfo: LiveData<UserInfo>
         get() = _userInfo
 
-    val totalWalkInfo: LiveData<WalkInfo>
-        get() = _totalWalkInfo
+    val totalWalkInfo: LiveData<TotalWalkInfo>
+        get() = _totalTotalWalkInfo
 
-    val walkDates: LiveData<HashMap<String, MutableList<WalkRecord>>>
+    val walkDates: LiveData<HashMap<String, MutableList<WalkDateInfo>>>
         get() = _walkDates
 
     val collectionInfo: LiveData<HashMap<String, Boolean>>
@@ -118,7 +125,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
             repository.observeUser(
                 _dogsInfo,
                 _userInfo,
-                _totalWalkInfo,
+                _totalTotalWalkInfo,
                 _walkDates,
                 _collectionInfo,
                 _dogsImg,
@@ -132,8 +139,8 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
        repository.updateUserInfo(userInfo)
     }
 
-    suspend fun updateDogInfo(dogInfo: DogInfo, beforeName: String, imgUri: Uri?, walkRecords: ArrayList<WalkRecord>): Boolean {
-        return repository.updateDogInfo(dogInfo, beforeName, imgUri, walkRecords)
+    suspend fun updateDogInfo(dogInfo: DogInfo, beforeName: String, imgUri: Uri?, walkDateInfos: ArrayList<WalkDateInfo>): Boolean {
+        return repository.updateDogInfo(dogInfo, beforeName, imgUri, walkDateInfos)
     }
 
     suspend fun removeDogInfo(beforeName: String) {
@@ -155,7 +162,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
 
     // 현재 좌표
     fun getLastLocation() {
-        if (ContextCompat.checkSelfPermission(getApplication(), Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED
         ) {
             fusedLocationProviderClient.lastLocation.addOnSuccessListener {
@@ -169,7 +176,7 @@ class UserInfoViewModel(private val application: Application) : AndroidViewModel
 
     // 현재 좌표를 주소로 변경
     private fun getCurrentAddress(coord: LatLng) {
-        val geocoder = Geocoder(application, Locale.getDefault())
+        val geocoder = Geocoder(context, Locale.getDefault())
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             try {
                 val addresses: MutableList<Address> = geocoder.getFromLocation(

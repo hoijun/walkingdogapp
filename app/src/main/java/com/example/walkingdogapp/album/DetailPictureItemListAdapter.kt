@@ -8,6 +8,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.request.target.Target
 import com.example.walkingdogapp.databinding.DetailpicturelistItemBinding
+import com.example.walkingdogapp.datamodel.GalleryImgInfo
 
 class DetailPictureItemListAdapter(private val imgList: List<GalleryImgInfo>, private val context: Context) : RecyclerView.Adapter<DetailPictureItemListAdapter.DetailPictureItemListViewHolder>(){
 

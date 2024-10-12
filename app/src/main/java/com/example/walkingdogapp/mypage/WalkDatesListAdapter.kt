@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingdogapp.databinding.WalkdateslistItemBinding
-import com.example.walkingdogapp.datamodel.WalkRecord
+import com.example.walkingdogapp.datamodel.WalkDateInfo
 
-class WalkDatesListAdapter(private val walkRecordList: List<WalkRecord>): RecyclerView.Adapter<WalkDatesListAdapter.WalkDatesListViewHolder>() {
+class WalkDatesListAdapter(private val walkDateInfoList: List<WalkDateInfo>): RecyclerView.Adapter<WalkDatesListAdapter.WalkDatesListViewHolder>() {
 
     fun interface OnItemClickListener {
-        fun onItemClick(date: WalkRecord)
+        fun onItemClick(date: WalkDateInfo)
     }
 
     var itemClickListener : OnItemClickListener? = null
@@ -18,22 +18,22 @@ class WalkDatesListAdapter(private val walkRecordList: List<WalkRecord>): Recycl
         return WalkDatesListViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = walkRecordList.size
+    override fun getItemCount(): Int = walkDateInfoList.size
 
     override fun onBindViewHolder(holder: WalkDatesListViewHolder, position: Int) {
-        holder.bind(walkRecordList[position])
+        holder.bind(walkDateInfoList[position])
     }
 
     inner class WalkDatesListViewHolder(private val binding: WalkdateslistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
-                itemClickListener?.onItemClick(walkRecordList[bindingAdapterPosition])
+                itemClickListener?.onItemClick(walkDateInfoList[bindingAdapterPosition])
             }
         }
-        fun bind(walkRecord: WalkRecord) {
+        fun bind(walkDateInfo: WalkDateInfo) {
             binding.apply {
-                walkRecordInfo = walkRecord
+                walkRecordInfo = walkDateInfo
             }
         }
     }

@@ -25,13 +25,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.example.walkingdogapp.Utils
+import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.NetworkManager
-import com.example.walkingdogapp.deco.HorizonSpacingItemDecoration
+import com.example.walkingdogapp.utils.utils.NetworkManager
+import com.example.walkingdogapp.utils.utils.HorizonSpacingItemDecoration
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentAlbumMapBinding
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.datamodel.AlbumMapImgInfo
+import com.example.walkingdogapp.viewmodel.MainViewModel
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
@@ -49,7 +50,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     private var _binding: FragmentAlbumMapBinding? = null
     private val binding get() = _binding!!
     private val imgInfos = mutableListOf<AlbumMapImgInfo>()
-    private val userDataViewModel: UserInfoViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private lateinit var mynavermap: NaverMap
     private lateinit var camera : CameraUpdate
@@ -113,10 +114,10 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             refresh.apply {
                 this.setOnRefreshListener {
                     CoroutineScope(Dispatchers.IO).launch {
-                        userDataViewModel.observeUser()
+                        mainViewModel.observeUser()
                     }
                 }
-                userDataViewModel.successGetData.observe(requireActivity()) {
+                mainViewModel.successGetData.observe(requireActivity()) {
                     refresh.isRefreshing = false
                 }
             }
@@ -299,8 +300,8 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         if(imgInfos.isNotEmpty()) {
             moveCamera(imgInfos[0].latLng, CameraAnimation.None)
         } else {
-            userDataViewModel.currentCoord.value?.let {
-                val coord = userDataViewModel.currentCoord.value!!
+            mainViewModel.currentCoord.value?.let {
+                val coord = mainViewModel.currentCoord.value!!
                 moveCamera(LatLng(coord.latitude, coord.longitude), CameraAnimation.None)
             }
         }

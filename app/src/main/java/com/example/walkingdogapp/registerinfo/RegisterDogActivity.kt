@@ -33,13 +33,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.NetworkManager
-import com.example.walkingdogapp.R
-import com.example.walkingdogapp.Utils
+import com.example.walkingdogapp.utils.utils.NetworkManager
+import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.databinding.ActivityRegisterDogBinding
 import com.example.walkingdogapp.datamodel.DogInfo
-import com.example.walkingdogapp.datamodel.WalkRecord
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.datamodel.WalkDateInfo
+import com.example.walkingdogapp.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -52,7 +51,7 @@ class RegisterDogActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterDogBinding
     private var dogInfo = DogInfo()
     private var imguri: Uri? = null
-    private lateinit var userInfoViewModel: UserInfoViewModel
+    private lateinit var mainViewModel: MainViewModel
 
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -88,7 +87,7 @@ class RegisterDogActivity : AppCompatActivity() {
 
         this.onBackPressedDispatcher.addCallback(this, backPressCallback)
 
-        userInfoViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
+        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         val userDogInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra("doginfo", DogInfo::class.java)
@@ -97,7 +96,7 @@ class RegisterDogActivity : AppCompatActivity() {
         }
 
         val walkRecords = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableArrayListExtra("walkRecord", WalkRecord::class.java) ?: arrayListOf()
+            intent.getParcelableArrayListExtra("walkRecord", WalkDateInfo::class.java) ?: arrayListOf()
         } else {
             intent.getParcelableArrayListExtra("walkRecord") ?: arrayListOf()
         }
@@ -227,7 +226,7 @@ class RegisterDogActivity : AppCompatActivity() {
                             loadingDialogFragment.show(this@RegisterDogActivity.supportFragmentManager, "loading")
                             lifecycleScope.launch { // 강아지 정보 등록
                                 withContext(Dispatchers.Main) {
-                                    val onFailed = userInfoViewModel.updateDogInfo(dogInfo, beforeName, imguri, walkRecords)
+                                    val onFailed = mainViewModel.updateDogInfo(dogInfo, beforeName, imguri, walkRecords)
                                     loadingDialogFragment.dismiss()
                                     if (onFailed) {
                                         Toast.makeText(this@RegisterDogActivity, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
@@ -258,7 +257,7 @@ class RegisterDogActivity : AppCompatActivity() {
                             loadingDialogFragment.show(this@RegisterDogActivity.supportFragmentManager, "loading")
 
                             lifecycleScope.launch { // 강아지 정보 등록
-                                userInfoViewModel.removeDogInfo(beforeName)
+                                mainViewModel.removeDogInfo(beforeName)
                                 withContext(Dispatchers.Main) {
                                     loadingDialogFragment.dismiss()
                                     goMain()

@@ -14,7 +14,7 @@ import com.example.walkingdogapp.mainhome.HomeFragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentSettingAlarmBinding
 import com.example.walkingdogapp.datamodel.AlarmDataModel
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,7 +25,7 @@ import java.util.Calendar
 class SettingAlarmFragment : Fragment() {
     private var _binding: FragmentSettingAlarmBinding? = null
     private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
-    private val userDataViewModel: UserInfoViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val binding get() = _binding!!
     private lateinit var mainactivity: MainActivity
     private var removeAlarmList = mutableListOf<AlarmDataModel>()
@@ -74,7 +74,7 @@ class SettingAlarmFragment : Fragment() {
                                     alarm.alarm_code,
                                     alarm.weeks
                                 )
-                                userDataViewModel.addAlarm(alarm)
+                                mainViewModel.addAlarm(alarm)
                                 alarmList.add(alarm)
                                 alarmList.sortBy { alarmTimeToString(it.time).toInt() }
                                 withContext(Dispatchers.Main) {
@@ -94,7 +94,7 @@ class SettingAlarmFragment : Fragment() {
             }
 
             coroutineScope.launch {
-                alarmList = userDataViewModel.getAlarmList().sortedBy { alarmTimeToString(it.time).toInt() }.toMutableList()
+                alarmList = mainViewModel.getAlarmList().sortedBy { alarmTimeToString(it.time).toInt() }.toMutableList()
                 adaptar = AlarmListAdapter(alarmList)
                 withContext(Dispatchers.Main) {
                     adaptar?.onItemClickListener = object : AlarmListAdapter.OnItemClickListener {
@@ -121,8 +121,8 @@ class SettingAlarmFragment : Fragment() {
                                         coroutineScope.launch {
                                             alarmFunctions.cancelAlarm(oldAlarm.alarm_code)
 
-                                            userDataViewModel.deleteAlarm(oldAlarm)
-                                            userDataViewModel.addAlarm(newAlarm)
+                                            mainViewModel.deleteAlarm(oldAlarm)
+                                            mainViewModel.addAlarm(newAlarm)
 
                                             if(oldAlarm.alarmOn) {
                                                 alarmFunctions.callAlarm(
@@ -193,7 +193,7 @@ class SettingAlarmFragment : Fragment() {
                                     alarmFunctions.cancelAlarm(alarm.alarm_code)
                                 }
                                 alarmList[alarmList.indexOf(alarm)].alarmOn = isChecked
-                                userDataViewModel.onOffAlarm(alarm, isChecked)
+                                mainViewModel.onOffAlarm(alarm, isChecked)
                             }
                         }
                     }
@@ -214,7 +214,7 @@ class SettingAlarmFragment : Fragment() {
                             coroutineScope.launch {
                                 for (alarm in removeAlarmList) {
                                     alarmFunctions.cancelAlarm(alarm.alarm_code)
-                                    userDataViewModel.deleteAlarm(alarm)
+                                    mainViewModel.deleteAlarm(alarm)
                                 }
                                 removeItems()
                                 unSelectMode()

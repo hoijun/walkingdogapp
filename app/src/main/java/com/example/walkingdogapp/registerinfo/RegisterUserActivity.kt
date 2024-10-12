@@ -16,14 +16,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.walkingdogapp.Utils
+import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.NetworkManager
-import com.example.walkingdogapp.R
+import com.example.walkingdogapp.utils.utils.NetworkManager
 import com.example.walkingdogapp.databinding.ActivityRegisterUserBinding
 import com.example.walkingdogapp.datamodel.UserInfo
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,7 +30,7 @@ import java.util.Calendar
 
 class RegisterUserActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterUserBinding
-    private lateinit var userInfoViewModel: UserInfoViewModel
+    private lateinit var mainViewModel: MainViewModel
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             selectGoMain()
@@ -43,7 +42,7 @@ class RegisterUserActivity : AppCompatActivity() {
         setContentView(binding.root)
         this.onBackPressedDispatcher.addCallback(this, backPressCallback)
 
-        userInfoViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
+        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         val currentUserInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra("userinfo", UserInfo::class.java)
@@ -116,7 +115,7 @@ class RegisterUserActivity : AppCompatActivity() {
                             loadingDialogFragment.show(this@RegisterUserActivity.supportFragmentManager, "loading")
                             lifecycleScope.launch(Dispatchers.IO) {
                                 try {
-                                    userInfoViewModel.updateUserInfo(userInfo)
+                                    mainViewModel.updateUserInfo(userInfo)
                                     withContext(Dispatchers.Main) {
                                         loadingDialogFragment.dismiss()
                                         goHome()

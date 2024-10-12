@@ -6,15 +6,14 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.NetworkManager
-import com.example.walkingdogapp.Utils
 import com.example.walkingdogapp.databinding.ActivityLoginBinding
-import com.example.walkingdogapp.datamodel.UserInfo
-import com.example.walkingdogapp.datamodel.WalkInfo
+import com.example.walkingdogapp.utils.utils.NetworkManager
+import com.example.walkingdogapp.viewmodel.LoginViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.database.ktx.database
@@ -28,24 +27,26 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlin.system.exitProcess
 
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.database
+    private val loginViewModel: LoginViewModel by viewModels()
     private var backPressedTime: Long = 0
     private val loadingDialogFragment = LoadingDialogFragment()
 
     private val kakaoLoginCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
         if (error != null) {
-            Log.e(TAG, "로그인 실패 $error")
             setLoginIngView(false)
+            Log.e(TAG, "로그인 실패 $error")
         } else if (token != null) {
             Log.e(TAG, "로그인 성공 ${token.accessToken}")
             loginApp("kakao")
@@ -99,18 +100,17 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
-
         auth = FirebaseAuth.getInstance()
+
         binding.apply {
             KakaoLoginBtn.setOnClickListener {
                 if (!NetworkManager.checkNetworkState(this@LoginActivity)) {
                     return@setOnClickListener
                 }
                 try {
-                    loginKakao()
                     setLoginIngView(true)
+                    loginKakao()
                 } catch (e: Exception) {
                     e.message?.let { it1 -> Log.d("error", it1) }
                 }
@@ -147,11 +147,9 @@ class LoginActivity : AppCompatActivity() {
                     )
                 }
             } else if (token != null) {
-                Log.e(TAG, "로그인 성공 ${token.accessToken}")
+                Log.e("savepoint", "로그인 성공 ${token.accessToken}")
                 loginApp("kakao")
             }
-
-            setLoginIngView(false)
         }
     }
 
@@ -174,7 +172,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun signupFirebase(myEmail: String, password: String) {
-        auth.createUserWithEmailAndPassword(myEmail, password).addOnCompleteListener {
+        auth.createUserWithEmailAndPassword(myEmail, password).addOnCompleteListener { it ->
             if (!it.isSuccessful) {
                 if (it.exception is FirebaseAuthUserCollisionException) {
                     //이미 가입된 이메일일 경우
@@ -188,103 +186,57 @@ class LoginActivity : AppCompatActivity() {
                 return@addOnCompleteListener
             }
 
-            setLoginIngView(false)
-
             auth.currentUser?.delete()?.addOnCompleteListener {
+                setLoginIngView(false)
                 val termsOfServiceDialog = TermOfServiceDialog()
                 termsOfServiceDialog.onClickYesListener =
                     TermOfServiceDialog.OnClickYesListener { agree ->
+                        setLoginIngView(true)
                         auth.createUserWithEmailAndPassword(myEmail, password)
                             .addOnCompleteListener {
                                 if (agree) {
-                                    val uid = auth.currentUser?.uid
-
-                                    val userRef = db.getReference("Users")
-                                    val userInfo = UserInfo(email = myEmail)
-                                    var error = false
-
-                                    setLoginIngView(true)
-                                    lifecycleScope.launch {
-                                        val userInfoJob = async(Dispatchers.IO) {
-                                            try {
-                                                userRef.child("$uid").child("user")
-                                                    .setValue(userInfo)
-                                                    .await()
-                                            } catch (e: Exception) {
-                                                error = true
-                                            }
-                                        }
-
-                                        val totalWalkInfoJob = async(Dispatchers.IO) {
-                                            try {
-                                                userRef.child("$uid").child("totalWalk")
-                                                    .setValue(WalkInfo()).await()
-                                            } catch (e: Exception) {
-                                                error = true
-                                            }
-                                        }
-
-                                        val collectionInfoJob = async(Dispatchers.IO) {
-                                            try {
-                                                userRef.child("$uid").child("collection")
-                                                    .setValue(Utils.item_whether)
-                                                    .await()
-                                            } catch (e: Exception) {
-                                                error = true
-                                            }
-                                        }
-
-                                        val termsOfServiceJob = async(Dispatchers.IO) {
-                                            try {
-                                                userRef.child("$uid").child("termsOfService")
-                                                    .setValue(true)
-                                                    .await()
-                                            } catch (e: Exception) {
-                                                error = true
-                                            }
-                                        }
-
-                                        userInfoJob.await()
-                                        totalWalkInfoJob.await()
-                                        collectionInfoJob.await()
-                                        termsOfServiceJob.await()
-
-                                        if (error) {
-                                            try {
-                                                userRef.child("$uid").removeValue().await()
-                                            } catch (e: Exception) {
-                                                Log.d("savepoint", e.message.toString())
-                                            }
-                                            auth.currentUser?.delete()
-                                            withContext(Dispatchers.Main) {
-                                                toastFailSignUp()
+                                    loginViewModel.signUp(myEmail)
+                                    loginViewModel.successSignUp.observe(this@LoginActivity) { success ->
+                                        lifecycleScope.launch(Dispatchers.Main) {
+                                            if (success) {
                                                 setLoginIngView(false)
-                                                return@withContext
+                                                startMain()
+                                            } else {
+                                                try {
+                                                    val uid = auth.currentUser?.uid
+                                                    val userRef = db.getReference("Users")
+                                                    userRef.child("$uid").removeValue().await()
+                                                } catch (e: Exception) {
+                                                    Log.d("savepoint", e.message.toString())
+                                                }
+                                                auth.currentUser?.delete()
+                                                withContext(Dispatchers.Main) {
+                                                    toastFailSignUp("")
+                                                    setLoginIngView(false)
+                                                    return@withContext
+                                                }
+                                                return@launch
                                             }
-                                            return@launch
                                         }
-
-                                        setLoginIngView(false)
-                                        startMain()
                                     }
                                 }
-                            }.addOnFailureListener {
-                                toastFailSignUp()
+                            }.addOnFailureListener { error ->
+                                toastFailSignUp(error.toString())
                                 setLoginIngView(false)
                             }
                     }
                 termsOfServiceDialog.show(supportFragmentManager, "terms")
-            }?.addOnFailureListener {
-                toastFailSignUp()
+            }?.addOnFailureListener { error ->
+                toastFailSignUp(error.toString())
             }
         }
     }
 
     private fun signInFirebase(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {  //통신 완료가 된 후 무슨일을 할지
-                task ->
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {task ->
             if (task.isSuccessful) {
                 //로그인 처리를 해주면 됨!
+                loginViewModel.resetUser()
                 startMain()
             } else {
                 // 오류가 난 경우!
@@ -310,7 +262,8 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun toastFailSignUp() {
+    private fun toastFailSignUp(reason: String) {
+        Log.d("savepoint", reason)
         Toast.makeText(
             this@LoginActivity,
             "회원가입 실패",

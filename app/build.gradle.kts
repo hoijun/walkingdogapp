@@ -8,6 +8,7 @@ plugins {
     id("kotlin-parcelize")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 val properties = Properties().apply {
@@ -99,6 +100,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:23.0.0")
     implementation("com.google.firebase:firebase-storage-ktx:21.0.0")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.dagger:hilt-android:2.49")
+    kapt("com.google.dagger:hilt-android-compiler:2.48")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
     implementation("androidx.core:core-ktx:1.13.1")

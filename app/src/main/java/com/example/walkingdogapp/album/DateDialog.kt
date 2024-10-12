@@ -4,7 +4,6 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,11 +13,10 @@ import androidx.fragment.app.activityViewModels
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.DateDialogBinding
-import com.example.walkingdogapp.datamodel.WalkRecord
-import com.example.walkingdogapp.deco.SelectedMonthDecorator
-import com.example.walkingdogapp.deco.ToDayDecorator
-import com.example.walkingdogapp.deco.WalkDayDecorator
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.utils.utils.SelectedMonthDecorator
+import com.example.walkingdogapp.utils.utils.ToDayDecorator
+import com.example.walkingdogapp.utils.utils.WalkDayDecorator
+import com.example.walkingdogapp.viewmodel.MainViewModel
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 
@@ -26,7 +24,7 @@ class DateDialog : DialogFragment() {
     private var _binding: DateDialogBinding? = null
     private val binding get() = _binding!!
     private var walkdates = mutableListOf<CalendarDay>()
-    private val userDataViewModel: UserInfoViewModel by activityViewModels()
+    private val userDataViewModel: MainViewModel by activityViewModels()
 
     fun interface OnDateClickListener {
         fun onDateClick(date: String)

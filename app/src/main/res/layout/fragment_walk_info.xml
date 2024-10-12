@@ -8,7 +8,7 @@
             type="com.example.walkingdogapp.datamodel.DogInfo" />
         <variable
             name="viewmodel"
-            type="com.example.walkingdogapp.viewmodel.UserInfoViewModel" />
+            type="com.example.walkingdogapp.viewmodel.MainViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:tools="http://schemas.android.com/tools"
@@ -134,7 +134,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="25dp"
-                                android:text="@{String.format(`산책 거리: %.1fkm`, selectDogInfo.walkInfo.distance / 1000.0f)}"
+                                android:text="@{String.format(`산책 거리: %.1fkm`, selectDogInfo.totalWalkInfo.distance / 1000.0f)}"
                                 android:textColor="@color/black"
                                 android:textSize="18sp"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -145,7 +145,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="25dp"
-                                android:text='@{"산책 시간: " + selectDogInfo.walkInfo.time / 60 + "분"}'
+                                android:text='@{"산책 시간: " + selectDogInfo.totalWalkInfo.time / 60 + "분"}'
                                 android:textColor="@color/black"
                                 android:textSize="18sp"
                                 app:layout_constraintStart_toStartOf="parent"

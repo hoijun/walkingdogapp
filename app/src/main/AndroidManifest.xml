@@ -43,22 +43,19 @@
         android:theme="@style/Theme.WalkingDogApp"
         tools:targetApi="31" >
         <activity
-            android:name=".mypage.CopyrightActivity"
-            android:exported="false" />
-        <activity
             android:name=".mypage.PrivacyWebViewActivity"
             android:exported="false" />
-        <activity
-            android:name=".AgreeToTermsOfUseActivity"
-            android:exported="false" />
+
         <activity
             android:name=".registerinfo.RegisterUserActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".registerinfo.RegisterDogActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".SplashActivity"
             android:exported="true"
@@ -81,18 +78,17 @@
 
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="oauth"
-                    android:scheme="${Kakao_Redirect_URI}" />
+                <data android:host="oauth"
+                    android:scheme="kakao${Kakao_Redirect_URI}" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".login.LoginActivity"
             android:exported="true"
@@ -103,6 +99,7 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />
+
         <service
             android:name="com.google.android.gms.metadata.ModuleDependencies"
             android:enabled="false"
@@ -125,6 +122,7 @@
             android:name=".walking.WalkingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

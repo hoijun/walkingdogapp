@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.NetworkManager
+import com.example.walkingdogapp.utils.utils.NetworkManager
 import com.example.walkingdogapp.databinding.HomedoglistItemBinding
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
