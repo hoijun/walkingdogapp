@@ -1,70 +1,136 @@
 package com.example.walkingdogapp.repository
 
-import android.app.Application
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.example.walkingdogapp.Utils
+import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.NetworkManager
 import com.example.walkingdogapp.datamodel.AlarmDao
 import com.example.walkingdogapp.datamodel.AlarmDataModel
-import com.example.walkingdogapp.database.LocalUserDatabase
 import com.example.walkingdogapp.datamodel.DogInfo
+import com.example.walkingdogapp.datamodel.TotalWalkInfo
 import com.example.walkingdogapp.datamodel.UserInfo
-import com.example.walkingdogapp.datamodel.WalkInfo
+import com.example.walkingdogapp.datamodel.WalkDateInfo
+import com.example.walkingdogapp.datamodel.WalkDateInfoInSave
 import com.example.walkingdogapp.datamodel.WalkLatLng
-import com.example.walkingdogapp.datamodel.WalkRecord
-import com.example.walkingdogapp.walking.SaveWalkDate
-import com.example.walkingdogapp.walking.WalkingService
+import com.example.walkingdogapp.utils.utils.NetworkManager
+import com.example.walkingdogapp.utils.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.naver.maps.geometry.LatLng
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class UserInfoRepository(private val application: Application) {
-    private val auth = FirebaseAuth.getInstance()
-    private val db = Firebase.database
-    private val storage = FirebaseStorage.getInstance()
+@Singleton
+class UserInfoRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val auth: FirebaseAuth,
+    private val database: FirebaseDatabase,
+    private val storage: FirebaseStorage,
     private val alarmDao: AlarmDao
-    private val uid = auth.currentUser?.uid
-    private val storageRef = storage.getReference("$uid").child("images")
-    private val userRef = db.getReference("Users").child("$uid")
+) {
+    private var uid = auth.currentUser?.uid
+    private var userRef = database.getReference("Users").child("$uid")
+    private var storageRef = storage.getReference("$uid").child("images")
     private lateinit var alarmList: List<AlarmDataModel>
 
-    init {
-        val roomDb = LocalUserDatabase.getInstance(application)
-        alarmDao = roomDb!!.alarmDao()
+    fun resetUser() {
+        uid = auth.currentUser?.uid
+        userRef = database.getReference("Users").child("$uid")
+        storageRef = storage.getReference("$uid").child("images")
+    }
+
+    suspend fun signUp(email: String, successSignUp: MutableLiveData<Boolean>) {
+        val userRef = database.getReference("Users")
+        val userInfo = UserInfo(email = email)
+        val isError = AtomicBoolean(false)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val userInfoJob = async(Dispatchers.IO) {
+                try {
+                    userRef.child("$uid").child("user")
+                        .setValue(userInfo)
+                        .await()
+                } catch (e: Exception) {
+                    Log.d("savepoint", e.message.toString())
+                    isError.set(true)
+                }
+            }
+
+            val totalTotalWalkInfoJob = async(Dispatchers.IO) {
+                try {
+                    userRef.child("$uid").child("totalWalk")
+                        .setValue(TotalWalkInfo()).await()
+                } catch (e: Exception) {
+                    Log.d("savepoint", e.message.toString())
+                    isError.set(true)
+                }
+            }
+
+            val collectionInfoJob = async(Dispatchers.IO) {
+                try {
+                    userRef.child("$uid").child("collection")
+                        .setValue(Utils.item_whether).await()
+                } catch (e: Exception) {
+                    Log.d("savepoint", e.message.toString())
+                    isError.set(true)
+                }
+            }
+
+            val termsOfServiceJob = async(Dispatchers.IO) {
+                try {
+                    userRef.child("$uid").child("termsOfService")
+                        .setValue(true).await()
+                } catch (e: Exception) {
+                    Log.d("savepoint", e.message.toString())
+                    isError.set(true)
+                }
+            }
+
+            userInfoJob.await()
+            totalTotalWalkInfoJob.await()
+            collectionInfoJob.await()
+            termsOfServiceJob.await()
+
+            if (!isError.get()) {
+                successSignUp.postValue(true)
+            } else {
+                successSignUp.postValue(false)
+            }
+        }
     }
 
     suspend fun observeUser(
         dogsInfo: MutableLiveData<List<DogInfo>>,
         userInfo: MutableLiveData<UserInfo>,
-        totalWalkInfo: MutableLiveData<WalkInfo>,
-        walkDates: MutableLiveData<HashMap<String, MutableList<WalkRecord>>>,
+        totalWalkInfo: MutableLiveData<TotalWalkInfo>,
+        walkDates: MutableLiveData<HashMap<String, MutableList<WalkDateInfo>>>,
         collectionInfo: MutableLiveData<HashMap<String, Boolean>>,
         dogsImg: MutableLiveData<HashMap<String, Uri>>,
         successGetData: MutableLiveData<Boolean>
     ) {
-        if (!NetworkManager.checkNetworkState(application)) {
+        if (!NetworkManager.checkNetworkState(context)) {
             successGetData.postValue(false)
             return
         }
@@ -76,8 +142,8 @@ class UserInfoRepository(private val application: Application) {
         val isError = AtomicBoolean(false)
         val dogsInfoDeferred = CompletableDeferred<List<DogInfo>>()
         val userDeferred = CompletableDeferred<UserInfo>()
-        val totalWalkDeferred = CompletableDeferred<WalkInfo>()
-        val walkDateDeferred = CompletableDeferred<HashMap<String, MutableList<WalkRecord>>>()
+        val totalWalkDeferred = CompletableDeferred<TotalWalkInfo>()
+        val walkDateDeferred = CompletableDeferred<HashMap<String, MutableList<WalkDateInfo>>>()
         val collectionDeferred = CompletableDeferred<HashMap<String, Boolean>>()
         val profileUriDeferred = CompletableDeferred<HashMap<String, Uri>>()
 
@@ -101,7 +167,7 @@ class UserInfoRepository(private val application: Application) {
                                     dogInfo.child("weight").getValue(String::class.java)!!,
                                     dogInfo.child("feature").getValue(String::class.java)!!,
                                     dogInfo.child("creationTime").getValue(Long::class.java)!!,
-                                    dogInfo.child("walkInfo").getValue(WalkInfo::class.java)!!
+                                    dogInfo.child("totalWalkInfo").getValue(TotalWalkInfo::class.java)!!
                                 )
                             )
                             dogNames.add(dogInfo.child("name").getValue(String::class.java)!!)
@@ -125,53 +191,53 @@ class UserInfoRepository(private val application: Application) {
             }
 
             userRef.child("totalWalkInfo").get().addOnSuccessListener {
-                totalWalkDeferred.complete(it.getValue(WalkInfo::class.java) ?: WalkInfo())
+                totalWalkDeferred.complete(it.getValue(TotalWalkInfo::class.java) ?: TotalWalkInfo())
             }.addOnFailureListener {
                 isError.set(true)
-                totalWalkDeferred.complete(WalkInfo())
+                totalWalkDeferred.complete(TotalWalkInfo())
             }
 
             dogsInfo.postValue(dogsInfoDeferred.await())
 
-            val dogsWalkRecord = HashMap<String, MutableList<WalkRecord>>()
+            val dogsWalkDateInfo = HashMap<String, MutableList<WalkDateInfo>>()
 
             if (MainActivity.dogNameList.isEmpty()) {
-                walkDateDeferred.complete(dogsWalkRecord)
+                walkDateDeferred.complete(dogsWalkDateInfo)
             } else {
                 for (dog in MainActivity.dogNameList) {
                     userRef.child("dog").child(dog).child("walkdates")
                         .addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
-                                val walkRecords = mutableListOf<WalkRecord>()
+                                val walkDateInfos = mutableListOf<WalkDateInfo>()
                                 if (snapshot.exists()) {
                                     for (dateData in snapshot.children) {
                                         val walkDay = dateData.key.toString().split(" ")
-                                        walkRecords.add(
-                                            WalkRecord(
+                                        walkDateInfos.add(
+                                            WalkDateInfo(
                                                 walkDay[0], walkDay[1], walkDay[2],
                                                 dateData.child("distance")
                                                     .getValue(Float::class.java)!!,
                                                 dateData.child("time").getValue(Int::class.java)!!,
                                                 dateData.child("coords")
                                                     .getValue<List<WalkLatLng>>()
-                                                    ?: listOf<WalkLatLng>(),
+                                                    ?: listOf(),
                                                 dateData.child("collections")
-                                                    .getValue<List<String>>() ?: listOf<String>()
+                                                    .getValue<List<String>>() ?: listOf()
                                             )
                                         )
                                     }
                                 }
-                                dogsWalkRecord[dog] = walkRecords
-                                if (dogsWalkRecord.size == MainActivity.dogNameList.size) {
-                                    walkDateDeferred.complete(dogsWalkRecord)
+                                dogsWalkDateInfo[dog] = walkDateInfos
+                                if (dogsWalkDateInfo.size == MainActivity.dogNameList.size) {
+                                    walkDateDeferred.complete(dogsWalkDateInfo)
                                 }
                             }
 
                             override fun onCancelled(error: DatabaseError) {
                                 isError.set(true)
-                                dogsWalkRecord[dog] = mutableListOf()
-                                if (dogsWalkRecord.size == MainActivity.dogNameList.size) {
-                                    walkDateDeferred.complete(dogsWalkRecord)
+                                dogsWalkDateInfo[dog] = mutableListOf()
+                                if (dogsWalkDateInfo.size == MainActivity.dogNameList.size) {
+                                    walkDateDeferred.complete(dogsWalkDateInfo)
                                 }
                             }
                         })
@@ -293,7 +359,7 @@ class UserInfoRepository(private val application: Application) {
         dogInfo: DogInfo,
         beforeName: String,
         imgUri: Uri?,
-        walkRecords: ArrayList<WalkRecord>
+        walkDateInfos: ArrayList<WalkDateInfo>
     ): Boolean {
         var error = false
         val result = CoroutineScope(Dispatchers.IO).launch {
@@ -317,11 +383,11 @@ class UserInfoRepository(private val application: Application) {
 
             val walkRecordJob = async(Dispatchers.IO) {
                 try {
-                    for (walkRecord in walkRecords) {
+                    for (walkRecord in walkDateInfos) {
                         val day = walkRecord.day + " " + walkRecord.startTime + " " + walkRecord.endTime
                         userRef.child("dog").child(dogInfo.name).child("walkdates").child(day)
                             .setValue(
-                                SaveWalkDate(
+                                WalkDateInfoInSave(
                                     walkRecord.distance,
                                     walkRecord.time,
                                     walkRecord.coords,
@@ -346,7 +412,7 @@ class UserInfoRepository(private val application: Application) {
                                 val tempFile = File.createTempFile(
                                     "temp",
                                     ".jpg",
-                                    application.cacheDir
+                                    context.cacheDir
                                 )
                                 storage.getReferenceFromUrl(MainActivity.dogUriList[beforeName].toString())
                                     .getStream { _, inputStream ->
@@ -437,11 +503,11 @@ class UserInfoRepository(private val application: Application) {
                     val walkDateInfo = LocalDateTime.now()
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " " + startTime + " " + endTime
 
-                    val totalWalk = snapshot.child("totalWalkInfo").getValue(WalkInfo::class.java)
-                    val indivisualWalks = hashMapOf<String, WalkInfo?>().also {
+                    val totalWalk = snapshot.child("totalWalkInfo").getValue(TotalWalkInfo::class.java)
+                    val indivisualWalks = hashMapOf<String, TotalWalkInfo?>().also {
                         for (name in walkDogs) {
                             it[name] = snapshot.child("dog").child(name).child("walkInfo").getValue(
-                                WalkInfo::class.java
+                                TotalWalkInfo::class.java
                             )
                         }
                     }
@@ -451,14 +517,14 @@ class UserInfoRepository(private val application: Application) {
                             try {
                                 if (totalWalk != null) {
                                     userRef.child("totalWalkInfo").setValue(
-                                        WalkInfo(
+                                        TotalWalkInfo(
                                             totalWalk.distance + distance,
                                             totalWalk.time + time
                                         )
                                     ).await()
                                 } else {
                                     userRef.child("totalWalkInfo")
-                                        .setValue(WalkInfo(distance, time))
+                                        .setValue(TotalWalkInfo(distance, time))
                                         .await()
                                 }
                             } catch (e: Exception) {
@@ -473,7 +539,7 @@ class UserInfoRepository(private val application: Application) {
                                     if (indivisualWalks[dogName] != null) {
                                         userRef.child("dog").child(dogName).child("walkInfo")
                                             .setValue(
-                                                WalkInfo(
+                                                TotalWalkInfo(
                                                     indivisualWalks[dogName]!!.distance + distance,
                                                     indivisualWalks[dogName]!!.time + time
                                                 )
@@ -481,7 +547,7 @@ class UserInfoRepository(private val application: Application) {
                                     } else {
                                         userRef.child("dog").child(dogName).child("walkInfo")
                                             .setValue(
-                                                WalkInfo(distance, time)
+                                                TotalWalkInfo(distance, time)
                                             ).await()
                                     }
                                 }
@@ -491,7 +557,7 @@ class UserInfoRepository(private val application: Application) {
                             }
                         }
 
-                        val saveWalkDateJob = async(Dispatchers.IO) {
+                        val walkDateInfoInSaveJob = async(Dispatchers.IO) {
                             try {
                                 val saveCoords = mutableListOf<WalkLatLng>()
                                 for (coord in coords) {
@@ -501,7 +567,7 @@ class UserInfoRepository(private val application: Application) {
                                     userRef.child("dog").child(dog).child("walkdates")
                                         .child(walkDateInfo)
                                         .setValue(
-                                            SaveWalkDate(
+                                            WalkDateInfoInSave(
                                                 distance,
                                                 time,
                                                 saveCoords,
@@ -531,7 +597,7 @@ class UserInfoRepository(private val application: Application) {
 
                         totalWalkJob.await()
                         indivisualWalkJob.await()
-                        saveWalkDateJob.await()
+                        walkDateInfoInSaveJob.await()
                         collectionInfoJob.await()
 
                         continuation.resume(isError)

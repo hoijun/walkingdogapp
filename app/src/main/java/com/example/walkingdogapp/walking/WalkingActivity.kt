@@ -2,9 +2,12 @@ package com.example.walkingdogapp.walking
 
 import android.Manifest
 import android.app.ActivityManager
+import android.content.ComponentName
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.PointF
@@ -13,6 +16,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.IBinder
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
@@ -23,6 +27,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -32,15 +37,14 @@ import androidx.databinding.BindingAdapter
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.example.walkingdogapp.Utils
+import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.NetworkManager
+import com.example.walkingdogapp.utils.utils.NetworkManager
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
 import com.example.walkingdogapp.datamodel.CollectionInfo
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
-import com.example.walkingdogapp.datamodel.WalkLatLng
+import com.example.walkingdogapp.viewmodel.MainViewModel
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
@@ -51,6 +55,7 @@ import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -63,17 +68,11 @@ import java.util.Random
 import kotlin.math.cos
 import kotlin.math.sin
 
-data class SaveWalkDate (
-    val distance: Float = 0.0f,
-    val time: Int = 0,
-    val coords: List<WalkLatLng> = listOf<WalkLatLng>(),
-    val collections: List<String>
-) // 산책 한 후 저장 할 때 쓰는 클래스
-
+@AndroidEntryPoint
 class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityWalkingBinding
     private lateinit var mynavermap: NaverMap
-    private lateinit var userInfoViewModel: UserInfoViewModel
+    private val mainViewModel: MainViewModel by viewModels()
 
     private var coordList = mutableListOf<LatLng>()
     private var trackingMarker = Marker()
@@ -101,6 +100,22 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private var startTime = ""
     private var selectedDogs = arrayListOf<String>()
     private var collectionsMap = hashMapOf<String, CollectionInfo>()
+    private lateinit var wService: WalkingService
+    private var isBinding = false
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as WalkingService.LocalBinder
+            wService = binder.getService()
+            binding.walkingService = wService
+            isBinding = true
+            setObserve()
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            isBinding = false
+        }
+    }
 
     // 뒤로 가기
     private val backPressedCallback = object : OnBackPressedCallback(true) {
@@ -122,8 +137,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityWalkingBinding.inflate(layoutInflater)
         setContentView(binding.root)
         this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
-        userInfoViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
-        userInfoViewModel.getLastLocation()
+        mainViewModel.getLastLocation()
 
         selectedDogs = intent.getStringArrayListExtra("selectedDogs") ?: arrayListOf()
 
@@ -148,7 +162,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 버튼 이벤트 설정
         binding.apply {
-            walkingService = WalkingService
             lifecycleOwner = this@WalkingActivity
             isTrackingCameraMode = trackingCameraMode
 
@@ -161,7 +174,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     return@setOnClickListener
                 }
 
-                if (WalkingService.isTracking.value == true) {
+                if (wService.isTracking.value == true) {
                     stopTracking()
                 } else {
                     startTracking()
@@ -191,7 +204,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
             currentCollections.setOnClickListener {
                 val currentCollections = arrayListOf<CollectionInfo>()
-                WalkingService.getCollectionItems.toMutableSet().toList().forEach {
+                wService.getCollectionItems.toMutableSet().toList().forEach {
                     currentCollections.add(collectionsMap[it]?: CollectionInfo())
                 }
                 val collectionListDialog = CurrentCollectionsDialog().apply {
@@ -249,7 +262,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         trackingPath.width = 15
         trackingPath.color = Color.YELLOW
 
-        userInfoViewModel.currentCoord.observe(this) {
+        mainViewModel.currentCoord.observe(this) {
             val firstCamera = CameraUpdate.scrollAndZoomTo(
                 LatLng(it.latitude, it.longitude),
                 16.0
@@ -259,8 +272,14 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             trackingMarker.map = mynavermap
         } // 현재 위치로 맵 이동
 
+        Intent(this, WalkingService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    private fun setObserve() {
         // 위치 업데이트 이벤트
-        WalkingService.coordList.observe(this) {
+        wService.coordList.observe(this) {
             coordList = it
             if (coordList.isNotEmpty()) {
                 trackingMarker.map = null
@@ -275,13 +294,13 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
 
                 val markersToRemove = mutableListOf<InfoWindow>()
-                for (marker in WalkingService.animalMarkers) { // 마커 특정 거리 이상일 경우 제거
+                for (marker in wService.animalMarkers) { // 마커 특정 거리 이상일 경우 제거
                     if (marker.position.distanceTo(coordList.last()) > 400) {
                         marker.map = null
                         markersToRemove.add(marker)
                     }
                 }
-                WalkingService.animalMarkers.removeAll(markersToRemove)
+                wService.animalMarkers.removeAll(markersToRemove)
 
                 if (coordList.size > 1) {
                     trackingPath.map = null
@@ -291,14 +310,14 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-        if (WalkingService.animalMarkers.isEmpty() && WalkingService.getCollectionItems.isEmpty()) {
+        if (wService.animalMarkers.isEmpty() && wService.getCollectionItems.isEmpty()) {
             randomMarker()
         }
 
-        if (WalkingService.animalMarkers.isNotEmpty() || WalkingService.getCollectionItems.isNotEmpty()) {
+        if (wService.animalMarkers.isNotEmpty() || wService.getCollectionItems.isNotEmpty()) {
             lifecycleScope.launch(Dispatchers.Main) {
                 delay(5000)
-                for (animalMarker in WalkingService.animalMarkers) {
+                for (animalMarker in wService.animalMarkers) {
                     animalMarker.adapter =
                         object : InfoWindow.DefaultViewAdapter(this@WalkingActivity) {
                             override fun getContentView(p0: InfoWindow): View {
@@ -309,9 +328,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     animalMarker.setOnClickListener {
                         if (coordList.last().distanceTo(animalMarker.position) < 20) {
                             val tag = animalMarker.tag.toString()
-                            WalkingService.getCollectionItems.add(tag)
+                            wService.getCollectionItems.add(tag)
                             animalMarker.map = null
-                            WalkingService.animalMarkers.remove(animalMarker)
+                            wService.animalMarkers.remove(animalMarker)
 
                             val getCollectionDialog = GetCollectionDialog().apply {
                                 arguments = Bundle().apply {
@@ -336,6 +355,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+
     private fun setCollectionImageView(collectionsMap: HashMap<String, CollectionInfo>) {
         collectionsMap.forEach { (key, value) ->
             val imgView = ImageView(this)
@@ -351,7 +371,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             while (isWalkingServiceRunning()) {
                 repeat(2) {
                     if (coordList.isNotEmpty()) {
-                        if (WalkingService.animalMarkers.size < 6) { // 마커의 갯수 상한선
+                        if (wService.animalMarkers.size < 6) { // 마커의 갯수 상한선
                             val randomCoord = getRandomCoord(coordList.last(), 300)
                             val randomNumber = kotlin.random.Random.nextInt(1, 24)
                             val randomKey = String.format("%03d", randomNumber)
@@ -373,9 +393,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             animalMarker.setOnClickListener {
                                 if (coordList.last().distanceTo(animalMarker.position) < 20) {
                                     val tag = animalMarker.tag.toString()
-                                    WalkingService.getCollectionItems.add(tag)
+                                    wService.getCollectionItems.add(tag)
                                     animalMarker.map = null
-                                    WalkingService.animalMarkers.remove(animalMarker)
+                                    wService.animalMarkers.remove(animalMarker)
 
                                     val getCollectionDialog = GetCollectionDialog().apply {
                                         arguments = Bundle().apply {
@@ -394,7 +414,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             }
                             animalMarker.position = randomCoord
                             animalMarker.map = mynavermap
-                            WalkingService.animalMarkers.add(animalMarker)
+                            wService.animalMarkers.add(animalMarker)
                         }
                     }
                 }
@@ -468,6 +488,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         val backIntent = Intent(this@WalkingActivity, MainActivity::class.java)
         backIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
                 Intent.FLAG_ACTIVITY_CLEAR_TASK
+        unbindService(connection)
         startActivity(backIntent)
         finish()
     }
@@ -483,19 +504,19 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    if (WalkingService.walkDistance.value!! < 300 && WalkingService.walkTime.value!! < 300) {
+                    if (wService.walkDistance.value!! < 300 && wService.walkTime.value!! < 300) {
                         Toast.makeText(this, "거리 또는 시간이 너무 부족해요!", Toast.LENGTH_SHORT).show()
                         stopWalkingService()
                         goHome()
                     } else {
-                        startTime = WalkingService.startTime
+                        startTime = wService.startTime
                         setSaveScreen()
                         saveWalkInfo(
-                            WalkingService.walkDistance.value ?: 0f,
-                            WalkingService.walkTime.value!!,
-                            WalkingService.coordList.value!!,
-                            WalkingService.walkingDogs.value ?: arrayListOf(),
-                            WalkingService.getCollectionItems.toMutableSet().toList()
+                            wService.walkDistance.value ?: 0f,
+                            wService.walkTime.value!!,
+                            wService.coordList.value!!,
+                            wService.walkingDogs.value ?: arrayListOf(),
+                            wService.getCollectionItems.toMutableSet().toList()
                         )
                     }
                 }
@@ -517,7 +538,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         lifecycleScope.launch(Dispatchers.IO) {
             val loadingDialogFragment = LoadingDialogFragment()
             loadingDialogFragment.show(this@WalkingActivity.supportFragmentManager, "loading")
-            val error = userInfoViewModel.saveWalkInfo(
+            val error = mainViewModel.saveWalkInfo(
                 walkDogs,
                 startTime,
                 distance,
@@ -538,7 +559,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setSaveScreen() {
-        val coors = WalkingService.coordList.value!!
+        val coors = wService.coordList.value!!
         if (coors.isNotEmpty()) {
             val middleCoor = coors[coors.size / 2]
             val saveCamera = CameraUpdate.scrollAndZoomTo(

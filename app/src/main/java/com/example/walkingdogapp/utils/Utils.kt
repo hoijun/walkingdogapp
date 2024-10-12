@@ -1,9 +1,10 @@
-package com.example.walkingdogapp
+package com.example.walkingdogapp.utils.utils
 
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.util.TypedValue
+import com.example.walkingdogapp.R
 import com.example.walkingdogapp.datamodel.CollectionInfo
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -62,6 +63,7 @@ class Utils {
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
+                return false
             }
             return false // 이미지가 존재하지 않음
         }

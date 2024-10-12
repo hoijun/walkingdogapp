@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.example.walkingdogapp.Utils
+import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.ManagedoglistItemBinding
 import com.example.walkingdogapp.datamodel.DogInfo

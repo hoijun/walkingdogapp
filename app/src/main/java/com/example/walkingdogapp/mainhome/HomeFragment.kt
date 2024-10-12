@@ -19,25 +19,26 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.NetworkManager
+import com.example.walkingdogapp.utils.utils.NetworkManager
 import com.example.walkingdogapp.alarm.SettingAlarmFragment
 import com.example.walkingdogapp.databinding.FragmentHomeBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.MainViewModel
 import com.example.walkingdogapp.walking.WalkingActivity
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val userInfoViewModel: UserInfoViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var builder: AlertDialog.Builder
     private lateinit var mainactivity: MainActivity
     private val selectedDogList = mutableListOf<String>()
@@ -67,17 +68,17 @@ class HomeFragment : Fragment() {
         builder = AlertDialog.Builder(requireContext())
 
         binding.apply {
-            viewmodel = userInfoViewModel
+            viewmodel = mainViewModel
             lifecycleOwner = requireActivity()
             selectedDogs = selectedDogList.joinToString(", ")
 
             refresh.apply {
                 this.setOnRefreshListener {
                     CoroutineScope(Dispatchers.IO).launch {
-                        userInfoViewModel.observeUser()
+                        mainViewModel.observeUser()
                     }
                 }
-                userInfoViewModel.successGetData.observe(requireActivity()) {
+                mainViewModel.successGetData.observe(requireActivity()) {
                     refresh.isRefreshing = false
                 }
             }
@@ -96,8 +97,8 @@ class HomeFragment : Fragment() {
                 mainactivity.changeFragment(SettingAlarmFragment())
             }
 
-            val dogsList = userInfoViewModel.dogsInfo.value?: listOf()
-            val homeDogListAdapter = HomeDogListAdapter(dogsList, userInfoViewModel.isSuccessGetData())
+            val dogsList = mainViewModel.dogsInfo.value?: listOf()
+            val homeDogListAdapter = HomeDogListAdapter(dogsList, mainViewModel.isSuccessGetData())
             homeDogListAdapter.onClickDogListener = HomeDogListAdapter.OnClickDogListener { dogName ->
                 if(selectedDogList.contains(dogName)) {
                     selectedDogList.remove(dogName)
@@ -112,7 +113,7 @@ class HomeFragment : Fragment() {
             TabLayoutMediator(homeDogsIndicator, homeDogsViewPager) { _, _ -> }.attach()
 
             btnWalk.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(requireContext()) || !userInfoViewModel.isSuccessGetData()) {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }
 
@@ -121,7 +122,7 @@ class HomeFragment : Fragment() {
                     val listener = DialogInterface.OnClickListener { _, ans ->
                         when (ans) {
                             DialogInterface.BUTTON_POSITIVE -> {
-                                if(!NetworkManager.checkNetworkState(requireContext()) || !userInfoViewModel.isSuccessGetData()) {
+                                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
                                     return@OnClickListener
                                 }
                                 val registerDogIntent =

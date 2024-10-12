@@ -14,13 +14,17 @@ import androidx.core.app.NotificationCompat.PRIORITY_DEFAULT
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.SplashActivity
 import com.example.walkingdogapp.repository.UserInfoRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AlarmReceiver: BroadcastReceiver() {
-
+    @Inject
+    lateinit var userInfoRepository: UserInfoRepository
     private lateinit var manager: NotificationManager
     private lateinit var builder: NotificationCompat.Builder
 
@@ -88,12 +92,11 @@ class AlarmReceiver: BroadcastReceiver() {
             set(Calendar.SECOND, 0)
         }
 
-        val repository = UserInfoRepository(context.applicationContext as Application)
         val alarmFunctions = AlarmFunctions(context)
         alarmFunctions.cancelAlarm(requestCode)
         alarmFunctions.callAlarm(calendar.timeInMillis, requestCode, weeks)
         CoroutineScope(Dispatchers.IO).launch {
-            repository.updateAlarmTime(requestCode, calendar.timeInMillis)
+            userInfoRepository.updateAlarmTime(requestCode, calendar.timeInMillis)
         }
     }
 }

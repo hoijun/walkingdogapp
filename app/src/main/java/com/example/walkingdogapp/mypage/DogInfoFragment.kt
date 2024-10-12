@@ -12,18 +12,18 @@ import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.NetworkManager
+import com.example.walkingdogapp.utils.utils.NetworkManager
 import com.example.walkingdogapp.databinding.FragmentDogInfoBinding
 import com.example.walkingdogapp.registerinfo.RegisterDogActivity
 import com.example.walkingdogapp.datamodel.DogInfo
-import com.example.walkingdogapp.datamodel.WalkRecord
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.datamodel.WalkDateInfo
+import com.example.walkingdogapp.viewmodel.MainViewModel
 
 class DogInfoFragment : Fragment() {
     private var _binding: FragmentDogInfoBinding? = null
     private val binding get() = _binding!!
 
-    private val userDataViewModel: UserInfoViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var mainactivity: MainActivity
     private var beforepage = ""
 
@@ -68,18 +68,18 @@ class DogInfoFragment : Fragment() {
             }
 
             btnSettingdog.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(requireContext()) || !userDataViewModel.isSuccessGetData()) {
+                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }
                 val registerDogIntent = Intent(requireContext(), RegisterDogActivity::class.java)
-                val walkRecordArrayList: ArrayList<WalkRecord> = (userDataViewModel.walkDates.value?.get(userDogInfo.name) ?: mutableListOf()) as ArrayList<WalkRecord>
+                val walkDateInfoArrayLists: ArrayList<WalkDateInfo> = (mainViewModel.walkDates.value?.get(userDogInfo.name) ?: mutableListOf()) as ArrayList<WalkDateInfo>
                 registerDogIntent.putExtra("doginfo", userDogInfo)
-                registerDogIntent.putParcelableArrayListExtra("walkRecord", walkRecordArrayList)
+                registerDogIntent.putParcelableArrayListExtra("walkRecord", walkDateInfoArrayLists)
                 startActivity(registerDogIntent)
             }
 
-            if (userDataViewModel.dogsImg.value?.get(userDogInfo.name) != null) {
-                Glide.with(requireContext()).load(userDataViewModel.dogsImg.value?.get(userDogInfo.name))
+            if (mainViewModel.dogsImg.value?.get(userDogInfo.name) != null) {
+                Glide.with(requireContext()).load(mainViewModel.dogsImg.value?.get(userDogInfo.name))
                     .format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(doginfoImage)
             }
         }

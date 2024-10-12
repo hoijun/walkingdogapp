@@ -11,10 +11,10 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.walkingdogapp.Utils
+import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.databinding.CurrentcollectionsDialogBinding
 import com.example.walkingdogapp.datamodel.CollectionInfo
-import com.example.walkingdogapp.deco.GridSpacingItemDecoration
+import com.example.walkingdogapp.utils.utils.GridSpacingItemDecoration
 
 class CurrentCollectionsDialog: DialogFragment() {
     private var _binding: CurrentcollectionsDialogBinding? = null

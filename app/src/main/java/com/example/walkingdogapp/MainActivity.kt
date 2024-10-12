@@ -7,27 +7,28 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.example.walkingdogapp.album.AlbumMapFragment
 import com.example.walkingdogapp.collection.CollectionFragment
 import com.example.walkingdogapp.databinding.ActivityMainBinding
 import com.example.walkingdogapp.mainhome.HomeFragment
 import com.example.walkingdogapp.mypage.ManageDogsFragment
 import com.example.walkingdogapp.mypage.MyPageFragment
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.MainViewModel
 import com.example.walkingdogapp.walking.WalkingActivity
 import com.example.walkingdogapp.walking.WalkingService
+import dagger.hilt.android.AndroidEntryPoint
 import kotlin.system.exitProcess
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
-    private lateinit var userInfoViewModel: UserInfoViewModel
+    private val mainViewModel: MainViewModel by viewModels()
     private lateinit var loadingDialogFragment: LoadingDialogFragment
     private val locationPermissionRequestCode = 1000
     private val permissions = arrayOf(
@@ -84,8 +85,6 @@ class MainActivity : AppCompatActivity() {
         loadingDialogFragment = LoadingDialogFragment()
         loadingDialogFragment.show(this.supportFragmentManager, "loading")
 
-        userInfoViewModel = ViewModelProvider(this).get(UserInfoViewModel::class.java)
-
         getUserInfo()
 
         // 화면 전환
@@ -136,7 +135,7 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             locationPermissionRequestCode -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    userInfoViewModel.getLastLocation()
+                    mainViewModel.getLastLocation()
                 }
                 return
             }
@@ -145,13 +144,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getUserInfo() {
-        userInfoViewModel.successGetData.observe(this) {
+        mainViewModel.successGetData.observe(this) {
             try {
                 loadingDialogFragment.dismiss()
-                dogUriList = userInfoViewModel.dogsImg.value ?: hashMapOf()
-            } catch (_: Exception) {
-
-            } finally {
+                dogUriList = mainViewModel.dogsImg.value ?: hashMapOf()
+            } catch (_: Exception) { }
+            finally {
                 when (preFragment) {
                     "Mypage" -> {
                         changeFragment(MyPageFragment())

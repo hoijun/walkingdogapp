@@ -9,14 +9,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.walkingdogapp.Utils
+import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.NetworkManager
-import com.example.walkingdogapp.deco.GridSpacingItemDecoration
+import com.example.walkingdogapp.utils.utils.NetworkManager
+import com.example.walkingdogapp.utils.utils.GridSpacingItemDecoration
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentCollectionBinding
 import com.example.walkingdogapp.datamodel.CollectionInfo
-import com.example.walkingdogapp.viewmodel.UserInfoViewModel
+import com.example.walkingdogapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,13 +24,13 @@ import kotlinx.coroutines.launch
 class CollectionFragment : Fragment() {
     private var _binding: FragmentCollectionBinding? = null
     private val binding get() = _binding!!
-    private val userDataViewModel: UserInfoViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var collections: List<CollectionInfo>
     private lateinit var mainactivity: MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val collectionInfo = userDataViewModel.collectionInfo.value ?: Utils.item_whether
+        val collectionInfo = mainViewModel.collectionInfo.value ?: Utils.item_whether
         collections = setCollection(collectionInfo)
 
         if (!NetworkManager.checkNetworkState(requireContext())) {
@@ -54,7 +54,7 @@ class CollectionFragment : Fragment() {
         val gridListManager = GridLayoutManager(requireContext(), 3)
         val adapter = CollectionListAdapter(collections)
         adapter.itemClickListener = CollectionListAdapter.OnItemClickListener { collection ->
-            if (userDataViewModel.collectionInfo.value?.get(collection.collectionNum) == true) {
+            if (mainViewModel.collectionInfo.value?.get(collection.collectionNum) == true) {
                 val detailCollectionDialog = DetailCollectionDialog().apply {
                     val bundle = Bundle()
                     bundle.putSerializable("collectionInfo", collection)
@@ -80,10 +80,10 @@ class CollectionFragment : Fragment() {
 
                 this.setOnRefreshListener {
                     CoroutineScope(Dispatchers.IO).launch {
-                        userDataViewModel.observeUser()
+                        mainViewModel.observeUser()
                     }
                 }
-                userDataViewModel.successGetData.observe(requireActivity()) {
+                mainViewModel.successGetData.observe(requireActivity()) {
                     refresh.isRefreshing = false
                 }
             }

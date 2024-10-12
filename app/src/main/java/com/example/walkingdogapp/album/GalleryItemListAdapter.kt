@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.databinding.GallerylistItemBinding
+import com.example.walkingdogapp.datamodel.GalleryImgInfo
 
 class GalleryItemListAdapter(private val imgList: MutableList<GalleryImgInfo>): RecyclerView.Adapter<GalleryItemListAdapter.AlbumMapItemListViewHolder>() {
     private lateinit var context: Context

@@ -1,4 +1,4 @@
-package com.example.walkingdogapp.deco
+package com.example.walkingdogapp.utils.utils
 
 import android.graphics.Rect
 import android.view.View
