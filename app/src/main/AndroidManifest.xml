@@ -85,7 +85,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:host="oauth"
-                    android:scheme="kakao${Kakao_Redirect_URI}" />
+                    android:scheme="${Kakao_Redirect_URI}" />
             </intent-filter>
         </activity>
 
