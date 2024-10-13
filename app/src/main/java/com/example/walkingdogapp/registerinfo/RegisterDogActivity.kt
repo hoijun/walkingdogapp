@@ -113,6 +113,7 @@ class RegisterDogActivity : AppCompatActivity() {
 
         binding.apply {
             dog = dogInfo
+            beforeDogName = beforeName
 
             if (MainActivity.dogUriList[beforeName] != null) {
                 Glide.with(this@RegisterDogActivity).load(MainActivity.dogUriList[beforeName])
@@ -247,6 +248,7 @@ class RegisterDogActivity : AppCompatActivity() {
             }
 
             removeBtn.setOnClickListener {
+                if (beforeName == "") return@setOnClickListener
                 if(!NetworkManager.checkNetworkState(this@RegisterDogActivity)) {
                     return@setOnClickListener
                 }
