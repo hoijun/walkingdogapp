@@ -320,6 +320,12 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             lifecycleScope.launch(Dispatchers.Main) {
                 delay(5000)
                 for (animalMarker in wService.animalMarkers) {
+                    if (collectionImgViews[animalMarker.tag.toString()]!!.parent != null) {
+                        ((collectionImgViews[animalMarker.tag.toString()]!!.parent) as ViewGroup).removeView(
+                            collectionImgViews[animalMarker.tag.toString()]
+                        )
+                    }
+
                     animalMarker.adapter =
                         object : InfoWindow.DefaultViewAdapter(this@WalkingActivity) {
                             override fun getContentView(p0: InfoWindow): View {
