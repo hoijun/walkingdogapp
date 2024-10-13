@@ -506,7 +506,7 @@ class UserInfoRepository @Inject constructor(
                     val totalWalk = snapshot.child("totalWalkInfo").getValue(TotalWalkInfo::class.java)
                     val indivisualWalks = hashMapOf<String, TotalWalkInfo?>().also {
                         for (name in walkDogs) {
-                            it[name] = snapshot.child("dog").child(name).child("walkInfo").getValue(
+                            it[name] = snapshot.child("dog").child(name).child("totalWalkInfo").getValue(
                                 TotalWalkInfo::class.java
                             )
                         }
@@ -537,7 +537,7 @@ class UserInfoRepository @Inject constructor(
                             try {
                                 for (dogName in walkDogs) {
                                     if (indivisualWalks[dogName] != null) {
-                                        userRef.child("dog").child(dogName).child("walkInfo")
+                                        userRef.child("dog").child(dogName).child("totalWalkInfo")
                                             .setValue(
                                                 TotalWalkInfo(
                                                     indivisualWalks[dogName]!!.distance + distance,
@@ -545,7 +545,7 @@ class UserInfoRepository @Inject constructor(
                                                 )
                                             ).await()
                                     } else {
-                                        userRef.child("dog").child(dogName).child("walkInfo")
+                                        userRef.child("dog").child(dogName).child("totalWalkInfo")
                                             .setValue(
                                                 TotalWalkInfo(distance, time)
                                             ).await()
