@@ -428,6 +428,7 @@ class UserInfoRepository @Inject constructor(
                         }
                     }
                 } catch (e: Exception) {
+                    Log.d("savepoint1", e.message.toString())
                     error = true
                     return@upload
                 }
@@ -441,7 +442,7 @@ class UserInfoRepository @Inject constructor(
                         return@delete
                     }
 
-                    if (!MainActivity.dogNameList.contains(dogInfo.name)) {
+                    if (!MainActivity.dogNameList.contains(dogInfo.name) && MainActivity.dogUriList[beforeName] != null) {
                         storageRef.child(beforeName).delete().await()
                     }
                 } catch (e: Exception) {

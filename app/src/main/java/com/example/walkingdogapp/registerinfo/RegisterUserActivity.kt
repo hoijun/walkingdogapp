@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
@@ -23,14 +24,17 @@ import com.example.walkingdogapp.utils.utils.NetworkManager
 import com.example.walkingdogapp.databinding.ActivityRegisterUserBinding
 import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.viewmodel.MainViewModel
+import com.example.walkingdogapp.viewmodel.RegisterUserViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 
+@AndroidEntryPoint
 class RegisterUserActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterUserBinding
-    private lateinit var mainViewModel: MainViewModel
+    private val registerUserViewModel: RegisterUserViewModel by viewModels()
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             selectGoMain()
@@ -41,8 +45,6 @@ class RegisterUserActivity : AppCompatActivity() {
         binding = ActivityRegisterUserBinding.inflate(layoutInflater)
         setContentView(binding.root)
         this.onBackPressedDispatcher.addCallback(this, backPressCallback)
-
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         val currentUserInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra("userinfo", UserInfo::class.java)
@@ -115,7 +117,7 @@ class RegisterUserActivity : AppCompatActivity() {
                             loadingDialogFragment.show(this@RegisterUserActivity.supportFragmentManager, "loading")
                             lifecycleScope.launch(Dispatchers.IO) {
                                 try {
-                                    mainViewModel.updateUserInfo(userInfo)
+                                    registerUserViewModel.updateUserInfo(userInfo)
                                     withContext(Dispatchers.Main) {
                                         loadingDialogFragment.dismiss()
                                         goHome()

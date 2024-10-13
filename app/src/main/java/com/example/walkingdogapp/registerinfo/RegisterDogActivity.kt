@@ -22,6 +22,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -39,6 +40,9 @@ import com.example.walkingdogapp.databinding.ActivityRegisterDogBinding
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.WalkDateInfo
 import com.example.walkingdogapp.viewmodel.MainViewModel
+import com.example.walkingdogapp.viewmodel.RegisterDogViewModel
+import com.example.walkingdogapp.viewmodel.WalkingViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -46,12 +50,12 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
 
-
+@AndroidEntryPoint
 class RegisterDogActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterDogBinding
     private var dogInfo = DogInfo()
     private var imguri: Uri? = null
-    private lateinit var mainViewModel: MainViewModel
+    private val registerDogViewModel: RegisterDogViewModel by viewModels()
 
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -86,8 +90,6 @@ class RegisterDogActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         this.onBackPressedDispatcher.addCallback(this, backPressCallback)
-
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         val userDogInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra("doginfo", DogInfo::class.java)
@@ -226,7 +228,7 @@ class RegisterDogActivity : AppCompatActivity() {
                             loadingDialogFragment.show(this@RegisterDogActivity.supportFragmentManager, "loading")
                             lifecycleScope.launch { // 강아지 정보 등록
                                 withContext(Dispatchers.Main) {
-                                    val onFailed = mainViewModel.updateDogInfo(dogInfo, beforeName, imguri, walkRecords)
+                                    val onFailed = registerDogViewModel.updateDogInfo(dogInfo, beforeName, imguri, walkRecords)
                                     loadingDialogFragment.dismiss()
                                     if (onFailed) {
                                         Toast.makeText(this@RegisterDogActivity, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
@@ -257,7 +259,7 @@ class RegisterDogActivity : AppCompatActivity() {
                             loadingDialogFragment.show(this@RegisterDogActivity.supportFragmentManager, "loading")
 
                             lifecycleScope.launch { // 강아지 정보 등록
-                                mainViewModel.removeDogInfo(beforeName)
+                                registerDogViewModel.removeDogInfo(beforeName)
                                 withContext(Dispatchers.Main) {
                                     loadingDialogFragment.dismiss()
                                     goMain()

@@ -46,6 +46,7 @@ import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
 import com.example.walkingdogapp.datamodel.CollectionInfo
 import com.example.walkingdogapp.viewmodel.MainViewModel
+import com.example.walkingdogapp.viewmodel.WalkingViewModel
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
@@ -77,7 +78,7 @@ import kotlin.math.sin
 class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityWalkingBinding
     private lateinit var mynavermap: NaverMap
-    private val mainViewModel: MainViewModel by viewModels()
+    private val walkingViewModel: WalkingViewModel by viewModels()
     private var randomMarkerJob: Job? = null
 
     private var coordList = mutableListOf<LatLng>()
@@ -139,7 +140,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityWalkingBinding.inflate(layoutInflater)
         setContentView(binding.root)
         this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
-        mainViewModel.getLastLocation()
+        walkingViewModel.getLastLocation()
 
         selectedDogs = intent.getStringArrayListExtra("selectedDogs") ?: arrayListOf()
 
@@ -264,7 +265,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         trackingPath.width = 15
         trackingPath.color = Color.YELLOW
 
-        mainViewModel.currentCoord.observe(this) {
+        walkingViewModel.currentCoord.observe(this) {
             val firstCamera = CameraUpdate.scrollAndZoomTo(
                 LatLng(it.latitude, it.longitude),
                 16.0
@@ -547,7 +548,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         lifecycleScope.launch(Dispatchers.IO) {
             val loadingDialogFragment = LoadingDialogFragment()
             loadingDialogFragment.show(this@WalkingActivity.supportFragmentManager, "loading")
-            val error = mainViewModel.saveWalkInfo(
+            val error = walkingViewModel.saveWalkInfo(
                 walkDogs,
                 startTime,
                 distance,

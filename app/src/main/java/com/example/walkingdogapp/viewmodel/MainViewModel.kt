@@ -135,22 +135,6 @@ class MainViewModel @Inject constructor(
         getLastLocation()
     }
 
-    suspend fun updateUserInfo(userInfo: UserInfo) {
-       repository.updateUserInfo(userInfo)
-    }
-
-    suspend fun updateDogInfo(dogInfo: DogInfo, beforeName: String, imgUri: Uri?, walkDateInfos: ArrayList<WalkDateInfo>): Boolean {
-        return repository.updateDogInfo(dogInfo, beforeName, imgUri, walkDateInfos)
-    }
-
-    suspend fun removeDogInfo(beforeName: String) {
-        repository.removeDogInfo(beforeName)
-    }
-
-    suspend fun saveWalkInfo(walkDogs: ArrayList<String>, startTime: String, distance: Float, time: Int, coords: List<com.naver.maps.geometry.LatLng>, collections: List<String>): Boolean {
-        return repository.saveWalkInfo(walkDogs, startTime, distance, time, coords, collections)
-    }
-
     suspend fun removeAccount() : Boolean {
         return repository.removeAccount()
     }
