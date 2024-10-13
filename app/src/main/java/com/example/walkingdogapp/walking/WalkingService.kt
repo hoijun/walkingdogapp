@@ -17,6 +17,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
+import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.R
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -49,6 +50,7 @@ class WalkingService : Service() {
     var animalMarkers = mutableListOf<InfoWindow>()
     var walkDistance = MutableLiveData<Float>()
     var startTime = ""
+    var isBinding = false
 
     inner class LocalBinder: Binder() {
         fun getService(): WalkingService = this@WalkingService
@@ -158,7 +160,7 @@ class WalkingService : Service() {
 
         val channelId = "WalkingDogApp_Channel"
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        val resultIntent = Intent(applicationContext, WalkingActivity::class.java)
+        val resultIntent = Intent(applicationContext, MainActivity::class.java)
         val pendingIntent =
             PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_IMMUTABLE)
         builder = NotificationCompat.Builder(applicationContext, channelId)
@@ -192,6 +194,7 @@ class WalkingService : Service() {
             locationCallback,
             Looper.getMainLooper()
         )
+
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             startForeground(Utils.Walking_SERVICE_ID, builder.build())

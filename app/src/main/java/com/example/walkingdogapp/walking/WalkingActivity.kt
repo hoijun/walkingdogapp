@@ -34,6 +34,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.databinding.BindingAdapter
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -57,7 +58,10 @@ import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -65,6 +69,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.Random
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -73,6 +78,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityWalkingBinding
     private lateinit var mynavermap: NaverMap
     private val mainViewModel: MainViewModel by viewModels()
+    private var randomMarkerJob: Job? = null
 
     private var coordList = mutableListOf<LatLng>()
     private var trackingMarker = Marker()
@@ -101,20 +107,16 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private var selectedDogs = arrayListOf<String>()
     private var collectionsMap = hashMapOf<String, CollectionInfo>()
     private lateinit var wService: WalkingService
-    private var isBinding = false
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as WalkingService.LocalBinder
             wService = binder.getService()
             binding.walkingService = wService
-            isBinding = true
             setObserve()
         }
 
-        override fun onServiceDisconnected(name: ComponentName?) {
-            isBinding = false
-        }
+        override fun onServiceDisconnected(name: ComponentName?) { }
     }
 
     // 뒤로 가기
@@ -295,7 +297,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 val markersToRemove = mutableListOf<InfoWindow>()
                 for (marker in wService.animalMarkers) { // 마커 특정 거리 이상일 경우 제거
-                    if (marker.position.distanceTo(coordList.last()) > 400) {
+                    if (marker.position.distanceTo(coordList.last()) > 350) {
                         marker.map = null
                         markersToRemove.add(marker)
                     }
@@ -326,7 +328,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
 
                     animalMarker.setOnClickListener {
-                        if (coordList.last().distanceTo(animalMarker.position) < 20) {
+                        if (coordList.last().distanceTo(animalMarker.position) < 30) {
                             val tag = animalMarker.tag.toString()
                             wService.getCollectionItems.add(tag)
                             animalMarker.map = null
@@ -366,9 +368,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun randomMarker() { // 마커 랜덤 표시
-        lifecycleScope.launch(Dispatchers.Main) {
+        randomMarkerJob = lifecycleScope.launch(Dispatchers.Main) {
             delay(10000) // 10초 후에
-            while (isWalkingServiceRunning()) {
+            while (isActive && isWalkingServiceRunning()) {
                 repeat(2) {
                     if (coordList.isNotEmpty()) {
                         if (wService.animalMarkers.size < 6) { // 마커의 갯수 상한선
@@ -391,7 +393,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                             animalMarker.tag = randomKey
                             animalMarker.setOnClickListener {
-                                if (coordList.last().distanceTo(animalMarker.position) < 20) {
+                                if (coordList.last().distanceTo(animalMarker.position) < 30) {
                                     val tag = animalMarker.tag.toString()
                                     wService.getCollectionItems.add(tag)
                                     animalMarker.map = null
@@ -412,6 +414,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                                 }
                                 true
                             }
+
                             animalMarker.position = randomCoord
                             animalMarker.map = mynavermap
                             wService.animalMarkers.add(animalMarker)
