@@ -46,6 +46,7 @@ class MainViewModel @Inject constructor(
     private val _walkDates = MutableLiveData<HashMap<String, MutableList<WalkDateInfo>>>()
     private val _collectionInfo = MutableLiveData<HashMap<String, Boolean>>()
     private val _dogsImg = MutableLiveData<HashMap<String, Uri>>()
+    private val _dogNames = MutableLiveData<List<String>>()
     private val _successGetData = MutableLiveData<Boolean>()
 
     private val _currentCoord = MutableLiveData<LatLng>()
@@ -63,6 +64,7 @@ class MainViewModel @Inject constructor(
                 _walkDates,
                 _collectionInfo,
                 _dogsImg,
+                _dogNames,
                 _successGetData
             )
         }
@@ -91,6 +93,9 @@ class MainViewModel @Inject constructor(
 
     val dogsImg: LiveData<HashMap<String, Uri>>
         get() = _dogsImg
+
+    val dogsNames: LiveData<List<String>>
+        get() = _dogNames
 
     val currentRegion: LiveData<String>
         get() = _currentRegion
@@ -129,6 +134,7 @@ class MainViewModel @Inject constructor(
                 _walkDates,
                 _collectionInfo,
                 _dogsImg,
+                _dogNames,
                 _successGetData
             )
         }

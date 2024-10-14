@@ -4,8 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.lifecycleScope
-import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.datamodel.AlarmDao
 import com.example.walkingdogapp.datamodel.AlarmDataModel
 import com.example.walkingdogapp.datamodel.DogInfo
@@ -31,7 +29,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDateTime
@@ -128,6 +125,7 @@ class UserInfoRepository @Inject constructor(
         walkDates: MutableLiveData<HashMap<String, MutableList<WalkDateInfo>>>,
         collectionInfo: MutableLiveData<HashMap<String, Boolean>>,
         dogsImg: MutableLiveData<HashMap<String, Uri>>,
+        dogNames: MutableLiveData<List<String>>,
         successGetData: MutableLiveData<Boolean>
     ) {
         if (!NetworkManager.checkNetworkState(context)) {
@@ -146,6 +144,7 @@ class UserInfoRepository @Inject constructor(
         val walkDateDeferred = CompletableDeferred<HashMap<String, MutableList<WalkDateInfo>>>()
         val collectionDeferred = CompletableDeferred<HashMap<String, Boolean>>()
         val profileUriDeferred = CompletableDeferred<HashMap<String, Uri>>()
+        var dogNameList = mutableListOf<String>()
 
         try {
             userRef.child("dog").addListenerForSingleValueEvent(object : ValueEventListener {
@@ -173,13 +172,13 @@ class UserInfoRepository @Inject constructor(
                             dogNames.add(dogInfo.child("name").getValue(String::class.java)!!)
                         }
                     }
-                    MainActivity.dogNameList = dogNames
+                    dogNameList = dogNames
                     dogsInfoDeferred.complete(dogsList.sortedBy { it.creationTime })
                 }
 
                 override fun onCancelled(error: DatabaseError) {
                     isError.set(true)
-                    dogsInfoDeferred.complete(listOf<DogInfo>())
+                    dogsInfoDeferred.complete(listOf())
                 }
             })
 
@@ -201,10 +200,10 @@ class UserInfoRepository @Inject constructor(
 
             val dogsWalkDateInfo = HashMap<String, MutableList<WalkDateInfo>>()
 
-            if (MainActivity.dogNameList.isEmpty()) {
+            if (dogNameList.isEmpty()) {
                 walkDateDeferred.complete(dogsWalkDateInfo)
             } else {
-                for (dog in MainActivity.dogNameList) {
+                for (dog in dogNameList) {
                     userRef.child("dog").child(dog).child("walkdates")
                         .addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
@@ -228,7 +227,7 @@ class UserInfoRepository @Inject constructor(
                                     }
                                 }
                                 dogsWalkDateInfo[dog] = walkDateInfos
-                                if (dogsWalkDateInfo.size == MainActivity.dogNameList.size) {
+                                if (dogsWalkDateInfo.size == dogNameList.size) {
                                     walkDateDeferred.complete(dogsWalkDateInfo)
                                 }
                             }
@@ -236,7 +235,7 @@ class UserInfoRepository @Inject constructor(
                             override fun onCancelled(error: DatabaseError) {
                                 isError.set(true)
                                 dogsWalkDateInfo[dog] = mutableListOf()
-                                if (dogsWalkDateInfo.size == MainActivity.dogNameList.size) {
+                                if (dogsWalkDateInfo.size == dogNameList.size) {
                                     walkDateDeferred.complete(dogsWalkDateInfo)
                                 }
                             }
@@ -282,6 +281,7 @@ class UserInfoRepository @Inject constructor(
                 profileUriDeferred.complete(HashMap<String, Uri>())
             }
 
+            dogNames.postValue(dogNameList)
             userInfo.postValue(userDeferred.await())
             totalWalkInfo.postValue(totalWalkDeferred.await())
             walkDates.postValue(walkDateDeferred.await())
@@ -359,7 +359,9 @@ class UserInfoRepository @Inject constructor(
         dogInfo: DogInfo,
         beforeName: String,
         imgUri: Uri?,
-        walkDateInfos: ArrayList<WalkDateInfo>
+        walkDateInfos: ArrayList<WalkDateInfo>,
+        dogUriList: HashMap<String, Uri>,
+        dogNameList: List<String>,
     ): Boolean {
         var error = false
         val result = CoroutineScope(Dispatchers.IO).launch {
@@ -407,14 +409,14 @@ class UserInfoRepository @Inject constructor(
                         storageRef.child(dogInfo.name)
                             .putFile(imgUri).await()
                     } else {
-                        if (MainActivity.dogUriList[beforeName] != null) {
+                        if (dogUriList[beforeName] != null) {
                             val tempUri = suspendCoroutine { continuation ->
                                 val tempFile = File.createTempFile(
                                     "temp",
                                     ".jpg",
                                     context.cacheDir
                                 )
-                                storage.getReferenceFromUrl(MainActivity.dogUriList[beforeName].toString())
+                                storage.getReferenceFromUrl(dogUriList[beforeName].toString())
                                     .getStream { _, inputStream ->
                                         val outputStream =
                                             FileOutputStream(tempFile)
@@ -442,7 +444,7 @@ class UserInfoRepository @Inject constructor(
                         return@delete
                     }
 
-                    if (!MainActivity.dogNameList.contains(dogInfo.name) && MainActivity.dogUriList[beforeName] != null) {
+                    if (!dogNameList.contains(dogInfo.name) && dogUriList[beforeName] != null) {
                         storageRef.child(beforeName).delete().await()
                     }
                 } catch (e: Exception) {
@@ -459,7 +461,7 @@ class UserInfoRepository @Inject constructor(
         return error
     }
 
-    suspend fun removeDogInfo(beforeName: String) {
+    suspend fun removeDogInfo(beforeName: String, dogUriList: HashMap<String, Uri>) {
         val result = CoroutineScope(Dispatchers.IO).launch {
             val removeDogInfoJob = async(Dispatchers.IO) {
                 try {
@@ -472,7 +474,7 @@ class UserInfoRepository @Inject constructor(
 
             val removeDogImgJob = launch(Dispatchers.IO) remove@ {
                 try {
-                    if (MainActivity.dogUriList[beforeName] != null) {
+                    if (dogUriList[beforeName] != null) {
                         storageRef.child(beforeName).delete()
                             .await()
                     }
