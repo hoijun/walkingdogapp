@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object { // 다른 액티비티로 변경 시 어떤 프래그먼트에서 변경했는지 
         var preFragment = "Home"
-        var dogNameList = mutableListOf<String>()
+        var dogNameList = listOf<String>()
         var dogUriList = HashMap<String, Uri>()
     }
 
@@ -148,6 +148,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 loadingDialogFragment.dismiss()
                 dogUriList = mainViewModel.dogsImg.value ?: hashMapOf()
+                dogNameList = mainViewModel.dogsNames.value ?: listOf()
             } catch (_: Exception) { }
             finally {
                 when (preFragment) {

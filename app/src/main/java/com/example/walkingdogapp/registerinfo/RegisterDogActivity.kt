@@ -28,7 +28,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
@@ -39,9 +38,7 @@ import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.databinding.ActivityRegisterDogBinding
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.WalkDateInfo
-import com.example.walkingdogapp.viewmodel.MainViewModel
 import com.example.walkingdogapp.viewmodel.RegisterDogViewModel
-import com.example.walkingdogapp.viewmodel.WalkingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -229,7 +226,7 @@ class RegisterDogActivity : AppCompatActivity() {
                             loadingDialogFragment.show(this@RegisterDogActivity.supportFragmentManager, "loading")
                             lifecycleScope.launch { // 강아지 정보 등록
                                 withContext(Dispatchers.Main) {
-                                    val onFailed = registerDogViewModel.updateDogInfo(dogInfo, beforeName, imguri, walkRecords)
+                                    val onFailed = registerDogViewModel.updateDogInfo(dogInfo, beforeName, imguri, walkRecords, MainActivity.dogUriList, MainActivity.dogNameList)
                                     loadingDialogFragment.dismiss()
                                     if (onFailed) {
                                         Toast.makeText(this@RegisterDogActivity, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
@@ -261,7 +258,7 @@ class RegisterDogActivity : AppCompatActivity() {
                             loadingDialogFragment.show(this@RegisterDogActivity.supportFragmentManager, "loading")
 
                             lifecycleScope.launch { // 강아지 정보 등록
-                                registerDogViewModel.removeDogInfo(beforeName)
+                                registerDogViewModel.removeDogInfo(beforeName, MainActivity.dogUriList)
                                 withContext(Dispatchers.Main) {
                                     loadingDialogFragment.dismiss()
                                     goMain()
