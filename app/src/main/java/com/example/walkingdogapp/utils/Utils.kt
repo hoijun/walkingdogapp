@@ -72,38 +72,38 @@ class Utils {
             return hashMapOf(
                 "001" to CollectionInfo(
                     "001",
-                    "하얀 양",
-                    "귀찮아...",
+                    "밥알 곰",
+                    "나 이제 잘래..zz",
                     R.drawable.collection_001
                 ),
                 "002" to CollectionInfo(
                     "002",
-                    "꽃든 병아리",
-                    "이거 가질래?",
+                    "밥알 고양이",
+                    "츄르 내놔랑 냥!",
                     R.drawable.collection_002
                 ),
                 "003" to CollectionInfo(
                     "003",
-                    "사과모자 강아지",
-                    "사과 냠",
+                    "밥알 원숭이",
+                    "우끼끼! 나랑 놀자!",
                     R.drawable.collection_003
                 ),
                 "004" to CollectionInfo(
                     "004",
-                    "양손 가득 원숭이",
-                    "내려줘!",
+                    "밥알 펭귄",
+                    "나도 날고 싶다!",
                     R.drawable.collection_004
                 ),
                 "005" to CollectionInfo(
                     "005",
-                    "우는 강아지",
-                    "힝..",
+                    "밥알 쿼카",
+                    "나 만지면 벌금!",
                     R.drawable.collection_005
                 ),
                 "006" to CollectionInfo(
                     "006",
-                    "시바견",
-                    "시바",
+                    "밥알 토끼",
+                    "나 달로 돌아갈래~",
                     R.drawable.collection_006
                 ),
                 "007" to CollectionInfo(

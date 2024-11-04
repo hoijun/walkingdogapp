@@ -128,38 +128,38 @@ class CollectionFragment : Fragment() {
         return listOf(
             CollectionInfo(
                 "001",
-                "하얀 양",
-                "귀찮아...",
+                "밥알 곰",
+                "나 이제 잘래..zz",
                 if (collectionInfo.getOrDefault("001", false)) R.drawable.collection_001 else R.drawable.waitimage
             ),
             CollectionInfo(
                 "002",
-                "꽃든 병아리",
-                "이거 가질래?",
+                "밥알 고양이",
+                "츄르 내놔랑 냥!",
                 if (collectionInfo.getOrDefault("002", false)) R.drawable.collection_002 else R.drawable.waitimage
             ),
             CollectionInfo(
                 "003",
-                "사과모자 강아지",
-                "사과 냠",
+                "밥알 원숭이",
+                "우끼끼! 나랑 놀자!",
                 if (collectionInfo.getOrDefault("003", false)) R.drawable.collection_003 else R.drawable.waitimage
             ),
             CollectionInfo(
                 "004",
-                "양손 가득 원숭이",
-                "내려줘!",
+                "밥알 펭귄",
+                "나도 날고 싶다!",
                 if (collectionInfo.getOrDefault("004", false)) R.drawable.collection_004 else R.drawable.waitimage
             ),
             CollectionInfo(
                 "005",
-                "우는 강아지",
-                "힝..",
+                "밥알 쿼카",
+                "나 만지면 벌금!",
                 if (collectionInfo.getOrDefault("005", false)) R.drawable.collection_005 else R.drawable.waitimage
             ),
             CollectionInfo(
                 "006",
-                "시바견",
-                "시바",
+                "밥알 토끼",
+                "나 달로 돌아갈래~",
                 if (collectionInfo.getOrDefault("006", false)) R.drawable.collection_006 else R.drawable.waitimage
             ),
             CollectionInfo(
