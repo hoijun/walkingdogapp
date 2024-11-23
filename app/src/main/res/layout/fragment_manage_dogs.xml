@@ -23,7 +23,7 @@
             android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/Alarm_top"
+                android:id="@+id/manage_top"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -35,11 +35,12 @@
                     android:id="@+id/btn_back"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginStart="10dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintWidth_percent="0.1"
+                    app:layout_constraintDimensionRatio="1:1"
                     app:srcCompat="@drawable/undo" />
 
                 <TextView
@@ -60,14 +61,21 @@
                     android:id="@+id/btn_addDog"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginEnd="5dp"
+                    android:layout_marginEnd="20dp"
                     android:src="@drawable/add"
                     android:visibility="@{countDog > 2 ? View.GONE : View.VISIBLE}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.1" />
+                    app:layout_constraintWidth_percent="0.1"
+                    app:layout_constraintDimensionRatio="1:1"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#e4e4e4"
+                app:layout_constraintTop_toBottomOf="@+id/manage_top" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"
@@ -75,7 +83,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.92"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/Alarm_top">
+                app:layout_constraintTop_toBottomOf="@+id/manage_top">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/Dogs_RecyclerView"

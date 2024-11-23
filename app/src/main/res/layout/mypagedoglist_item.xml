@@ -76,6 +76,7 @@
                     android:text="@{String.format(`%d살 / %skg / %s`, dogAge, dogInfo.weight, dogInfo.breed)}"
                     android:textSize="12sp"
                     android:textStyle="bold"
+                    android:textColor="@color/black"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHeight_percent="0.35"
                     app:layout_constraintStart_toStartOf="parent"
