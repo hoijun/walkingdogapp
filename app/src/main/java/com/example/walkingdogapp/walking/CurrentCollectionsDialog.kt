@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.databinding.CurrentcollectionsDialogBinding
 import com.example.walkingdogapp.datamodel.CollectionInfo
-import com.example.walkingdogapp.utils.utils.GridSpacingItemDecoration
+import com.example.walkingdogapp.utils.GridSpacingItemDecoration
 
 class CurrentCollectionsDialog: DialogFragment() {
     private var _binding: CurrentcollectionsDialogBinding? = null

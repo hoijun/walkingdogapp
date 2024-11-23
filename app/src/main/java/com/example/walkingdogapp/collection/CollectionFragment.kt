@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.utils.utils.NetworkManager
-import com.example.walkingdogapp.utils.utils.GridSpacingItemDecoration
+import com.example.walkingdogapp.utils.GridSpacingItemDecoration
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentCollectionBinding
 import com.example.walkingdogapp.datamodel.CollectionInfo

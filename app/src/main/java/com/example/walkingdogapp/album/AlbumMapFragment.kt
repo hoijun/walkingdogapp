@@ -28,7 +28,7 @@ import com.bumptech.glide.load.DecodeFormat
 import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.utils.utils.NetworkManager
-import com.example.walkingdogapp.utils.utils.HorizonSpacingItemDecoration
+import com.example.walkingdogapp.utils.HorizonSpacingItemDecoration
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.FragmentAlbumMapBinding
 import com.example.walkingdogapp.datamodel.AlbumMapImgInfo
