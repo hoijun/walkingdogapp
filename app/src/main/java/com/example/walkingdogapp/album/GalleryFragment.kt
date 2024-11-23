@@ -26,7 +26,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.FragmentGalleryBinding
-import com.example.walkingdogapp.utils.utils.GridSpacingItemDecoration
+import com.example.walkingdogapp.utils.GridSpacingItemDecoration
 import com.example.walkingdogapp.datamodel.GalleryImgInfo
 import com.example.walkingdogapp.mypage.MyPageFragment
 import com.example.walkingdogapp.viewmodel.MainViewModel

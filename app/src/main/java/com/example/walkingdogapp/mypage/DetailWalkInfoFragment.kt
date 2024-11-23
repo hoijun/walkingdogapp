@@ -17,7 +17,7 @@ import com.example.walkingdogapp.databinding.FragmentDetailWalkInfoBinding
 import com.example.walkingdogapp.datamodel.CollectionInfo
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.WalkDateInfo
-import com.example.walkingdogapp.utils.utils.GridSpacingItemDecoration
+import com.example.walkingdogapp.utils.GridSpacingItemDecoration
 import com.example.walkingdogapp.walking.CurrentCollectionItemListAdapter
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate

@@ -23,7 +23,7 @@ import com.example.walkingdogapp.databinding.FragmentWalkInfoBinding
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.datamodel.WalkDateInfo
 import com.example.walkingdogapp.utils.utils.DayDecorator
-import com.example.walkingdogapp.utils.utils.HorizonSpacingItemDecoration
+import com.example.walkingdogapp.utils.HorizonSpacingItemDecoration
 import com.example.walkingdogapp.utils.utils.SaturdayDecorator
 import com.example.walkingdogapp.utils.utils.SelectedMonthDecorator
 import com.example.walkingdogapp.utils.utils.SundayDecorator
