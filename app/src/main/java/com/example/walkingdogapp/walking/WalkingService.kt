@@ -32,6 +32,10 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Timer
 import kotlin.concurrent.timer
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 class WalkingService : Service() {
     private var binder = LocalBinder()
@@ -39,8 +43,8 @@ class WalkingService : Service() {
     private lateinit var builder : NotificationCompat.Builder
     private var fusedLocationProviderClient: FusedLocationProviderClient? = null
     private var walkTimer: Timer? = Timer()
-    private var miscount = 0
     private var totalTime = 0
+    private var angleThreshold = 30
 
     val coordList = MutableLiveData<MutableList<LatLng>>()
     val isTracking = MutableLiveData<Boolean>()
@@ -50,7 +54,6 @@ class WalkingService : Service() {
     var animalMarkers = mutableListOf<InfoWindow>()
     var walkDistance = MutableLiveData<Float>()
     var startTime = ""
-    var isBinding = false
 
     inner class LocalBinder: Binder() {
         fun getService(): WalkingService = this@WalkingService
@@ -61,7 +64,6 @@ class WalkingService : Service() {
         walkTime.postValue(0)
         coordList.postValue(mutableListOf())
         totalTime = 0
-        miscount = 0
         walkingDogs.postValue(arrayListOf())
         getCollectionItems = mutableListOf()
         animalMarkers = mutableListOf()
@@ -76,17 +78,17 @@ class WalkingService : Service() {
                 for (location in locationResult.locations) {
                     if (location != null) {
                         val pos = LatLng(location.latitude, location.longitude)
-                        // 위치 업데이트 간의 거리가 클 경우 업데이트 안함 및 이 상황이 1번일 경우는 통과
-                        if (coordList.value!!.isNotEmpty() && coordList.value!!.last().distanceTo(pos) > 5f && miscount < 1) {
-                            miscount++
+                        Log.d("savepoint2", "위도: ${pos.latitude}, 경도: ${pos.longitude}")
+                        if (coordList.value!!.isNotEmpty() && coordList.value!!.last().distanceTo(pos) < 3f) {
                             return
                         }
 
                         coordList.value!!.apply {
                             add(pos)
                             coordList.postValue(this)
-                            miscount = 0
                         }
+
+                        val previousDistance = walkDistance.value!!
 
                         if (coordList.value!!.size > 1) { // 거리 증가
                             walkDistance.postValue(
@@ -96,6 +98,21 @@ class WalkingService : Service() {
                                         .toFloat()
                                 )
                             )
+                        }
+
+                        if (coordList.value!!.size > 2) {
+                            val lastThree = coordList.value!!.takeLast(3)
+                            if (needToFlat(lastThree[0], lastThree[1], lastThree[2])) {
+                                coordList.value!!.removeAt(coordList.value!!.size - 2)
+                                coordList.postValue(coordList.value!!)
+                            }
+                        }
+
+                        if (hasPassedKm(previousDistance.toInt(), walkDistance.value!!.toInt())) {
+                            angleThreshold -= 2
+                            if (angleThreshold < 0) {
+                                angleThreshold = 20
+                            }
                         }
                     }
                 }
@@ -183,9 +200,9 @@ class WalkingService : Service() {
             notificationManager.createNotificationChannel(notificationChannel)
         }
 
-        locationRequest = LocationRequest.Builder(2500)
-            .setMinUpdateIntervalMillis(2500)
-            .setMaxUpdateDelayMillis(2500)
+        locationRequest = LocationRequest.Builder(5000)
+            .setMinUpdateIntervalMillis(5000)
+            .setMaxUpdateDelayMillis(5000)
             .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
             .build()
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -243,5 +260,38 @@ class WalkingService : Service() {
 
     private fun stopTimer() {
         walkTimer?.cancel()
+    }
+
+    fun needToFlat(point1: LatLng, point2: LatLng, point3: LatLng): Boolean {
+        var needToFlat = false
+        val angle1 = calculateAngle(point1, point2)
+        val angle2 = calculateAngle(point2, point3)
+
+        if (abs(angle1 - angle2) <= angleThreshold) {
+            needToFlat = true
+        }
+
+        Log.d("savepoint", "needToFlat: $needToFlat, angle1: $angle1, angle2: $angle2")
+        return needToFlat
+    }
+
+    private fun calculateAngle(point1: LatLng, point2: LatLng): Float {
+        val dx = point2.longitude - point1.longitude
+        val dy = point2.latitude - point1.latitude
+
+        var angle = Math.toDegrees(atan2(dx, dy)).toFloat()
+
+        // 각도를 0에서 360도 사이의 값으로 조정
+        if (angle < 0) {
+            angle += 360f
+        }
+
+        return angle
+    }
+
+    fun hasPassedKm(previousDistance: Int, currentDistance: Int): Boolean {
+        val previousThousand = previousDistance / 1000
+        val currentThousand = currentDistance / 1000
+        return currentThousand > previousThousand
     }
 }

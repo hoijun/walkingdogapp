@@ -34,8 +34,15 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.1"
+                app:layout_constraintDimensionRatio="1:1"
                 app:srcCompat="@drawable/undo" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#e4e4e4"
+            app:layout_constraintTop_toBottomOf="@+id/walkinfo_top" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/dogInfo_layout"
@@ -52,6 +59,12 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#e4e4e4"
+            app:layout_constraintTop_toBottomOf="@+id/dogInfo_layout" />
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/WalkInfo_scrollView"

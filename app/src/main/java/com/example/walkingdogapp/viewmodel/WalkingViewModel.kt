@@ -3,6 +3,7 @@ package com.example.walkingdogapp.viewmodel
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -35,6 +36,7 @@ class WalkingViewModel @Inject constructor(
         ) {
             fusedLocationProviderClient.lastLocation.addOnSuccessListener {
                 if (it != null) {
+                    Log.d("savepoint", "위도: ${it.latitude}, 경도: ${it.longitude}")
                     updateLocateInfo(LatLng(it.latitude, it.longitude))
                 }
             }

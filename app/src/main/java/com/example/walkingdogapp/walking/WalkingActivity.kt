@@ -34,18 +34,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.databinding.BindingAdapter
-import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
-import com.example.walkingdogapp.utils.utils.NetworkManager
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.ActivityWalkingBinding
 import com.example.walkingdogapp.datamodel.CollectionInfo
-import com.example.walkingdogapp.viewmodel.MainViewModel
+import com.example.walkingdogapp.utils.utils.NetworkManager
+import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.viewmodel.WalkingViewModel
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
@@ -61,7 +58,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -70,7 +66,6 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.Random
-import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.cos
 import kotlin.math.sin
 

@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/refresh"
     tools:context=".collection.CollectionFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/collection_top"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.07"
+            app:layout_constraintHeight_percent="0.09"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -38,13 +38,20 @@
                 android:id="@+id/open_searching"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.1"
+                app:layout_constraintWidth_percent="0.095"
                 app:srcCompat="@drawable/search" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#e4e4e4"
+            app:layout_constraintTop_toBottomOf="@+id/collection_top" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/collection_search"
@@ -60,6 +67,7 @@
                 android:id="@+id/searchview"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
                 android:background="@drawable/roundstyle2"
@@ -83,7 +91,7 @@
             android:layout_height="0dp"
             android:layout_marginTop="15dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.92"
+            app:layout_constraintHeight_percent="0.9"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/collection_search">
 

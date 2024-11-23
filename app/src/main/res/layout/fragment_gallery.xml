@@ -28,11 +28,12 @@
                 android:id="@+id/btn_back"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginStart="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.1"
+                app:layout_constraintDimensionRatio="1:1"
                 app:srcCompat="@drawable/undo" />
 
             <TextView
@@ -51,19 +52,25 @@
 
             <TextView
                 android:id="@+id/imgRemove_Btn"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="사진 삭제"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
+                android:layout_marginEnd="25dp"
                 android:visibility="@{isSelectMode ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.25" />
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#e4e4e4"
+            app:layout_constraintTop_toBottomOf="@+id/gallery_top" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/gallery_bottom"
@@ -76,6 +83,7 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/gallery_recyclerview"
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
