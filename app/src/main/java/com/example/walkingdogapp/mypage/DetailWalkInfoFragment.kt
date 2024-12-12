@@ -123,7 +123,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             walkCoords.add(LatLng(coord.latitude, coord.longitude))
         }
 
-        if (walkCoords.size > 2) {
+        if (walkCoords.size > 1) {
             camera =
                 CameraUpdate.scrollAndZoomTo(walkCoords[walkCoords.size / 2], 16.0) //
             mynavermap.moveCamera(camera)
