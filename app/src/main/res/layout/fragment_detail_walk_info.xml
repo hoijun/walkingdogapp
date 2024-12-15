@@ -128,8 +128,7 @@
                     android:layout_height="225dp"
                     android:layout_marginStart="15dp"
                     android:layout_marginEnd="15dp"
-                    android:background="@drawable/roundstyle"
-                    android:elevation="4dp">
+                    android:background="@drawable/roundstyle_rad20">
 
                     <View
                         android:id="@+id/view29"
@@ -288,8 +287,7 @@
                     android:layout_marginStart="15dp"
                     android:layout_marginTop="40dp"
                     android:layout_marginEnd="15dp"
-                    android:background="@drawable/roundstyle"
-                    android:elevation="4dp">
+                    android:background="@drawable/roundstyle_rad20">
 
                     <TextView
                         android:id="@+id/text_getCollections"

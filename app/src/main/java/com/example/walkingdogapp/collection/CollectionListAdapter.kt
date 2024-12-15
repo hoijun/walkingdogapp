@@ -12,10 +12,14 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
+import com.example.walkingdogapp.R
 import com.example.walkingdogapp.databinding.CollectionlistItemBinding
 import com.example.walkingdogapp.datamodel.CollectionInfo
 
-class CollectionListAdapter(private val collections: List<CollectionInfo>) : RecyclerView.Adapter<CollectionListAdapter.CollectionListViewHolder>(), Filterable {
+class CollectionListAdapter(
+    private val collections: List<CollectionInfo>,
+    private val collectionWhether: HashMap<String, Boolean>
+) : RecyclerView.Adapter<CollectionListAdapter.CollectionListViewHolder>(), Filterable {
     private lateinit var context: Context
     fun interface OnItemClickListener {
         fun onItemClick(item: CollectionInfo)
@@ -51,6 +55,7 @@ class CollectionListAdapter(private val collections: List<CollectionInfo>) : Rec
         fun bind(collectionInfo: CollectionInfo) {
             binding.apply {
                 collectionItem = collectionInfo
+                isOwnedCollection = collectionWhether[collectionInfo.collectionNum]
                 executePendingBindings()
             }
         }
@@ -94,10 +99,16 @@ class CollectionListAdapter(private val collections: List<CollectionInfo>) : Rec
     }
 
     object CollectionItemImageViewBindingAdapter {
-        @BindingAdapter("CollectionItemImgResId")
+        @BindingAdapter("CollectionItemImgResId", "IsExistedCollection")
         @JvmStatic
-        fun loadImage(iv: ImageView, resId: Int) {
-            Glide.with(iv.context).load(resId).format(DecodeFormat.PREFER_RGB_565).override(400, 400).into(iv)
+        fun loadImage(iv: ImageView, resId: Int, isOwned: Boolean) {
+            if (isOwned) {
+                Glide.with(iv.context).load(resId).format(DecodeFormat.PREFER_RGB_565)
+                    .override(400, 400).into(iv)
+            } else {
+                Glide.with(iv.context).load(R.drawable.waitimage).format(DecodeFormat.PREFER_RGB_565)
+                    .override(400, 400).into(iv)
+            }
         }
     }
 }

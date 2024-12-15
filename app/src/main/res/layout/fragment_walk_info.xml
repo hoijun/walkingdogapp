@@ -93,8 +93,7 @@
                         android:layout_height="250dp"
                         android:layout_marginStart="10dp"
                         android:layout_marginEnd="10dp"
-                        android:background="@drawable/roundstyle2"
-                        android:elevation="4dp"
+                        android:background="@drawable/roundstyle_rad15"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
@@ -180,8 +179,7 @@
                         android:layout_marginStart="10dp"
                         android:layout_marginEnd="10dp"
                         android:layout_marginBottom="20dp"
-                        android:background="@drawable/roundstyle2"
-                        android:elevation="4dp"
+                        android:background="@drawable/roundstyle_rad15"
                         app:mcv_dateTextAppearance="@style/CalenderViewDateCustomText"
                         app:mcv_firstDayOfWeek="sunday"
                         app:mcv_headerTextAppearance="@style/CalendarWidgetHeader"
@@ -201,7 +199,7 @@
                         android:id="@+id/walkinfo_recyclerview"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/roundstyle5"
+                        android:background="@drawable/roundstyle_toprad30"
                         android:overScrollMode="never" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>

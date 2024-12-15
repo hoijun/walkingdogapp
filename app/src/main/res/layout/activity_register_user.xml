@@ -222,7 +222,7 @@
             android:id="@+id/register_user"
             android:layout_width="0dp"
             android:layout_height="55dp"
-            android:background="@drawable/btn_roundstyle"
+            android:background="@drawable/btn_roundstyle_rad15"
             android:backgroundTint="#e4e4e4"
             android:gravity="center"
             android:text="등록"
