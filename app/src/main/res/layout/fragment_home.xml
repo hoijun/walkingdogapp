@@ -155,7 +155,7 @@
                     android:id="@+id/btn_walk"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:background="@drawable/btn_roundstyle"
+                    android:background="@drawable/btn_roundstyle_rad15"
                     android:backgroundTint="#e4e4e4"
                     android:text="산책 시작"
                     android:textSize="22sp"
@@ -165,7 +165,6 @@
                     app:layout_constraintHeight_percent="0.45"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/selectDogs"
-                    app:layout_constraintVertical_bias="0.488"
                     app:layout_constraintWidth_percent="0.85" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

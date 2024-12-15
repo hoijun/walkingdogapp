@@ -44,7 +44,7 @@ class MainViewModel @Inject constructor(
     private val _userInfo = MutableLiveData<UserInfo>()
     private val _totalTotalWalkInfo = MutableLiveData<TotalWalkInfo>()
     private val _walkDates = MutableLiveData<HashMap<String, MutableList<WalkDateInfo>>>()
-    private val _collectionInfo = MutableLiveData<HashMap<String, Boolean>>()
+    private val _collectionWhether = MutableLiveData<HashMap<String, Boolean>>()
     private val _dogsImg = MutableLiveData<HashMap<String, Uri>>()
     private val _dogNames = MutableLiveData<List<String>>()
     private val _successGetData = MutableLiveData<Boolean>()
@@ -62,7 +62,7 @@ class MainViewModel @Inject constructor(
                 _userInfo,
                 _totalTotalWalkInfo,
                 _walkDates,
-                _collectionInfo,
+                _collectionWhether,
                 _dogsImg,
                 _dogNames,
                 _successGetData
@@ -85,8 +85,8 @@ class MainViewModel @Inject constructor(
     val walkDates: LiveData<HashMap<String, MutableList<WalkDateInfo>>>
         get() = _walkDates
 
-    val collectionInfo: LiveData<HashMap<String, Boolean>>
-        get() = _collectionInfo
+    val collectionWhether: LiveData<HashMap<String, Boolean>>
+        get() = _collectionWhether
 
     val albumImgs: LiveData<List<GalleryImgInfo>>
         get() = _albumImgs
@@ -132,7 +132,7 @@ class MainViewModel @Inject constructor(
                 _userInfo,
                 _totalTotalWalkInfo,
                 _walkDates,
-                _collectionInfo,
+                _collectionWhether,
                 _dogsImg,
                 _dogNames,
                 _successGetData

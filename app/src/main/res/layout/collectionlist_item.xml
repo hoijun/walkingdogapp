@@ -6,6 +6,9 @@
         <variable
             name="collectionItem"
             type="com.example.walkingdogapp.datamodel.CollectionInfo" />
+        <variable
+            name="isOwnedCollection"
+            type="Boolean" />
     </data>
 
 <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,13 +27,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.8"
-        app:CollectionItemImgResId="@{collectionItem.collectionResId}"/>
+        app:CollectionItemImgResId="@{collectionItem.collectionResId}"
+        app:IsExistedCollection="@{isOwnedCollection}" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="-25dp"
-        android:background="@drawable/roundstyle2"
+        android:background="@drawable/roundstyle_rad15"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/collection_img">
 

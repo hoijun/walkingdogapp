@@ -115,7 +115,7 @@
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:visibility="@{isStoragePermitted ? View.GONE : View.VISIBLE}"
-                    android:background="@drawable/btn_roundstyle"
+                    android:background="@drawable/btn_roundstyle_rad15"
                     android:backgroundTint="#dcdcdc"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/roundstyle2">
+    android:background="@drawable/roundstyle_rad15">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/dialogRecyclerView"

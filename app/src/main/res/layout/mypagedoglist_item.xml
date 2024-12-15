@@ -19,8 +19,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/roundstyle"
-        android:elevation="4dp">
+        android:background="@drawable/roundstyle_rad20">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
