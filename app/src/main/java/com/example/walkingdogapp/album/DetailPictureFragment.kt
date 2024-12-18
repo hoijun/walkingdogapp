@@ -19,6 +19,7 @@ import com.example.walkingdogapp.viewmodel.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class DetailPictureFragment : Fragment() {
@@ -92,40 +93,61 @@ class DetailPictureFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        val iterator = imgList.iterator()
-        while (iterator.hasNext()) {
+        lifecycleScope.launch {
             try {
-                val img = iterator.next()
-                if (!Utils.isImageExists(img.uri, requireActivity())) {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        val index = imgList.indexOf(img)
-                        val recyclerViewAdapter =
-                            binding.detailViewpager2.adapter as DetailPictureItemListAdapter
-                        iterator.remove()
-                        recyclerViewAdapter.notifyItemRemoved(index)
-                        binding.apply {
-                            if (recyclerViewAdapter.itemCount > 0 && detailViewpager2.currentItem == index) {
-                                if (detailViewpager2.currentItem == 0) {
-                                    detailViewpager2.setCurrentItem(
-                                        detailViewpager2.currentItem,
-                                        false
-                                    )
-                                } else if (detailViewpager2.currentItem <= recyclerViewAdapter.itemCount - 1) {
-                                    detailViewpager2.setCurrentItem(
-                                        detailViewpager2.currentItem - 1,
-                                        false
-                                    )
-                                }
-                            } else if (recyclerViewAdapter.itemCount == 0) {
-                                mainactivity.changeFragment(GalleryFragment())
-                            }
+                val itemsToRemove = mutableListOf<GalleryImgInfo>()
+                
+                for (img in imgList) {
+                    try {
+                        if (!Utils.isImageExists(img.uri, requireActivity())) {
+                            itemsToRemove.add(img)
                         }
-                        bottomSheetFragment?.dismiss()
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            mainactivity.changeFragment(GalleryFragment())
+                        }
+                        return@launch
                     }
                 }
+
+                // UI 업데이트
+                withContext(Dispatchers.Main) {
+                    itemsToRemove.forEach { img ->
+                        try {
+                            val index = imgList.indexOf(img)
+                            imgList.remove(img)
+
+                            val recyclerViewAdapter = binding.detailViewpager2.adapter as DetailPictureItemListAdapter
+                            recyclerViewAdapter.notifyItemRemoved(index)
+
+                            binding.apply {
+                                if (recyclerViewAdapter.itemCount > 0 && detailViewpager2.currentItem == index) {
+                                    if (detailViewpager2.currentItem == 0) {
+                                        detailViewpager2.setCurrentItem(
+                                            detailViewpager2.currentItem,
+                                            false
+                                        )
+                                    } else if (detailViewpager2.currentItem <= recyclerViewAdapter.itemCount - 1) {
+                                        detailViewpager2.setCurrentItem(
+                                            detailViewpager2.currentItem - 1,
+                                            false
+                                        )
+                                    }
+                                } else if (recyclerViewAdapter.itemCount == 0) {
+                                    mainactivity.changeFragment(GalleryFragment())
+                                }
+                            }
+                        } catch (e: Exception) {
+                            mainactivity.changeFragment(GalleryFragment())
+                            return@withContext
+                        }
+                    }
+                    bottomSheetFragment?.dismiss()
+                }
             } catch (e: Exception) {
-                mainactivity.changeFragment(GalleryFragment())
-                break
+                withContext(Dispatchers.Main) {
+                    mainactivity.changeFragment(GalleryFragment())
+                }
             }
         }
     }
