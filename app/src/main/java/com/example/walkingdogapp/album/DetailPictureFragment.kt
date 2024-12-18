@@ -50,7 +50,7 @@ class DetailPictureFragment : Fragment() {
         val imgNum = arguments?.getInt("select", 0) ?: 0
         binding.apply {
             imgList = (mainViewModel.albumImgs.value?: mutableListOf()).toMutableList()
-            val adapter = DetailPictureItemListAdapter( imgList, requireContext())
+            val adapter = DetailPictureItemListAdapter(imgList)
             adapter.onClickItemListener = DetailPictureItemListAdapter.OnClickItemListener { imgInfo ->
                 bottomSheetFragment = GalleryBottomSheetFragment().apply {
                     val bundle = Bundle()
@@ -86,6 +86,7 @@ class DetailPictureFragment : Fragment() {
             }
             detailViewpager2.adapter = adapter
             detailViewpager2.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+            detailViewpager2.offscreenPageLimit = 1
             detailViewpager2.setCurrentItem(imgNum, false)
         }
         return binding.root
@@ -96,7 +97,7 @@ class DetailPictureFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val itemsToRemove = mutableListOf<GalleryImgInfo>()
-                
+
                 for (img in imgList) {
                     try {
                         if (!Utils.isImageExists(img.uri, requireActivity())) {

@@ -10,7 +10,8 @@ import com.example.walkingdogapp.databinding.WalkinfodoglistItemBinding
 import com.example.walkingdogapp.datamodel.DogInfo
 import com.example.walkingdogapp.viewmodel.MainViewModel
 
-class WalkInfoDogListAdapter(private val context: Context, private val viewModel: MainViewModel):  RecyclerView.Adapter<WalkInfoDogListAdapter.WalkInfoDogListViewHolder>(){
+class WalkInfoDogListAdapter(private val viewModel: MainViewModel):  RecyclerView.Adapter<WalkInfoDogListAdapter.WalkInfoDogListViewHolder>(){
+    private lateinit var context: Context
     fun interface OnItemClickListener {
         fun onItemClick(dog: DogInfo)
     }
@@ -18,8 +19,8 @@ class WalkInfoDogListAdapter(private val context: Context, private val viewModel
     var onItemClickListener: OnItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalkInfoDogListViewHolder {
-        val binding =
-            WalkinfodoglistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        context = parent.context
+        val binding = WalkinfodoglistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return WalkInfoDogListViewHolder(binding)
     }
 
