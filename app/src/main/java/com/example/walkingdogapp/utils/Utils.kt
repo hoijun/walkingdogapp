@@ -78,7 +78,7 @@ class Utils {
                 ),
                 "002" to CollectionInfo(
                     "002",
-                    "밥알 고양이",
+                    "밥알 집냥이",
                     "츄르 내놔랑 냥!",
                     R.drawable.collection_002
                 ),
@@ -102,116 +102,116 @@ class Utils {
                 ),
                 "006" to CollectionInfo(
                     "006",
-                    "밥알 토끼",
+                    "밥알 핑크토끼",
                     "나 달로 돌아갈래~",
                     R.drawable.collection_006
                 ),
                 "007" to CollectionInfo(
                     "007",
-                    "노트북 하는 강아지",
-                    "과제 힘들어..",
+                    "밥알 시바견",
+                    "엄살 아니다! 멍!",
                     R.drawable.collection_007
                 ),
                 "008" to CollectionInfo(
                     "008",
-                    "웃고있는 강아지",
-                    "헤헤..",
+                    "밥알 공룡",
+                    "내가 다시 나타났다!",
                     R.drawable.collection_008
                 ),
                 "009" to CollectionInfo(
                     "009",
-                    "양치하는 강아지",
-                    "치카치카",
+                    "밥알 루돌프",
+                    "춥다...",
                     R.drawable.collection_009
                 ),
                 "010" to CollectionInfo(
                     "010",
-                    "신난 코알라",
-                    "시인나안다아",
+                    "밥알 고슴도치",
+                    "따끔따끔 하지!",
                     R.drawable.collection_010
                 ),
                 "011" to CollectionInfo(
                     "011",
-                    "신난 고양이",
-                    "냥냥냥",
+                    "밥알 병아리",
+                    "엄마 어딨어! 삐약!",
                     R.drawable.collection_011
                 ),
                 "012" to CollectionInfo(
                     "012",
-                    "힘든 곰돌이",
-                    "힘들어...",
+                    "밥알 호랑이",
+                    "어흥! 떡 내놔!",
                     R.drawable.collection_012
                 ),
                 "013" to CollectionInfo(
                     "013",
-                    "하얀 강아지",
-                    "멍멍!",
+                    "밥알 돼지",
+                    "밥 달라! 꿀꿀!",
                     R.drawable.collection_013
                 ),
                 "014" to CollectionInfo(
                     "014",
-                    "책 읽는 강아지",
-                    "음....",
+                    "밥알 비글",
+                    "내 밥이다! 멍!",
                     R.drawable.collection_014
                 ),
                 "015" to CollectionInfo(
                     "015",
-                    "치킨 먹는 강아지",
-                    "헤헤.. 맛있당",
+                    "밥알 코끼리",
+                    "모자 멋있지. 뿌우!",
                     R.drawable.collection_015
                 ),
                 "016" to CollectionInfo(
                     "016",
-                    "귀여운 다람쥐",
-                    "반갑습니다람쥐",
+                    "밥알 상어",
+                    "크아앙! 내 공을 받아라!",
                     R.drawable.collection_016
                 ),
                 "017" to CollectionInfo(
                     "017",
-                    "책 읽는 돼지",
-                    "흡.. 휴",
+                    "밥알 판다",
+                    "대나무 맛있당...",
                     R.drawable.collection_017
                 ),
                 "018" to CollectionInfo(
                     "018",
-                    "행복한 곰돌이",
-                    "치킨 맛있당",
+                    "밥알 누룽지냥이",
+                    "이 털뭉치는 뭐냥..",
                     R.drawable.collection_018
                 ),
                 "019" to CollectionInfo(
                     "019",
-                    "일보는 강아지",
-                    "저리가..",
+                    "밥알 하얀 토끼",
+                    "깡총! 당근은 내꺼당!",
                     R.drawable.collection_019
                 ),
                 "020" to CollectionInfo(
                     "020",
-                    "귀여운 곰",
-                    "데헷!",
+                    "밥알 랫서판다",
+                    "크앙! 무섭지!",
                     R.drawable.collection_020
                 ),
                 "021" to CollectionInfo(
                     "021",
-                    "핸드폰 하는 악어",
-                    "뒹굴 뒹굴",
+                    "밥알 하마",
+                    "수박을 한입에 앙!",
                     R.drawable.collection_021
                 ),
                 "022" to CollectionInfo(
                     "022",
-                    "하트 강아지",
-                    "이거 받아",
+                    "밥알 햄스터",
+                    "입안에 넣어 놔야지!",
                     R.drawable.collection_022
                 ),
                 "023" to CollectionInfo(
                     "023",
-                    "버블티 강아지",
-                    "헤헤.. 시원해",
+                    "밥알 닭",
+                    "엄마 여기 있어! 꼬끼오!",
                     R.drawable.collection_023
                 ),
                 "024" to CollectionInfo(
                     "024",
-                    "튜브 토끼",
-                    "신난당!",
+                    "밥알 다람쥐",
+                    "도토리 더 없나...",
                     R.drawable.collection_024
                 )
             )
