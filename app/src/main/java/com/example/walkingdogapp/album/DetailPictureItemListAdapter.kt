@@ -6,11 +6,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.bumptech.glide.request.target.Target
 import com.example.walkingdogapp.databinding.DetailpicturelistItemBinding
 import com.example.walkingdogapp.datamodel.GalleryImgInfo
 
-class DetailPictureItemListAdapter(private val imgList: List<GalleryImgInfo>, private val context: Context) : RecyclerView.Adapter<DetailPictureItemListAdapter.DetailPictureItemListViewHolder>(){
+class DetailPictureItemListAdapter(private val imgList: List<GalleryImgInfo>) : RecyclerView.Adapter<DetailPictureItemListAdapter.DetailPictureItemListViewHolder>(){
+    private lateinit var context: Context
+    private var screenWidth = 0
+    private var screenHeight = 0
 
     fun interface OnClickItemListener {
         fun onClickItem(imgInfo: GalleryImgInfo)
@@ -19,6 +21,10 @@ class DetailPictureItemListAdapter(private val imgList: List<GalleryImgInfo>, pr
     var onClickItemListener: OnClickItemListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailPictureItemListViewHolder {
+        context = parent.context
+        val displayMetrics = context.resources.displayMetrics
+        screenWidth = displayMetrics.widthPixels
+        screenHeight = displayMetrics.heightPixels
         val binding = DetailpicturelistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return DetailPictureItemListViewHolder(binding)
     }
@@ -38,7 +44,7 @@ class DetailPictureItemListAdapter(private val imgList: List<GalleryImgInfo>, pr
         }
 
         fun bind(imgInfo: GalleryImgInfo) {
-            Glide.with(context).load(imgInfo.uri).override(Target.SIZE_ORIGINAL)
+            Glide.with(context).load(imgInfo.uri).override(screenWidth, screenHeight)
                 .format(DecodeFormat.PREFER_ARGB_8888).into(binding.galleryImg)
         }
     }

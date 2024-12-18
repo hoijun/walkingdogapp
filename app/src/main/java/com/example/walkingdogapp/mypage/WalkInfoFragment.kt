@@ -127,7 +127,7 @@ class WalkInfoFragment : Fragment() { // 수정
                 }
             }
 
-            val walkInfoDogListAdapter = WalkInfoDogListAdapter(requireContext(), mainViewModel).also {
+            val walkInfoDogListAdapter = WalkInfoDogListAdapter(mainViewModel).also {
                 it.onItemClickListener = WalkInfoDogListAdapter.OnItemClickListener { selectedDogInfo ->
                     if(!NetworkManager.checkNetworkState(requireContext())) {
                         return@OnItemClickListener
