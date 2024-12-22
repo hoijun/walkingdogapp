@@ -9,7 +9,7 @@ import com.example.walkingdogapp.datamodel.AlarmDao
 import com.example.walkingdogapp.datamodel.AlarmDataModel
 import com.example.walkingdogapp.datamodel.WeekListConverters
 
-@Database(entities = [AlarmDataModel::class], version = 1)
+@Database(entities = [AlarmDataModel::class], version = 1, exportSchema = false)
 @TypeConverters(WeekListConverters::class)
 abstract class LocalUserDatabase: RoomDatabase() {
     abstract fun alarmDao(): AlarmDao

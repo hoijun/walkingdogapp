@@ -26,7 +26,7 @@ class ManageDogListAdapter(private val dogsList: List<DogInfo>): RecyclerView.Ad
         return ManageDogListViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = dogsList.size ?: 0
+    override fun getItemCount(): Int = dogsList.size
     override fun onBindViewHolder(holder: ManageDogListViewHolder, position: Int) {
         holder.bind(dogsList[position])
     }

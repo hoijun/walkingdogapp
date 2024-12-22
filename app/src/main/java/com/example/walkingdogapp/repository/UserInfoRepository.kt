@@ -150,7 +150,7 @@ class UserInfoRepository @Inject constructor(
             userRef.child("dog").addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val dogsList = mutableListOf<DogInfo>()
-                    val dogNames = mutableListOf<String>()
+                    val dogNamesList = mutableListOf<String>()
                     if (snapshot.exists()) {
                         for (dogInfo in snapshot.children) {
                             dogsList.add(
@@ -169,10 +169,10 @@ class UserInfoRepository @Inject constructor(
                                     dogInfo.child("totalWalkInfo").getValue(TotalWalkInfo::class.java)!!
                                 )
                             )
-                            dogNames.add(dogInfo.child("name").getValue(String::class.java)!!)
+                            dogNamesList.add(dogInfo.child("name").getValue(String::class.java)!!)
                         }
                     }
-                    dogNameList = dogNames
+                    dogNameList = dogNamesList
                     dogsInfoDeferred.complete(dogsList.sortedBy { it.creationTime })
                 }
 

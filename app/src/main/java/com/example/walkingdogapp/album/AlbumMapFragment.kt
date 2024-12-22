@@ -190,11 +190,11 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             return
         }
         val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        val projection = arrayOf(MediaStore.Images.Media._ID, MediaStore.Images.Media.DATE_ADDED)
+        val projection = arrayOf(MediaStore.Images.Media._ID, MediaStore.Images.Media.DATE_TAKEN)
         val selection =
             "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ?"
         val selectionArgs = arrayOf("털뭉치", "%munchi_%")
-        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} ASC"
+        val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} ASC"
         val cursor = requireActivity().contentResolver.query(
             uri,
             projection,
@@ -203,12 +203,12 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             sortOrder
         )
 
-        cursor?.use { cursor ->
-            val columnIndexId: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            val columnIndexDate: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
-            while (cursor.moveToNext()) {
-                val imageDate = Utils.convertLongToTime(SimpleDateFormat("yyyy-MM-dd"), cursor.getLong(columnIndexDate))
-                val imagePath: String = cursor.getString(columnIndexId)
+        cursor?.use { it ->
+            val columnIndexId: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            val columnIndexDate: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
+            while (it.moveToNext()) {
+                val imageDate = Utils.convertLongToTime(SimpleDateFormat("yyyy-MM-dd"), it.getLong(columnIndexDate) / 1000L)
+                val imagePath: String = it.getString(columnIndexId)
                 val contentUri = Uri.withAppendedPath(uri, imagePath)
                 val imgView = getMarkerImageView(contentUri)
                 if (imageDate == selectDate) {
@@ -263,11 +263,10 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         try {
             val inputStream = context.contentResolver.openInputStream(uri)
             val exifInterface = inputStream?.let { ExifInterface(it) }
-            val latLng = FloatArray(2)
-            val hasLatLng = exifInterface?.getLatLong(latLng)
+            val latLng = exifInterface?.getLatLong()
 
-            if(hasLatLng == true)  {
-                return LatLng(latLng[0].toDouble(), latLng[1].toDouble())
+            if(latLng != null)  {
+                return LatLng(latLng[0], latLng[1])
             }
 
             return null

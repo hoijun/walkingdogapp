@@ -40,7 +40,7 @@ class AlbumMapItemListAdapter(private val imgInfoList: MutableList<AlbumMapImgIn
             }
         }
         fun bind(img: Uri) {
-            Glide.with(context).load(img).format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(binding.albumImg)
+            Glide.with(context).load(img).format(DecodeFormat.PREFER_RGB_565).override(400, 400).into(binding.albumImg)
         }
     }
 }

@@ -49,6 +49,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            // isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -88,6 +89,16 @@ android {
             resources.excludes.add("META-INF/LICENSE-notice.md")
         }
     }
+
+    /* bundle {
+        language {
+            enableSplit = true
+        }
+
+        density {
+            enableSplit = true
+        }
+    }*/
 }
 
 dependencies {
@@ -128,11 +139,6 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-
     implementation("com.airbnb.android:lottie:6.3.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("com.kakao.sdk:v2-user:2.20.3")

@@ -214,8 +214,8 @@ class MyPageFragment : Fragment() {
             selectionArgs,
             sortOrder
         )
-        cursor?.use { cursor ->
-            while (cursor.moveToNext()) {
+        cursor?.use {
+            while (it.moveToNext()) {
                 count++
             }
         }
