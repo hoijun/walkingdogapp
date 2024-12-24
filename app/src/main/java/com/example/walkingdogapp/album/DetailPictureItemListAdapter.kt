@@ -1,11 +1,17 @@
 package com.example.walkingdogapp.album
 
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
+import com.bumptech.glide.load.resource.bitmap.FitCenter
 import com.example.walkingdogapp.databinding.DetailpicturelistItemBinding
 import com.example.walkingdogapp.datamodel.GalleryImgInfo
 
@@ -44,8 +50,20 @@ class DetailPictureItemListAdapter(private val imgList: List<GalleryImgInfo>) : 
         }
 
         fun bind(imgInfo: GalleryImgInfo) {
-            Glide.with(context).load(imgInfo.uri).override(screenWidth, screenHeight)
-                .format(DecodeFormat.PREFER_ARGB_8888).into(binding.galleryImg)
+            val width = screenWidth - 50
+            var height = screenHeight
+
+            if (imgInfo.height < screenHeight) {
+                height = imgInfo.height
+            }
+
+            Glide.with(context)
+                .load(imgInfo.uri)
+                .override(width, height)
+                .format(DecodeFormat.PREFER_ARGB_8888)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .downsample(DownsampleStrategy.CENTER_INSIDE)
+                .into(binding.galleryImg)
         }
     }
 }

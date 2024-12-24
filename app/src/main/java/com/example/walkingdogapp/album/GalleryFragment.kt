@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -225,10 +226,10 @@ class GalleryFragment : Fragment() {
     @SuppressLint("SimpleDateFormat")
     private fun getAlbumImage() {
         val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        val projection = arrayOf(MediaStore.Images.Media._ID, MediaStore.Images.Media.TITLE, MediaStore.Images.Media.DATE_ADDED)
+        val projection = arrayOf(MediaStore.Images.Media._ID, MediaStore.Images.Media.TITLE, MediaStore.Images.Media.DATE_TAKEN, MediaStore.Images.Media.WIDTH, MediaStore.Images.Media.HEIGHT, MediaStore.Images.Media.ORIENTATION)
         val selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ?"
         val selectionArgs = arrayOf("털뭉치", "%munchi_%")
-        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} ASC"
+        val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} ASC"
         val cursor = requireActivity().contentResolver.query(
             uri,
             projection,
@@ -236,16 +237,29 @@ class GalleryFragment : Fragment() {
             selectionArgs,
             sortOrder
         )
-        cursor?.use { cursor ->
-            val columnIndexId: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            val columnIndexTitle: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE)
-            val columnIndexDate: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
-            while (cursor.moveToNext()) {
-                val imagePath: String = cursor.getString(columnIndexId)
-                val imageTitle: String = cursor.getString(columnIndexTitle)
-                val imageDate: Long = cursor.getLong(columnIndexDate)
+        cursor?.use {
+            val columnIndexId: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            val columnIndexTitle: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE)
+            val columnIndexDate: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
+            val columnIndexWidth: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media.WIDTH)
+            val columnIndexHeight: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media.HEIGHT)
+            val columnIndexOrientation: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media.ORIENTATION)
+
+            while (it.moveToNext()) {
+                val imagePath: String = it.getString(columnIndexId)
+                val imageTitle: String = it.getString(columnIndexTitle)
+                val imageDate: Long = it.getLong(columnIndexDate)
+                val imageWidth: Int = it.getInt(columnIndexWidth)
+                val imageHeight: Int = it.getInt(columnIndexHeight)
                 val contentUri = Uri.withAppendedPath(uri, imagePath)
-                imgInfos.add(GalleryImgInfo(contentUri, imageTitle, Utils.convertLongToTime(SimpleDateFormat("yyyy년 MM월 dd일 HH:mm"), imageDate)))
+                val orientation = it.getInt(columnIndexOrientation)
+
+                val (finalWidth, finalHeight) = when(orientation) {
+                    90, 270 -> Pair(imageHeight, imageWidth)
+                    else -> Pair(imageWidth, imageHeight)
+                }
+
+                imgInfos.add(GalleryImgInfo(contentUri, imageTitle, Utils.convertLongToTime(SimpleDateFormat("yyyy년 MM월 dd일 HH:mm"), imageDate / 1000L), finalWidth, finalHeight))
             }
             mainViewModel.saveAlbumImgs(imgInfos)
         }

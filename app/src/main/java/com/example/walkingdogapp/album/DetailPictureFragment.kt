@@ -1,6 +1,9 @@
 package com.example.walkingdogapp.album
 
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
 import com.example.walkingdogapp.utils.utils.Utils
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.R
@@ -84,10 +88,12 @@ class DetailPictureFragment : Fragment() {
                 }
                 bottomSheetFragment?.show(requireActivity().supportFragmentManager, "bottomSheet")
             }
-            detailViewpager2.adapter = adapter
-            detailViewpager2.orientation = ViewPager2.ORIENTATION_HORIZONTAL
-            detailViewpager2.offscreenPageLimit = 1
-            detailViewpager2.setCurrentItem(imgNum, false)
+            detailViewpager2.apply {
+                this.adapter = adapter
+                orientation = ViewPager2.ORIENTATION_HORIZONTAL
+                offscreenPageLimit = 1
+                setCurrentItem(imgNum, false)
+            }
         }
         return binding.root
     }
