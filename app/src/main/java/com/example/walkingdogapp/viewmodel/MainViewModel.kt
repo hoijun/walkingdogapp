@@ -1,7 +1,6 @@
 package com.example.walkingdogapp.viewmodel
 
 import android.Manifest
-import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Address
@@ -11,19 +10,17 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.walkingdogapp.datamodel.GalleryImgInfo
 import com.example.walkingdogapp.datamodel.AlarmDataModel
 import com.example.walkingdogapp.datamodel.DogInfo
-import com.example.walkingdogapp.datamodel.UserInfo
+import com.example.walkingdogapp.datamodel.GalleryImgInfo
 import com.example.walkingdogapp.datamodel.TotalWalkInfo
+import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.datamodel.WalkDateInfo
 import com.example.walkingdogapp.repository.UserInfoRepository
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

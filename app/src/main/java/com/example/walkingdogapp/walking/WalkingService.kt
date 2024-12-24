@@ -34,8 +34,6 @@ import java.util.Timer
 import kotlin.concurrent.timer
 import kotlin.math.abs
 import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 
 class WalkingService : Service() {
     private var binder = LocalBinder()

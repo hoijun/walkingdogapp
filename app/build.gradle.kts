@@ -48,8 +48,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            // isShrinkResources = true
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -90,7 +90,7 @@ android {
         }
     }
 
-    /* bundle {
+    bundle {
         language {
             enableSplit = true
         }
@@ -98,53 +98,64 @@ android {
         density {
             enableSplit = true
         }
-    }*/
+
+        abi {
+            enableSplit = true
+        }
+
+    }
 }
 
 dependencies {
-    implementation("com.google.android.gms:play-services-location:21.3.0")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("com.google.android.gms:play-services-maps:19.0.0")
-    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
-    implementation("com.google.firebase:firebase-database-ktx:21.0.0")
-    implementation("com.google.firebase:firebase-analytics-ktx:22.1.2")
-    implementation("com.google.firebase:firebase-auth:23.0.0")
-    implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.google.dagger:hilt-android:2.49")
-    kapt("com.google.dagger:hilt-android-compiler:2.48")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.legacy:legacy-support-core-utils:1.0.0")
-    implementation("androidx.browser:browser:1.8.0")
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.fragment:fragment-ktx:1.8.4")
-    implementation("androidx.work:work-runtime-ktx:2.9.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+
     implementation("androidx.activity:activity-ktx:1.9.3")
-    implementation("androidx.test:monitor:1.7.2")
-    implementation("androidx.test.ext:junit-ktx:1.2.1")
-    implementation("androidx.activity:activity-ktx:1.9.3")
-    implementation("androidx.media:media:1.7.0")
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("com.android.identity:identity-credential-android:20231002")
-    implementation("androidx.activity:activity-ktx:1.9.3")
-    androidTestImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
-    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.fragment:fragment-ktx:1.8.5")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
+
+    implementation("com.google.dagger:hilt-android:2.49")
+    kapt("com.google.dagger:hilt-android-compiler:2.48")
+
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.room:room-runtime:2.6.1")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
+
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-database-ktx:21.0.0")
+    implementation("com.google.firebase:firebase-analytics-ktx:22.1.2")
+    implementation("com.google.firebase:firebase-auth:23.1.0")
+    implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
+
+    implementation("androidx.legacy:legacy-support-core-utils:1.0.0")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation("androidx.browser:browser:1.8.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("com.airbnb.android:lottie:6.3.0")
-    implementation("de.hdodenhof:circleimageview:3.1.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+
     implementation("com.kakao.sdk:v2-user:2.20.3")
-    implementation("com.naver.maps:map-sdk:3.19.1")
+    implementation("com.naver.maps:map-sdk:3.20.0")
     implementation(files("libs/oauth-5.9.0.aar"))
+
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
+    implementation("com.airbnb.android:lottie:6.3.0")
     implementation("com.jakewharton.threetenabp:threetenabp:1.2.0")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
+    androidTestImplementation("androidx.test:monitor:1.7.2")
+    androidTestImplementation("androidx.test.ext:junit-ktx:1.2.1")
+    androidTestImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
 }
