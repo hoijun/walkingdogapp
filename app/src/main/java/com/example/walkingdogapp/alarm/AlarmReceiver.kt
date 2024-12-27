@@ -11,6 +11,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_DEFAULT
+import androidx.core.app.NotificationCompat.PRIORITY_HIGH
 import com.example.walkingdogapp.R
 import com.example.walkingdogapp.SplashActivity
 import com.example.walkingdogapp.repository.UserInfoRepository
@@ -25,8 +26,6 @@ import javax.inject.Inject
 class AlarmReceiver: BroadcastReceiver() {
     @Inject
     lateinit var userInfoRepository: UserInfoRepository
-    private lateinit var manager: NotificationManager
-    private lateinit var builder: NotificationCompat.Builder
 
     companion object{
         const val CHANNEL_ID = "WalkingDogApp_Channel"
@@ -45,19 +44,7 @@ class AlarmReceiver: BroadcastReceiver() {
                 return
         }
 
-        manager = context?.getSystemService(Service.NOTIFICATION_SERVICE) as NotificationManager
-
-        if (manager.getNotificationChannel(CHANNEL_ID) == null) {
-            val notificationChannel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            notificationChannel.description = "This channel is used by Walking_Alarm"
-            manager.createNotificationChannel(notificationChannel)
-        }
-
-        builder = NotificationCompat.Builder(context, CHANNEL_ID)
+        val notificationManager = context?.getSystemService(Service.NOTIFICATION_SERVICE) as NotificationManager
 
         val requestCode = intent?.extras!!.getInt("alarm_rqCode")
 
@@ -68,7 +55,7 @@ class AlarmReceiver: BroadcastReceiver() {
                 requestCode,
                 resultIntent,
                 PendingIntent.FLAG_IMMUTABLE
-            ); //Activity를 시작하는 인텐트 생성
+            )
         } else {
             PendingIntent.getActivity(
                 context,
@@ -78,13 +65,28 @@ class AlarmReceiver: BroadcastReceiver() {
             )
         }
 
-        val notification = builder.setSmallIcon(R.drawable.appicon).setContentTitle("털뭉치")
-            .setDefaults(NotificationCompat.DEFAULT_ALL).setContentText("산책 할 시간 이에요!")
-            .setContentIntent(pendingIntent).setAutoCancel(true).setOngoing(false).setPriority(
-                PRIORITY_DEFAULT
-            ).setVisibility(NotificationCompat.VISIBILITY_PUBLIC).build()
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.appicon)
+            .setContentTitle("털뭉치")
+            .setContentText("산책 할 시간 이에요!")
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .setOngoing(false)
+            .setPriority(PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 
-        manager.notify(1, notification)
+        if (notificationManager.getNotificationChannel(CHANNEL_ID) == null) {
+            val notificationChannel = NotificationChannel(
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            notificationChannel.description = "This channel is used by Walking_Alarm"
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+
+        notificationManager.notify(requestCode, builder.build())
 
         val calendar = Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
