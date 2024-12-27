@@ -168,7 +168,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             btnStart.setOnClickListener {
-                if (!isWalkingServiceRunning()) {
+                if (!WalkingService.isWalkingServiceRunning()) {
                     return@setOnClickListener
                 }
 
@@ -372,7 +372,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun randomMarker() { // 마커 랜덤 표시
         randomMarkerJob = lifecycleScope.launch(Dispatchers.Main) {
             delay(10000) // 10초 후에
-            while (isActive && isWalkingServiceRunning()) {
+            while (isActive && WalkingService.isWalkingServiceRunning()) {
                 repeat(2) {
                     if (coordList.isNotEmpty()) {
                         if (wService.animalMarkers.size < 6) { // 마커의 갯수 상한선
@@ -441,21 +441,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         return LatLng(randomLat, randomLong)
     }
 
-    private fun isWalkingServiceRunning(): Boolean {
-        val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-        for (myService in activityManager.getRunningServices(Int.MAX_VALUE)) {
-            if (WalkingService::class.java.name == myService.service.className) {
-                if (myService.foreground) {
-                    return true
-                }
-            }
-            return false
-        }
-        return false
-    }
-
     private fun startWalkingService() {
-        if (!isWalkingServiceRunning()) {
+        if (!WalkingService.isWalkingServiceRunning()) {
             Log.d("WalkingService", "start")
             val serviceIntent = Intent(this, WalkingService::class.java)
             serviceIntent.putStringArrayListExtra("selectedDogs", ArrayList(selectedDogs))
@@ -465,7 +452,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun stopWalkingService() {
-        if (isWalkingServiceRunning()) {
+        if (WalkingService.isWalkingServiceRunning()) {
             Log.d("WalkingService", "stop")
             val serviceIntent = Intent(this, WalkingService::class.java)
             serviceIntent.action = Utils.ACTION_STOP_Walking_SERVICE
@@ -474,7 +461,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun startTracking() {
-        if (isWalkingServiceRunning()) {
+        if (WalkingService.isWalkingServiceRunning()) {
             val serviceIntent = Intent(this, WalkingService::class.java)
             serviceIntent.action = Utils.ACTION_START_Walking_Tracking
             startService(serviceIntent)
@@ -482,7 +469,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun stopTracking() {
-        if (isWalkingServiceRunning()) {
+        if (WalkingService.isWalkingServiceRunning()) {
             val serviceIntent = Intent(this, WalkingService::class.java)
             serviceIntent.action = Utils.ACTION_STOP_Walking_Tracking
             startService(serviceIntent)

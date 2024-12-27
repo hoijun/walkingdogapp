@@ -2,6 +2,7 @@ package com.example.walkingdogapp
 
 import android.Manifest
 import android.app.ActivityManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -76,7 +77,7 @@ class MainActivity : AppCompatActivity() {
 
         this.onBackPressedDispatcher.addCallback(this, callback)
 
-        if (isWalkingServiceRunning()) {
+        if (WalkingService.isWalkingServiceRunning()) {
             val walkingIntent = Intent(this, WalkingActivity::class.java)
             walkingIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(walkingIntent)
@@ -181,19 +182,5 @@ class MainActivity : AppCompatActivity() {
             .beginTransaction()
             .replace(binding.screenFl.id, fragment)
             .commitAllowingStateLoss()
-    }
-
-    // 산책 진행 여부
-    private fun isWalkingServiceRunning(): Boolean {
-        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        for (myService in activityManager.getRunningServices(Int.MAX_VALUE)) {
-            if (WalkingService::class.java.name == myService.service.className) {
-                if (myService.foreground) {
-                    return true
-                }
-            }
-            return false
-        }
-        return false
     }
 }

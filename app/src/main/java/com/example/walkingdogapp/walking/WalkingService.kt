@@ -36,6 +36,12 @@ import kotlin.math.abs
 import kotlin.math.atan2
 
 class WalkingService : Service() {
+    companion object {
+        private var isWalkingServiceRunning = false
+        fun isWalkingServiceRunning(): Boolean {
+            return isWalkingServiceRunning
+        }
+    }
     private var binder = LocalBinder()
     private lateinit var locationRequest: LocationRequest
     private lateinit var builder : NotificationCompat.Builder
@@ -76,7 +82,6 @@ class WalkingService : Service() {
                 for (location in locationResult.locations) {
                     if (location != null) {
                         val pos = LatLng(location.latitude, location.longitude)
-                        Log.d("savepoint2", "위도: ${pos.latitude}, 경도: ${pos.longitude}")
                         if (coordList.value!!.isNotEmpty() && coordList.value!!.last().distanceTo(pos) < 3f) {
                             return
                         }
@@ -129,6 +134,7 @@ class WalkingService : Service() {
                 when(action) {
                     Utils.ACTION_START_Walking_SERVICE -> {
                         postInitialValue()
+                        isWalkingServiceRunning = true
                         walkingDogs.postValue(intent.getStringArrayListExtra("selectedDogs")?: arrayListOf())
                         startLocationService()
                     }
@@ -178,21 +184,21 @@ class WalkingService : Service() {
         val resultIntent = Intent(applicationContext, MainActivity::class.java)
         val pendingIntent =
             PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_IMMUTABLE)
+
         builder = NotificationCompat.Builder(applicationContext, channelId)
-        builder.setSmallIcon(R.drawable.appicon)
-        builder.setContentTitle("털뭉치")
-        builder.setDefaults(NotificationCompat.DEFAULT_ALL)
-        builder.setContentText("산책중 이에요.")
-        builder.setContentIntent(pendingIntent)
-        builder.setAutoCancel(false)
-        builder.setOngoing(true)
-        builder.priority = NotificationCompat.PRIORITY_DEFAULT
+            .setSmallIcon(R.drawable.appicon)
+            .setContentTitle("털뭉치")
+            .setContentText("산책중 이에요.")
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(false)
+            .setOngoing(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
 
         if (notificationManager.getNotificationChannel(channelId) == null) {
             val notificationChannel = NotificationChannel(
                 channelId,
                 "Walking Service",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_HIGH
             )
             notificationChannel.description = "This channel is used by walking service"
             notificationManager.createNotificationChannel(notificationChannel)
@@ -241,6 +247,7 @@ class WalkingService : Service() {
 
     private fun stopLocationService() {
         isTracking.postValue(false)
+        isWalkingServiceRunning = false
         stopTimer()
         fusedLocationProviderClient?.removeLocationUpdates(locationCallback)
         postInitialValue()
@@ -269,7 +276,6 @@ class WalkingService : Service() {
             needToFlat = true
         }
 
-        Log.d("savepoint", "needToFlat: $needToFlat, angle1: $angle1, angle2: $angle2")
         return needToFlat
     }
 
