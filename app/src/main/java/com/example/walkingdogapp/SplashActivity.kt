@@ -8,13 +8,17 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.walkingdogapp.login.LoginActivity
+import com.example.walkingdogapp.utils.FirebaseAnalyticHelper
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.system.exitProcess
 
+@AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -30,6 +34,10 @@ class SplashActivity : AppCompatActivity() {
             backPressedTime = System.currentTimeMillis()
         }
     }
+
+    @Inject
+    lateinit var firebaseHelper: FirebaseAnalyticHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
@@ -54,6 +62,14 @@ class SplashActivity : AppCompatActivity() {
 
             currentUser.getIdToken(true).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
+                    firebaseHelper.logEvent(
+                        listOf(
+                            "type" to "Login_Fail",
+                            "api" to "Firebase",
+                            "reason" to task.exception?.message.toString()
+                        )
+                    )
+
                     auth.signOut()
                     startLogin()
                     return@addOnCompleteListener

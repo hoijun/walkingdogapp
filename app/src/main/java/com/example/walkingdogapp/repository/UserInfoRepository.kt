@@ -12,6 +12,7 @@ import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.datamodel.WalkDateInfo
 import com.example.walkingdogapp.datamodel.WalkDateInfoInSave
 import com.example.walkingdogapp.datamodel.WalkLatLng
+import com.example.walkingdogapp.utils.FirebaseAnalyticHelper
 import com.example.walkingdogapp.utils.utils.NetworkManager
 import com.example.walkingdogapp.utils.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
@@ -52,6 +53,9 @@ class UserInfoRepository @Inject constructor(
     private var storageRef = storage.getReference("$uid").child("images")
     private lateinit var alarmList: List<AlarmDataModel>
 
+    @Inject
+    lateinit var firebaseHelper: FirebaseAnalyticHelper
+
     fun resetUser() {
         uid = auth.currentUser?.uid
         userRef = database.getReference("Users").child("$uid")
@@ -61,6 +65,7 @@ class UserInfoRepository @Inject constructor(
     suspend fun signUp(email: String, successSignUp: MutableLiveData<Boolean>) {
         val userRef = database.getReference("Users")
         val userInfo = UserInfo(email = email)
+        val errorReason = mutableListOf<Pair<String, String>>()
         val isError = AtomicBoolean(false)
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -70,7 +75,7 @@ class UserInfoRepository @Inject constructor(
                         .setValue(userInfo)
                         .await()
                 } catch (e: Exception) {
-                    Log.d("savepoint", e.message.toString())
+                    errorReason.add("Error: userInfo" to e.message.toString())
                     isError.set(true)
                 }
             }
@@ -80,7 +85,7 @@ class UserInfoRepository @Inject constructor(
                     userRef.child("$uid").child("totalWalk")
                         .setValue(TotalWalkInfo()).await()
                 } catch (e: Exception) {
-                    Log.d("savepoint", e.message.toString())
+                    errorReason.add("Error: totalWalkInfo" to e.message.toString())
                     isError.set(true)
                 }
             }
@@ -90,7 +95,7 @@ class UserInfoRepository @Inject constructor(
                     userRef.child("$uid").child("collection")
                         .setValue(Utils.item_whether).await()
                 } catch (e: Exception) {
-                    Log.d("savepoint", e.message.toString())
+                    errorReason.add("Error: collectionInfo" to e.message.toString())
                     isError.set(true)
                 }
             }
@@ -100,7 +105,7 @@ class UserInfoRepository @Inject constructor(
                     userRef.child("$uid").child("termsOfService")
                         .setValue(true).await()
                 } catch (e: Exception) {
-                    Log.d("savepoint", e.message.toString())
+                    errorReason.add("Error: termsOfService" to e.message.toString())
                     isError.set(true)
                 }
             }
@@ -113,6 +118,12 @@ class UserInfoRepository @Inject constructor(
             if (!isError.get()) {
                 successSignUp.postValue(true)
             } else {
+                firebaseHelper.logEvent(
+                    listOf(
+                        "type" to "SignUp_Fail",
+                        "api" to "Firebase",
+                    ) + errorReason
+                )
                 successSignUp.postValue(false)
             }
         }
@@ -138,6 +149,7 @@ class UserInfoRepository @Inject constructor(
         }
 
         val isError = AtomicBoolean(false)
+        val errorReason = mutableListOf<Pair<String, String>>()
         val dogsInfoDeferred = CompletableDeferred<List<DogInfo>>()
         val userDeferred = CompletableDeferred<UserInfo>()
         val totalWalkDeferred = CompletableDeferred<TotalWalkInfo>()
@@ -178,6 +190,7 @@ class UserInfoRepository @Inject constructor(
 
                 override fun onCancelled(error: DatabaseError) {
                     isError.set(true)
+                    errorReason.add("Error: dogsInfo" to error.message)
                     dogsInfoDeferred.complete(listOf())
                 }
             })
@@ -185,6 +198,7 @@ class UserInfoRepository @Inject constructor(
             userRef.child("user").get().addOnSuccessListener {
                 userDeferred.complete(it.getValue(UserInfo::class.java) ?: UserInfo())
             }.addOnFailureListener {
+                errorReason.add("Error: userInfo" to it.message.toString())
                 isError.set(true)
                 userDeferred.complete(UserInfo())
             }
@@ -192,6 +206,7 @@ class UserInfoRepository @Inject constructor(
             userRef.child("totalWalkInfo").get().addOnSuccessListener {
                 totalWalkDeferred.complete(it.getValue(TotalWalkInfo::class.java) ?: TotalWalkInfo())
             }.addOnFailureListener {
+                errorReason.add("Error: totalWalkInfo" to it.message.toString())
                 isError.set(true)
                 totalWalkDeferred.complete(TotalWalkInfo())
             }
@@ -234,6 +249,7 @@ class UserInfoRepository @Inject constructor(
 
                             override fun onCancelled(error: DatabaseError) {
                                 isError.set(true)
+                                errorReason.add("Error: walkDateInfo" to error.message)
                                 dogsWalkDateInfo[dog] = mutableListOf()
                                 if (dogsWalkDateInfo.size == dogNameList.size) {
                                     walkDateDeferred.complete(dogsWalkDateInfo)
@@ -248,6 +264,7 @@ class UserInfoRepository @Inject constructor(
                     it.getValue<HashMap<String, Boolean>>() ?: Utils.item_whether
                 )
             }.addOnFailureListener {
+                errorReason.add("Error: collectionInfo" to it.message.toString())
                 isError.set(true)
                 collectionDeferred.complete(Utils.item_whether)
             }
@@ -259,7 +276,7 @@ class UserInfoRepository @Inject constructor(
             storageRef.listAll().addOnSuccessListener { listResult ->
                 imgCount = listResult.items.size
                 if (imgCount == 0) {
-                    profileUriDeferred.complete(HashMap<String, Uri>())
+                    profileUriDeferred.complete(HashMap())
                 }
                 listResult.items.forEach { item ->
                     item.downloadUrl.addOnSuccessListener { uri ->
@@ -278,7 +295,8 @@ class UserInfoRepository @Inject constructor(
                 }
             }.addOnFailureListener {
                 isError.set(true)
-                profileUriDeferred.complete(HashMap<String, Uri>())
+                errorReason.add("Error: profileUri" to it.message.toString())
+                profileUriDeferred.complete(HashMap())
             }
 
             dogNames.postValue(dogNameList)
@@ -291,42 +309,108 @@ class UserInfoRepository @Inject constructor(
             if (!isError.get()) {
                 successGetData.postValue(true)
             } else {
+                firebaseHelper.logEvent(
+                    listOf(
+                        "type" to "GetData_Fail",
+                        "api" to "Firebase",
+                    ) + errorReason
+                )
                 successGetData.postValue(false)
             }
 
-
         } catch (e: Exception) {
+            firebaseHelper.logEvent(
+                listOf(
+                    "type" to "GetData_Fail",
+                    "api" to "Firebase",
+                    "reason" to e.message.toString()
+                )
+            )
             successGetData.postValue(false)
         }
     }
 
     fun add(alarm: AlarmDataModel) {
-        alarmDao.addAlarm(alarm)
+        try {
+            alarmDao.addAlarm(alarm)
+        } catch (e: Exception) {
+            firebaseHelper.logEvent(
+                listOf(
+                    "type" to "AddAlarm_Fail",
+                    "api" to "",
+                    "reason" to e.message.toString()
+                )
+            )
+        }
     }
 
     fun delete(alarm: AlarmDataModel) {
-        alarmDao.deleteAlarm(alarm.alarm_code)
+        try {
+            alarmDao.deleteAlarm(alarm.alarm_code)
+        } catch (e: Exception) {
+            firebaseHelper.logEvent(
+                listOf(
+                    "type" to "DeleteAlarm_Fail",
+                    "api" to "",
+                    "reason" to e.message.toString()
+                )
+            )
+        }
     }
 
     fun getAll(): List<AlarmDataModel> {
-        alarmList = alarmDao.getAlarmsList()
+        try {
+            alarmList = alarmDao.getAlarmsList()
+        } catch (e: Exception) {
+            alarmList = listOf()
+            firebaseHelper.logEvent(
+                listOf(
+                    "type" to "GetAllAlarm_Fail",
+                    "api" to "",
+                    "reason" to e.message.toString()
+                )
+            )
+        }
+
         return alarmList
     }
 
     fun onOffAlarm(alarmCode: Int, alarmOn: Boolean) {
-        alarmDao.updateAlarmStatus(alarmCode, alarmOn)
+        try {
+            alarmDao.updateAlarmStatus(alarmCode, alarmOn)
+        } catch (e: Exception) {
+            firebaseHelper.logEvent(
+                listOf(
+                    "type" to "UpdateAlarmStatus_Fail",
+                    "api" to "",
+                    "reason" to e.message.toString()
+                )
+            )
+        }
     }
 
     fun updateAlarmTime(alarmCode: Int, time: Long) {
-        alarmDao.updateAlarmTime(alarmCode, time)
+        try {
+            alarmDao.updateAlarmTime(alarmCode, time)
+        } catch (e: Exception) {
+            firebaseHelper.logEvent(
+                listOf(
+                    "type" to "UpdateAlarmTime_Fail",
+                    "api" to "",
+                    "reason" to e.message.toString()
+                )
+            )
+        }
     }
 
     suspend fun updateUserInfo(userInfo: UserInfo) {
+        val errorReason = mutableListOf<Pair<String, String>>()
         val userInfoUpdateJob = CoroutineScope(Dispatchers.IO).launch {
             val nameDeferred = async(Dispatchers.IO) {
                 try {
                     userRef.child("user").child("name").setValue(userInfo.name).await()
                 } catch (e: Exception) {
+                    errorReason.add("Error: name" to e.message.toString())
                     return@async
                 }
             }
@@ -335,6 +419,7 @@ class UserInfoRepository @Inject constructor(
                 try {
                     userRef.child("user").child("gender").setValue(userInfo.gender).await()
                 } catch (e: Exception) {
+                    errorReason.add("Error: gender" to e.message.toString())
                     return@async
                 }
             }
@@ -343,8 +428,18 @@ class UserInfoRepository @Inject constructor(
                 try {
                     userRef.child("user").child("birth").setValue(userInfo.birth).await()
                 } catch (e: Exception) {
+                    errorReason.add("Error: birth" to e.message.toString())
                     return@async
                 }
+            }
+
+            if (errorReason.isNotEmpty()) {
+                firebaseHelper.logEvent(
+                    listOf(
+                        "type" to "UpdateUserInfo_Fail",
+                        "api" to "Firebase",
+                    ) + errorReason
+                )
             }
 
             nameDeferred.await()
@@ -364,6 +459,7 @@ class UserInfoRepository @Inject constructor(
         dogNameList: List<String>,
     ): Boolean {
         var error = false
+        val errorReason = mutableListOf<Pair<String, String>>()
         val result = CoroutineScope(Dispatchers.IO).launch {
             val dogInfoJob = async(Dispatchers.IO) {
                 try {
@@ -372,6 +468,7 @@ class UserInfoRepository @Inject constructor(
                     }
                     userRef.child("dog").child(dogInfo.name).setValue(dogInfo).await()
                 } catch (e: Exception) {
+                    errorReason.add("Error: dogInfo" to e.message.toString())
                     error = true
                     return@async
                 }
@@ -398,6 +495,7 @@ class UserInfoRepository @Inject constructor(
                             ).await()
                     }
                 } catch (e: Exception) {
+                    errorReason.add("Error: walkRecord" to e.message.toString())
                     error = true
                     return@async
                 }
@@ -430,7 +528,7 @@ class UserInfoRepository @Inject constructor(
                         }
                     }
                 } catch (e: Exception) {
-                    Log.d("savepoint1", e.message.toString())
+                    errorReason.add("Error: upload" to e.message.toString())
                     error = true
                     return@upload
                 }
@@ -448,6 +546,7 @@ class UserInfoRepository @Inject constructor(
                         storageRef.child(beforeName).delete().await()
                     }
                 } catch (e: Exception) {
+                    errorReason.add("Error: delete" to e.message.toString())
                     error = true
                     return@delete
                 }
@@ -458,16 +557,28 @@ class UserInfoRepository @Inject constructor(
         }
 
         result.join()
+
+        if (errorReason.isNotEmpty()) {
+            firebaseHelper.logEvent(
+                listOf(
+                    "type" to "UpdateDogInfo_Fail",
+                    "api" to "Firebase",
+                ) + errorReason
+            )
+        }
+
         return error
     }
 
     suspend fun removeDogInfo(beforeName: String, dogUriList: HashMap<String, Uri>) {
+        val errorReason = mutableListOf<Pair<String, String>>()
         val result = CoroutineScope(Dispatchers.IO).launch {
             val removeDogInfoJob = async(Dispatchers.IO) {
                 try {
                     userRef.child("dog").child(beforeName).removeValue()
                         .await()
                 } catch (e: Exception) {
+                    errorReason.add("Error: dogInfo" to e.message.toString())
                     return@async
                 }
             }
@@ -479,6 +590,7 @@ class UserInfoRepository @Inject constructor(
                             .await()
                     }
                 } catch (e: Exception) {
+                    errorReason.add("Error: dogImg" to e.message.toString())
                     return@remove
                 }
             }
@@ -488,6 +600,15 @@ class UserInfoRepository @Inject constructor(
         }
 
         result.join()
+
+        if (errorReason.isNotEmpty()) {
+            firebaseHelper.logEvent(
+                listOf(
+                    "type" to "RemoveDogInfo_Fail",
+                    "api" to "Firebase",
+                ) + errorReason
+            )
+        }
     }
 
     suspend fun saveWalkInfo(
@@ -499,6 +620,7 @@ class UserInfoRepository @Inject constructor(
         collections: List<String>
     ): Boolean {
         var isError = false
+        val errorReason = mutableListOf<Pair<String, String>>()
         val walkInfoUpdateJob = suspendCoroutine { continuation ->
             userRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -532,6 +654,7 @@ class UserInfoRepository @Inject constructor(
                                 }
                             } catch (e: Exception) {
                                 isError = true
+                                errorReason.add("Error: totalWalkInfo" to e.message.toString())
                                 return@async
                             }
                         }
@@ -556,6 +679,7 @@ class UserInfoRepository @Inject constructor(
                                 }
                             } catch (e: Exception) {
                                 isError = true
+                                errorReason.add("Error: indivisualWalkInfo" to e.message.toString())
                                 return@async
                             }
                         }
@@ -581,6 +705,7 @@ class UserInfoRepository @Inject constructor(
                                 }
                             } catch (e: Exception) {
                                 isError = true
+                                errorReason.add("Error: walkDateInfo" to e.message.toString())
                                 return@async
                             }
                         }
@@ -594,6 +719,7 @@ class UserInfoRepository @Inject constructor(
                                 userRef.child("collection").updateChildren(update).await()
                             } catch (e: Exception) {
                                 isError = true
+                                errorReason.add("Error: collectionInfo" to e.message.toString())
                                 return@async
                             }
                         }
@@ -613,11 +739,21 @@ class UserInfoRepository @Inject constructor(
             })
         }
 
+        if (errorReason.isNotEmpty()) {
+            firebaseHelper.logEvent(
+                listOf(
+                    "type" to "SaveWalkInfo_Fail",
+                    "api" to "Firebase",
+                ) + errorReason
+            )
+        }
+
         return walkInfoUpdateJob
     }
 
     suspend fun removeAccount(): Boolean {
         var error = false
+        val errorReason = mutableListOf<Pair<String, String>>()
         val result = CoroutineScope(Dispatchers.IO).async {
             val deleteProfileJob = async(Dispatchers.IO) {
                 try {
@@ -627,7 +763,7 @@ class UserInfoRepository @Inject constructor(
                         }
                     }
                 } catch (e: Exception) {
-                    Log.d("savepoint", e.message.toString())
+                    errorReason.add("Error: profile" to e.message.toString())
                     error = true
                 }
             }
@@ -642,12 +778,21 @@ class UserInfoRepository @Inject constructor(
                 try {
                     userRef.removeValue().await()
                 } catch (e: Exception) {
-                    Log.d("savepoint", e.message.toString())
+                    errorReason.add("Error: User" to e.message.toString())
                     error = true
                 }
             }
 
             deleteInfoJob.await()
+
+            if (errorReason.isNotEmpty()) {
+                firebaseHelper.logEvent(
+                    listOf(
+                        "type" to "RemoveAccount_Fail",
+                        "api" to "Firebase",
+                    ) + errorReason
+                )
+            }
 
             return@async !error
         }

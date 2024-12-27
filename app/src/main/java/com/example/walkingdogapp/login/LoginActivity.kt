@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.walkingdogapp.LoadingDialogFragment
 import com.example.walkingdogapp.MainActivity
 import com.example.walkingdogapp.databinding.ActivityLoginBinding
+import com.example.walkingdogapp.utils.FirebaseAnalyticHelper
 import com.example.walkingdogapp.utils.utils.NetworkManager
 import com.example.walkingdogapp.viewmodel.LoginViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -32,6 +33,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint
@@ -43,12 +45,14 @@ class LoginActivity : AppCompatActivity() {
     private var backPressedTime: Long = 0
     private val loadingDialogFragment = LoadingDialogFragment()
 
+    @Inject
+    lateinit var firebaseHelper: FirebaseAnalyticHelper
+
     private val kakaoLoginCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
         if (error != null) {
             setLoginIngView(false)
-            Log.e(TAG, "로그인 실패 $error")
+            toastFailSignUp("Kakao", error.message.toString())
         } else if (token != null) {
-            Log.e(TAG, "로그인 성공 ${token.accessToken}")
             loginApp("kakao")
         }
     }
@@ -59,6 +63,7 @@ class LoginActivity : AppCompatActivity() {
 
         override fun onFailure(httpStatus: Int, message: String) {
             setLoginIngView(false)
+            toastFailSignUp("Naver", message)
         }
 
         override fun onSuccess() {
@@ -76,10 +81,11 @@ class LoginActivity : AppCompatActivity() {
         }
 
         override fun onError(errorCode: Int, message: String) {
-            setLoginIngView(false)
+            onFailure(errorCode, message)
         }
 
         override fun onFailure(httpStatus: Int, message: String) {
+            toastFailSignUp("Naver",message)
             setLoginIngView(false)
         }
     }
@@ -108,13 +114,10 @@ class LoginActivity : AppCompatActivity() {
                 if (!NetworkManager.checkNetworkState(this@LoginActivity)) {
                     return@setOnClickListener
                 }
-                try {
-                    setLoginIngView(true)
-                    loginKakao()
-                } catch (e: Exception) {
-                    e.message?.let { it1 -> Log.d("error", it1) }
-                }
+                setLoginIngView(true)
+                loginKakao()
             }
+
             NaverLoginBtn.setOnClickListener {
                 if (!NetworkManager.checkNetworkState(this@LoginActivity)) {
                     return@setOnClickListener
@@ -130,15 +133,15 @@ class LoginActivity : AppCompatActivity() {
             UserApiClient.instance.loginWithKakaoAccount(
                 this,
                 callback = kakaoLoginCallback
-            ) // 카카오 이메일 로그인
+            )
             return
         }
 
         UserApiClient.instance.loginWithKakaoTalk(this) { token, error ->
             if (error != null) {
-                Log.e(TAG, "로그인 실패", error)
                 setLoginIngView(false)
                 if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                    toastFailSignUp("Kakao", error.message.toString())
                     return@loginWithKakaoTalk
                 } else {
                     UserApiClient.instance.loginWithKakaoAccount(
@@ -147,7 +150,6 @@ class LoginActivity : AppCompatActivity() {
                     )
                 }
             } else if (token != null) {
-                Log.e("savepoint", "로그인 성공 ${token.accessToken}")
                 loginApp("kakao")
             }
         }
@@ -158,7 +160,7 @@ class LoginActivity : AppCompatActivity() {
         if (sns == "kakao") {
             UserApiClient.instance.me { user, error1 ->
                 if (error1 != null) {
-                    Log.e(TAG, "사용자 정보 요청 실패", error1)
+                    toastFailSignUp("Kakao", error1.message.toString())
                     setLoginIngView(false)
                 } else if (user?.kakaoAccount?.email != null) {
                     signupFirebase(user.kakaoAccount!!.email!!, user.id.toString())
@@ -178,9 +180,7 @@ class LoginActivity : AppCompatActivity() {
                     //이미 가입된 이메일일 경우
                     signInFirebase(myEmail, password)
                 } else {
-                    //예외메세지가 있다면 출력
-                    //에러가 났다거나 서버가 연결이 실패했다거나
-                    Toast.makeText(this, it.exception?.message, Toast.LENGTH_LONG).show()
+                    toastFailSignUp("Firebase", it.exception?.message.toString())
                     setLoginIngView(false)
                 }
                 return@addOnCompleteListener
@@ -206,12 +206,10 @@ class LoginActivity : AppCompatActivity() {
                                                     val uid = auth.currentUser?.uid
                                                     val userRef = db.getReference("Users")
                                                     userRef.child("$uid").removeValue().await()
-                                                } catch (e: Exception) {
-                                                    Log.d("savepoint", e.message.toString())
-                                                }
+                                                } catch (_: Exception) { }
                                                 auth.currentUser?.delete()
                                                 withContext(Dispatchers.Main) {
-                                                    toastFailSignUp("")
+                                                    toastFailSignUp("Firebase", "")
                                                     setLoginIngView(false)
                                                     return@withContext
                                                 }
@@ -221,13 +219,13 @@ class LoginActivity : AppCompatActivity() {
                                     }
                                 }
                             }.addOnFailureListener { error ->
-                                toastFailSignUp(error.toString())
+                                toastFailSignUp("Firebase", error.toString())
                                 setLoginIngView(false)
                             }
                     }
                 termsOfServiceDialog.show(supportFragmentManager, "terms")
             }?.addOnFailureListener { error ->
-                toastFailSignUp(error.toString())
+                toastFailSignUp("Firebase", error.toString())
             }
         }
     }
@@ -262,8 +260,15 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun toastFailSignUp(reason: String) {
-        Log.d("savepoint", reason)
+    private fun toastFailSignUp(api: String, reason: String) {
+        firebaseHelper.logEvent(
+            listOf(
+                "type" to "Login_Fail",
+                "api" to api,
+                "reason" to reason
+            )
+        )
+
         Toast.makeText(
             this@LoginActivity,
             "회원가입 실패",

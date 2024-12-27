@@ -5,6 +5,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
     id("kotlin-parcelize")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.kapt")
@@ -102,7 +103,6 @@ android {
         abi {
             enableSplit = true
         }
-
     }
 }
 
@@ -130,12 +130,13 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:19.0.0")
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
-    implementation("com.google.firebase:firebase-database-ktx:21.0.0")
-    implementation("com.google.firebase:firebase-analytics-ktx:22.1.2")
-    implementation("com.google.firebase:firebase-auth:23.1.0")
-    implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
+    implementation("com.google.firebase:firebase-database-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-storage-ktx")
 
-    implementation("androidx.legacy:legacy-support-core-utils:1.0.0")
+    // implementation("androidx.legacy:legacy-support-core-utils:1.0.0")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.browser:browser:1.8.0")
     implementation("com.google.code.gson:gson:2.10.1")
