@@ -66,9 +66,9 @@ class SettingFragment : Fragment() {
                 goMyPage()
             }
 
-            userInfo = user
+            userEmail = user.email
 
-            logoutbtn.setOnClickListener {
+            logoutBtn.setOnClickListener {
                 if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }
