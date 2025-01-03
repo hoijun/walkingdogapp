@@ -24,6 +24,7 @@ import com.example.walkingdogapp.databinding.FragmentSettingBinding
 import com.example.walkingdogapp.datamodel.UserInfo
 import com.example.walkingdogapp.utils.FirebaseAnalyticHelper
 import com.example.walkingdogapp.viewmodel.MainViewModel
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
@@ -44,6 +45,7 @@ class SettingFragment : Fragment() {
     private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
     private val auth = FirebaseAuth.getInstance()
     private var email = ""
+    private var password = ""
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -62,6 +64,7 @@ class SettingFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(this, callback)
         val sharedPreferences = requireActivity().getSharedPreferences("UserEmail", Context.MODE_PRIVATE)
         email = sharedPreferences.getString("email", "") ?: ""
+        password = sharedPreferences.getString("password", "") ?: ""
     }
 
 
@@ -123,76 +126,84 @@ class SettingFragment : Fragment() {
             }
 
             settingWithdrawal.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
+                if (!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }
 
-                val writeDialog = WriteDialog()
-                writeDialog.clickYesListener = WriteDialog.OnClickYesListener { writeText ->
-                    if (userEmail != writeText) {
-                        toastMsg("이메일이 일치하지 않습니다.")
-                        return@OnClickYesListener
-                    } // 이메일 올바르게 입력x
+                val loadingDialogFragment = LoadingDialogFragment()
+                loadingDialogFragment.show(requireActivity().supportFragmentManager, "loading")
 
-                    val loadingDialogFragment = LoadingDialogFragment()
-                    loadingDialogFragment.show(requireActivity().supportFragmentManager, "loading")
+                val credential = EmailAuthProvider.getCredential(email, password)
+                auth.currentUser?.reauthenticate(credential)?.addOnSuccessListener {
+                    loadingDialogFragment.dismiss()
+                    val writeDialog = WriteDialog()
+                    writeDialog.clickYesListener = WriteDialog.OnClickYesListener { writeText ->
+                        if (userEmail != writeText) {
+                            toastMsg("이메일이 일치하지 않습니다.")
+                            return@OnClickYesListener
+                        } // 이메일 올바르게 입력x
 
-                    lifecycleScope.launch {
-                        if (email.contains("@naver.com")) { // 네이버로 로그인 했을 경우
-                            if (!mainViewModel.removeAccount()) {
-                                toastMsg("탈퇴가 재대로 안됐어요..")
-                                loadingDialogFragment.dismiss()
-                                return@launch
-                            }
+                        loadingDialogFragment.show(requireActivity().supportFragmentManager, "loading")
 
-                            auth.currentUser?.delete()?.addOnSuccessListener {
-                                NidOAuthLogin().callDeleteTokenApi(object :
-                                    OAuthLoginCallback {
-                                    override fun onError(errorCode: Int, message: String) {
-                                        onFailure(errorCode, message)
-                                    }
+                        lifecycleScope.launch {
+                            if (email.contains("@naver.com")) { // 네이버로 로그인 했을 경우
+                                if (!mainViewModel.removeAccount()) {
+                                    toastMsg("탈퇴가 재대로 안됐어요..")
+                                    loadingDialogFragment.dismiss()
+                                    return@launch
+                                }
 
-                                    override fun onFailure(
-                                        httpStatus: Int,
-                                        message: String
-                                    ) {
-                                        completeDeleteAccount()
-                                        loadingDialogFragment.dismiss()
-                                    }
+                                auth.currentUser?.delete()?.addOnSuccessListener {
+                                    NidOAuthLogin().callDeleteTokenApi(object :
+                                        OAuthLoginCallback {
+                                        override fun onError(errorCode: Int, message: String) {
+                                            onFailure(errorCode, message)
+                                        }
 
-                                    override fun onSuccess() {
-                                        completeDeleteAccount()
-                                        loadingDialogFragment.dismiss()
-                                    }
-                                })
-                            }?.addOnFailureListener {
-                                toastMsg("탈퇴가 재대로 안됐어요..")
-                                loadingDialogFragment.dismiss()
-                            }
-                        } else { // 카카오로 로그인 했을 경우
-                            if (!mainViewModel.removeAccount()) {
-                                toastMsg("탈퇴가 재대로 안됐어요..")
-                                loadingDialogFragment.dismiss()
-                                return@launch
-                            }
+                                        override fun onFailure(
+                                            httpStatus: Int,
+                                            message: String
+                                        ) {
+                                            completeDeleteAccount()
+                                            loadingDialogFragment.dismiss()
+                                        }
 
-                            auth.currentUser?.delete()?.addOnSuccessListener {
-                                UserApiClient.instance.unlink {
-                                    completeDeleteAccount()
+                                        override fun onSuccess() {
+                                            completeDeleteAccount()
+                                            loadingDialogFragment.dismiss()
+                                        }
+                                    })
+                                }?.addOnFailureListener {
+                                    toastMsg("탈퇴가 재대로 안됐어요..")
                                     loadingDialogFragment.dismiss()
                                 }
-                            }?.addOnFailureListener {
-                                Log.e("savepoint", it.message.toString())
-                                toastMsg("탈퇴가 재대로 안됐어요..")
-                                loadingDialogFragment.dismiss()
+                            } else { // 카카오로 로그인 했을 경우
+                                if (!mainViewModel.removeAccount()) {
+                                    toastMsg("탈퇴가 재대로 안됐어요..")
+                                    loadingDialogFragment.dismiss()
+                                    return@launch
+                                }
+
+                                auth.currentUser?.delete()?.addOnSuccessListener {
+                                    UserApiClient.instance.unlink {
+                                        completeDeleteAccount()
+                                        loadingDialogFragment.dismiss()
+                                    }
+                                }?.addOnFailureListener {
+                                    Log.e("savepoint", it.message.toString())
+                                    toastMsg("탈퇴가 재대로 안됐어요..")
+                                    loadingDialogFragment.dismiss()
+                                }
                             }
                         }
                     }
+                    val bundle = Bundle()
+                    bundle.putString("text", "이메일을 입력해주세요.")
+                    writeDialog.arguments = bundle
+                    writeDialog.show(requireActivity().supportFragmentManager, "writeEmail")
+                }?.addOnFailureListener {
+                    toastMsg("앱을 껏다 켜주세요!")
                 }
-                val bundle = Bundle()
-                bundle.putString("text", "이메일을 입력해주세요.")
-                writeDialog.arguments = bundle
-                writeDialog.show(requireActivity().supportFragmentManager, "writeEmail")
             }
         }
         return binding.root

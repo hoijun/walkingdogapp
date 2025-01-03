@@ -182,7 +182,7 @@ class LoginActivity : AppCompatActivity() {
             if (!it.isSuccessful) {
                 if (it.exception is FirebaseAuthUserCollisionException) {
                     //이미 가입된 이메일일 경우
-                    saveEmail(this, myEmail)
+                    saveEmail(this, myEmail, password)
                     signInFirebase(myEmail, password)
                 } else {
                     toastFailSignUp("Firebase", it.exception?.message.toString())
@@ -203,7 +203,7 @@ class LoginActivity : AppCompatActivity() {
                                 lifecycleScope.launch(Dispatchers.Main) {
                                     if (success) {
                                         setLoginIngView(false)
-                                        saveEmail(this@LoginActivity, myEmail)
+                                        saveEmail(this@LoginActivity, myEmail, password)
                                         startMain()
                                         return@launch
                                     }
@@ -279,10 +279,11 @@ class LoginActivity : AppCompatActivity() {
         ).show()
     }
 
-    private fun saveEmail(context: Context, email: String) {
+    private fun saveEmail(context: Context, email: String, password: String) {
         val sharedPreferences = context.getSharedPreferences("UserEmail", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putString("email", email)
+        editor.putString("password", password)
         editor.apply()
     }
 }
