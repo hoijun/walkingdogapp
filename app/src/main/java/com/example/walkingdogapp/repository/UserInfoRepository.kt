@@ -56,7 +56,7 @@ class UserInfoRepository @Inject constructor(
     @Inject
     lateinit var firebaseHelper: FirebaseAnalyticHelper
 
-    fun resetUser() {
+    fun setUser() {
         uid = auth.currentUser?.uid
         userRef = database.getReference("Users").child("$uid")
         storageRef = storage.getReference("$uid").child("images")

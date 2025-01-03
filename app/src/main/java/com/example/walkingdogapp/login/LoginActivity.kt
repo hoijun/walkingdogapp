@@ -1,7 +1,10 @@
 package com.example.walkingdogapp.login
 
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -56,6 +59,7 @@ class LoginActivity : AppCompatActivity() {
             loginApp("kakao")
         }
     }
+
     private val naverLoginCallback = object : OAuthLoginCallback {
         override fun onError(errorCode: Int, message: String) {
             onFailure(errorCode, message)
@@ -174,10 +178,11 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun signupFirebase(myEmail: String, password: String) {
-        auth.createUserWithEmailAndPassword(myEmail, password).addOnCompleteListener { it ->
+        auth.createUserWithEmailAndPassword(myEmail, password).addOnCompleteListener {
             if (!it.isSuccessful) {
                 if (it.exception is FirebaseAuthUserCollisionException) {
                     //이미 가입된 이메일일 경우
+                    saveEmail(this, myEmail)
                     signInFirebase(myEmail, password)
                 } else {
                     toastFailSignUp("Firebase", it.exception?.message.toString())
@@ -189,40 +194,40 @@ class LoginActivity : AppCompatActivity() {
             auth.currentUser?.delete()?.addOnCompleteListener {
                 setLoginIngView(false)
                 val termsOfServiceDialog = TermOfServiceDialog()
-                termsOfServiceDialog.onClickYesListener =
-                    TermOfServiceDialog.OnClickYesListener { agree ->
-                        setLoginIngView(true)
-                        auth.createUserWithEmailAndPassword(myEmail, password)
-                            .addOnCompleteListener {
-                                if (agree) {
-                                    loginViewModel.signUp(myEmail)
-                                    loginViewModel.successSignUp.observe(this@LoginActivity) { success ->
-                                        lifecycleScope.launch(Dispatchers.Main) {
-                                            if (success) {
-                                                setLoginIngView(false)
-                                                startMain()
-                                            } else {
-                                                try {
-                                                    val uid = auth.currentUser?.uid
-                                                    val userRef = db.getReference("Users")
-                                                    userRef.child("$uid").removeValue().await()
-                                                } catch (_: Exception) { }
-                                                auth.currentUser?.delete()
-                                                withContext(Dispatchers.Main) {
-                                                    toastFailSignUp("Firebase", "")
-                                                    setLoginIngView(false)
-                                                    return@withContext
-                                                }
-                                                return@launch
-                                            }
-                                        }
+                termsOfServiceDialog.onClickYesListener = TermOfServiceDialog.OnClickYesListener { agree ->
+                    setLoginIngView(true)
+                    auth.createUserWithEmailAndPassword(myEmail, password).addOnCompleteListener {
+                        if (agree) {
+                            loginViewModel.signUp(myEmail)
+                            loginViewModel.successSignUp.observe(this@LoginActivity) { success ->
+                                lifecycleScope.launch(Dispatchers.Main) {
+                                    if (success) {
+                                        setLoginIngView(false)
+                                        saveEmail(this@LoginActivity, myEmail)
+                                        startMain()
+                                        return@launch
                                     }
+
+                                    try {
+                                        val uid = auth.currentUser?.uid
+                                        val userRef = db.getReference("Users")
+                                        userRef.child("$uid").removeValue().await()
+                                    } catch (_: Exception) { }
+                                    auth.currentUser?.delete()
+                                    withContext(Dispatchers.Main) {
+                                        toastFailSignUp("Firebase", "")
+                                        setLoginIngView(false)
+                                        return@withContext
+                                    }
+                                    return@launch
                                 }
-                            }.addOnFailureListener { error ->
-                                toastFailSignUp("Firebase", error.toString())
-                                setLoginIngView(false)
                             }
+                        }
+                    }.addOnFailureListener { error ->
+                        toastFailSignUp("Firebase", error.toString())
+                        setLoginIngView(false)
                     }
+                }
                 termsOfServiceDialog.show(supportFragmentManager, "terms")
             }?.addOnFailureListener { error ->
                 toastFailSignUp("Firebase", error.toString())
@@ -233,12 +238,10 @@ class LoginActivity : AppCompatActivity() {
     private fun signInFirebase(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {task ->
             if (task.isSuccessful) {
-                //로그인 처리를 해주면 됨!
-                loginViewModel.resetUser()
+                loginViewModel.setUser()
                 startMain()
             } else {
-                // 오류가 난 경우!
-                Toast.makeText(this, task.exception?.message + " 2", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                 setLoginIngView(false)
             }
         }
@@ -274,5 +277,12 @@ class LoginActivity : AppCompatActivity() {
             "회원가입 실패",
             Toast.LENGTH_SHORT
         ).show()
+    }
+
+    private fun saveEmail(context: Context, email: String) {
+        val sharedPreferences = context.getSharedPreferences("UserEmail", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("email", email)
+        editor.apply()
     }
 }

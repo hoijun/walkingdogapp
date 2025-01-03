@@ -17,13 +17,13 @@ class LoginViewModel @Inject constructor(
     val successSignUp: MutableLiveData<Boolean>
         get() = _successSignUp
 
-    fun resetUser() {
-        repository.resetUser()
+    fun setUser() {
+        repository.setUser()
     }
 
     fun signUp(email: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            resetUser()
+            setUser()
             repository.signUp(email, _successSignUp)
         }
     }
