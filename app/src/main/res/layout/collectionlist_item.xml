@@ -5,7 +5,7 @@
     <data>
         <variable
             name="collectionItem"
-            type="com.example.walkingdogapp.datamodel.CollectionInfo" />
+            type="com.tulmunchi.walkingdogapp.datamodel.CollectionInfo" />
         <variable
             name="isOwnedCollection"
             type="Boolean" />

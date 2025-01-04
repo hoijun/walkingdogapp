@@ -9,7 +9,7 @@
 
         <variable
             name="dog"
-            type="com.example.walkingdogapp.datamodel.DogInfo" />
+            type="com.tulmunchi.walkingdogapp.datamodel.DogInfo" />
 
         <variable
             name="beforeDogName"

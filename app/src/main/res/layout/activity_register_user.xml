@@ -6,7 +6,7 @@
 
         <variable
             name="user"
-            type="com.example.walkingdogapp.datamodel.UserInfo" />
+            type="com.tulmunchi.walkingdogapp.datamodel.UserInfo" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

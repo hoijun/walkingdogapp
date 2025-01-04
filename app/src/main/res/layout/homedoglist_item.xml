@@ -4,7 +4,7 @@
     <data>
         <variable
             name="dogInfo"
-            type="com.example.walkingdogapp.datamodel.DogInfo" />
+            type="com.tulmunchi.walkingdogapp.datamodel.DogInfo" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

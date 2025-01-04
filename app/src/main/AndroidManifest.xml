@@ -138,7 +138,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.walkingdogapp.provider"
+            android:authorities="com.tulmunchi.walkingdogapp.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

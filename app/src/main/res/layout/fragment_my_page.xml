@@ -7,7 +7,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.walkingdogapp.viewmodel.MainViewModel" />
+            type="com.tulmunchi.walkingdogapp.viewmodel.MainViewModel" />
 
         <variable
             name="countImg"

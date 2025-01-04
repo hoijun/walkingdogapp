@@ -24,11 +24,11 @@ val naverclientsecret = properties["naverlogin_clientsecret"] ?: ""
 
 
 android {
-    namespace = "com.example.walkingdogapp"
+    namespace = "com.tulmunchi.walkingdogapp"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.walkingdogapp"
+        applicationId = "com.tulmunchi.walkingdogapp"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

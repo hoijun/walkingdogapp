@@ -5,7 +5,7 @@
 
         <variable
             name="collection"
-            type="com.example.walkingdogapp.datamodel.CollectionInfo" />
+            type="com.tulmunchi.walkingdogapp.datamodel.CollectionInfo" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"

@@ -5,10 +5,10 @@
     <data>
         <variable
             name="selectDogInfo"
-            type="com.example.walkingdogapp.datamodel.DogInfo" />
+            type="com.tulmunchi.walkingdogapp.datamodel.DogInfo" />
         <variable
             name="viewmodel"
-            type="com.example.walkingdogapp.viewmodel.MainViewModel" />
+            type="com.tulmunchi.walkingdogapp.viewmodel.MainViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:tools="http://schemas.android.com/tools"
