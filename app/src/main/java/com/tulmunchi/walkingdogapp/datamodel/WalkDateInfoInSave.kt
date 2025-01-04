@@ -1,8 +1,16 @@
 package com.tulmunchi.walkingdogapp.datamodel
 
-data class WalkDateInfoInSave (
+import androidx.annotation.Keep
+import com.google.gson.annotations.SerializedName
+
+@Keep
+data class WalkDateInfoInSave(
+    @SerializedName("distance")
     val distance: Float = 0.0f,
+    @SerializedName("time")
     val time: Int = 0,
+    @SerializedName("coords")
     val coords: List<WalkLatLng> = listOf(),
-    val collections: List<String>
-) // 산책 한 후 저장 할 때 쓰는 클래스
+    @SerializedName("collections")
+    val collections: List<String> = listOf()
+)
