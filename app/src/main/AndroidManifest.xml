@@ -46,26 +46,29 @@
 
         <activity
             android:name=".mypage.PrivacyWebViewActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:configChanges="uiMode"/>
 
         <activity
             android:name=".registerinfo.RegisterUserActivity"
             android:exported="false"
+            android:configChanges="uiMode"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".registerinfo.RegisterDogActivity"
             android:exported="false"
+            android:configChanges="uiMode"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait"
+            android:configChanges="uiMode"
             android:theme="@style/AppTheme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -96,6 +99,7 @@
         <activity
             android:name=".login.LoginActivity"
             android:exported="true"
+            android:configChanges="uiMode"
             android:screenOrientation="portrait" />
 
         <service
@@ -127,6 +131,7 @@
             android:name=".walking.WalkingActivity"
             android:exported="false"
             android:hardwareAccelerated="true"
+            android:configChanges="uiMode"
             android:screenOrientation="portrait" />
 
         <activity
