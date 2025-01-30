@@ -27,6 +27,7 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
+import com.tulmunchi.walkingdogapp.mainhome.PermissionGuideDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -244,11 +245,15 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun startMain() {
-        val mainIntent = Intent(this, MainActivity::class.java)
-        mainIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                Intent.FLAG_ACTIVITY_CLEAR_TASK or
-                Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(mainIntent)
+        val permissionGuideDialog = PermissionGuideDialog()
+        permissionGuideDialog.onClickYesListener = PermissionGuideDialog.OnClickYesListener {
+            val mainIntent = Intent(this, MainActivity::class.java)
+            mainIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK or
+                    Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(mainIntent)
+        }
+        permissionGuideDialog.show(supportFragmentManager, "permission")
     }
 
     private fun setLoginIngView(loginIng: Boolean) {
