@@ -57,15 +57,15 @@ class TermOfServiceDialog: DialogFragment() {
             }
 
             toUseServiceDetail.setOnClickListener {
-                openWebView("https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80")
+                openWebView("https://hoitho.tistory.com/1")
             }
 
             toUserInfoServiceDetail.setOnClickListener {
-                openWebView("https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4-%EC%B2%98%EB%A6%AC-%EB%B0%A9%EC%B9%A8#")
+                openWebView("https://hoitho.tistory.com/2")
             }
 
             toLocationServiceDetail.setOnClickListener {
-                openWebView("https://velog.io/@ghlwns10/%ED%84%B8%EB%AD%89%EC%B9%98-%EC%9C%84%EC%B9%98-%EA%B8%B0%EB%B0%98-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80")
+                openWebView("https://hoitho.tistory.com/3")
             }
 
             cancelButton.setOnClickListener {
