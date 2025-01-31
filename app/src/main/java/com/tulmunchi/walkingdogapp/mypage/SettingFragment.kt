@@ -187,7 +187,6 @@ class SettingFragment : Fragment() {
                                         loadingDialogFragment.dismiss()
                                     }
                                 }?.addOnFailureListener {
-                                    Log.e("savepoint", it.message.toString())
                                     toastMsg("탈퇴가 재대로 안됐어요..")
                                     loadingDialogFragment.dismiss()
                                 }

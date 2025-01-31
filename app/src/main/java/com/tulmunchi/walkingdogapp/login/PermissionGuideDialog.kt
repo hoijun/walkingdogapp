@@ -1,4 +1,4 @@
-package com.tulmunchi.walkingdogapp.mainhome
+package com.tulmunchi.walkingdogapp.login
 
 import android.content.res.Resources
 import android.graphics.Color
@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import com.tulmunchi.walkingdogapp.databinding.PermissionguideDialogBinding
-import com.tulmunchi.walkingdogapp.login.TermOfServiceDialog.OnClickYesListener
 
 class PermissionGuideDialog: DialogFragment() {
     private var _binding: PermissionguideDialogBinding? = null

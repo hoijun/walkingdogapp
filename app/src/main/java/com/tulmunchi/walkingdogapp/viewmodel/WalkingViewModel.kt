@@ -36,7 +36,6 @@ class WalkingViewModel @Inject constructor(
         ) {
             fusedLocationProviderClient.lastLocation.addOnSuccessListener {
                 if (it != null) {
-                    Log.d("savepoint", "위도: ${it.latitude}, 경도: ${it.longitude}")
                     updateLocateInfo(LatLng(it.latitude, it.longitude))
                 }
             }

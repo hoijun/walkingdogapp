@@ -82,7 +82,6 @@ class CollectionListAdapter(
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
                 // val oldSize = collectionInfos.size
                 collectionInfos = (results.values as List<CollectionInfo>)
-                Log.d("savepoint", collectionInfos.toString())
                 notifyDataSetChanged()
                 /* val newSize = collectionInfos.size
                 if (oldSize == newSize) {

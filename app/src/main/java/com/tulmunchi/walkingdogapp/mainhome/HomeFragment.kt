@@ -111,7 +111,7 @@ class HomeFragment : Fragment() {
             TabLayoutMediator(homeDogsIndicator, homeDogsViewPager) { _, _ -> }.attach()
 
             btnWalk.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
+                if (!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }
 
@@ -120,7 +120,7 @@ class HomeFragment : Fragment() {
                     val listener = DialogInterface.OnClickListener { _, ans ->
                         when (ans) {
                             DialogInterface.BUTTON_POSITIVE -> {
-                                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
+                                if (!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
                                     return@OnClickListener
                                 }
                                 val registerDogIntent =
@@ -136,7 +136,8 @@ class HomeFragment : Fragment() {
                 }
 
                 if (selectedDogList.isEmpty()) {
-                    Toast.makeText(requireContext(), "함께 산책할 강아지를 선택해주세요!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "함께 산책할 강아지를 선택해주세요!", Toast.LENGTH_SHORT)
+                        .show()
                     return@setOnClickListener
                 }
 
@@ -157,7 +158,8 @@ class HomeFragment : Fragment() {
                                 // 권한 창으로 이동
                                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                intent.data = Uri.fromParts("package", requireContext().packageName, null)
+                                intent.data =
+                                    Uri.fromParts("package", requireContext().packageName, null)
                                 startActivity(intent)
                             }
                         }
@@ -168,41 +170,10 @@ class HomeFragment : Fragment() {
                     return@setOnClickListener
                 }
 
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                    if (ContextCompat.checkSelfPermission(
-                            requireContext(),
-                            Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                        )
-                        == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        val intent = Intent(requireContext(), WalkingActivity::class.java).apply {
-                            this.putStringArrayListExtra("selectedDogs", ArrayList(selectedDogList))
-                        }
-                        startActivity(intent)
-                    } else {
-                        builder.setTitle("산책을 하기 위해 위치 권한을 \n항상 허용으로 해주세요!")
-                        val listener = DialogInterface.OnClickListener { _, ans ->
-                            when (ans) {
-                                DialogInterface.BUTTON_POSITIVE -> {
-                                    ActivityCompat.requestPermissions(
-                                        requireActivity(),
-                                        arrayOf(
-                                            Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                                        ), 998
-                                    )
-                                }
-                            }
-                        }
-                        builder.setPositiveButton("네", listener)
-                        builder.setNegativeButton("아니오", null)
-                        builder.show()
-                    }
-                } else {
-                    val intent = Intent(requireContext(), WalkingActivity::class.java).apply {
-                        this.putStringArrayListExtra("selectedDogs", ArrayList(selectedDogList))
-                    }
-                    startActivity(intent)
+                val intent = Intent(requireContext(), WalkingActivity::class.java).apply {
+                    this.putStringArrayListExtra("selectedDogs", ArrayList(selectedDogList))
                 }
+                startActivity(intent)
             }
         }
         return binding.root

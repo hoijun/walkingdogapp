@@ -218,30 +218,18 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                Toast.makeText(this, "오류가 생겨 산책이 종료 되었습니다", Toast.LENGTH_SHORT).show()
-                stopWalkingService()
-                goHome()
-            }
-        } else {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                Toast.makeText(this, "오류가 생겨 산책이 종료 되었습니다", Toast.LENGTH_SHORT).show()
-                stopWalkingService()
-                goHome()
-            }
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Toast.makeText(this, "오류가 생겨 산책이 종료 되었습니다", Toast.LENGTH_SHORT).show()
+            stopWalkingService()
+            goHome()
         }
     }
 
