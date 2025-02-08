@@ -13,3 +13,6 @@
 
 ## 저작권
 산책 아이콘 출처: 강아지 PNG는 百事可口阔落에 의해 설계되었고,에서 유래되었습니다. https://kor.pngtree.com/freepng/yellow-white-pixel-kuki-dog_6357944.html?sol=downref&id=bef
+
+## 플레이 스토어 링크
+https://play.google.com/store/apps/details?id=com.tulmunchi.walkingdogapp&pcampaignid=web_share
