@@ -35,7 +35,7 @@ class WalkInfoDogListAdapter(private val dogsInfo: List<DogInfo>, private val do
         fun bind(dog: DogInfo) {
             if (dogsImg.get(dog.name) != null) {
                 Glide.with(context).load(dogsImg.get(dog.name))
-                    .format(DecodeFormat.PREFER_RGB_565).override(100, 100).into(binding.WalkInfoDogImg)
+                    .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(binding.WalkInfoDogImg)
             }
 
             binding.root.setOnClickListener {

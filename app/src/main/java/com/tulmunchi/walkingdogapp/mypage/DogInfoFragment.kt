@@ -80,7 +80,7 @@ class DogInfoFragment : Fragment() {
 
             if (mainViewModel.dogsImg.value?.get(userDogInfo.name) != null) {
                 Glide.with(requireContext()).load(mainViewModel.dogsImg.value?.get(userDogInfo.name))
-                    .format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(doginfoImage)
+                    .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(doginfoImage)
             }
         }
 

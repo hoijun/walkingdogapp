@@ -46,7 +46,7 @@ class HomeDogListAdapter(private val dogsList: List<DogInfo>, private val succes
                 homeAddDogBtn.visibility = View.GONE
                 if (MainActivity.dogUriList[dog.name] != null) {
                     Glide.with(context).load(MainActivity.dogUriList[dog.name])
-                        .format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(homeDogImage)
+                        .format(DecodeFormat.PREFER_ARGB_8888).override(500, 500).into(homeDogImage)
                 }
 
                 homeDogLayout.setOnClickListener {

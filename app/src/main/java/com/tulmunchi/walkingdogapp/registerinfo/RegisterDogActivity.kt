@@ -67,7 +67,7 @@ class RegisterDogActivity : AppCompatActivity() {
         if (uri != null && getExtension(uri) == "jpg") {
             imguri = pressImage(uri,this)
             Glide.with(this@RegisterDogActivity).load(uri)
-                .format(DecodeFormat.PREFER_RGB_565).override(150, 150).into(binding.registerImage)
+                .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(binding.registerImage)
         } else {
             return@registerForActivityResult
         }
@@ -114,7 +114,7 @@ class RegisterDogActivity : AppCompatActivity() {
 
             if (MainActivity.dogUriList[beforeName] != null) {
                 Glide.with(this@RegisterDogActivity).load(MainActivity.dogUriList[beforeName])
-                    .format(DecodeFormat.PREFER_RGB_565).override(150, 150).into(registerImage)
+                    .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(registerImage)
             }
 
             btnDogismale.setOnClickListener {
@@ -279,24 +279,33 @@ class RegisterDogActivity : AppCompatActivity() {
     }
 
     private fun pressImage(uri: Uri, context: Context): Uri {
-        val bitmap = try {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        try {
+            val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri))
             } else {
                 MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
             }
+
+            val maxSize = 1400f
+
+            val ratio = maxSize / maxOf(bitmap.width, bitmap.height)
+            val targetWidth = (bitmap.width * ratio).toInt()
+            val targetHeight = (bitmap.height * ratio).toInt()
+
+            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true)
+            bitmap.recycle()
+
+            val tempFile = File.createTempFile("profile_img", ".jpg", context.cacheDir)
+            FileOutputStream(tempFile).use { fileOutputStream ->
+                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, fileOutputStream)
+                scaledBitmap.recycle()
+            }
+
+            return Uri.fromFile(tempFile)
         } catch (e: Exception) {
+            e.printStackTrace()
             return Uri.EMPTY
         }
-
-        val tempFile = File.createTempFile("pressed_img", ".jpg", context.cacheDir)
-        FileOutputStream(tempFile).use { fileOutputStream ->
-            // 이미지 압축 및 크기 조정 로직
-            val compressedBitmap =
-                Bitmap.createScaledBitmap(bitmap, bitmap.width / 3, bitmap.height / 3, true)
-            compressedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream)
-        }
-        return Uri.fromFile(tempFile)
     }
 
     private fun selectGoMain() {

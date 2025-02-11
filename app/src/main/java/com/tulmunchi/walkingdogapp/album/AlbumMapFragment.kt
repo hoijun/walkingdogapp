@@ -254,7 +254,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         val imgView = ImageView(requireContext())
         imgView.layoutParams = ViewGroup.LayoutParams(200, 200)
         imgView.scaleType = ImageView.ScaleType.CENTER_CROP
-        Glide.with(requireContext()).load(uri).format(DecodeFormat.PREFER_RGB_565)
+        Glide.with(requireContext()).load(uri).format(DecodeFormat.PREFER_ARGB_8888)
             .override(200, 200).into(imgView)
         return imgView
     }

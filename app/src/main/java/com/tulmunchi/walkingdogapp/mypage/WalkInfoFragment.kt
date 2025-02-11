@@ -315,10 +315,10 @@ class WalkInfoFragment : Fragment() { // 수정
         fun loadImage(iv: ImageView, selectedDog: DogInfo, viewModel: MainViewModel) {
             if (viewModel.dogsImg.value?.get(selectedDog.name) != null) {
                 Glide.with(iv.context).load(viewModel.dogsImg.value?.get(selectedDog.name))
-                    .format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(iv)
+                    .format(DecodeFormat.PREFER_ARGB_8888).override(500, 500).into(iv)
             } else {
                 Glide.with(iv.context).load(R.drawable.collection_003)
-                    .format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(iv)
+                    .format(DecodeFormat.PREFER_ARGB_8888).override(500, 500).into(iv)
             }
         }
     }

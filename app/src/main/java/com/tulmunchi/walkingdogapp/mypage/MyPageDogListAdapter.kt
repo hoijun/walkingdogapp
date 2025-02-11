@@ -64,7 +64,7 @@ class MyPageDogListAdapter(private val dogsList: List<DogInfo>, private val succ
 
                 if (MainActivity.dogUriList[dog.name] != null) {
                     Glide.with(context).load(MainActivity.dogUriList[dog.name])
-                        .format(DecodeFormat.PREFER_RGB_565).override(100, 100).into(menuDogimg)
+                        .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(menuDogimg)
                 }
                 root.setOnClickListener {
                     onItemClickListener?.onItemClick(dog)

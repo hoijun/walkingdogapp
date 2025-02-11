@@ -40,7 +40,7 @@ class ManageDogListAdapter(private val dogsList: List<DogInfo>): RecyclerView.Ad
 
                 if (MainActivity.dogUriList[dog.name] != null) {
                     Glide.with(context).load(MainActivity.dogUriList[dog.name])
-                        .format(DecodeFormat.PREFER_RGB_565).override(100, 100).into(manageDogimg)
+                        .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(manageDogimg)
                 }
 
                 root.setOnClickListener {

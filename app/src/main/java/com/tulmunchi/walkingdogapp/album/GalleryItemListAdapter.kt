@@ -56,7 +56,7 @@ class GalleryItemListAdapter(private val imgList: MutableList<GalleryImgInfo>): 
             }
         }
         fun bind(imgInfo: GalleryImgInfo) {
-            Glide.with(context).load(imgInfo.uri).format(DecodeFormat.PREFER_RGB_565).override(500, 500).into(binding.galleryImg)
+            Glide.with(context).load(imgInfo.uri).format(DecodeFormat.PREFER_ARGB_8888).override(500, 500).into(binding.galleryImg)
             if (selectMode) {
                 binding.checkBox.visibility = View.VISIBLE
                 binding.checkBox.isChecked = selectedItems.contains(imgList[bindingAdapterPosition])

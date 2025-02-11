@@ -102,10 +102,10 @@ class CollectionListAdapter(
         @JvmStatic
         fun loadImage(iv: ImageView, resId: Int, isOwned: Boolean) {
             if (isOwned) {
-                Glide.with(iv.context).load(resId).format(DecodeFormat.PREFER_RGB_565)
+                Glide.with(iv.context).load(resId).format(DecodeFormat.PREFER_ARGB_8888)
                     .override(400, 400).into(iv)
             } else {
-                Glide.with(iv.context).load(R.drawable.waitimage).format(DecodeFormat.PREFER_RGB_565)
+                Glide.with(iv.context).load(R.drawable.waitimage).format(DecodeFormat.PREFER_ARGB_8888)
                     .override(400, 400).into(iv)
             }
         }
