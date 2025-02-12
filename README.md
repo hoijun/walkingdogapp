@@ -12,7 +12,7 @@
    <img src="https://img.shields.io/badge/kotlin-7F52FF?style=flat&logo=kotlin&logoColor=white"/>	
 
 ## 기술 스택
-   - Firebase - 데이터 베이스 및 사용자 인증-
+   - Firebase - 데이터 베이스 및 사용자 인증
    - FusedLocationProviderClient - 사용자의 좌표 추적
    - AlarmManager - 산책 알람
    - Room - 산책 알람 설정을 저장
