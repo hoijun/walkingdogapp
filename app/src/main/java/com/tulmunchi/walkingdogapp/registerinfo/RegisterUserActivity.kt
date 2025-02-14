@@ -157,9 +157,10 @@ class RegisterUserActivity : AppCompatActivity() {
     }
 
     private fun goHome() {
-        val backIntent = Intent(this, MainActivity::class.java)
-        backIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val backIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("isImgChanged", false)
+        }
         startActivity(backIntent)
         finish()
     }

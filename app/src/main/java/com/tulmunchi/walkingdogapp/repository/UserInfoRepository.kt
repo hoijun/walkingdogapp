@@ -2,6 +2,7 @@ package com.tulmunchi.walkingdogapp.repository
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.tulmunchi.walkingdogapp.datamodel.AlarmDao
 import com.tulmunchi.walkingdogapp.datamodel.AlarmDataModel
@@ -136,7 +137,9 @@ class UserInfoRepository @Inject constructor(
         collectionInfo: MutableLiveData<HashMap<String, Boolean>>,
         dogsImg: MutableLiveData<HashMap<String, Uri>>,
         dogNames: MutableLiveData<List<String>>,
-        successGetData: MutableLiveData<Boolean>
+        successGetData: MutableLiveData<Boolean>,
+        isImgChanged: Boolean,
+        successGetImg: MutableLiveData<Boolean>
     ) {
         if (!NetworkManager.checkNetworkState(context)) {
             successGetData.postValue(false)
@@ -145,6 +148,7 @@ class UserInfoRepository @Inject constructor(
 
         if (successGetData.value == true) {
             successGetData.postValue(true)
+            return
         }
 
         val isError = AtomicBoolean(false)
@@ -177,7 +181,8 @@ class UserInfoRepository @Inject constructor(
                                     dogInfo.child("weight").getValue(String::class.java)!!,
                                     dogInfo.child("feature").getValue(String::class.java)!!,
                                     dogInfo.child("creationTime").getValue(Long::class.java)!!,
-                                    dogInfo.child("totalWalkInfo").getValue(TotalWalkInfo::class.java)!!
+                                    dogInfo.child("totalWalkInfo")
+                                        .getValue(TotalWalkInfo::class.java)!!
                                 )
                             )
                             dogNamesList.add(dogInfo.child("name").getValue(String::class.java)!!)
@@ -203,7 +208,9 @@ class UserInfoRepository @Inject constructor(
             }
 
             userRef.child("totalWalkInfo").get().addOnSuccessListener {
-                totalWalkDeferred.complete(it.getValue(TotalWalkInfo::class.java) ?: TotalWalkInfo())
+                totalWalkDeferred.complete(
+                    it.getValue(TotalWalkInfo::class.java) ?: TotalWalkInfo()
+                )
             }.addOnFailureListener {
                 errorReason.add("Error: totalWalkInfo" to it.message.toString())
                 isError.set(true)
@@ -268,34 +275,35 @@ class UserInfoRepository @Inject constructor(
                 collectionDeferred.complete(Utils.item_whether)
             }
 
-            // 강아지 프로필 사진
-            val dogImgs = HashMap<String, Uri>()
-            var downloadCount = 0
-            var imgCount: Int
-            storageRef.listAll().addOnSuccessListener { listResult ->
-                imgCount = listResult.items.size
-                if (imgCount == 0) {
-                    profileUriDeferred.complete(HashMap())
-                }
-                listResult.items.forEach { item ->
-                    item.downloadUrl.addOnSuccessListener { uri ->
-                        downloadCount++
-                        dogImgs[item.name] = uri
-                        if (imgCount == downloadCount) {
-                            profileUriDeferred.complete(dogImgs)
-                        }
-                    }.addOnFailureListener {
-                        downloadCount++
-                        dogImgs[item.name] = Uri.EMPTY
-                        if (imgCount == downloadCount) {
-                            profileUriDeferred.complete(dogImgs)
+            if (isImgChanged) {
+                val dogImgs = HashMap<String, Uri>()
+                var downloadCount = 0
+                var imgCount: Int
+                storageRef.listAll().addOnSuccessListener { listResult ->
+                    imgCount = listResult.items.size
+                    if (imgCount == 0) {
+                        profileUriDeferred.complete(HashMap())
+                    }
+                    listResult.items.forEach { item ->
+                        item.downloadUrl.addOnSuccessListener { uri ->
+                            downloadCount++
+                            dogImgs[item.name] = uri
+                            if (imgCount == downloadCount) {
+                                profileUriDeferred.complete(dogImgs)
+                            }
+                        }.addOnFailureListener {
+                            downloadCount++
+                            dogImgs[item.name] = Uri.EMPTY
+                            if (imgCount == downloadCount) {
+                                profileUriDeferred.complete(dogImgs)
+                            }
                         }
                     }
+                }.addOnFailureListener {
+                    isError.set(true)
+                    errorReason.add("Error: profileUri" to it.message.toString())
+                    profileUriDeferred.complete(HashMap())
                 }
-            }.addOnFailureListener {
-                isError.set(true)
-                errorReason.add("Error: profileUri" to it.message.toString())
-                profileUriDeferred.complete(HashMap())
             }
 
             dogNames.postValue(dogNameList)
@@ -303,7 +311,10 @@ class UserInfoRepository @Inject constructor(
             totalWalkInfo.postValue(totalWalkDeferred.await())
             walkDates.postValue(walkDateDeferred.await())
             collectionInfo.postValue(collectionDeferred.await())
-            dogsImg.postValue(profileUriDeferred.await())
+            if (isImgChanged) {
+                dogsImg.postValue(profileUriDeferred.await())
+                successGetImg.postValue(true)
+            }
 
             if (!isError.get()) {
                 successGetData.postValue(true)

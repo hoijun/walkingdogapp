@@ -49,23 +49,9 @@ class MainViewModel @Inject constructor(
     private val _currentCoord = MutableLiveData<LatLng>()
     private val _currentRegion = MutableLiveData<String>()
     private val _albumImgs = MutableLiveData<List<GalleryImgInfo>>()
+    private val _successGetImg = MutableLiveData(false)
 
     private lateinit var address : List<String>
-
-    init {
-        CoroutineScope(Dispatchers.IO).launch {
-            repository.observeUser(
-                _dogsInfo,
-                _userInfo,
-                _totalTotalWalkInfo,
-                _walkDates,
-                _collectionWhether,
-                _dogsImg,
-                _dogNames,
-                _successGetData
-            )
-        }
-    }
 
     val currentCoord: LiveData<LatLng>
         get() = _currentCoord
@@ -100,7 +86,16 @@ class MainViewModel @Inject constructor(
     val successGetData: LiveData<Boolean>
         get() = _successGetData
 
+    private val successGetImg: LiveData<Boolean>
+        get() = _successGetImg
+
     fun isSuccessGetData(): Boolean = successGetData.value!!
+
+    fun isSuccessGetImg(): Boolean = successGetImg.value!!
+
+    fun setDogsImg(dogsImg: HashMap<String, Uri>) {
+        _dogsImg.value = dogsImg
+    }
 
     fun saveAlbumImgs(albumImgs: List<GalleryImgInfo>) {
         _albumImgs.value = albumImgs
@@ -122,7 +117,7 @@ class MainViewModel @Inject constructor(
         repository.onOffAlarm(alarm.alarm_code, isChecked)
     }
 
-    fun observeUser() {
+    fun observeUser(isImgChanged: Boolean = true) {
         CoroutineScope(Dispatchers.IO).launch {
             repository.observeUser(
                 _dogsInfo,
@@ -132,7 +127,9 @@ class MainViewModel @Inject constructor(
                 _collectionWhether,
                 _dogsImg,
                 _dogNames,
-                _successGetData
+                _successGetData,
+                isImgChanged,
+                _successGetImg
             )
         }
         getLastLocation()

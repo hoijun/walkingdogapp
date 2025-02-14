@@ -230,9 +230,9 @@ class RegisterDogActivity : AppCompatActivity() {
                                     loadingDialogFragment.dismiss()
                                     if (onFailed) {
                                         Toast.makeText(this@RegisterDogActivity, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
-                                        goMain()
+                                        goMain(false)
                                     }
-                                    goMain()
+                                    goMain(true)
                                 }
                             }
                         }
@@ -261,7 +261,7 @@ class RegisterDogActivity : AppCompatActivity() {
                                 registerDogViewModel.removeDogInfo(beforeName, MainActivity.dogUriList)
                                 withContext(Dispatchers.Main) {
                                     loadingDialogFragment.dismiss()
-                                    goMain()
+                                    goMain(true)
                                 }
                             }
                         }
@@ -314,7 +314,7 @@ class RegisterDogActivity : AppCompatActivity() {
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    goMain()
+                    goMain(false)
                 }
             }
         }
@@ -323,10 +323,12 @@ class RegisterDogActivity : AppCompatActivity() {
         builder.show()
     }
 
-    private fun goMain() {
-        val backIntent = Intent(this, MainActivity::class.java)
-        backIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                Intent.FLAG_ACTIVITY_CLEAR_TASK
+    private fun goMain(isUpdateImg: Boolean) {
+        val backIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("isImgChanged", isUpdateImg)
+        }
+
         startActivity(backIntent)
         finish()
     }

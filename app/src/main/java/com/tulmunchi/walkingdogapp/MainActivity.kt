@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -144,11 +145,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getUserInfo() {
+        val isImgChanged = intent.getBooleanExtra("isImgChanged", true)
+        mainViewModel.observeUser(isImgChanged)
         mainViewModel.successGetData.observe(this) {
             try {
                 loadingDialogFragment.dismiss()
-                dogUriList = mainViewModel.dogsImg.value ?: hashMapOf()
                 dogNameList = mainViewModel.dogsNames.value ?: listOf()
+                if (mainViewModel.isSuccessGetImg()) {
+                    dogUriList = mainViewModel.dogsImg.value ?: hashMapOf()
+                } else {
+                    mainViewModel.setDogsImg(dogUriList)
+                }
             } catch (_: Exception) { }
             finally {
                 when (preFragment) {

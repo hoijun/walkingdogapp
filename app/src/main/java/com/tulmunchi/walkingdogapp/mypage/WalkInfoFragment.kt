@@ -171,7 +171,7 @@ class WalkInfoFragment : Fragment() { // 수정
 
             walkcalendar.addDecorators(dayDecorator, saturdayDecorator, sundayDecorator, selectedMonthDecorator)
             walkcalendar.setWeekDayFormatter(ArrayWeekDayFormatter(resources.getTextArray(R.array.custom_weekdays)))
-            walkcalendar.state().edit().setMaximumDate(CalendarDay.today()).commit() // 최대 날짜 설정
+            walkcalendar.state().edit().setMaximumDate(CalendarDay.today()).setMinimumDate(CalendarDay.from(2024, 1, 1)).commit()
             walkcalendar.setTitleFormatter { day -> // 년 월 표시 변경
                 val inputText = day.date
                 val calendarHeaderElements = inputText.toString().split("-").toMutableList()
