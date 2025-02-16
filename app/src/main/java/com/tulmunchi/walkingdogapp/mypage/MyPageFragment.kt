@@ -201,25 +201,31 @@ class MyPageFragment : Fragment() {
     }
 
     private fun getAlbumImageCount(): Int {
-        var count = 0
-        val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        val projection = arrayOf(MediaStore.Images.Media._ID)
-        val selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ?"
-        val selectionArgs = arrayOf("털뭉치", "%munchi_%")
-        val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC"
-        val cursor = requireActivity().contentResolver.query(
-            uri,
-            projection,
-            selection,
-            selectionArgs,
-            sortOrder
-        )
-        cursor?.use {
-            while (it.moveToNext()) {
-                count++
+        try {
+            var count = 0
+            val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            val projection = arrayOf(MediaStore.Images.Media._ID)
+            val selection =
+                "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ?"
+            val selectionArgs = arrayOf("털뭉치", "%munchi_%")
+            val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC"
+            val cursor = requireActivity().contentResolver.query(
+                uri,
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder
+            )
+            cursor?.use {
+                while (it.moveToNext()) {
+                    count++
+                }
             }
+            return count
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "이미지를 불러오는 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show()
+            return 0
         }
-        return count
     }
 
     object MyPageBindingAdapter {

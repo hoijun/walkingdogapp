@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -189,38 +190,48 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         if (selectDate.isEmpty()) {
             return
         }
-        val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        val projection = arrayOf(MediaStore.Images.Media._ID, MediaStore.Images.Media.DATE_TAKEN)
-        val selection =
-            "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ?"
-        val selectionArgs = arrayOf("털뭉치", "%munchi_%")
-        val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} ASC"
-        val cursor = requireActivity().contentResolver.query(
-            uri,
-            projection,
-            selection,
-            selectionArgs,
-            sortOrder
-        )
 
-        cursor?.use { it ->
-            val columnIndexId: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            val columnIndexDate: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
-            while (it.moveToNext()) {
-                val imageDate = Utils.convertLongToTime(SimpleDateFormat("yyyy-MM-dd"), it.getLong(columnIndexDate) / 1000L)
-                val imagePath: String = it.getString(columnIndexId)
-                val contentUri = Uri.withAppendedPath(uri, imagePath)
-                val imgView = getMarkerImageView(contentUri)
-                if (imageDate == selectDate) {
-                    getImgLatLng(contentUri, requireContext())?.let {
-                        imgInfos.add(AlbumMapImgInfo(contentUri, it, imgView))
-                    }
+        try {
+            val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            val projection =
+                arrayOf(MediaStore.Images.Media._ID, MediaStore.Images.Media.DATE_TAKEN)
+            val selection =
+                "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ?"
+            val selectionArgs = arrayOf("털뭉치", "%munchi_%")
+            val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} ASC"
+            val cursor = requireActivity().contentResolver.query(
+                uri,
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder
+            )
 
-                    if (imgInfos.size == 20) {
-                        return
+            cursor?.use { it ->
+                val columnIndexId: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+                val columnIndexDate: Int =
+                    it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
+                while (it.moveToNext()) {
+                    val imageDate = Utils.convertLongToTime(
+                        SimpleDateFormat("yyyy-MM-dd"),
+                        it.getLong(columnIndexDate) / 1000L
+                    )
+                    val imagePath: String = it.getString(columnIndexId)
+                    val contentUri = Uri.withAppendedPath(uri, imagePath)
+                    val imgView = getMarkerImageView(contentUri)
+                    if (imageDate == selectDate) {
+                        getImgLatLng(contentUri, requireContext())?.let {
+                            imgInfos.add(AlbumMapImgInfo(contentUri, it, imgView))
+                        }
+
+                        if (imgInfos.size == 20) {
+                            return
+                        }
                     }
                 }
             }
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "이미지를 불러오는 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show()
         }
     }
 
