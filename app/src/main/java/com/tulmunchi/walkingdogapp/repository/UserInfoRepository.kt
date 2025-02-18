@@ -82,7 +82,7 @@ class UserInfoRepository @Inject constructor(
 
             val totalTotalWalkInfoJob = async(Dispatchers.IO) {
                 try {
-                    userRef.child("$uid").child("totalWalk")
+                    userRef.child("$uid").child("totalWalkInfo")
                         .setValue(TotalWalkInfo()).await()
                 } catch (e: Exception) {
                     errorReason.add("Error: totalWalkInfo" to e.message.toString())
