@@ -288,7 +288,12 @@ class RegisterDogActivity : AppCompatActivity() {
 
             val maxSize = 1400f
 
-            val ratio = maxSize / maxOf(bitmap.width, bitmap.height)
+            val ratio = if (maxOf(bitmap.width, bitmap.height) > maxSize) {
+                maxSize / maxOf(bitmap.width, bitmap.height)
+            } else {
+                1.0f
+            }
+            
             val targetWidth = (bitmap.width * ratio).toInt()
             val targetHeight = (bitmap.height * ratio).toInt()
 
