@@ -234,9 +234,18 @@ class GalleryFragment : Fragment() {
                 MediaStore.Images.Media.HEIGHT,
                 MediaStore.Images.Media.ORIENTATION
             )
-            val selection =
-                "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ?"
-            val selectionArgs = arrayOf("털뭉치", "%munchi_%")
+
+            val selection: String
+            val selectionArgs: Array<String>
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ? AND ${MediaStore.Images.Media.IS_PENDING} = 0"
+                selectionArgs = arrayOf("털뭉치", "%munchi_%")
+            } else {
+                selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ?"
+                selectionArgs = arrayOf("털뭉치", "%munchi_%")
+            }
+
             val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} ASC"
             val cursor = requireActivity().contentResolver.query(
                 uri,
