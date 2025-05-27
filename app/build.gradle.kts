@@ -151,7 +151,7 @@ dependencies {
 
     implementation("com.kakao.sdk:v2-user:2.21.3")
     implementation("com.naver.maps:map-sdk:3.21.0")
-    implementation(files("libs/oauth-5.9.0.aar"))
+    implementation("com.navercorp.nid:oauth:5.10.0")
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
