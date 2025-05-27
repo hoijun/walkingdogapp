@@ -28,11 +28,12 @@ android {
     compileSdk = 34
 
     defaultConfig {
+        manifestPlaceholders += mapOf()
         applicationId = "com.tulmunchi.walkingdogapp"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 8
+        versionName = "1.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -40,8 +41,8 @@ android {
         }
 
         manifestPlaceholders["Kakao_Redirect_URI"] = kakaoredirecturi as String
-        manifestPlaceholders["NaverMap_API_KEY"] = navermapapiKey as String
         manifestPlaceholders["Kakao_API_KEY"]  = kakaoapikey as String
+        buildConfigField("String", "NaverMap_API_KEY", navermapapiKey as String)
         buildConfigField("String", "Kakao_API_KEY", kakaoapikey)
         buildConfigField("String", "Naver_ClientId", naverclientid as String)
         buildConfigField("String", "Naver_ClientSecret", naverclientsecret as String)
@@ -56,6 +57,7 @@ android {
                 "proguard-rules.pro"
             )
         }
+
         buildFeatures {
             viewBinding = true
             dataBinding = true
@@ -71,12 +73,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     composeOptions {
@@ -117,7 +119,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
 
     implementation("com.google.dagger:hilt-android:2.49")
-    kapt("com.google.dagger:hilt-android-compiler:2.48")
+    ksp("com.google.dagger:hilt-android-compiler:2.49")
 
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
@@ -128,6 +130,7 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.android.gms:play-services-maps:19.0.0")
+    implementation("com.google.android.play:app-update-ktx:2.1.0")
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-database-ktx")
@@ -146,8 +149,8 @@ dependencies {
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.0")
 
-    implementation("com.kakao.sdk:v2-user:2.20.3")
-    implementation("com.naver.maps:map-sdk:3.20.0")
+    implementation("com.kakao.sdk:v2-user:2.21.3")
+    implementation("com.naver.maps:map-sdk:3.21.0")
     implementation(files("libs/oauth-5.9.0.aar"))
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
@@ -159,4 +162,5 @@ dependencies {
     androidTestImplementation("androidx.test:monitor:1.7.2")
     androidTestImplementation("androidx.test.ext:junit-ktx:1.2.1")
     androidTestImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testImplementation(kotlin("test"))
 }
