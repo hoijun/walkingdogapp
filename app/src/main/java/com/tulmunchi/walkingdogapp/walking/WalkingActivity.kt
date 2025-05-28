@@ -703,6 +703,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         @BindingAdapter("isTracking")
         @JvmStatic
         fun setStartBtnImg(iv: ImageView, isTracking: Boolean?) {
+            if (iv.context == null) return
             if(isTracking == true) {
                 Glide.with(iv.context).load(R.drawable.pause).into(iv)
             } else {
@@ -721,6 +722,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         @BindingAdapter("isTrackingCameraMode")
         @JvmStatic
         fun setTrackingCameraModeOnBtn(iv: ImageView, isTrackingCameraMode: Boolean) {
+            if (iv.context == null) return
             if (isTrackingCameraMode) {
                 Glide.with(iv.context).load(R.drawable.mylocation).into(iv)
             } else {

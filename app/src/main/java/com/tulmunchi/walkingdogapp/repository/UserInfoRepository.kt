@@ -2,8 +2,15 @@ package com.tulmunchi.walkingdogapp.repository
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
+import com.google.firebase.storage.FirebaseStorage
+import com.naver.maps.geometry.LatLng
 import com.tulmunchi.walkingdogapp.datamodel.AlarmDao
 import com.tulmunchi.walkingdogapp.datamodel.AlarmDataModel
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
@@ -15,14 +22,6 @@ import com.tulmunchi.walkingdogapp.datamodel.WalkLatLng
 import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
 import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
 import com.tulmunchi.walkingdogapp.utils.utils.Utils
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.getValue
-import com.google.firebase.storage.FirebaseStorage
-import com.naver.maps.geometry.LatLng
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -62,7 +61,7 @@ class UserInfoRepository @Inject constructor(
         storageRef = storage.getReference("$uid").child("images")
     }
 
-    suspend fun signUp(email: String, successSignUp: MutableLiveData<Boolean>) {
+    fun signUp(email: String, successSignUp: MutableLiveData<Boolean>) {
         val userRef = database.getReference("Users")
         val userInfo = UserInfo(email = email)
         val errorReason = mutableListOf<Pair<String, String>>()

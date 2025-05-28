@@ -12,19 +12,22 @@ import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.tulmunchi.walkingdogapp.MainActivity
+import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
 import com.tulmunchi.walkingdogapp.databinding.FragmentDogInfoBinding
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterDogActivity
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
+import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
+import javax.inject.Inject
 
 class DogInfoFragment : Fragment() {
     private var _binding: FragmentDogInfoBinding? = null
     private val binding get() = _binding!!
 
     private val mainViewModel: MainViewModel by activityViewModels()
-    private lateinit var mainactivity: MainActivity
+    private var mainActivity: MainActivity? = null
     private var beforepage = ""
 
     private val callback = object : OnBackPressedCallback(true) {
@@ -36,31 +39,33 @@ class DogInfoFragment : Fragment() {
             }
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainactivity = requireActivity() as MainActivity
-        mainactivity.binding.menuBn.visibility = View.GONE
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        activity?.let {
+            mainActivity = it as? MainActivity
+        }
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentDogInfoBinding.inflate(inflater,container, false)
+        _binding = FragmentDogInfoBinding.inflate(inflater, container, false)
 
         val userDogInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable("doginfo", DogInfo::class.java)?: DogInfo()
+            arguments?.getSerializable("doginfo", DogInfo::class.java) ?: DogInfo()
         } else {
             (arguments?.getSerializable("doginfo") ?: DogInfo()) as DogInfo
         }
 
-        beforepage = arguments?.getString("before", "mypage")?: "mypage"
+        beforepage = arguments?.getString("before", "mypage") ?: "mypage"
 
         binding.apply {
             dogInfo = userDogInfo
             btnBack.setOnClickListener {
-                if(beforepage == "mypage") {
+                if (beforepage == "mypage") {
                     goMypage()
                 } else {
                     goManage()
@@ -68,40 +73,67 @@ class DogInfoFragment : Fragment() {
             }
 
             btnSettingdog.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
-                    return@setOnClickListener
+                context?.let { ctx ->
+                    if (!NetworkManager.checkNetworkState(ctx) || !mainViewModel.isSuccessGetData()) {
+                        return@setOnClickListener
+                    }
+                    val registerDogIntent =
+                        Intent(ctx, RegisterDogActivity::class.java)
+                    val walkDateInfoArrayLists: ArrayList<WalkDateInfo> =
+                        (mainViewModel.walkDates.value?.get(userDogInfo.name)
+                            ?: mutableListOf()) as ArrayList<WalkDateInfo>
+                    registerDogIntent.putExtra("doginfo", userDogInfo)
+                    registerDogIntent.putParcelableArrayListExtra(
+                        "walkRecord",
+                        walkDateInfoArrayLists
+                    )
+                    startActivity(registerDogIntent)
                 }
-                val registerDogIntent = Intent(requireContext(), RegisterDogActivity::class.java)
-                val walkDateInfoArrayLists: ArrayList<WalkDateInfo> = (mainViewModel.walkDates.value?.get(userDogInfo.name) ?: mutableListOf()) as ArrayList<WalkDateInfo>
-                registerDogIntent.putExtra("doginfo", userDogInfo)
-                registerDogIntent.putParcelableArrayListExtra("walkRecord", walkDateInfoArrayLists)
-                startActivity(registerDogIntent)
             }
 
-            if (mainViewModel.dogsImg.value?.get(userDogInfo.name) != null) {
-                Glide.with(requireContext()).load(mainViewModel.dogsImg.value?.get(userDogInfo.name))
-                    .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(doginfoImage)
+            val dogImg = mainViewModel.dogsImg.value?.get(userDogInfo.name)
+            if (dogImg != null) {
+                context?.let { ctx ->
+                    try {
+                        Glide.with(ctx)
+                            .load(dogImg)
+                            .format(DecodeFormat.PREFER_ARGB_8888)
+                            .override(300, 300)
+                            .error(R.drawable.collection_003) // 에러 시 기본 이미지
+                            .into(doginfoImage)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        doginfoImage.setImageResource(R.drawable.collection_003)
+                    }
+                }
             }
         }
 
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        mainActivity?.setMenuVisibility(View.GONE)
+    }
+
+
     override fun onResume() {
         super.onResume()
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        activity?.onBackPressedDispatcher?.addCallback(this, callback)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        mainActivity = null
         _binding = null
     }
 
     private fun goMypage() {
-        mainactivity.changeFragment(MyPageFragment())
+        mainActivity?.changeFragment(MyPageFragment())
     }
 
     private fun goManage() {
-        mainactivity.changeFragment(ManageDogsFragment())
+        mainActivity?.changeFragment(ManageDogsFragment())
     }
 }

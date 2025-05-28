@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
+import androidx.core.graphics.toColorInt
 
 @AndroidEntryPoint
 class RegisterUserActivity : AppCompatActivity() {
@@ -173,7 +174,7 @@ class RegisterUserActivity : AppCompatActivity() {
             val shape = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
                 cornerRadius = 10f * btn.resources.displayMetrics.density  // 10dp를 픽셀로 변환
-                setColor(Color.parseColor(color))
+                setColor(color.toColorInt())
             }
             btn.background = shape
         }

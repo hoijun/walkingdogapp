@@ -46,6 +46,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
+import androidx.core.graphics.toColorInt
 
 @AndroidEntryPoint
 class RegisterDogActivity : AppCompatActivity() {
@@ -370,7 +371,7 @@ class RegisterDogActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         when (requestCode) {
             storageCode -> {
@@ -404,7 +405,7 @@ class RegisterDogActivity : AppCompatActivity() {
             val shape = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
                 cornerRadius = 10f * btn.resources.displayMetrics.density  // 10dp를 픽셀로 변환
-                setColor(Color.parseColor(color))
+                setColor(color.toColorInt())
             }
             btn.background = shape
         }

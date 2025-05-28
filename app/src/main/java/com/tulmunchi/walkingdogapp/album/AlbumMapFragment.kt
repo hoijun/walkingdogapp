@@ -41,11 +41,13 @@ import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.InfoWindow
+import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import javax.inject.Inject
 
 class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     private var _binding: FragmentAlbumMapBinding? = null
@@ -56,9 +58,9 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var mynavermap: NaverMap
     private lateinit var camera : CameraUpdate
     private var markers = mutableListOf<InfoWindow>()
-    private lateinit var mainactivity: MainActivity
+    private var mainActivity: MainActivity? = null
 
-    private lateinit var itemDecoration: HorizonSpacingItemDecoration
+    private var itemDecoration: HorizonSpacingItemDecoration? = null
 
     private var selectday = MutableLiveData("")
 
@@ -86,17 +88,20 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                 }
         mapFragment.getMapAsync(this)
 
-        if (!NetworkManager.checkNetworkState(requireContext())) {
-            val builder = AlertDialog.Builder(requireContext())
-            builder.setTitle("인터넷을 연결해주세요!")
-            builder.setPositiveButton("네", null)
-            builder.setCancelable(false)
-            builder.show()
+        context?.let { ctx ->
+            if (!NetworkManager.checkNetworkState(ctx)) {
+                val builder = AlertDialog.Builder(ctx)
+                builder.setTitle("인터넷을 연결해주세요!")
+                builder.setPositiveButton("네", null)
+                builder.setCancelable(false)
+                builder.show()
+            }
         }
 
         MainActivity.preFragment = "AlbumMap"
-        mainactivity = requireActivity() as MainActivity
-        mainactivity.binding.menuBn.visibility = View.VISIBLE
+        activity?.let {
+            mainActivity = it as? MainActivity
+        }
     }
 
     override fun onCreateView(
@@ -104,13 +109,15 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAlbumMapBinding.inflate(inflater, container, false)
-        itemDecoration = HorizonSpacingItemDecoration(3, Utils.dpToPx(12f, requireContext()))
+        context?.let { ctx ->
+            itemDecoration = HorizonSpacingItemDecoration(3, Utils.dpToPx(12f, ctx))
+        }
 
         binding.apply {
             isStoragePermitted = false
             isImgExisted = false
             selectDay = selectday
-            lifecycleOwner = requireActivity()
+            lifecycleOwner = viewLifecycleOwner
 
             refresh.apply {
                 this.setOnRefreshListener {
@@ -118,37 +125,17 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                         mainViewModel.observeUser()
                     }
                 }
-                mainViewModel.successGetData.observe(requireActivity()) {
+                mainViewModel.successGetData.observe(viewLifecycleOwner) {
                     refresh.isRefreshing = false
                 }
             }
 
             permissionBtn.setOnClickListener {
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.data = Uri.fromParts("package", requireContext().packageName, null)
-                startActivity(intent)
+                handlePermissionButtonClick()
             }
 
             btnSelectDate.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(requireContext())) {
-                    return@setOnClickListener
-                }
-                val dialog = DateDialog()
-                dialog.dateClickListener = DateDialog.OnDateClickListener { date ->
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        imgRecyclerView.removeItemDecoration(itemDecoration)
-                        imgInfos.clear()
-                        selectday.value = date
-                        setAlbumMap(selectday.value ?: "")
-                        removeMarker()
-                        setMarker()
-                        if (imgInfos.isNotEmpty()) {
-                            moveCamera(imgInfos[0].latLng, CameraAnimation.Easing)
-                        }
-                    }
-                }
-                dialog.show(requireActivity().supportFragmentManager, "date")
+                handleDateSelectClick()
             }
         }
         return binding.root
@@ -156,12 +143,15 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onStart() {
         super.onStart()
-        if (checkPermission(storagePermission)) {
-            setAlbumMap(selectday.value ?: "")
-            if (markers.isNotEmpty()) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    removeMarker()
-                    setMarker()
+        mainActivity?.setMenuVisibility(View.VISIBLE)
+        context?.let { ctx ->
+            if (checkPermission(storagePermission, ctx)) {
+                setAlbumMap(selectday.value ?: "")
+                if (markers.isNotEmpty()) {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        removeMarker()
+                        setMarker()
+                    }
                 }
             }
         }
@@ -170,12 +160,58 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     override fun onStop() {
         super.onStop()
         imgInfos.clear()
-        binding.imgRecyclerView.removeItemDecoration(itemDecoration)
+        itemDecoration?.let { decoration ->
+            binding.imgRecyclerView.removeItemDecoration(decoration)
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        mainActivity = null
         _binding = null
+    }
+
+    private fun handlePermissionButtonClick() {
+        context?.let { ctx ->
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            intent.data = Uri.fromParts("package", ctx.packageName, null)
+            startActivity(intent)
+        }
+    }
+
+    private fun handleDateSelectClick() {
+        context?.let { ctx ->
+            if (!NetworkManager.checkNetworkState(ctx)) {
+                return
+            }
+
+            val dialog = DateDialog()
+            dialog.dateClickListener = DateDialog.OnDateClickListener { date ->
+                lifecycleScope.launch(Dispatchers.Main) {
+                    itemDecoration?.let { decoration ->
+                        binding.imgRecyclerView.removeItemDecoration(decoration)
+                    }
+                    imgInfos.clear()
+                    selectday.value = date
+                    setAlbumMap(selectday.value ?: "")
+                    removeMarker()
+                    setMarker()
+                    if (imgInfos.isNotEmpty()) {
+                        moveCamera(imgInfos[0].latLng, CameraAnimation.Easing)
+                    }
+                }
+            }
+
+            parentFragmentManager.let {
+                try {
+                    dialog.show(it, "date")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    // 다이얼로그 표시 실패 시 로그만 기록
+                }
+            }
+        }
     }
 
     private fun setAlbumMap(selectDate: String) {
@@ -192,6 +228,8 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         }
 
         try {
+            val contentResolver = activity?.contentResolver ?: return
+
             val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val projection =
                 arrayOf(MediaStore.Images.Media._ID, MediaStore.Images.Media.DATE_TAKEN)
@@ -208,7 +246,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             }
 
             val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} ASC"
-            val cursor = requireActivity().contentResolver.query(
+            val cursor = contentResolver.query(
                 uri,
                 projection,
                 selection,
@@ -229,8 +267,10 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                     val contentUri = Uri.withAppendedPath(uri, imagePath)
                     val imgView = getMarkerImageView(contentUri)
                     if (imageDate == selectDate) {
-                        getImgLatLng(contentUri, requireContext())?.let {
-                            imgInfos.add(AlbumMapImgInfo(contentUri, it, imgView))
+                        context?.let { ctx ->
+                            getImgLatLng(contentUri, ctx)?.let { latLng ->
+                                imgInfos.add(AlbumMapImgInfo(contentUri, latLng, imgView))
+                            }
                         }
 
                         if (imgInfos.size == 20) {
@@ -240,7 +280,9 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), "이미지를 불러오는 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show()
+            context?.let { ctx ->
+                Toast.makeText(ctx, "이미지를 불러오는 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -263,20 +305,34 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                         moveCamera(latLng, CameraAnimation.Easing)
                     }
 
-                imgRecyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-                imgRecyclerView.addItemDecoration(itemDecoration)
+                context?.let { ctx ->
+                    imgRecyclerView.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
+                }
+                itemDecoration?.let { decoration ->
+                    imgRecyclerView.addItemDecoration(decoration)
+                }
                 imgRecyclerView.adapter = adapter
             }
         }
     }
 
-    private fun getMarkerImageView(uri: Uri): ImageView {
-        val imgView = ImageView(requireContext())
-        imgView.layoutParams = ViewGroup.LayoutParams(200, 200)
-        imgView.scaleType = ImageView.ScaleType.CENTER_CROP
-        Glide.with(requireContext()).load(uri).format(DecodeFormat.PREFER_ARGB_8888)
-            .override(200, 200).into(imgView)
-        return imgView
+    private fun getMarkerImageView(uri: Uri): ImageView? {
+        return context?.let { ctx ->
+            val imgView = ImageView(ctx)
+            imgView.layoutParams = ViewGroup.LayoutParams(200, 200)
+            imgView.scaleType = ImageView.ScaleType.CENTER_CROP
+
+            try {
+                Glide.with(ctx).load(uri).format(DecodeFormat.PREFER_ARGB_8888)
+                    .override(200, 200)
+                    .error(R.drawable.collection_003)
+                    .into(imgView)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            imgView
+        }
     }
 
     private fun getImgLatLng(uri: Uri, context: Context): LatLng? {
@@ -295,10 +351,10 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun checkPermission(permissions : Array<out String>) : Boolean{
+    private fun checkPermission(permissions : Array<out String>, context: Context) : Boolean{
         for (permission in permissions) {
             if (ContextCompat.checkSelfPermission(
-                    requireContext(),
+                    context,
                     permission
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
@@ -333,22 +389,24 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
 
     private suspend fun setMarker() {
         delay(500)
-        for ((markerNum, imgInfo) in imgInfos.withIndex()) {
-            val imgMarker = InfoWindow()
-            imgMarker.zIndex = 0
-            imgMarker.adapter = object : InfoWindow.DefaultViewAdapter(requireContext()) {
-                override fun getContentView(p0: InfoWindow): View {
-                    return imgInfo.imgView?.rootView ?: ImageView(requireContext())
+        context?.let { ctx ->
+            for ((markerNum, imgInfo) in imgInfos.withIndex()) {
+                val imgMarker = InfoWindow()
+                imgMarker.zIndex = 0
+                imgMarker.adapter = object : InfoWindow.DefaultViewAdapter(ctx) {
+                    override fun getContentView(p0: InfoWindow): View {
+                        return imgInfo.imgView?.rootView ?: ImageView(ctx)
+                    }
                 }
+                imgMarker.tag = markerNum
+                imgInfo.tag = imgMarker.tag as Int
+                imgMarker.position = imgInfo.latLng
+                imgMarker.map = mynavermap
+                markers.add(imgMarker)
             }
-            imgMarker.tag = markerNum
-            imgInfo.tag = imgMarker.tag as Int
-            imgMarker.position = imgInfo.latLng
-            imgMarker.map = mynavermap
-            markers.add(imgMarker)
-        }
-        if (markers.isNotEmpty()) {
-            markers[0].zIndex = 10
+            if (markers.isNotEmpty()) {
+                markers[0].zIndex = 10
+            }
         }
     }
 

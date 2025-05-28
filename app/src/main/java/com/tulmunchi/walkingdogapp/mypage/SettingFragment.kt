@@ -3,32 +3,31 @@ package com.tulmunchi.walkingdogapp.mypage
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.tulmunchi.walkingdogapp.LoadingDialogFragment
-import com.tulmunchi.walkingdogapp.login.LoginActivity
-import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
-import com.tulmunchi.walkingdogapp.WriteDialog
-import com.tulmunchi.walkingdogapp.alarm.AlarmFunctions
-import com.tulmunchi.walkingdogapp.databinding.FragmentSettingBinding
-import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
-import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
+import com.tulmunchi.walkingdogapp.LoadingDialogFragment
+import com.tulmunchi.walkingdogapp.MainActivity
+import com.tulmunchi.walkingdogapp.WriteDialog
+import com.tulmunchi.walkingdogapp.alarm.AlarmFunctions
+import com.tulmunchi.walkingdogapp.databinding.FragmentSettingBinding
+import com.tulmunchi.walkingdogapp.login.LoginActivity
+import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
+import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
+import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,7 +37,7 @@ class SettingFragment : Fragment() {
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
-    private lateinit var mainactivity: MainActivity
+    private var mainActivity: MainActivity? = null
     private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
     private val auth = FirebaseAuth.getInstance()
     private var email = ""
@@ -55,19 +54,18 @@ class SettingFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainactivity = requireActivity() as MainActivity
-        mainactivity.binding.menuBn.visibility = View.GONE
-
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
-        val sharedPreferences = requireActivity().getSharedPreferences("UserEmail", Context.MODE_PRIVATE)
-        email = sharedPreferences.getString("email", "") ?: ""
-        password = sharedPreferences.getString("password", "") ?: ""
+        activity?.let {
+            mainActivity = it as? MainActivity
+            val sharedPreferences = it.getSharedPreferences("UserEmail", Context.MODE_PRIVATE)
+            email = sharedPreferences.getString("email", "") ?: ""
+            password = sharedPreferences.getString("password", "") ?: ""
+        }
     }
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentSettingBinding.inflate(inflater, container, false)
         binding.apply {
@@ -78,8 +76,10 @@ class SettingFragment : Fragment() {
             userEmail = email
 
             logoutBtn.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
-                    return@setOnClickListener
+                context?.let { ctx ->
+                    if (!NetworkManager.checkNetworkState(ctx) || !mainViewModel.isSuccessGetData()) {
+                        return@setOnClickListener
+                    }
                 }
 
                 if (email.contains("@naver.com")) { // 네이버로 로그인 했을 경우
@@ -103,7 +103,9 @@ class SettingFragment : Fragment() {
             }
 
             settingInquiry.setOnClickListener {
-                sendEmail(requireActivity())
+                activity?.let {
+                    sendEmail(it)
+                }
             }
 
             settingPrivacyPolicy.setOnClickListener {
@@ -123,12 +125,20 @@ class SettingFragment : Fragment() {
             }
 
             settingWithdrawal.setOnClickListener {
-                if (!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
-                    return@setOnClickListener
+                context?.let { ctx ->
+                    if (!NetworkManager.checkNetworkState(ctx) || !mainViewModel.isSuccessGetData()) {
+                        return@setOnClickListener
+                    }
                 }
 
                 val loadingDialogFragment = LoadingDialogFragment()
-                loadingDialogFragment.show(requireActivity().supportFragmentManager, "loading")
+                parentFragmentManager.let {
+                    try {
+                        loadingDialogFragment.show(it, "loading")
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
 
                 val credential = EmailAuthProvider.getCredential(email, password)
                 auth.currentUser?.reauthenticate(credential)?.addOnSuccessListener {
@@ -140,7 +150,13 @@ class SettingFragment : Fragment() {
                             return@OnClickYesListener
                         } // 이메일 올바르게 입력x
 
-                        loadingDialogFragment.show(requireActivity().supportFragmentManager, "loading")
+                        parentFragmentManager.let {
+                            try {
+                                loadingDialogFragment.show(it, "loading")
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
 
                         lifecycleScope.launch {
                             if (email.contains("@naver.com")) { // 네이버로 로그인 했을 경우
@@ -159,7 +175,7 @@ class SettingFragment : Fragment() {
 
                                         override fun onFailure(
                                             httpStatus: Int,
-                                            message: String
+                                            message: String,
                                         ) {
                                             completeDeleteAccount()
                                             loadingDialogFragment.dismiss()
@@ -196,7 +212,14 @@ class SettingFragment : Fragment() {
                     val bundle = Bundle()
                     bundle.putString("text", "이메일을 입력해주세요.")
                     writeDialog.arguments = bundle
-                    writeDialog.show(requireActivity().supportFragmentManager, "writeEmail")
+
+                    parentFragmentManager.let {
+                        try {
+                            writeDialog.show(it, "writeEmail")
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
                 }?.addOnFailureListener {
                     toastMsg("앱을 껏다 켜주세요!")
                 }
@@ -205,25 +228,33 @@ class SettingFragment : Fragment() {
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        mainActivity?.setMenuVisibility(View.GONE)
+    }
+
     override fun onResume() {
         super.onResume()
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        activity?.onBackPressedDispatcher?.addCallback(this, callback)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        mainActivity = null
         _binding = null
     }
 
     private fun goMyPage() {
-        mainactivity.changeFragment(MyPageFragment())
+        mainActivity?.changeFragment(MyPageFragment())
     }
 
     private fun goLogin() {
-        val loginIntent = Intent(requireContext(), LoginActivity::class.java)
-        loginIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(loginIntent)
-        MainActivity.preFragment = "Home" // 로그아웃 바로 후에 홈 부터 시작하기 위함
+        context?.let { ctx ->
+            val loginIntent = Intent(ctx, LoginActivity::class.java)
+            loginIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(loginIntent)
+            MainActivity.preFragment = "Home" // 로그아웃 바로 후에 홈 부터 시작하기 위함
+        }
     }
 
     private fun completeDeleteAccount() {
@@ -249,29 +280,35 @@ class SettingFragment : Fragment() {
     }
 
     private fun removeAlarms() {
-        val alarmFunctions = AlarmFunctions(requireContext())
-        coroutineScope.launch {
-            for (alarm in mainViewModel.getAlarmList()) {
-                alarmFunctions.cancelAlarm(alarm.alarm_code)
-                mainViewModel.deleteAlarm(alarm)
+        context?.let { ctx ->
+            val alarmFunctions = AlarmFunctions(ctx)
+            coroutineScope.launch {
+                for (alarm in mainViewModel.getAlarmList()) {
+                    alarmFunctions.cancelAlarm(alarm.alarm_code)
+                    mainViewModel.deleteAlarm(alarm)
+                }
             }
         }
     }
 
     private fun toastMsg(msg: String) {
-        Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+        context?.let { ctx ->
+            Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun goWebView(uri: String) {
-        val intent = Intent(requireContext(), PrivacyWebViewActivity::class.java).apply {
-            putExtra("uri", uri)
+        context?.let { ctx ->
+            val intent = Intent(ctx, PrivacyWebViewActivity::class.java).apply {
+                putExtra("uri", uri)
+            }
+            startActivity(intent)
         }
-        startActivity(intent)
     }
 
     private fun sendEmail(context: Context) {
         val emailSelectorIntent = Intent(Intent.ACTION_SENDTO).apply {
-            setData(Uri.parse("mailto:"))
+            setData("mailto:".toUri())
         }
 
         val emailIntent = Intent(Intent.ACTION_SEND).apply {

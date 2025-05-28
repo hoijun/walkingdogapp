@@ -83,11 +83,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(walkingIntent)
         }
 
-        loadingDialogFragment = LoadingDialogFragment()
-        loadingDialogFragment.show(this.supportFragmentManager, "loading")
-
-        getUserInfo()
-
         // 화면 전환
         binding.menuBn.apply {
             setOnItemSelectedListener { item ->
@@ -126,6 +121,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        loadingDialogFragment = LoadingDialogFragment()
+        loadingDialogFragment.show(this.supportFragmentManager, "loading")
+
+        getUserInfo()
     }
 
     override fun onRequestPermissionsResult(
@@ -144,7 +144,18 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
+    fun setMenuVisibility(visibility: Int) {
+        if (::binding.isInitialized) {
+            binding.menuBn.visibility = visibility
+        }
+    }
+
     private fun getUserInfo() {
+        if (!::binding.isInitialized) {
+            Toast.makeText(this, "앱을 재시작 해주세요!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val isImgChanged = intent.getBooleanExtra("isImgChanged", true)
         mainViewModel.observeUser(isImgChanged)
         mainViewModel.successGetData.observe(this) {
@@ -158,27 +169,33 @@ class MainActivity : AppCompatActivity() {
                 }
             } catch (_: Exception) { }
             finally {
-                when (preFragment) {
+               val targetFragment = when (preFragment) {
                     "Mypage" -> {
-                        changeFragment(MyPageFragment())
+                        MyPageFragment()
                     }
 
                     "Home" -> {
-                        changeFragment(HomeFragment())
+                        HomeFragment()
                     }
 
                     "Manage" -> {
-                        changeFragment(ManageDogsFragment())
+                        ManageDogsFragment()
                     }
 
                     "Collection" -> {
-                        changeFragment(CollectionFragment())
+                        CollectionFragment()
                     }
 
                     "AlbumMap" -> {
-                        changeFragment(AlbumMapFragment())
+                        AlbumMapFragment()
+                    }
+
+                    else -> {
+                        HomeFragment()
                     }
                 }
+
+                changeFragment(targetFragment)
             }
         }
     }

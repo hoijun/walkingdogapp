@@ -3,6 +3,7 @@ package com.tulmunchi.walkingdogapp.album
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -36,11 +37,11 @@ import java.text.SimpleDateFormat
 class GalleryFragment : Fragment() {
     private var _binding: FragmentGalleryBinding? = null
     private val binding get() = _binding!!
-    private lateinit var mainactivity: MainActivity
+    private var mainActivity: MainActivity? = null
     private val mainViewModel: MainViewModel by activityViewModels()
     private val imgInfos = mutableListOf<GalleryImgInfo>()
     private val removeImgList = mutableListOf<Uri>()
-    private lateinit var itemDecoration: GridSpacingItemDecoration
+    private var itemDecoration: GridSpacingItemDecoration? = null
     private var selectMode = MutableLiveData(false)
 
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -57,7 +58,9 @@ class GalleryFragment : Fragment() {
             when (storagePermission) {
                 true -> {
                     setGallery()
-                    binding.galleryRecyclerview.addItemDecoration(itemDecoration)
+                    itemDecoration?.let { decoration ->
+                        binding.galleryRecyclerview.addItemDecoration(decoration)
+                    }
                 }
 
                 false -> return@registerForActivityResult
@@ -79,17 +82,22 @@ class GalleryFragment : Fragment() {
             Activity.RESULT_OK -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 updateRecyclerView()
                 unSelectMode()
-                Toast.makeText(requireContext(), "사진을 삭제 했습니다.", Toast.LENGTH_SHORT).show()
+                context?.let { ctx ->
+                    Toast.makeText(ctx, "사진을 삭제 했습니다.", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainactivity = requireActivity() as MainActivity
-        mainactivity.binding.menuBn.visibility = View.GONE
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
-        itemDecoration = GridSpacingItemDecoration(3, Utils.dpToPx(15f, requireContext()))
+        activity?.let {
+            mainActivity = it as? MainActivity
+        }
+
+        context?.let { ctx ->
+            itemDecoration = GridSpacingItemDecoration(3, Utils.dpToPx(15f, ctx))
+        }
     }
 
     override fun onCreateView(
@@ -97,53 +105,22 @@ class GalleryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentGalleryBinding.inflate(inflater, container, false)
-        if (checkPermission(storagePermission)) {
-            setGallery()
+        context?.let { ctx ->
+            if (checkPermission(storagePermission, ctx)) {
+                setGallery()
+            }
         }
 
         binding.apply {
             isSelectMode = selectMode
-            lifecycleOwner = requireActivity()
+            lifecycleOwner = viewLifecycleOwner
 
             btnBack.setOnClickListener {
                 goMyPage()
             }
 
             imgRemoveBtn.setOnClickListener {
-                try {
-                    if (removeImgList.isEmpty()) {
-                        unSelectMode()
-                        return@setOnClickListener
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        val intentSender = MediaStore.createDeleteRequest(
-                            requireActivity().contentResolver,
-                            removeImgList
-                        ).intentSender
-                        launcher.launch(IntentSenderRequest.Builder(intentSender).build())
-                    } else {
-                        val builder = AlertDialog.Builder(requireContext())
-                        builder.setTitle("사진을 삭제하시겠습니까?")
-                        val listener = DialogInterface.OnClickListener { _, ans ->
-                            when (ans) {
-                                DialogInterface.BUTTON_POSITIVE -> {
-                                    for (uri in removeImgList) {
-                                        requireActivity().contentResolver.delete(uri, null, null)
-                                    }
-                                    updateRecyclerView()
-                                    unSelectMode()
-                                }
-                            }
-                        }
-                        builder.setPositiveButton("네", listener)
-                        builder.setNegativeButton("아니오", null)
-                        builder.show()
-                    }
-                } catch (e: Exception) {
-                    Toast.makeText(requireContext(), "삭제하는 데 오류가 발생 했어요.", Toast.LENGTH_SHORT).show()
-                    unSelectMode()
-                    return@setOnClickListener
-                }
+                handleImageRemoval()
             }
         }
         return binding.root
@@ -151,26 +128,82 @@ class GalleryFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        if (checkPermission(storagePermission)) {
-            updateRecyclerView()
+        mainActivity?.setMenuVisibility(View.GONE)
+        context?.let { ctx ->
+            if (checkPermission(storagePermission, ctx)) {
+                updateRecyclerView()
+            }
         }
-        binding.galleryRecyclerview.addItemDecoration(itemDecoration)
+        itemDecoration?.let { decoration ->
+            binding.galleryRecyclerview.addItemDecoration(decoration)
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        activity?.onBackPressedDispatcher?.addCallback(this, callback)
     }
 
     override fun onStop() {
         super.onStop()
         unSelectMode()
-        binding.galleryRecyclerview.removeItemDecoration(itemDecoration)
+        itemDecoration?.let { decoration ->
+            binding.galleryRecyclerview.removeItemDecoration(decoration)
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        mainActivity = null
         _binding = null
+    }
+
+    private fun handleImageRemoval() {
+        try {
+            if (removeImgList.isEmpty()) {
+                unSelectMode()
+                return
+            }
+
+            val contentResolver = activity?.contentResolver ?: return
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val intentSender = MediaStore.createDeleteRequest(
+                    contentResolver,
+                    removeImgList
+                ).intentSender
+                launcher.launch(IntentSenderRequest.Builder(intentSender).build())
+            } else {
+                showDeleteConfirmDialog()
+            }
+        } catch (e: Exception) {
+            context?.let { ctx ->
+                Toast.makeText(ctx, "삭제하는 데 오류가 발생 했어요.", Toast.LENGTH_SHORT).show()
+            }
+            unSelectMode()
+        }
+    }
+
+    private fun showDeleteConfirmDialog() {
+        val contentResolver = activity?.contentResolver ?: return
+        context?.let { ctx ->
+            val builder = AlertDialog.Builder(ctx)
+            builder.setTitle("사진을 삭제하시겠습니까?")
+            val listener = DialogInterface.OnClickListener { _, ans ->
+                when (ans) {
+                    DialogInterface.BUTTON_POSITIVE -> {
+                        for (uri in removeImgList) {
+                            contentResolver.delete(uri, null, null)
+                        }
+                        updateRecyclerView()
+                        unSelectMode()
+                    }
+                }
+            }
+            builder.setPositiveButton("네", listener)
+            builder.setNegativeButton("아니오", null)
+            builder.show()
+        }
     }
 
     private fun setGallery() {
@@ -188,13 +221,13 @@ class GalleryFragment : Fragment() {
             val adapter = GalleryItemListAdapter(imgInfos)
             adapter.itemClickListener = object : GalleryItemListAdapter.OnItemClickListener {
                 override fun onItemClick(imgNum: Int) {
-                    if(!selectMode.value!!) {
+                    if (!selectMode.value!!) {
                         val bundle = Bundle()
                         bundle.putInt("select", imgNum)
                         val detailPictureFragment = DetailPictureFragment().apply {
                             arguments = bundle
                         }
-                        mainactivity.changeFragment(detailPictureFragment)
+                        mainActivity?.changeFragment(detailPictureFragment)
                     }
                 }
 
@@ -216,7 +249,9 @@ class GalleryFragment : Fragment() {
                 }
 
             }
-            galleryRecyclerview.layoutManager = GridLayoutManager(requireContext(), 3)
+            context?.let { ctx ->
+                galleryRecyclerview.layoutManager = GridLayoutManager(ctx, 3)
+            }
             galleryRecyclerview.scrollToPosition(imgNum)
             galleryRecyclerview.adapter = adapter
         }
@@ -225,6 +260,8 @@ class GalleryFragment : Fragment() {
     @SuppressLint("SimpleDateFormat")
     private fun getAlbumImage() {
         try {
+            val contentResolver = activity?.contentResolver ?: return
+
             val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val projection = arrayOf(
                 MediaStore.Images.Media._ID,
@@ -247,7 +284,7 @@ class GalleryFragment : Fragment() {
             }
 
             val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} ASC"
-            val cursor = requireActivity().contentResolver.query(
+            val cursor = contentResolver.query(
                 uri,
                 projection,
                 selection,
@@ -294,16 +331,19 @@ class GalleryFragment : Fragment() {
                 }
             }
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), "이미지를 불러오는 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show()
+            context?.let { ctx ->
+                Toast.makeText(ctx, "이미지를 불러오는 중 오류가 발생했습니다", Toast.LENGTH_SHORT)
+                    .show()
+            }
         } finally {
             mainViewModel.saveAlbumImgs(imgInfos)
         }
     }
 
-    private fun checkPermission(permissions: Array<out String>): Boolean {
+    private fun checkPermission(permissions: Array<out String>, context: Context): Boolean {
         for (permission in permissions) {
             if (ContextCompat.checkSelfPermission(
-                    requireContext(),
+                    context,
                     permission
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
@@ -321,17 +361,19 @@ class GalleryFragment : Fragment() {
     }
 
     private fun goMyPage() {
-        mainactivity.changeFragment(MyPageFragment())
+        mainActivity?.changeFragment(MyPageFragment())
     }
 
     private fun updateRecyclerView() {
         val iterator = imgInfos.iterator()
         while (iterator.hasNext()) {
             val img = iterator.next()
-            if (!Utils.isImageExists(img.uri, requireActivity())) {
-                val index = imgInfos.indexOf(img)
-                iterator.remove()
-                (binding.galleryRecyclerview.adapter as GalleryItemListAdapter).notifyItemRemoved(index)
+            activity?.let { act ->
+                if (!Utils.isImageExists(img.uri, act)) {
+                    val index = imgInfos.indexOf(img)
+                    iterator.remove()
+                    (binding.galleryRecyclerview.adapter as? GalleryItemListAdapter)?.notifyItemRemoved(index)
+                }
             }
         }
     }

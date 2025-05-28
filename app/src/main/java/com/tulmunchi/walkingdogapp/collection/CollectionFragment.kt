@@ -16,10 +16,13 @@ import com.tulmunchi.walkingdogapp.utils.GridSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.databinding.FragmentCollectionBinding
 import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
+import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import androidx.core.view.isGone
 
 class CollectionFragment : Fragment() {
     private var _binding: FragmentCollectionBinding? = null
@@ -27,32 +30,39 @@ class CollectionFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private var collectionWhether = HashMap<String, Boolean>()
     private lateinit var collections: List<CollectionInfo>
-    private lateinit var mainactivity: MainActivity
+    private var mainActivity: MainActivity? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         collectionWhether = mainViewModel.collectionWhether.value ?: Utils.item_whether
         collections = Utils.setCollectionMap().values.toList().sortedBy { it.collectionNum }
 
-        if (!NetworkManager.checkNetworkState(requireContext())) {
-            val builder = AlertDialog.Builder(requireContext())
-            builder.setTitle("인터넷을 연결해주세요!")
-            builder.setPositiveButton("네", null)
-            builder.setCancelable(false)
-            builder.show()
+        context?.let { ctx ->
+            if (!NetworkManager.checkNetworkState(ctx)) {
+                val builder = AlertDialog.Builder(ctx)
+                builder.setTitle("인터넷을 연결해주세요!")
+                builder.setPositiveButton("네", null)
+                builder.setCancelable(false)
+                builder.show()
+            }
         }
 
         MainActivity.preFragment = "Collection"
-        mainactivity = requireActivity() as MainActivity
-        mainactivity.binding.menuBn.visibility = View.VISIBLE
+
+        activity?.let {
+            mainActivity = it as? MainActivity
+        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentCollectionBinding.inflate(inflater, container, false)
-        val gridListManager = GridLayoutManager(requireContext(), 3)
+        val gridListManager = context?.let { ctx ->
+            GridLayoutManager(ctx, 3)
+        } ?: GridLayoutManager(requireContext(), 3)
+
         val adapter = CollectionListAdapter(collections, collectionWhether)
         adapter.itemClickListener = CollectionListAdapter.OnItemClickListener { collection ->
             if (mainViewModel.collectionWhether.value?.get(collection.collectionNum) == true) {
@@ -61,10 +71,15 @@ class CollectionFragment : Fragment() {
                     bundle.putSerializable("collectionInfo", collection)
                     arguments = bundle
                 }
-                detailCollectionDialog.show(
-                    requireActivity().supportFragmentManager,
-                    "detailCollection"
-                )
+
+                parentFragmentManager.let {
+                    try {
+                        detailCollectionDialog.show(it, "detailCollection")
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        // 다이얼로그 표시 실패 시 로그만 기록
+                    }
+                }
             }
         }
 
@@ -84,19 +99,23 @@ class CollectionFragment : Fragment() {
                         mainViewModel.observeUser()
                     }
                 }
-                mainViewModel.successGetData.observe(requireActivity()) {
+                mainViewModel.successGetData.observe(viewLifecycleOwner) {
                     refresh.isRefreshing = false
                 }
             }
 
+            val itemDecoration = context?.let { ctx ->
+                GridSpacingItemDecoration(3, Utils.dpToPx(15f, ctx))
+            } ?: GridSpacingItemDecoration(3, 15) // 기본값
+
             collectionRecyclerview.layoutManager = gridListManager
-            collectionRecyclerview.addItemDecoration(GridSpacingItemDecoration(3, Utils.dpToPx(15f, requireContext())))
+            collectionRecyclerview.addItemDecoration(itemDecoration)
             collectionRecyclerview.adapter = adapter
             collectionRecyclerview.itemAnimator = null
 
             openSearching.setOnClickListener {
                 // 입력창이 보이는 지 안보이는 지에 따라
-                if(collectionSearch.visibility == View.GONE) {
+                if(collectionSearch.isGone) {
                     collectionSearch.visibility = View.VISIBLE
                     openSearching.setImageResource(R.drawable.arrow_drop_up)
                 } else {
@@ -120,8 +139,14 @@ class CollectionFragment : Fragment() {
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        mainActivity?.setMenuVisibility(View.VISIBLE)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        mainActivity = null
         _binding = null
     }
 }

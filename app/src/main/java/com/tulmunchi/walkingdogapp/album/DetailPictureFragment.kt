@@ -17,15 +17,17 @@ import com.tulmunchi.walkingdogapp.databinding.FragmentDetailPictureBinding
 import com.tulmunchi.walkingdogapp.datamodel.GalleryImgInfo
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 
 class DetailPictureFragment : Fragment() {
     private var _binding: FragmentDetailPictureBinding? = null
     private val binding get() = _binding!!
-    private lateinit var mainactivity: MainActivity
+    private var mainActivity: MainActivity? = null
     private val mainViewModel: MainViewModel by activityViewModels()
     private var imgList = mutableListOf<GalleryImgInfo>()
     private var bottomSheetFragment: BottomSheetDialogFragment? = null
@@ -38,8 +40,9 @@ class DetailPictureFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainactivity = requireActivity() as MainActivity
-        mainactivity.binding.menuBn.visibility = View.GONE
+        activity?.let {
+            mainActivity = it as? MainActivity
+        }
     }
 
     override fun onCreateView(
@@ -75,15 +78,24 @@ class DetailPictureFragment : Fragment() {
                                     )
                                 }
                             } else {
-                                mainactivity.changeFragment(GalleryFragment())
+                                mainActivity?.changeFragment(GalleryFragment())
                             }
                         } catch (e: Exception) {
-                            mainactivity.changeFragment(GalleryFragment())
+                            mainActivity?.changeFragment(GalleryFragment())
                         }
                     }
                 }
-                bottomSheetFragment?.show(requireActivity().supportFragmentManager, "bottomSheet")
+
+                parentFragmentManager.let {
+                    try {
+                        bottomSheetFragment?.show(it, "bottomSheet")
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        // 다이얼로그 표시 실패 시 처리 (로그만 기록)
+                    }
+                }
             }
+
             detailViewpager2.apply {
                 this.adapter = adapter
                 orientation = ViewPager2.ORIENTATION_HORIZONTAL
@@ -96,18 +108,26 @@ class DetailPictureFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        mainActivity?.setMenuVisibility(View.GONE)
         lifecycleScope.launch {
             try {
                 val itemsToRemove = mutableListOf<GalleryImgInfo>()
 
                 for (img in imgList) {
                     try {
-                        if (!Utils.isImageExists(img.uri, requireActivity())) {
+                        val activity = mainActivity
+                        if (activity != null && !Utils.isImageExists(img.uri, activity)) {
                             itemsToRemove.add(img)
+                        } else if (activity == null) {
+                            // Activity가 null이면 Fragment로 돌아가기
+                            withContext(Dispatchers.Main) {
+                                mainActivity?.changeFragment(GalleryFragment())
+                            }
+                            return@launch
                         }
                     } catch (e: Exception) {
                         withContext(Dispatchers.Main) {
-                            mainactivity.changeFragment(GalleryFragment())
+                            mainActivity?.changeFragment(GalleryFragment())
                         }
                         return@launch
                     }
@@ -137,11 +157,11 @@ class DetailPictureFragment : Fragment() {
                                         )
                                     }
                                 } else if (recyclerViewAdapter.itemCount == 0) {
-                                    mainactivity.changeFragment(GalleryFragment())
+                                    mainActivity?.changeFragment(GalleryFragment())
                                 }
                             }
                         } catch (e: Exception) {
-                            mainactivity.changeFragment(GalleryFragment())
+                            mainActivity?.changeFragment(GalleryFragment())
                             return@withContext
                         }
                     }
@@ -149,7 +169,7 @@ class DetailPictureFragment : Fragment() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    mainactivity.changeFragment(GalleryFragment())
+                    mainActivity?.changeFragment(GalleryFragment())
                 }
             }
         }
@@ -157,11 +177,24 @@ class DetailPictureFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        activity?.onBackPressedDispatcher?.addCallback(this, callback)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        bottomSheetFragment?.let { dialog ->
+            try {
+                if (dialog.isAdded) {
+                    dialog.dismiss()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        bottomSheetFragment = null
+
+        mainActivity = null
         _binding = null
     }
 
@@ -171,7 +204,7 @@ class DetailPictureFragment : Fragment() {
         val galleryFragment = GalleryFragment().apply {
             arguments = bundle
         }
-        mainactivity.changeFragment(galleryFragment)
+        mainActivity?.changeFragment(galleryFragment)
     }
 
     private fun removePicture(position: Int) {

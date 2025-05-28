@@ -5,11 +5,11 @@ import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
@@ -138,13 +138,13 @@ class SplashActivity : AppCompatActivity() {
     private fun updateApp(context: Context) {
         try {
             val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("market://details?id=${context.packageName}")
+                data = "market://details?id=${context.packageName}".toUri()
                 setPackage("com.android.vending")
             }
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             val webIntent = Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://play.google.com/store/apps/details?id=${context.packageName}"))
+                "https://play.google.com/store/apps/details?id=${context.packageName}".toUri())
             startActivity(webIntent)
         }
     }

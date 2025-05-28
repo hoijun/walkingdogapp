@@ -25,6 +25,8 @@ import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.PathOverlay
+import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
+import javax.inject.Inject
 
 class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
     private var _binding: FragmentDetailWalkInfoBinding? = null
@@ -36,7 +38,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
     private var day = listOf<String>()
     private var walkDateInfo = WalkDateInfo()
 
-    private lateinit var mainactivity: MainActivity
+    private var mainActivity: MainActivity? = null
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goWalkInfo()
@@ -45,9 +47,10 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainactivity = requireActivity() as MainActivity
-        mainactivity.binding.menuBn.visibility = View.GONE
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        activity?.let {
+            mainActivity = it as? MainActivity
+        }
+
         val mapFragment: MapFragment =
             childFragmentManager.findFragmentById(R.id.Map) as MapFragment?
                 ?: MapFragment.newInstance().also {
@@ -71,7 +74,11 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
 
         val collectionsMap = Utils.setCollectionMap()
         val currentCollections = arrayListOf<CollectionInfo>()
-        val itemDecoration = GridSpacingItemDecoration(3, Utils.dpToPx(20f, requireContext()))
+
+        val itemDecoration = context?.let { ctx ->
+            GridSpacingItemDecoration(3, Utils.dpToPx(20f, ctx))
+        } ?: GridSpacingItemDecoration(3, 20) // 기본값
+
         walkDateInfo.collections.toList().forEach {
             currentCollections.add(collectionsMap[it]?: CollectionInfo())
         }
@@ -89,7 +96,9 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             walkRecordInfo = walkDateInfo
 
             val collectionAdapter = if (currentCollections.isEmpty()) CurrentCollectionItemListAdapter(emptyCollections) else CurrentCollectionItemListAdapter(currentCollections)
-            getCollectionRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+            context?.let { ctx ->
+                getCollectionRecyclerView.layoutManager = GridLayoutManager(ctx, 3)
+            }
             getCollectionRecyclerView.addItemDecoration(itemDecoration)
             getCollectionRecyclerView.adapter = collectionAdapter
             getCollectionRecyclerView.isNestedScrollingEnabled = false
@@ -97,13 +106,19 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        mainActivity?.setMenuVisibility(View.GONE)
+    }
+
     override fun onResume() {
         super.onResume()
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        activity?.onBackPressedDispatcher?.addCallback(this, callback)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        mainActivity = null
         _binding = null
     }
 
@@ -145,6 +160,6 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
         val walkInfoFragment = WalkInfoFragment().apply {
             arguments = bundle
         }
-        mainactivity.changeFragment(walkInfoFragment)
+        mainActivity?.changeFragment(walkInfoFragment)
     }
 }

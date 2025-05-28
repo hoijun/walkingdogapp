@@ -10,9 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
 import com.tulmunchi.walkingdogapp.databinding.FragmentManageDogsBinding
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterDogActivity
+import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +22,7 @@ class ManageDogsFragment : Fragment() {
     private var _binding: FragmentManageDogsBinding? = null
     private val mainViewModel: MainViewModel by activityViewModels()
     private val binding get() = _binding!!
-    private lateinit var mainactivity: MainActivity
+    private var mainActivity: MainActivity? = null
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goMyPage()
@@ -31,9 +31,10 @@ class ManageDogsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainactivity = requireActivity() as MainActivity
-        mainactivity.binding.menuBn.visibility = View.GONE
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        activity?.let {
+            mainActivity = it as? MainActivity
+        }
+
         MainActivity.preFragment = "Manage"
     }
 
@@ -52,7 +53,7 @@ class ManageDogsFragment : Fragment() {
                 bundle.putString("before", "manage")
                 arguments = bundle
             }
-            mainactivity.changeFragment(dogInfoFragment)
+            goDogInfoPage(dogInfoFragment)
         }
 
         binding.apply {
@@ -73,17 +74,19 @@ class ManageDogsFragment : Fragment() {
                         mainViewModel.observeUser()
                     }
                 }
-                mainViewModel.successGetData.observe(requireActivity()) {
+                mainViewModel.successGetData.observe(viewLifecycleOwner) {
                     refresh.isRefreshing = false
                 }
             }
 
             btnAddDog.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(requireContext()) || !mainViewModel.isSuccessGetData()) {
-                    return@setOnClickListener
+                context?.let { ctx ->
+                    if (!NetworkManager.checkNetworkState(ctx) || !mainViewModel.isSuccessGetData()) {
+                        return@let
+                    }
+                    val registerDogIntent = Intent(ctx, RegisterDogActivity::class.java)
+                    startActivity(registerDogIntent)
                 }
-                val registerDogIntent = Intent(requireContext(), RegisterDogActivity::class.java)
-                startActivity(registerDogIntent)
             }
 
             btnBack.setOnClickListener {
@@ -93,17 +96,27 @@ class ManageDogsFragment : Fragment() {
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        mainActivity?.setMenuVisibility(View.GONE)
+    }
+
     override fun onResume() {
         super.onResume()
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        activity?.onBackPressedDispatcher?.addCallback(this, callback)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        mainActivity = null
         _binding = null
     }
 
     private fun goMyPage() {
-        mainactivity.changeFragment(MyPageFragment())
+        mainActivity?.changeFragment(MyPageFragment())
+    }
+
+    private fun goDogInfoPage(fragment: DogInfoFragment) {
+        mainActivity?.changeFragment(fragment)
     }
 }

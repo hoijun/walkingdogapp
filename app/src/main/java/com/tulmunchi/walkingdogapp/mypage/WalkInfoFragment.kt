@@ -31,6 +31,8 @@ import com.tulmunchi.walkingdogapp.utils.utils.WalkDayDecorator
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
+import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
+import javax.inject.Inject
 
 data class DogsWalkRecord(
     val walkDateList: MutableList<CalendarDay> = mutableListOf(),
@@ -40,7 +42,7 @@ data class DogsWalkRecord(
 )
 
 class WalkInfoFragment : Fragment() { // 수정
-    private lateinit var mainActivity: MainActivity
+    private var mainActivity: MainActivity? = null
     private var _binding: FragmentWalkInfoBinding? = null
 
     private val mainViewModel: MainViewModel by activityViewModels()
@@ -61,9 +63,9 @@ class WalkInfoFragment : Fragment() { // 수정
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainActivity = requireActivity() as MainActivity
-        mainActivity.binding.menuBn.visibility = View.GONE
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        activity?.let {
+            mainActivity = it as? MainActivity
+        }
 
         selectedDog = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable("selectDog", DogInfo::class.java)?: DogInfo()
@@ -92,7 +94,7 @@ class WalkInfoFragment : Fragment() { // 수정
         _binding = FragmentWalkInfoBinding.inflate(inflater,container, false)
 
         // 달력 커스텀
-        val dayDecorator = DayDecorator(requireContext())
+        val dayDecorator = context?.let { DayDecorator(it) } ?: return binding.root
         val sundayDecorator = SundayDecorator()
         val saturdayDecorator = SaturdayDecorator()
         var selectedMonthDecorator = SelectedMonthDecorator(selectedDay.month)
@@ -129,9 +131,12 @@ class WalkInfoFragment : Fragment() { // 수정
 
             val walkInfoDogListAdapter = WalkInfoDogListAdapter(mainViewModel.dogsInfo.value?: listOf(), mainViewModel.dogsImg.value?: hashMapOf()).also {
                 it.onItemClickListener = WalkInfoDogListAdapter.OnItemClickListener { selectedDogInfo ->
-                    if(!NetworkManager.checkNetworkState(requireContext())) {
-                        return@OnItemClickListener
-                    }
+                    context?.let { ctx ->
+                        if (!NetworkManager.checkNetworkState(ctx)) {
+                            return@OnItemClickListener
+                        }
+                    } ?: return@OnItemClickListener
+
                     selectedDog = selectedDogInfo
                     selectDogInfo = selectedDog
 
@@ -155,7 +160,13 @@ class WalkInfoFragment : Fragment() { // 수정
                 }
             }
 
-            val spacingItemDecoration = HorizonSpacingItemDecoration(mainViewModel.dogsInfo.value?.size ?: 0, Utils.dpToPx(10f, requireContext())) // 리사이클러뷰 아이템 간격
+            val spacingItemDecoration = context?.let { ctx ->
+                HorizonSpacingItemDecoration(
+                    mainViewModel.dogsInfo.value?.size ?: 0,
+                    Utils.dpToPx(10f, ctx)
+                )
+            } ?: HorizonSpacingItemDecoration(0, 0) // 리사이클러뷰 아이템 간격
+
             selectDogsRecyclerView.addItemDecoration(spacingItemDecoration)
             selectDogsRecyclerView.adapter = walkInfoDogListAdapter
             selectDogsRecyclerView.layoutManager = LinearLayoutManager(context).apply {
@@ -192,7 +203,7 @@ class WalkInfoFragment : Fragment() { // 수정
 
                 selectDogInfo = selectedDog
                 viewmodel = mainViewModel
-                lifecycleOwner = requireActivity()
+                lifecycleOwner = viewLifecycleOwner
 
                 walkDayDecorator = WalkDayDecorator(dogsWalkRecordMap[selectedDog.name]!!.walkDateList) // 산책한 날 표시
                 adapter = WalkDatesListAdapter(dogsWalkRecordMap[selectedDog.name]!!.walkDateInfoFirstSelectedDay)
@@ -251,18 +262,24 @@ class WalkInfoFragment : Fragment() { // 수정
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        mainActivity?.setMenuVisibility(View.GONE)
+    }
+
     override fun onResume() {
         super.onResume()
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        activity?.onBackPressedDispatcher?.addCallback(this, callback)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        mainActivity = null
         _binding = null
     }
 
     private fun goMyPage() {
-        mainActivity.changeFragment(MyPageFragment())
+        mainActivity?.changeFragment(MyPageFragment())
     }
 
     private fun setDogsWalkDate() {
@@ -305,20 +322,34 @@ class WalkInfoFragment : Fragment() { // 수정
         val detailWalkInfoFragment = DetailWalkInfoFragment().apply {
             arguments = bundle
         }
-        mainActivity.changeFragment(detailWalkInfoFragment)
-        mainActivity.binding.menuBn.visibility = View.GONE
+        mainActivity?.changeFragment(detailWalkInfoFragment)
+        mainActivity?.let {
+            it.binding.menuBn.visibility = View.GONE
+        }
     }
 
     object DogImgBindingAdapter {
         @BindingAdapter("selectedDog", "viewModel")
         @JvmStatic
         fun loadImage(iv: ImageView, selectedDog: DogInfo, viewModel: MainViewModel) {
-            if (viewModel.dogsImg.value?.get(selectedDog.name) != null) {
-                Glide.with(iv.context).load(viewModel.dogsImg.value?.get(selectedDog.name))
-                    .format(DecodeFormat.PREFER_ARGB_8888).override(500, 500).into(iv)
-            } else {
-                Glide.with(iv.context).load(R.drawable.collection_003)
-                    .format(DecodeFormat.PREFER_ARGB_8888).override(500, 500).into(iv)
+            if (iv.context == null) return
+
+            try {
+                val dogImage = viewModel.dogsImg.value?.get(selectedDog.name)
+                if (dogImage != null) {
+                    Glide.with(iv.context).load(dogImage)
+                        .format(DecodeFormat.PREFER_ARGB_8888)
+                        .override(500, 500)
+                        .error(R.drawable.collection_003)
+                        .into(iv)
+                } else {
+                    Glide.with(iv.context).load(R.drawable.collection_003)
+                        .format(DecodeFormat.PREFER_ARGB_8888)
+                        .override(500, 500)
+                        .into(iv)
+                }
+            } catch (e: Exception) {
+                iv.setImageResource(R.drawable.collection_003)
             }
         }
     }

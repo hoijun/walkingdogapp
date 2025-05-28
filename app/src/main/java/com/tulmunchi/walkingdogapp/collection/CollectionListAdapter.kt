@@ -101,12 +101,18 @@ class CollectionListAdapter(
         @BindingAdapter("CollectionItemImgResId", "IsExistedCollection")
         @JvmStatic
         fun loadImage(iv: ImageView, resId: Int, isOwned: Boolean) {
-            if (isOwned) {
-                Glide.with(iv.context).load(resId).format(DecodeFormat.PREFER_ARGB_8888)
-                    .override(400, 400).into(iv)
-            } else {
-                Glide.with(iv.context).load(R.drawable.waitimage).format(DecodeFormat.PREFER_ARGB_8888)
-                    .override(400, 400).into(iv)
+            if (iv.context == null) return
+            try {
+                if (isOwned) {
+                    Glide.with(iv.context).load(resId).format(DecodeFormat.PREFER_ARGB_8888)
+                        .override(400, 400).error(R.drawable.waitimage).into(iv)
+                } else {
+                    Glide.with(iv.context).load(R.drawable.waitimage)
+                        .format(DecodeFormat.PREFER_ARGB_8888)
+                        .override(400, 400).into(iv)
+                }
+            } catch (e: Exception) {
+                iv.setImageResource(R.drawable.waitimage)
             }
         }
     }
