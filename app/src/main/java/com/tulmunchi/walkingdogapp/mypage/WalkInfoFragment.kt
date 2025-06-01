@@ -323,9 +323,7 @@ class WalkInfoFragment : Fragment() { // 수정
             arguments = bundle
         }
         mainActivity?.changeFragment(detailWalkInfoFragment)
-        mainActivity?.let {
-            it.binding.menuBn.visibility = View.GONE
-        }
+        mainActivity?.setMenuVisibility(View.GONE)
     }
 
     object DogImgBindingAdapter {

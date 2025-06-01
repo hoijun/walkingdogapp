@@ -13,13 +13,16 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import com.tulmunchi.walkingdogapp.album.AlbumMapFragment
 import com.tulmunchi.walkingdogapp.collection.CollectionFragment
 import com.tulmunchi.walkingdogapp.databinding.ActivityMainBinding
 import com.tulmunchi.walkingdogapp.mainhome.HomeFragment
 import com.tulmunchi.walkingdogapp.mypage.ManageDogsFragment
 import com.tulmunchi.walkingdogapp.mypage.MyPageFragment
+import com.tulmunchi.walkingdogapp.utils.utils.Utils.Companion.LOADING_DIALOG_TAG
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import com.tulmunchi.walkingdogapp.walking.WalkingActivity
 import com.tulmunchi.walkingdogapp.walking.WalkingService
@@ -28,9 +31,8 @@ import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
     private val mainViewModel: MainViewModel by viewModels()
-    private lateinit var loadingDialogFragment: LoadingDialogFragment
     private val locationPermissionRequestCode = 1000
     private val permissions = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -72,17 +74,6 @@ class MainActivity : AppCompatActivity() {
         if (preFragment =="AlbumMap")
             binding.menuBn.selectedItemId = R.id.navigation_albummap
 
-        // 위치 권한
-        ActivityCompat.requestPermissions(this, permissions, locationPermissionRequestCode)
-
-        this.onBackPressedDispatcher.addCallback(this, callback)
-
-        if (WalkingService.isWalkingServiceRunning()) {
-            val walkingIntent = Intent(this, WalkingActivity::class.java)
-            walkingIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(walkingIntent)
-        }
-
         // 화면 전환
         binding.menuBn.apply {
             setOnItemSelectedListener { item ->
@@ -122,9 +113,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        loadingDialogFragment = LoadingDialogFragment()
-        loadingDialogFragment.show(this.supportFragmentManager, "loading")
+        // 위치 권한
+        ActivityCompat.requestPermissions(this, permissions, locationPermissionRequestCode)
 
+
+        this.onBackPressedDispatcher.addCallback(this, callback)
+
+        // 산책 중인지 확인
+        if (WalkingService.isWalkingServiceRunning()) {
+            val walkingIntent = Intent(this, WalkingActivity::class.java)
+            walkingIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(walkingIntent)
+        }
+
+        showLoadingFragment()
         getUserInfo()
     }
 
@@ -160,7 +162,7 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.observeUser(isImgChanged)
         mainViewModel.successGetData.observe(this) {
             try {
-                loadingDialogFragment.dismiss()
+                hideLoadingDialog()
                 dogNameList = mainViewModel.dogsNames.value ?: listOf()
                 if (mainViewModel.isSuccessGetImg()) {
                     dogUriList = mainViewModel.dogsImg.value ?: hashMapOf()
@@ -200,7 +202,40 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun showLoadingFragment() {
+        val existingDialog = supportFragmentManager.findFragmentByTag(LOADING_DIALOG_TAG)
+        if (existingDialog != null && !existingDialog.isDetached) {
+            return
+        }
+
+        try {
+            if (!supportFragmentManager.isStateSaved) {
+                val loadingDialog = LoadingDialogFragment()
+                loadingDialog.show(supportFragmentManager, LOADING_DIALOG_TAG)
+            }
+        } catch (_: IllegalStateException) { }
+    }
+
+    private fun hideLoadingDialog() {
+        val loadingDialog = supportFragmentManager.findFragmentByTag(LOADING_DIALOG_TAG) as? DialogFragment
+        loadingDialog?.let {
+            try {
+                if (it.isAdded && !it.isDetached) {
+                    it.dismiss()
+                }
+            } catch (_: IllegalStateException) { }
+        }
+    }
+
     fun changeFragment(fragment: Fragment) {
+        if (!::binding.isInitialized) {
+            return
+        }
+
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            return
+        }
+
         supportFragmentManager
             .beginTransaction()
             .replace(binding.screenFl.id, fragment)

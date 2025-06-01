@@ -68,8 +68,6 @@ class MyPageFragment : Fragment() {
             mainActivity = it as? MainActivity
         }
 
-        mainActivity?.setMenuVisibility(View.VISIBLE)
-
         MainActivity.preFragment = "Mypage"  // 다른 액티비티로 이동 할 때 마이페이지에서 이동을 표시
 
         context?.let { ctx ->

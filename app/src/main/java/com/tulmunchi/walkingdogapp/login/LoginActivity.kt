@@ -3,6 +3,7 @@ package com.tulmunchi.walkingdogapp.login
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -34,6 +35,10 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.system.exitProcess
+import androidx.core.content.edit
+import androidx.fragment.app.DialogFragment
+import com.tulmunchi.walkingdogapp.utils.utils.Utils
+import com.tulmunchi.walkingdogapp.utils.utils.Utils.Companion.LOADING_DIALOG_TAG
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
@@ -42,7 +47,7 @@ class LoginActivity : AppCompatActivity() {
     private val db = Firebase.database
     private val loginViewModel: LoginViewModel by viewModels()
     private var backPressedTime: Long = 0
-    private val loadingDialogFragment = LoadingDialogFragment()
+    private var shouldShowPermissionDialog = false
 
     @Inject
     lateinit var firebaseHelper: FirebaseAnalyticHelper
@@ -85,7 +90,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         override fun onFailure(httpStatus: Int, message: String) {
-            toastFailSignUp("Naver",message)
+            toastFailSignUp("Naver", message)
             setLoginIngView(false)
         }
     }
@@ -125,6 +130,19 @@ class LoginActivity : AppCompatActivity() {
                 setLoginIngView(true)
                 NaverIdLoginSDK.authenticate(this@LoginActivity, naverLoginCallback)
             }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        hideLoadingDialog()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (shouldShowPermissionDialog) {
+            shouldShowPermissionDialog = false
+            startMain()
         }
     }
 
@@ -232,7 +250,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun signInFirebase(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {task ->
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            if (isFinishing || isDestroyed) return@addOnCompleteListener
+
             if (task.isSuccessful) {
                 loginViewModel.setUser()
                 startMain()
@@ -244,22 +264,67 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun startMain() {
-        val permissionGuideDialog = PermissionGuideDialog()
-        permissionGuideDialog.onClickYesListener = PermissionGuideDialog.OnClickYesListener {
-            val mainIntent = Intent(this, MainActivity::class.java)
-            mainIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_CLEAR_TASK or
-                    Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(mainIntent)
+        if (isFinishing || isDestroyed || supportFragmentManager.isStateSaved) {
+            shouldShowPermissionDialog = true
+            return
         }
-        permissionGuideDialog.show(supportFragmentManager, "permission")
+
+        val permissionGuideDialog = PermissionGuideDialog()
+
+        permissionGuideDialog.onClickYesListener = PermissionGuideDialog.OnClickYesListener {
+            goMain()
+        }
+
+        try {
+            permissionGuideDialog.show(supportFragmentManager, "permission")
+        } catch (e: IllegalStateException) {
+            // Dialog 실패 시 바로 메인으로 이동
+            goMain()
+        }
+    }
+
+    private fun goMain() {
+        val mainIntent = Intent(this, MainActivity::class.java)
+        mainIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_CLEAR_TASK or
+                Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(mainIntent)
     }
 
     private fun setLoginIngView(loginIng: Boolean) {
+        if (isFinishing || isDestroyed) {
+            return
+        }
+
         if (loginIng) {
-            loadingDialogFragment.show(this.supportFragmentManager, "loading")
+            showLoadingFragment()
         } else {
-            loadingDialogFragment.dismissAllowingStateLoss()
+            hideLoadingDialog()
+        }
+    }
+
+    private fun showLoadingFragment() {
+        val existingDialog = supportFragmentManager.findFragmentByTag(LOADING_DIALOG_TAG)
+        if (existingDialog != null && !existingDialog.isDetached) {
+            return
+        }
+
+        try {
+            if (!supportFragmentManager.isStateSaved) {
+                val loadingDialog = LoadingDialogFragment()
+                loadingDialog.show(supportFragmentManager, LOADING_DIALOG_TAG)
+            }
+        } catch (_: IllegalStateException) { }
+    }
+
+    private fun hideLoadingDialog() {
+        val loadingDialog = supportFragmentManager.findFragmentByTag(LOADING_DIALOG_TAG) as? DialogFragment
+        loadingDialog?.let {
+            try {
+                if (it.isAdded && !it.isDetached) {
+                    it.dismissAllowingStateLoss()
+                }
+            } catch (_: IllegalStateException) { }
         }
     }
 
@@ -272,18 +337,20 @@ class LoginActivity : AppCompatActivity() {
             )
         )
 
-        Toast.makeText(
-            this@LoginActivity,
-            "회원가입 실패",
-            Toast.LENGTH_SHORT
-        ).show()
+        runOnUiThread {
+            Toast.makeText(
+                this@LoginActivity,
+                "회원가입 실패",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private fun saveEmail(context: Context, email: String, password: String) {
         val sharedPreferences = context.getSharedPreferences("UserEmail", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString("email", email)
-        editor.putString("password", password)
-        editor.apply()
+        sharedPreferences.edit {
+            putString("email", email)
+            putString("password", password)
+        }
     }
 }

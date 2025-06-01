@@ -89,9 +89,9 @@ class MainViewModel @Inject constructor(
     private val successGetImg: LiveData<Boolean>
         get() = _successGetImg
 
-    fun isSuccessGetData(): Boolean = successGetData.value!!
+    fun isSuccessGetData(): Boolean = successGetData.value ?: false
 
-    fun isSuccessGetImg(): Boolean = successGetImg.value!!
+    fun isSuccessGetImg(): Boolean = successGetImg.value ?: false
 
     fun setDogsImg(dogsImg: HashMap<String, Uri>) {
         _dogsImg.value = dogsImg
@@ -165,7 +165,7 @@ class MainViewModel @Inject constructor(
             try {
                 val addresses: MutableList<Address> = geocoder.getFromLocation(
                     coord.latitude,
-                    coord.longitude, 7)!!
+                    coord.longitude, 7) ?: mutableListOf()
                 address = addresses[0].getAddressLine(0).split(" ").takeLast(3)
                 val nameofLoc = address[0] + " " + address[1]
                 _currentRegion.postValue(nameofLoc)

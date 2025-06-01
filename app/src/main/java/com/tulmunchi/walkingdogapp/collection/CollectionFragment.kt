@@ -5,24 +5,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tulmunchi.walkingdogapp.utils.utils.Utils
 import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
-import com.tulmunchi.walkingdogapp.utils.GridSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.databinding.FragmentCollectionBinding
 import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
-import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
+import com.tulmunchi.walkingdogapp.utils.GridSpacingItemDecoration
+import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
+import com.tulmunchi.walkingdogapp.utils.utils.Utils
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import androidx.core.view.isGone
 
 class CollectionFragment : Fragment() {
     private var _binding: FragmentCollectionBinding? = null

@@ -22,6 +22,8 @@ class Utils {
         const val ACTION_START_Walking_Tracking = "startWalkingTracking"
         const val ACTION_STOP_Walking_Tracking = "stopWalkingTracking"
 
+        const val LOADING_DIALOG_TAG = "loading_dialog"
+
         val item_whether = HashMap<String, Boolean>().apply {
             for (num: Int in 1..24) {
                 put(String.format("%03d", num), false)
