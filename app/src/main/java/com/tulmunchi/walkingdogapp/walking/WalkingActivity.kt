@@ -303,6 +303,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             lifecycleScope.launch(Dispatchers.Main) {
                 delay(5000)
                 for (animalMarker in wService.animalMarkers) {
+                    if (collectionImgViews[animalMarker.tag.toString()] == null) return@launch
+
                     if (collectionImgViews[animalMarker.tag.toString()]!!.parent != null) {
                         ((collectionImgViews[animalMarker.tag.toString()]!!.parent) as ViewGroup).removeView(
                             collectionImgViews[animalMarker.tag.toString()]
@@ -312,7 +314,10 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     animalMarker.adapter =
                         object : InfoWindow.DefaultViewAdapter(this@WalkingActivity) {
                             override fun getContentView(p0: InfoWindow): View {
-                                return collectionImgViews[animalMarker.tag.toString()]!!
+                                return collectionImgViews[animalMarker.tag.toString()] ?: ImageView(this@WalkingActivity).apply {
+                                    setImageResource(R.drawable.walkicon)
+                                    layoutParams = ViewGroup.LayoutParams(200, 200)
+                                }
                             }
                         }
 
@@ -367,6 +372,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             val randomNumber = kotlin.random.Random.nextInt(1, 24)
                             val randomKey = String.format("%03d", randomNumber)
                             val animalMarker = InfoWindow()
+                            if (collectionImgViews[randomKey] == null) return@launch
+
                             if (collectionImgViews[randomKey]!!.parent != null) {
                                 ((collectionImgViews[randomKey]!!.parent) as ViewGroup).removeView(
                                     collectionImgViews[randomKey]
@@ -376,7 +383,10 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             animalMarker.adapter =
                                 object : InfoWindow.DefaultViewAdapter(this@WalkingActivity) {
                                     override fun getContentView(p0: InfoWindow): View {
-                                        return collectionImgViews[randomKey]!!
+                                        return collectionImgViews[randomKey] ?: ImageView(this@WalkingActivity).apply {
+                                            setImageResource(R.drawable.walkicon)
+                                            layoutParams = ViewGroup.LayoutParams(200, 200)
+                                        }
                                     }
                                 }
 
@@ -485,6 +495,10 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
+                    if (wService.walkDistance.value == null || wService.walkTime.value == null) {
+                        return@OnClickListener
+                    }
+
                     if (wService.walkDistance.value!! < 300 && wService.walkTime.value!! < 300) {
                         Toast.makeText(this, "거리 또는 시간이 너무 부족해요!", Toast.LENGTH_SHORT).show()
                         stopWalkingService()
@@ -540,7 +554,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setSaveScreen() {
-        val coors = wService.coordList.value!!
+        val coors = wService.coordList.value ?: listOf()
         if (coors.isNotEmpty()) {
             val middleCoor = coors[coors.size / 2]
             val saveCamera = CameraUpdate.scrollAndZoomTo(

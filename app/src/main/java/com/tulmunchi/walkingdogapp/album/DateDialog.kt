@@ -2,7 +2,6 @@ package com.tulmunchi.walkingdogapp.album
 
 import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,12 +12,13 @@ import androidx.fragment.app.activityViewModels
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.databinding.DateDialogBinding
-import com.tulmunchi.walkingdogapp.utils.utils.SelectedMonthDecorator
-import com.tulmunchi.walkingdogapp.utils.utils.ToDayDecorator
-import com.tulmunchi.walkingdogapp.utils.utils.WalkDayDecorator
+import com.tulmunchi.walkingdogapp.utils.SelectedMonthDecorator
+import com.tulmunchi.walkingdogapp.utils.ToDayDecorator
+import com.tulmunchi.walkingdogapp.utils.WalkDayDecorator
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
+import androidx.core.graphics.drawable.toDrawable
 
 class DateDialog : DialogFragment() {
     private var _binding: DateDialogBinding? = null
@@ -54,7 +54,7 @@ class DateDialog : DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = DateDialogBinding.inflate(inflater, container, false)
         val todayDecorator = ToDayDecorator(requireContext(), CalendarDay.today())
@@ -100,7 +100,7 @@ class DateDialog : DialogFragment() {
         }
 
         isCancelable = true
-        this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        this.dialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         return binding.root
     }
 

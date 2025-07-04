@@ -15,6 +15,7 @@ import com.tulmunchi.walkingdogapp.utils.utils.Utils
 import com.tulmunchi.walkingdogapp.databinding.CurrentcollectionsDialogBinding
 import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
 import com.tulmunchi.walkingdogapp.utils.GridSpacingItemDecoration
+import androidx.core.graphics.drawable.toDrawable
 
 class CurrentCollectionsDialog: DialogFragment() {
     private var _binding: CurrentcollectionsDialogBinding? = null
@@ -23,7 +24,7 @@ class CurrentCollectionsDialog: DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = CurrentcollectionsDialogBinding.inflate(inflater, container, false)
         val currentCollections = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -41,7 +42,7 @@ class CurrentCollectionsDialog: DialogFragment() {
             getCollectionRecyclerView.adapter = adapter
         }
 
-        this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        this.dialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         return binding.root
     }
 

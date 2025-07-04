@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import com.tulmunchi.walkingdogapp.databinding.PermissionguideDialogBinding
+import androidx.core.graphics.drawable.toDrawable
 
 class PermissionGuideDialog: DialogFragment() {
     private var _binding: PermissionguideDialogBinding? = null
@@ -24,7 +25,7 @@ class PermissionGuideDialog: DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = PermissionguideDialogBinding.inflate(inflater, container, false)
         binding.apply {
@@ -34,7 +35,7 @@ class PermissionGuideDialog: DialogFragment() {
             }
         }
         isCancelable = false
-        this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        this.dialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         return binding.root
     }
 

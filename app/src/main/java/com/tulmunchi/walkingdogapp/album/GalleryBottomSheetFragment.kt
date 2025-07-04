@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import com.tulmunchi.walkingdogapp.databinding.FragmentGalleryBottomSheetBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import androidx.core.graphics.drawable.toDrawable
 
 class GalleryBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -40,7 +41,7 @@ class GalleryBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentGalleryBottomSheetBinding.inflate(inflater, container, false)
         val date = arguments?.getString("date") ?: "2024년 03월 20일 00:00"
@@ -77,8 +78,8 @@ class GalleryBottomSheetFragment : BottomSheetDialogFragment() {
             }
         }
 
-        this.dialog?.window!!.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-        this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        this.dialog?.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        this.dialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         return binding.root
     }
 

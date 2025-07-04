@@ -16,7 +16,7 @@ class RestartAlarmReceiver: BroadcastReceiver() {
             functions = AlarmFunctions(context)
             coroutineScope.launch {
                 val db = LocalUserDatabase.getInstance(context)
-                val alarmDao = db!!.alarmDao()
+                val alarmDao = db?.alarmDao() ?: return@launch
                 val alarms = alarmDao.getAlarmsList()
                 alarms.let {
                     for (i in alarms.indices) {

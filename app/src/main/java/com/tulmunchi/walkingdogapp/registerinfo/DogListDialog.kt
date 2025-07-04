@@ -12,6 +12,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tulmunchi.walkingdogapp.WriteDialog
 import com.tulmunchi.walkingdogapp.databinding.DoglistDialogBinding
+import androidx.core.graphics.drawable.toDrawable
 
 class DogListDialog : DialogFragment(){
     private var _binding: DoglistDialogBinding? = null
@@ -31,7 +32,7 @@ class DogListDialog : DialogFragment(){
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = DoglistDialogBinding.inflate(inflater, container, false)
         val dialogRecyclerView = binding.dialogRecyclerView
@@ -56,7 +57,7 @@ class DogListDialog : DialogFragment(){
             }
         dialogRecyclerView.adapter = adapter
         this.dialog?.setCanceledOnTouchOutside(true)
-        this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        this.dialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         return binding.root
     }
 

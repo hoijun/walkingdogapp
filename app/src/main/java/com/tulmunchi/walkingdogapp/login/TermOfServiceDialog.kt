@@ -12,6 +12,7 @@ import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import com.tulmunchi.walkingdogapp.databinding.TermofserviceDialogBinding
 import com.tulmunchi.walkingdogapp.mypage.PrivacyWebViewActivity
+import androidx.core.graphics.drawable.toDrawable
 
 class TermOfServiceDialog: DialogFragment() {
     private var _binding: TermofserviceDialogBinding? = null
@@ -29,7 +30,7 @@ class TermOfServiceDialog: DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = TermofserviceDialogBinding.inflate(inflater, container, false)
         binding.apply {
@@ -78,7 +79,7 @@ class TermOfServiceDialog: DialogFragment() {
             }
         }
         isCancelable = false
-        this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        this.dialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         return binding.root
     }
 

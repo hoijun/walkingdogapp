@@ -1,4 +1,4 @@
-package com.tulmunchi.walkingdogapp.utils.utils
+package com.tulmunchi.walkingdogapp.utils
 
 import android.content.Context
 import android.graphics.Color
@@ -20,6 +20,7 @@ class DayDecorator(context: Context): DayViewDecorator {
 
     // 일자 선택 시 내가 정의한 드로어블이 적용되도록 한다
     override fun decorate(view: DayViewFacade) {
+        if (drawable == null) return
         view.setSelectionDrawable(drawable!!)
     }
 }
@@ -33,6 +34,7 @@ class ToDayDecorator(context: Context, private val today: CalendarDay): DayViewD
 
     // 일자 선택 시 내가 정의한 드로어블이 적용되도록 한다
     override fun decorate(view: DayViewFacade) {
+        if (drawable == null) return
         view.setSelectionDrawable(drawable!!)
     }
 }

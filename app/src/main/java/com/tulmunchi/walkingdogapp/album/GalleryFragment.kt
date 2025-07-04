@@ -69,10 +69,10 @@ class GalleryFragment : Fragment() {
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if(!selectMode.value!!) {
-                goMyPage()
-            } else {
+            if(selectMode.value == true) {
                 unSelectMode()
+            } else {
+                goMyPage()
             }
         }
     }
@@ -221,7 +221,7 @@ class GalleryFragment : Fragment() {
             val adapter = GalleryItemListAdapter(imgInfos)
             adapter.itemClickListener = object : GalleryItemListAdapter.OnItemClickListener {
                 override fun onItemClick(imgNum: Int) {
-                    if (!selectMode.value!!) {
+                    if (selectMode.value == false) {
                         val bundle = Bundle()
                         bundle.putInt("select", imgNum)
                         val detailPictureFragment = DetailPictureFragment().apply {

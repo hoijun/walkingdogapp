@@ -169,22 +169,22 @@ class UserInfoRepository @Inject constructor(
                         for (dogInfo in snapshot.children) {
                             dogsList.add(
                                 DogInfo(
-                                    dogInfo.child("name").getValue(String::class.java)!!,
-                                    dogInfo.child("breed").getValue(String::class.java)!!,
-                                    dogInfo.child("gender").getValue(String::class.java)!!,
-                                    dogInfo.child("birth").getValue(String::class.java)!!,
+                                    dogInfo.child("name").getValue(String::class.java) ?: "털뭉치",
+                                    dogInfo.child("breed").getValue(String::class.java) ?: "시고르자브종",
+                                    dogInfo.child("gender").getValue(String::class.java) ?: "남",
+                                    dogInfo.child("birth").getValue(String::class.java) ?: "2000/10/14",
                                     dogInfo.child("neutering")
-                                        .getValue(String::class.java)!!,
+                                        .getValue(String::class.java) ?: "예",
                                     dogInfo.child("vaccination")
-                                        .getValue(String::class.java)!!,
-                                    dogInfo.child("weight").getValue(String::class.java)!!,
-                                    dogInfo.child("feature").getValue(String::class.java)!!,
-                                    dogInfo.child("creationTime").getValue(Long::class.java)!!,
+                                        .getValue(String::class.java) ?: "예",
+                                    dogInfo.child("weight").getValue(String::class.java) ?: "11",
+                                    dogInfo.child("feature").getValue(String::class.java) ?: "",
+                                    dogInfo.child("creationTime").getValue(Long::class.java) ?: System.currentTimeMillis(),
                                     dogInfo.child("totalWalkInfo")
-                                        .getValue(TotalWalkInfo::class.java)!!
+                                        .getValue(TotalWalkInfo::class.java) ?: TotalWalkInfo()
                                 )
                             )
-                            dogNamesList.add(dogInfo.child("name").getValue(String::class.java)!!)
+                            dogNamesList.add(dogInfo.child("name").getValue(String::class.java) ?: "털뭉치")
                         }
                     }
                     dogNameList = dogNamesList
@@ -235,8 +235,8 @@ class UserInfoRepository @Inject constructor(
                                             WalkDateInfo(
                                                 walkDay[0], walkDay[1], walkDay[2],
                                                 dateData.child("distance")
-                                                    .getValue(Float::class.java)!!,
-                                                dateData.child("time").getValue(Int::class.java)!!,
+                                                    .getValue(Float::class.java) ?: 0f,
+                                                dateData.child("time").getValue(Int::class.java) ?: 0,
                                                 dateData.child("coords")
                                                     .getValue<List<WalkLatLng>>()
                                                     ?: listOf(),
@@ -675,8 +675,10 @@ class UserInfoRepository @Inject constructor(
                                         userRef.child("dog").child(dogName).child("totalWalkInfo")
                                             .setValue(
                                                 TotalWalkInfo(
-                                                    indivisualWalks[dogName]!!.distance + distance,
-                                                    indivisualWalks[dogName]!!.time + time
+                                                    indivisualWalks[dogName]?.distance?.plus(
+                                                        distance
+                                                    ) ?: 0.0f,
+                                                    indivisualWalks[dogName]?.time?.plus(time) ?: 0
                                                 )
                                             ).await()
                                     } else {

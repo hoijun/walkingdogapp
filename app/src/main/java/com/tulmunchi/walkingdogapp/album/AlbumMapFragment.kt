@@ -376,7 +376,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             moveCamera(imgInfos[0].latLng, CameraAnimation.None)
         } else {
             mainViewModel.currentCoord.value?.let {
-                val coord = mainViewModel.currentCoord.value!!
+                val coord = mainViewModel.currentCoord.value ?: return@let
                 moveCamera(LatLng(coord.latitude, coord.longitude), CameraAnimation.None)
             }
         }

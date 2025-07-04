@@ -12,6 +12,7 @@ import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import com.tulmunchi.walkingdogapp.databinding.GetcollectionDialogBinding
 import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
+import androidx.core.graphics.drawable.toDrawable
 
 class GetCollectionDialog: DialogFragment() {
     private var _binding: GetcollectionDialogBinding? = null
@@ -20,7 +21,7 @@ class GetCollectionDialog: DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = GetcollectionDialogBinding.inflate(inflater, container, false)
         val getCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -30,7 +31,7 @@ class GetCollectionDialog: DialogFragment() {
         }
 
         binding.collection = getCollection
-        this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        this.dialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         return binding.root
     }
 

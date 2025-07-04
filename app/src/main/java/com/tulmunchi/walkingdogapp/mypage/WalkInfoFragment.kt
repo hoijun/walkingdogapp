@@ -22,17 +22,15 @@ import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.databinding.FragmentWalkInfoBinding
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
-import com.tulmunchi.walkingdogapp.utils.utils.DayDecorator
+import com.tulmunchi.walkingdogapp.utils.DayDecorator
 import com.tulmunchi.walkingdogapp.utils.HorizonSpacingItemDecoration
-import com.tulmunchi.walkingdogapp.utils.utils.SaturdayDecorator
-import com.tulmunchi.walkingdogapp.utils.utils.SelectedMonthDecorator
-import com.tulmunchi.walkingdogapp.utils.utils.SundayDecorator
-import com.tulmunchi.walkingdogapp.utils.utils.WalkDayDecorator
+import com.tulmunchi.walkingdogapp.utils.SaturdayDecorator
+import com.tulmunchi.walkingdogapp.utils.SelectedMonthDecorator
+import com.tulmunchi.walkingdogapp.utils.SundayDecorator
+import com.tulmunchi.walkingdogapp.utils.WalkDayDecorator
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
-import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
-import javax.inject.Inject
 
 data class DogsWalkRecord(
     val walkDateList: MutableList<CalendarDay> = mutableListOf(),
@@ -141,7 +139,7 @@ class WalkInfoFragment : Fragment() { // 수정
                     selectDogInfo = selectedDog
 
                     walkcalendar.removeDecorator(walkDayDecorator)
-                    walkDayDecorator = WalkDayDecorator(dogsWalkRecordMap[selectedDogInfo.name]!!.walkDateList) // 산책한 날 표시
+                    walkDayDecorator = WalkDayDecorator(dogsWalkRecordMap[selectedDogInfo.name]?.walkDateList ?: listOf()) // 산책한 날 표시
                     walkcalendar.addDecorators(walkDayDecorator)
 
                     val selectedDayWalkDateInfoList = mutableListOf<WalkDateInfo>()
@@ -197,7 +195,7 @@ class WalkInfoFragment : Fragment() { // 수정
 
             if (MainActivity.dogNameList.isNotEmpty()) {
                 if (selectedDog == DogInfo()) {
-                    selectedDog = mainViewModel.dogsInfo.value!![0]
+                    selectedDog = mainViewModel.dogsInfo.value?.get(0) ?: DogInfo()
                     selectDogInfo = selectedDog
                 }
 
@@ -205,8 +203,8 @@ class WalkInfoFragment : Fragment() { // 수정
                 viewmodel = mainViewModel
                 lifecycleOwner = viewLifecycleOwner
 
-                walkDayDecorator = WalkDayDecorator(dogsWalkRecordMap[selectedDog.name]!!.walkDateList) // 산책한 날 표시
-                adapter = WalkDatesListAdapter(dogsWalkRecordMap[selectedDog.name]!!.walkDateInfoFirstSelectedDay)
+                walkDayDecorator = WalkDayDecorator(dogsWalkRecordMap[selectedDog.name]?.walkDateList ?: listOf()) // 산책한 날 표시
+                adapter = WalkDatesListAdapter(dogsWalkRecordMap[selectedDog.name]?.walkDateInfoFirstSelectedDay ?: listOf())
                 adapter.itemClickListener = WalkDatesListAdapter.OnItemClickListener { selectDate ->
                     goDetail(selectDate)
                 }
@@ -236,7 +234,7 @@ class WalkInfoFragment : Fragment() { // 수정
                 walkcalendar.invalidateDecorators() // 데코 초기화
                 if (date.month == CalendarDay.today().month) {
                     walkcalendar.selectedDate = CalendarDay.today() // 현재 달로 바꿀 때 마다 현재 날짜 표시
-                    selectedDay = walkcalendar.selectedDate!!
+                    selectedDay = walkcalendar.selectedDate ?: CalendarDay.today()
                     adapter = WalkDatesListAdapter(
                         dogsWalkRecordMap[selectedDog.name]?.walkDateInfoToday ?: listOf()
                     )
@@ -252,7 +250,7 @@ class WalkInfoFragment : Fragment() { // 수정
                 walkinfoRecyclerview.adapter = adapter
 
                 if (MainActivity.dogNameList.isNotEmpty()) {
-                    walkDayDecorator = WalkDayDecorator(dogsWalkRecordMap[selectedDog.name]!!.walkDateList) // 산책한 날 표시
+                    walkDayDecorator = WalkDayDecorator(dogsWalkRecordMap[selectedDog.name]?.walkDateList ?: listOf()) // 산책한 날 표시
                     walkcalendar.addDecorators(walkDayDecorator)
                 }
                 walkcalendar.addDecorators(dayDecorator, saturdayDecorator, sundayDecorator, selectedMonthDecorator) //데코 설정

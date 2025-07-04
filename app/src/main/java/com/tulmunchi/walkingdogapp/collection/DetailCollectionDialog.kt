@@ -15,6 +15,7 @@ import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
 import com.tulmunchi.walkingdogapp.databinding.DetailcollectionDialogBinding
 import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
+import androidx.core.graphics.drawable.toDrawable
 
 class DetailCollectionDialog: DialogFragment() {
     private var _binding: DetailcollectionDialogBinding? = null
@@ -23,7 +24,7 @@ class DetailCollectionDialog: DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = DetailcollectionDialogBinding.inflate(inflater, container, false)
         val collectionInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -35,7 +36,7 @@ class DetailCollectionDialog: DialogFragment() {
         binding.collection = collectionInfo
 
 
-        this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        this.dialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         return binding.root
     }
 

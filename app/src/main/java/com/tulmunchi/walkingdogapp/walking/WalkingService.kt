@@ -82,6 +82,10 @@ class WalkingService : Service() {
                 for (location in locationResult.locations) {
                     if (location != null) {
                         val pos = LatLng(location.latitude, location.longitude)
+                        if (coordList.value == null) {
+                            return
+                        }
+
                         if (coordList.value!!.isNotEmpty() && coordList.value!!.last().distanceTo(pos) < 3f) {
                             return
                         }
@@ -91,7 +95,7 @@ class WalkingService : Service() {
                             coordList.postValue(this)
                         }
 
-                        val previousDistance = walkDistance.value!!
+                        val previousDistance = walkDistance.value ?: 0f
 
                         if (coordList.value!!.size > 1) { // 거리 증가
                             walkDistance.postValue(
@@ -111,7 +115,7 @@ class WalkingService : Service() {
                             }
                         }
 
-                        if (hasPassedKm(previousDistance.toInt(), walkDistance.value!!.toInt())) {
+                        if (hasPassedKm(previousDistance.toInt(), walkDistance.value?.toInt() ?: 0)) {
                             angleThreshold -= 2
                             if (angleThreshold < 0) {
                                 angleThreshold = 20
@@ -200,7 +204,7 @@ class WalkingService : Service() {
             .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
             .build()
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        fusedLocationProviderClient!!.requestLocationUpdates(
+        fusedLocationProviderClient?.requestLocationUpdates(
             locationRequest,
             locationCallback,
             Looper.getMainLooper()

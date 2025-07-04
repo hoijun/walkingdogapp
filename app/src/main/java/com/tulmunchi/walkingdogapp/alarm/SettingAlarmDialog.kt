@@ -15,6 +15,7 @@ import androidx.fragment.app.DialogFragment
 import com.tulmunchi.walkingdogapp.databinding.SettingalarmDialogBinding
 import com.tulmunchi.walkingdogapp.datamodel.AlarmDataModel
 import java.util.Calendar
+import androidx.core.graphics.drawable.toDrawable
 
 class SettingAlarmDialog : DialogFragment() {
     private var _binding: SettingalarmDialogBinding? = null
@@ -30,7 +31,7 @@ class SettingAlarmDialog : DialogFragment() {
     @SuppressLint("DefaultLocale")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = SettingalarmDialogBinding.inflate(inflater, container, false)
 
@@ -118,7 +119,7 @@ class SettingAlarmDialog : DialogFragment() {
         }
 
         isCancelable = true
-        this.dialog?.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        this.dialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         return binding.root
     }
 

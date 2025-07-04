@@ -44,7 +44,7 @@ class AlarmReceiver: BroadcastReceiver() {
 
         val notificationManager = context?.getSystemService(Service.NOTIFICATION_SERVICE) as NotificationManager
 
-        val requestCode = intent?.extras!!.getInt("alarm_rqCode")
+        val requestCode = intent?.extras?.getInt("alarm_rqCode") ?: 0
 
         val resultIntent = Intent(context, SplashActivity::class.java)
         val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
