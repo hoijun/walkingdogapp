@@ -50,7 +50,6 @@ class UserInfoRepository @Inject constructor(
     private var uid = auth.currentUser?.uid
     private var userRef = database.getReference("Users").child("$uid")
     private var storageRef = storage.getReference("$uid").child("images")
-    private lateinit var alarmList: List<AlarmDataModel>
 
     @Inject
     lateinit var firebaseHelper: FirebaseAnalyticHelper
@@ -368,10 +367,10 @@ class UserInfoRepository @Inject constructor(
     }
 
     fun getAll(): List<AlarmDataModel> {
+        var alarmList = listOf<AlarmDataModel>()
         try {
             alarmList = alarmDao.getAlarmsList()
         } catch (e: Exception) {
-            alarmList = listOf()
             firebaseHelper.logEvent(
                 listOf(
                     "type" to "GetAllAlarm_Fail",

@@ -10,10 +10,9 @@ import kotlinx.coroutines.launch
 
 class RestartAlarmReceiver: BroadcastReceiver() {
     private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
-    private lateinit var functions: AlarmFunctions
     override fun onReceive(context: Context, intent: Intent) {
         if(intent.action.equals("android.intent.action.BOOT_COMPLETED")) {
-            functions = AlarmFunctions(context)
+            val functions = AlarmFunctions(context)
             coroutineScope.launch {
                 val db = LocalUserDatabase.getInstance(context)
                 val alarmDao = db?.alarmDao() ?: return@launch

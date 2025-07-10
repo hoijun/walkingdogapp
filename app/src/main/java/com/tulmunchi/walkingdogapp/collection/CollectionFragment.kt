@@ -27,7 +27,7 @@ class CollectionFragment : Fragment() {
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
     private var collectionWhether = HashMap<String, Boolean>()
-    private lateinit var collections: List<CollectionInfo>
+    private var collections: List<CollectionInfo> = listOf()
     private var mainActivity: MainActivity? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

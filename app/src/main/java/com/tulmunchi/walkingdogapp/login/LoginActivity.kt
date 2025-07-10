@@ -3,18 +3,13 @@ package com.tulmunchi.walkingdogapp.login
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
-import com.tulmunchi.walkingdogapp.LoadingDialogFragment
-import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.databinding.ActivityLoginBinding
-import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
-import com.tulmunchi.walkingdogapp.viewmodel.LoginViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.database.ktx.database
@@ -28,6 +23,13 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
+import com.tulmunchi.walkingdogapp.LoadingDialogFragment
+import com.tulmunchi.walkingdogapp.MainActivity
+import com.tulmunchi.walkingdogapp.databinding.ActivityLoginBinding
+import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
+import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
+import com.tulmunchi.walkingdogapp.utils.utils.Utils.Companion.LOADING_DIALOG_TAG
+import com.tulmunchi.walkingdogapp.viewmodel.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,10 +37,6 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.system.exitProcess
-import androidx.core.content.edit
-import androidx.fragment.app.DialogFragment
-import com.tulmunchi.walkingdogapp.utils.utils.Utils
-import com.tulmunchi.walkingdogapp.utils.utils.Utils.Companion.LOADING_DIALOG_TAG
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {

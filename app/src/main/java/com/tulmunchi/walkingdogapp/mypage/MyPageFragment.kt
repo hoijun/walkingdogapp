@@ -38,7 +38,7 @@ class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
-    private lateinit var totalWalkInfo: TotalWalkInfo
+    private var totalWalkInfo = TotalWalkInfo()
     private var walkdates = mutableListOf<WalkDateInfo>()
     private var mainActivity: MainActivity? = null
 

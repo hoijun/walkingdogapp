@@ -51,8 +51,6 @@ class MainViewModel @Inject constructor(
     private val _albumImgs = MutableLiveData<List<GalleryImgInfo>>()
     private val _successGetImg = MutableLiveData(false)
 
-    private lateinit var address : List<String>
-
     val currentCoord: LiveData<LatLng>
         get() = _currentCoord
 
@@ -166,7 +164,7 @@ class MainViewModel @Inject constructor(
                 val addresses: MutableList<Address> = geocoder.getFromLocation(
                     coord.latitude,
                     coord.longitude, 7) ?: mutableListOf()
-                address = addresses[0].getAddressLine(0).split(" ").takeLast(3)
+                val address = addresses[0].getAddressLine(0).split(" ").takeLast(3)
                 val nameofLoc = address[0] + " " + address[1]
                 _currentRegion.postValue(nameofLoc)
             } catch(e: IOException) {
@@ -178,9 +176,8 @@ class MainViewModel @Inject constructor(
                 @RequiresApi(33) object :
                 Geocoder.GeocodeListener {
                 override fun onGeocode(addresses: MutableList<Address>) {
-                    address = addresses[0].getAddressLine(0).split(" ").takeLast(3)
+                    val address = addresses[0].getAddressLine(0).split(" ").takeLast(3)
                     val nameofLoc = address[0] + " " + address[1]
-                    Log.d("locate", "get locate")
                     _currentRegion.postValue(nameofLoc)
                 }
                 override fun onError(errorMessage: String?) {

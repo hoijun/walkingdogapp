@@ -72,13 +72,14 @@ import kotlin.math.sin
 class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityWalkingBinding
     private lateinit var mynavermap: NaverMap
+    private lateinit var wService: WalkingService
+
     private val walkingViewModel: WalkingViewModel by viewModels()
     private var randomMarkerJob: Job? = null
 
     private var coordList = mutableListOf<LatLng>()
     private var trackingMarker = Marker()
     private var trackingPath = PathOverlay()
-    private lateinit var trackingCamera: CameraUpdate
     private var trackingCameraMode = true // 지도의 화면이 자동으로 사용자에 위치에 따라 움직이는 지
 
     private var collectionImgViews = hashMapOf<String, ImageView>()
@@ -95,13 +96,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private val cameraCode = 98
     private val storageCode = 99
 
-    private lateinit var uri: Uri
-    private lateinit var currentPhotoPath: String
+    private var currentPhotoPath = ""
 
     private var startTime = ""
     private var selectedDogs = arrayListOf<String>()
     private var collectionsMap = hashMapOf<String, CollectionInfo>()
-    private lateinit var wService: WalkingService
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -121,12 +120,14 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private val getResultCamera =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == RESULT_OK) {
-                galleryAddPic()
-            }
+    private val getResultCamera = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (currentPhotoPath == "") {
+            Toast.makeText(this,"사진을 저장하지 못했어요!",Toast.LENGTH_SHORT).show()
         }
+        if (it.resultCode == RESULT_OK) {
+            galleryAddPic()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -187,8 +188,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     trackingCameraMode = true
                     isTrackingCameraMode = trackingCameraMode
                     if (coordList.isNotEmpty()) {
-                        trackingCamera = CameraUpdate.scrollAndZoomTo(coordList.last(), 16.0)
-                            .animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
+                        val trackingCamera = CameraUpdate.scrollAndZoomTo(coordList.last(), 16.0).animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
                         mynavermap.moveCamera(trackingCamera)
                     }
                     return@setOnClickListener
@@ -272,9 +272,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 trackingMarker.map = mynavermap
 
                 if (trackingCameraMode) {
-                    trackingCamera =
-                        CameraUpdate.scrollAndZoomTo(coordList.last(), 16.0)
-                            .animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
+                    val trackingCamera = CameraUpdate.scrollAndZoomTo(coordList.last(), 16.0).animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
                     mynavermap.moveCamera(trackingCamera)
                 }
 
@@ -583,44 +581,51 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun takePhoto(intent: Intent) {
-        val parentDir =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absoluteFile
+        val parentDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absoluteFile
+
         if(!parentDir.exists()) {
             parentDir.mkdir()
         }
+
         val subDir = File(parentDir, "털뭉치")
+
         if (!subDir.exists()) {
             subDir.mkdir()
         }
+
         val photoFile: File? = try {
             createImageFile(subDir)
         } catch (ex: IOException) {
-            // Error occurred while creating the File
             ex.printStackTrace()
             null
         }
 
-        photoFile?.also {
-            uri = FileProvider.getUriForFile(
-                this,
-                "$packageName.provider",
-                it
-            )
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            getResultCamera.launch(intent)
+        try {
+            photoFile?.also {
+                val uri = FileProvider.getUriForFile(
+                    this,
+                    "$packageName.provider",
+                    it
+                )
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                getResultCamera.launch(intent)
+            }
+        } catch (ex: IOException) {
+            ex.printStackTrace()
         }
     }
 
     @Throws(IOException::class)
     private fun createImageFile(storageDir: File?): File {
-        // Create an image file name
-        val timeStamp: String = setFileName()
-        val imageFileName = "munchi_$timeStamp.jpeg"
-        return File(storageDir, imageFileName)
-        .apply {
-            Log.i("syTest", "Created File AbsolutePath : $absolutePath")
-            currentPhotoPath = absolutePath
+        try {
+            val timeStamp: String = setFileName()
+            val imageFileName = "munchi_$timeStamp.jpeg"
+            return File(storageDir, imageFileName).apply {
+                currentPhotoPath = absolutePath
+            }
+        } catch (ex: IOException) {
+            throw ex
         }
     }
 
@@ -633,13 +638,14 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
     private fun galleryAddPic() {
-        MediaScannerConnection.scanFile(
-            this,
-            arrayOf(currentPhotoPath),
-            null
-        ) { path, uri ->
-            Log.d("testsave", "Scanned file path: $path")
-            Log.d("testsave", "Scanned file URI: $uri")
+        try {
+            MediaScannerConnection.scanFile(
+                this,
+                arrayOf(currentPhotoPath),
+                null
+            ) { _, _ -> }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

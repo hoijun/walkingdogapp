@@ -44,7 +44,6 @@ class WalkingService : Service() {
     }
     private var binder = LocalBinder()
     private lateinit var locationRequest: LocationRequest
-    private lateinit var builder : NotificationCompat.Builder
     private var fusedLocationProviderClient: FusedLocationProviderClient? = null
     private var walkTimer: Timer? = Timer()
     private var totalTime = 0
@@ -179,7 +178,7 @@ class WalkingService : Service() {
         val pendingIntent =
             PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_IMMUTABLE)
 
-        builder = NotificationCompat.Builder(applicationContext, channelId)
+        val builder = NotificationCompat.Builder(applicationContext, channelId)
             .setSmallIcon(R.drawable.appicon)
             .setContentTitle("털뭉치")
             .setContentText("산책중 이에요.")
@@ -203,6 +202,7 @@ class WalkingService : Service() {
             .setMaxUpdateDelayMillis(5000)
             .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
             .build()
+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationProviderClient?.requestLocationUpdates(
             locationRequest,
