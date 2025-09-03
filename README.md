@@ -32,7 +32,7 @@
   | **Database** | Room | 로컬 데이터베이스 (알람 설정 등) |
   | **Async** | Coroutines | 비동기 처리 |
   | **DI** | Dagger Hilt | 의존성 주입 |
-  | **UI** | Material Design, Lottie | 사용자 인터페이스 |
+  | **UI** | XML | 사용자 인터페이스 |
   | **Auth** | Kakao SDK, Naver OAuth | 소셜 로그인 |
   | **Image** | Glide | 이미지 로딩 |
 
@@ -48,17 +48,16 @@
   - Android SDK 26 이상
   - JDK 17
 
-  - API 키 설정
-  local.properties 파일에 다음 키들을 추가:
-  navermap_api_key="YOUR_NAVER_MAP_API_KEY"
-  kakaologin_api_key="YOUR_KAKAO_API_KEY"
-  kakaologin_redirect_uri="YOUR_KAKAO_REDIRECT_URI"
-  naverlogin_clientid="YOUR_NAVER_CLIENT_ID"
-  naverlogin_clientsecret="YOUR_NAVER_CLIENT_SECRET"
+  ### API 키 설정(local.properties 파일에 다음 키들을 추가)
+  - navermap_api_key="YOUR_NAVER_MAP_API_KEY"
+  - kakaologin_api_key="YOUR_KAKAO_API_KEY"
+  - kakaologin_redirect_uri="YOUR_KAKAO_REDIRECT_URI"
+  - naverlogin_clientid="YOUR_NAVER_CLIENT_ID"
+  - naverlogin_clientsecret="YOUR_NAVER_CLIENT_SECRET"
 
-  - Firebase 설정
-    - Firebase 프로젝트 생성
-    - google-services.json 파일을 app/ 디렉토리에 추가
+  ### Firebase 설정
+  - Firebase 프로젝트 생성
+  - google-services.json 파일을 app/ 디렉토리에 추가
 
   ## 📊 프로젝트 정보
 
