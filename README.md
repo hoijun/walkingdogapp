@@ -5,23 +5,22 @@
   [![API](https://img.shields.io/badge/API-26%2B-brightgreen.svg)](https://android-arsenal.com/api?level=26)
   [![Google Play](https://img.shields.io/badge/Google%20Play-Download-blue)](https://play.google.com/store/apps/details?id=com.tulmunchi.walkingdogapp&pcampaignid=web_share)
 
+  ## 프로젝트 소개
   강아지와 함께 산책하면서 다양한 캐릭터 아이콘을 획득하여 도감을 채워나가는 강아지 산책 앱입니다.
-
+  <br><br/>
   ## ✨ 주요 기능
-
   - **🚶‍♀️ 산책 기록 관리**: 강아지와의 산책 정보를 기록하고 확인
   - **🏆 도감 시스템**: 산책 중 캐릭터 아이콘 획득으로 도감 완성
   - **📍 지도 연동**: 산책 시 촬영한 사진을 지도에서 확인 가능
   - **⏰ 알람 기능**: 산책 시간 알림 설정
   - **📸 갤러리**: 산책 중 촬영한 사진들을 체계적으로 관리
-
+  <br><br/>
   ## 🛠 기술 스택
 
   ### 개발 환경
   - **언어**: Kotlin
   - **SDK**: Android API 26+ (Target: API 35)
   - **IDE**: Android Studio
-  - **빌드 도구**: Gradle (KTS)
 
   ### 주요 라이브러리
   | 카테고리 | 라이브러리 | 용도 |
@@ -41,7 +40,7 @@
   - **구조**: Multiple Activity, Multiple Fragment
   - **의존성 주입**: Dagger Hilt
   - **데이터 바인딩**: Android Data Binding
-
+  <br><br/>
   ## 🚀 시작하기
 
   ### 요구사항
@@ -58,20 +57,20 @@
   ### Firebase 설정
   - Firebase 프로젝트 생성
   - google-services.json 파일을 app/ 디렉토리에 추가
-
+  <br><br/>
   ## 📊 프로젝트 정보
 
   - 개발 기간: 2024년 1월 ~ 2024년 12월
   - 개발 인원:
      - 안드로이드 개발자 1명
      - 디자인 2명
-
+  <br><br/>
   ## 📄 라이선스 및 저작권
 
   이미지 저작권
 
   - 산책 아이콘: https://kor.pngtree.com/freepng/yellow-white-pixel-kuki-dog_6357944.html - 百事可口阔落 작가
-
+  <br><br/>
   ## 📱 플레이 스토어 링크
 
   - https://play.google.com/store/apps/details?id=com.tulmunchi.walkingdogapp&pcampaignid=web_share
