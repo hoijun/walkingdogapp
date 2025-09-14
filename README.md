@@ -74,3 +74,12 @@
   ## 📱 플레이 스토어 링크
 
   - https://play.google.com/store/apps/details?id=com.tulmunchi.walkingdogapp&pcampaignid=web_share
+  <br><br/>
+  ## 📺 구현 화면
+   ### - 산책 화면 및 도감 화면  
+   <img width="255" height="495" alt="Image" src="https://github.com/user-attachments/assets/d74b2fd1-fa4e-418f-a243-287fd1daebaa" />
+   <img width="255" height="496" alt="Image" src="https://github.com/user-attachments/assets/a03443af-e20c-4fc8-8ef5-8f1b2b10bd80" />
+   
+   ### - 지도 앨범 화면 및 산책 기록 화면  
+   <img width="255" height="495" alt="Image" align="top" src="https://github.com/user-attachments/assets/01266945-6712-463a-8962-a9b53721c988" />
+   <img width="255" height="576" alt="Image" align="top" src="https://github.com/user-attachments/assets/7d2a8b07-d7f6-4404-acce-839ae8fce35a" />
