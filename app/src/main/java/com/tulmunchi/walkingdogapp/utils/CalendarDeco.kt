@@ -68,7 +68,7 @@ class SundayDecorator: DayViewDecorator {
     }
 
     override fun decorate(view: DayViewFacade) {
-        view.addSpan(object:ForegroundColorSpan(Color.RED){})
+        view.addSpan(object: ForegroundColorSpan(Color.RED){})
     }
 }
 
@@ -80,6 +80,6 @@ class SaturdayDecorator: DayViewDecorator {
     }
 
     override fun decorate(view: DayViewFacade) {
-        view.addSpan(object:ForegroundColorSpan(Color.BLUE){})
+        view.addSpan(object: ForegroundColorSpan(Color.BLUE){})
     }
 }

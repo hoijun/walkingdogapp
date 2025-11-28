@@ -1,4 +1,4 @@
-package com.tulmunchi.walkingdogapp.album
+package com.tulmunchi.walkingdogapp.albumMap
 
 import android.Manifest
 import android.annotation.SuppressLint

@@ -1,4 +1,4 @@
-package com.tulmunchi.walkingdogapp
+package com.tulmunchi.walkingdogapp.splash
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -15,6 +15,8 @@ import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.firebase.auth.FirebaseAuth
+import com.tulmunchi.walkingdogapp.MainActivity
+import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.login.LoginActivity
 import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
 import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
@@ -25,7 +27,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.system.exitProcess
-
 
 @AndroidEntryPoint
 @SuppressLint("CustomSplashScreen")
@@ -61,7 +62,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun checkUpdate(context: Context) {
-        if (!NetworkManager.checkNetworkState(context)) {
+        if (!NetworkManager.Companion.checkNetworkState(context)) {
             AlertDialog.Builder(context)
                 .setTitle("네트워크 오류")
                 .setMessage("네트워크 연결을 확인해주세요.\n업데이트 확인을 위해 네트워크 연결이 필요합니다.")
@@ -138,13 +139,15 @@ class SplashActivity : AppCompatActivity() {
     private fun updateApp(context: Context) {
         try {
             val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = "market://details?id=${context.packageName}".toUri()
+                this.setData("market://details?id=${context.packageName}".toUri())
                 setPackage("com.android.vending")
             }
             startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            val webIntent = Intent(Intent.ACTION_VIEW,
-                "https://play.google.com/store/apps/details?id=${context.packageName}".toUri())
+            val webIntent = Intent(
+                Intent.ACTION_VIEW,
+                "https://play.google.com/store/apps/details?id=${context.packageName}".toUri()
+            )
             startActivity(webIntent)
         }
     }

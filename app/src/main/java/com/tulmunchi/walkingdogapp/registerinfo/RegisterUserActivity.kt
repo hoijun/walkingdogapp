@@ -3,7 +3,6 @@ package com.tulmunchi.walkingdogapp.registerinfo
 import android.app.DatePickerDialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
@@ -17,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.lifecycleScope
 import com.tulmunchi.walkingdogapp.utils.utils.Utils
-import com.tulmunchi.walkingdogapp.LoadingDialogFragment
+import com.tulmunchi.walkingdogapp.common.utils.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
 import com.tulmunchi.walkingdogapp.databinding.ActivityRegisterUserBinding

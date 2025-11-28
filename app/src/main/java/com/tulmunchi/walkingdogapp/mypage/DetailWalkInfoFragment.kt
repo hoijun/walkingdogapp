@@ -25,8 +25,6 @@ import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.PathOverlay
-import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
-import javax.inject.Inject
 
 class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
     private var _binding: FragmentDetailWalkInfoBinding? = null

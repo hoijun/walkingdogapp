@@ -1,4 +1,4 @@
-package com.tulmunchi.walkingdogapp
+package com.tulmunchi.walkingdogapp.common.utils
 
 import android.content.res.Resources
 import android.os.Bundle

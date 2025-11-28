@@ -18,9 +18,7 @@ import com.tulmunchi.walkingdogapp.databinding.FragmentDogInfoBinding
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterDogActivity
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
-import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
-import javax.inject.Inject
 
 class DogInfoFragment : Fragment() {
     private var _binding: FragmentDogInfoBinding? = null

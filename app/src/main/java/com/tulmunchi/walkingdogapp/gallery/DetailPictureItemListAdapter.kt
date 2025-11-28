@@ -1,4 +1,4 @@
-package com.tulmunchi.walkingdogapp.album
+package com.tulmunchi.walkingdogapp.gallery
 
 import android.content.Context
 import android.view.LayoutInflater

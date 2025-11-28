@@ -1,9 +1,8 @@
-package com.tulmunchi.walkingdogapp.album
+package com.tulmunchi.walkingdogapp.gallery
 
 import android.app.Activity.RESULT_OK
 import android.content.DialogInterface
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle

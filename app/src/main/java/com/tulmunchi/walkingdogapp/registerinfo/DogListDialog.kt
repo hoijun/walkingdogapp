@@ -2,7 +2,6 @@ package com.tulmunchi.walkingdogapp.registerinfo
 
 import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tulmunchi.walkingdogapp.WriteDialog
+import com.tulmunchi.walkingdogapp.common.utils.WriteDialog
 import com.tulmunchi.walkingdogapp.databinding.DoglistDialogBinding
 import androidx.core.graphics.drawable.toDrawable
 

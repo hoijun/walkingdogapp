@@ -7,7 +7,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
@@ -31,7 +30,7 @@ import androidx.databinding.BindingAdapter
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.tulmunchi.walkingdogapp.LoadingDialogFragment
+import com.tulmunchi.walkingdogapp.common.utils.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
 import com.tulmunchi.walkingdogapp.utils.utils.Utils

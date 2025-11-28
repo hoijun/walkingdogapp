@@ -1,13 +1,13 @@
-package com.tulmunchi.walkingdogapp
+package com.tulmunchi.walkingdogapp.common.utils
 
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.core.graphics.drawable.toDrawable
+import com.tulmunchi.walkingdogapp.R
 
 class LoadingDialogFragment : DialogFragment() {
     override fun onCreateView(

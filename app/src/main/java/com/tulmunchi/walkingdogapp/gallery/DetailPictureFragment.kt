@@ -1,4 +1,4 @@
-package com.tulmunchi.walkingdogapp.album
+package com.tulmunchi.walkingdogapp.gallery
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,11 +17,9 @@ import com.tulmunchi.walkingdogapp.databinding.FragmentDetailPictureBinding
 import com.tulmunchi.walkingdogapp.datamodel.GalleryImgInfo
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 
 class DetailPictureFragment : Fragment() {

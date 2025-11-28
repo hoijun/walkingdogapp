@@ -11,7 +11,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_HIGH
 import com.tulmunchi.walkingdogapp.R
-import com.tulmunchi.walkingdogapp.SplashActivity
+import com.tulmunchi.walkingdogapp.splash.SplashActivity
 import com.tulmunchi.walkingdogapp.repository.UserInfoRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope

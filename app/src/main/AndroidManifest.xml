@@ -61,7 +61,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".SplashActivity"
+            android:name=".splash.SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:configChanges="uiMode"

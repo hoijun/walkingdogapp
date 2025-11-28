@@ -24,7 +24,7 @@
         android:id="@+id/refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".album.AlbumMapFragment">
+        tools:context=".albumMap.AlbumMapFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

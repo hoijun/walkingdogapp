@@ -14,14 +14,12 @@ import com.tulmunchi.walkingdogapp.mainhome.HomeFragment
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.databinding.FragmentSettingAlarmBinding
 import com.tulmunchi.walkingdogapp.datamodel.AlarmDataModel
-import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
-import javax.inject.Inject
 
 
 class SettingAlarmFragment : Fragment() {

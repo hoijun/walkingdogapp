@@ -21,7 +21,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.album.GalleryFragment
+import com.tulmunchi.walkingdogapp.gallery.GalleryFragment
 import com.tulmunchi.walkingdogapp.databinding.FragmentMyPageBinding
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 import com.tulmunchi.walkingdogapp.datamodel.TotalWalkInfo
