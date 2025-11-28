@@ -23,7 +23,7 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
-import com.tulmunchi.walkingdogapp.common.utils.LoadingDialogFragment
+import com.tulmunchi.walkingdogapp.commom.utils.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.databinding.ActivityLoginBinding
 import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper

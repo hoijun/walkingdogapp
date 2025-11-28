@@ -35,7 +35,7 @@ import androidx.core.content.FileProvider
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.tulmunchi.walkingdogapp.common.utils.LoadingDialogFragment
+import com.tulmunchi.walkingdogapp.commom.utils.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.databinding.ActivityWalkingBinding
