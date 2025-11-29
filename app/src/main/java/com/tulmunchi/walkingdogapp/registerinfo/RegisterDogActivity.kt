@@ -30,7 +30,7 @@ import androidx.databinding.BindingAdapter
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.tulmunchi.walkingdogapp.commom.utils.LoadingDialogFragment
+import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
 import com.tulmunchi.walkingdogapp.utils.utils.Utils

@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tulmunchi.walkingdogapp.commom.utils.WriteDialog
+import com.tulmunchi.walkingdogapp.common.WriteDialog
 import com.tulmunchi.walkingdogapp.databinding.DoglistDialogBinding
 import androidx.core.graphics.drawable.toDrawable
 

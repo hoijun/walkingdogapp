@@ -19,9 +19,9 @@ import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
-import com.tulmunchi.walkingdogapp.commom.utils.LoadingDialogFragment
+import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.commom.utils.WriteDialog
+import com.tulmunchi.walkingdogapp.common.WriteDialog
 import com.tulmunchi.walkingdogapp.alarm.AlarmFunctions
 import com.tulmunchi.walkingdogapp.databinding.FragmentSettingBinding
 import com.tulmunchi.walkingdogapp.login.LoginActivity
