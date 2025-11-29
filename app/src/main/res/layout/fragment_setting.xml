@@ -7,6 +7,10 @@
         <variable
             name="userEmail"
             type="String" />
+
+        <variable
+            name="tulmunchiVersion"
+            type="String" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -76,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="25dp"
                     android:gravity="center|start"
-                    android:text="버전정보 v0.0.1"
+                    android:text="@{tulmunchiVersion}"
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     app:layout_constraintBottom_toBottomOf="parent"

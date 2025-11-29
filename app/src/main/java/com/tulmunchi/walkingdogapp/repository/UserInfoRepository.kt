@@ -20,8 +20,8 @@ import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
 import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfoInSave
 import com.tulmunchi.walkingdogapp.datamodel.WalkLatLng
 import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
-import com.tulmunchi.walkingdogapp.utils.utils.Utils
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.utils.Utils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +45,8 @@ class UserInfoRepository @Inject constructor(
     private val auth: FirebaseAuth,
     private val database: FirebaseDatabase,
     private val storage: FirebaseStorage,
-    private val alarmDao: AlarmDao
+    private val alarmDao: AlarmDao,
+    private val networkChecker: NetworkChecker
 ) {
     private var uid = auth.currentUser?.uid
     private var userRef = database.getReference("Users").child("$uid")
@@ -139,7 +140,7 @@ class UserInfoRepository @Inject constructor(
         isImgChanged: Boolean,
         successGetImg: MutableLiveData<Boolean>
     ) {
-        if (!NetworkManager.checkNetworkState(context)) {
+        if (!networkChecker.isNetworkAvailable()) {
             successGetData.postValue(false)
             return
         }

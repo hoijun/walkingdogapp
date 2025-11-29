@@ -27,13 +27,16 @@ import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 import com.tulmunchi.walkingdogapp.datamodel.TotalWalkInfo
 import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterUserActivity
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
+@AndroidEntryPoint
 class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
     private val binding get() = _binding!!
@@ -41,6 +44,9 @@ class MyPageFragment : Fragment() {
     private var totalWalkInfo = TotalWalkInfo()
     private var walkdates = mutableListOf<WalkDateInfo>()
     private var mainActivity: MainActivity? = null
+
+    @Inject
+    lateinit var networkChecker: NetworkChecker
 
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
@@ -71,7 +77,7 @@ class MyPageFragment : Fragment() {
         MainActivity.preFragment = "Mypage"  // 다른 액티비티로 이동 할 때 마이페이지에서 이동을 표시
 
         context?.let { ctx ->
-            if (!NetworkManager.checkNetworkState(ctx)) {
+            if (!networkChecker.isNetworkAvailable()) {
                 val builder = AlertDialog.Builder(ctx)
                 builder.setTitle("인터넷을 연결해주세요!")
                 builder.setPositiveButton("네", null)
@@ -121,7 +127,7 @@ class MyPageFragment : Fragment() {
 
             btnSetting.setOnClickListener {
                 context?.let { ctx ->
-                    if (!NetworkManager.checkNetworkState(ctx)) {
+                    if (!networkChecker.isNetworkAvailable()) {
                         return@setOnClickListener
                     }
                 }
@@ -129,10 +135,10 @@ class MyPageFragment : Fragment() {
             }
 
             val dogsList = mainViewModel.dogsInfo.value ?: listOf()
-            val myPageDogListAdapter = MyPageDogListAdapter(dogsList, mainViewModel.isSuccessGetData())
+            val myPageDogListAdapter = MyPageDogListAdapter(dogsList, mainViewModel.isSuccessGetData(), networkChecker)
             myPageDogListAdapter.onItemClickListener = MyPageDogListAdapter.OnItemClickListener {
                 context?.let { ctx ->
-                    if (!NetworkManager.checkNetworkState(ctx) || !mainViewModel.isSuccessGetData()) {
+                    if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
                         return@OnItemClickListener
                     }
                 }
@@ -151,7 +157,7 @@ class MyPageFragment : Fragment() {
 
             managedoginfoBtn.setOnClickListener {
                 context?.let { ctx ->
-                    if (!NetworkManager.checkNetworkState(ctx)) {
+                    if (!networkChecker.isNetworkAvailable()) {
                         return@setOnClickListener
                     }
                 }
@@ -162,7 +168,7 @@ class MyPageFragment : Fragment() {
 
             modifyuserinfoBtn.setOnClickListener {
                 context?.let { ctx ->
-                    if (!NetworkManager.checkNetworkState(ctx) || !mainViewModel.isSuccessGetData()) {
+                    if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
                         return@setOnClickListener
                     }
 
@@ -188,7 +194,7 @@ class MyPageFragment : Fragment() {
 
             menuWalkinfo.setOnClickListener {
                 context?.let { ctx ->
-                    if (!NetworkManager.checkNetworkState(ctx) || !mainViewModel.isSuccessGetData()) {
+                    if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
                         return@setOnClickListener
                     }
                 }

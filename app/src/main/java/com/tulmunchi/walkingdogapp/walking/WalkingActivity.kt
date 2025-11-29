@@ -40,8 +40,9 @@ import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.databinding.ActivityWalkingBinding
 import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
-import com.tulmunchi.walkingdogapp.utils.utils.Utils
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.utils.Utils
+import javax.inject.Inject
 import com.tulmunchi.walkingdogapp.viewmodel.WalkingViewModel
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
@@ -76,6 +77,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val walkingViewModel: WalkingViewModel by viewModels()
     private var randomMarkerJob: Job? = null
+
+    @Inject
+    lateinit var networkChecker: NetworkChecker
 
     private var coordList = mutableListOf<LatLng>()
     private var trackingMarker = Marker()
@@ -483,7 +487,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun selectStopWalk() {
-        if(!NetworkManager.checkNetworkState(this)) {
+        if(!networkChecker.isNetworkAvailable()) {
             return
         }
 

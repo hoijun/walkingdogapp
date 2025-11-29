@@ -8,14 +8,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.tulmunchi.walkingdogapp.utils.utils.Utils
+import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.MypagedoglistItemBinding
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterDogActivity
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 
-class MyPageDogListAdapter(private val dogsList: List<DogInfo>, private val successGetData: Boolean): RecyclerView.Adapter<MyPageDogListAdapter.MyPageDogListViewHolder>() {
+class MyPageDogListAdapter(
+    private val dogsList: List<DogInfo>,
+    private val successGetData: Boolean,
+    private val networkChecker: NetworkChecker
+): RecyclerView.Adapter<MyPageDogListAdapter.MyPageDogListViewHolder>() {
     private lateinit var context: Context
 
     fun interface OnItemClickListener {
@@ -47,7 +51,7 @@ class MyPageDogListAdapter(private val dogsList: List<DogInfo>, private val succ
             binding.apply {
                 menuDogInfo.visibility = View.GONE
                 root.setOnClickListener {
-                    if (!NetworkManager.checkNetworkState(context) || !successGetData) {
+                    if (!networkChecker.isNetworkAvailable() || !successGetData) {
                         return@setOnClickListener
                     }
                     val registerDogIntent = Intent(context, RegisterDogActivity::class.java)

@@ -15,11 +15,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.lifecycleScope
-import com.tulmunchi.walkingdogapp.utils.utils.Utils
+import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.ActivityRegisterUserBinding
+import javax.inject.Inject
 import com.tulmunchi.walkingdogapp.datamodel.UserInfo
 import com.tulmunchi.walkingdogapp.viewmodel.RegisterUserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,6 +34,10 @@ import androidx.core.graphics.toColorInt
 class RegisterUserActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterUserBinding
     private val registerUserViewModel: RegisterUserViewModel by viewModels()
+
+    @Inject
+    lateinit var networkChecker: NetworkChecker
+
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             selectGoMain()
@@ -93,7 +98,7 @@ class RegisterUserActivity : AppCompatActivity() {
             }
 
             registerUser.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(this@RegisterUserActivity)) {
+                if(!networkChecker.isNetworkAvailable()) {
                     return@setOnClickListener
                 }
                 userInfo.apply {

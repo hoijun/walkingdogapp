@@ -20,7 +20,7 @@ import com.tulmunchi.walkingdogapp.mainhome.HomeFragment
 import com.tulmunchi.walkingdogapp.mypage.ManageDogsFragment
 import com.tulmunchi.walkingdogapp.mypage.MyPageFragment
 import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
-import com.tulmunchi.walkingdogapp.utils.utils.Utils.Companion.LOADING_DIALOG_TAG
+import com.tulmunchi.walkingdogapp.utils.Utils.Companion.LOADING_DIALOG_TAG
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import com.tulmunchi.walkingdogapp.walking.WalkingActivity
 import com.tulmunchi.walkingdogapp.walking.WalkingService

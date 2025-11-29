@@ -15,19 +15,21 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.tulmunchi.walkingdogapp.utils.utils.Utils
+import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.R
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import com.tulmunchi.walkingdogapp.databinding.FragmentWalkInfoBinding
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
-import com.tulmunchi.walkingdogapp.utils.DayDecorator
-import com.tulmunchi.walkingdogapp.utils.HorizonSpacingItemDecoration
-import com.tulmunchi.walkingdogapp.utils.SaturdayDecorator
-import com.tulmunchi.walkingdogapp.utils.SelectedMonthDecorator
-import com.tulmunchi.walkingdogapp.utils.SundayDecorator
-import com.tulmunchi.walkingdogapp.utils.WalkDayDecorator
+import com.tulmunchi.walkingdogapp.common.DayDecorator
+import com.tulmunchi.walkingdogapp.common.HorizonSpacingItemDecoration
+import com.tulmunchi.walkingdogapp.common.SaturdayDecorator
+import com.tulmunchi.walkingdogapp.common.SelectedMonthDecorator
+import com.tulmunchi.walkingdogapp.common.SundayDecorator
+import com.tulmunchi.walkingdogapp.common.WalkDayDecorator
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
@@ -39,6 +41,7 @@ data class DogsWalkRecord(
     var walkDateInfoList: MutableList<WalkDateInfo> = mutableListOf()
 )
 
+@AndroidEntryPoint
 class WalkInfoFragment : Fragment() { // 수정
     private var mainActivity: MainActivity? = null
     private var _binding: FragmentWalkInfoBinding? = null
@@ -52,6 +55,9 @@ class WalkInfoFragment : Fragment() { // 수정
 
     private lateinit var adapter: WalkDatesListAdapter
     private val binding get() = _binding!!
+
+    @Inject
+    lateinit var networkChecker: NetworkChecker
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -130,7 +136,7 @@ class WalkInfoFragment : Fragment() { // 수정
             val walkInfoDogListAdapter = WalkInfoDogListAdapter(mainViewModel.dogsInfo.value?: listOf(), mainViewModel.dogsImg.value?: hashMapOf()).also {
                 it.onItemClickListener = WalkInfoDogListAdapter.OnItemClickListener { selectedDogInfo ->
                     context?.let { ctx ->
-                        if (!NetworkManager.checkNetworkState(ctx)) {
+                        if (!networkChecker.isNetworkAvailable()) {
                             return@OnItemClickListener
                         }
                     } ?: return@OnItemClickListener

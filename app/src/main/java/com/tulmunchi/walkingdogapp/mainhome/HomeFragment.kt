@@ -24,21 +24,27 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.alarm.SettingAlarmFragment
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.FragmentHomeBinding
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterDogActivity
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import com.tulmunchi.walkingdogapp.walking.WalkingActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
     private var mainActivity: MainActivity? = null
     private val selectedDogList = mutableListOf<String>()
+
+    @Inject
+    lateinit var networkChecker: NetworkChecker
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +54,7 @@ class HomeFragment : Fragment() {
         }
 
         context?.let { ctx ->
-            if (!NetworkManager.checkNetworkState(ctx)) {
+            if (!networkChecker.isNetworkAvailable()) {
                 val builder = AlertDialog.Builder(ctx)
                 builder.setTitle("인터넷을 연결해주세요!")
                 builder.setPositiveButton("네", null)
@@ -91,7 +97,7 @@ class HomeFragment : Fragment() {
 
             btnAlarm.setOnClickListener {
                 context?.let { ctx ->
-                    if (!NetworkManager.checkNetworkState(ctx)) {
+                    if (!networkChecker.isNetworkAvailable()) {
                         return@setOnClickListener
                     }
                     mainActivity?.changeFragment(SettingAlarmFragment())
@@ -99,7 +105,7 @@ class HomeFragment : Fragment() {
             }
 
             val dogsList = mainViewModel.dogsInfo.value ?: listOf()
-            val homeDogListAdapter = HomeDogListAdapter(dogsList, mainViewModel.isSuccessGetData())
+            val homeDogListAdapter = HomeDogListAdapter(dogsList, mainViewModel.isSuccessGetData(), networkChecker)
             homeDogListAdapter.onClickDogListener =
                 HomeDogListAdapter.OnClickDogListener { dogName ->
                     if (selectedDogList.contains(dogName)) {
@@ -124,7 +130,7 @@ class HomeFragment : Fragment() {
     private fun handleWalkButtonClick(dogsList: List<Any>) {
         val ctx = context ?: return
 
-        if (!NetworkManager.checkNetworkState(ctx) || !mainViewModel.isSuccessGetData()) {
+        if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
             return
         }
 
@@ -155,7 +161,7 @@ class HomeFragment : Fragment() {
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    if (!NetworkManager.checkNetworkState(context) || !mainViewModel.isSuccessGetData()) {
+                    if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
                         return@OnClickListener
                     }
                     val registerDogIntent =

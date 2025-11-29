@@ -23,16 +23,20 @@ import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.common.WriteDialog
 import com.tulmunchi.walkingdogapp.alarm.AlarmFunctions
+import com.tulmunchi.walkingdogapp.core.datastore.UserPreferencesDataStore
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.FragmentSettingBinding
 import com.tulmunchi.walkingdogapp.login.LoginActivity
 import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class SettingFragment : Fragment() {
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
@@ -52,13 +56,16 @@ class SettingFragment : Fragment() {
     @Inject
     lateinit var firebaseHelper: FirebaseAnalyticHelper
 
+    @Inject
+    lateinit var userPreferencesDataStore: UserPreferencesDataStore
+
+    @Inject
+    lateinit var networkChecker: NetworkChecker
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activity?.let {
             mainActivity = it as? MainActivity
-            val sharedPreferences = it.getSharedPreferences("UserEmail", Context.MODE_PRIVATE)
-            email = sharedPreferences.getString("email", "") ?: ""
-            password = sharedPreferences.getString("password", "") ?: ""
         }
     }
 
@@ -73,13 +80,21 @@ class SettingFragment : Fragment() {
                 goMyPage()
             }
 
-            userEmail = email
+            // 버전 정보 설정
+            tulmunchiVersion = "버전정보 v${context?.packageManager?.getPackageInfo(
+                context?.packageName ?: "",
+                0
+            )?.versionName ?: "Unknown"}"
+
+            lifecycleScope.launch {
+                email = userPreferencesDataStore.getEmail().first() ?: ""
+                password = userPreferencesDataStore.getPassword().first() ?: ""
+                userEmail = email
+            }
 
             logoutBtn.setOnClickListener {
-                context?.let { ctx ->
-                    if (!NetworkManager.checkNetworkState(ctx) || !mainViewModel.isSuccessGetData()) {
-                        return@setOnClickListener
-                    }
+                if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
+                    return@setOnClickListener
                 }
 
                 if (email.contains("@naver.com")) { // 네이버로 로그인 했을 경우
@@ -125,10 +140,8 @@ class SettingFragment : Fragment() {
             }
 
             settingWithdrawal.setOnClickListener {
-                context?.let { ctx ->
-                    if (!NetworkManager.checkNetworkState(ctx) || !mainViewModel.isSuccessGetData()) {
-                        return@setOnClickListener
-                    }
+                if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
+                    return@setOnClickListener
                 }
 
                 val loadingDialogFragment = LoadingDialogFragment()
@@ -258,11 +271,17 @@ class SettingFragment : Fragment() {
     }
 
     private fun completeDeleteAccount() {
+        lifecycleScope.launch {
+            userPreferencesDataStore.clearAll()
+        }
         removeAlarms()
         goLogin()
     }
 
     private fun successLogout() {
+        lifecycleScope.launch {
+            userPreferencesDataStore.clearAll()
+        }
         goLogin()
         removeAlarms()
         toastMsg("로그아웃 성공")

@@ -2,7 +2,7 @@ package com.tulmunchi.walkingdogapp.core.ui.dialog
 
 import androidx.fragment.app.FragmentManager
 import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
-import com.tulmunchi.walkingdogapp.utils.utils.Utils.Companion.LOADING_DIALOG_TAG
+import com.tulmunchi.walkingdogapp.utils.Utils.Companion.LOADING_DIALOG_TAG
 import javax.inject.Inject
 
 /**
@@ -32,15 +32,28 @@ class LoadingDialogImpl(
     private var dialogFragment: LoadingDialogFragment? = null
 
     override fun show() {
-        if (dialogFragment == null || dialogFragment?.isAdded == false) {
-            dialogFragment = LoadingDialogFragment()
-            dialogFragment?.show(fragmentManager, LOADING_DIALOG_TAG)
+        try {
+            if (dialogFragment == null || dialogFragment?.isAdded == false) {
+                dialogFragment = LoadingDialogFragment()
+                dialogFragment?.show(fragmentManager, LOADING_DIALOG_TAG)
+            }
+        } catch (e: IllegalStateException) {
+            // FragmentManager가 이미 destroyed된 경우 무시
         }
     }
 
     override fun dismiss() {
-        dialogFragment?.dismiss()
-        dialogFragment = null
+        try {
+            dialogFragment?.let {
+                if (it.isAdded && !it.isDetached) {
+                    it.dismissAllowingStateLoss()
+                }
+            }
+        } catch (e: IllegalStateException) {
+            // Fragment가 이미 FragmentManager와 연결이 끊긴 경우 무시
+        } finally {
+            dialogFragment = null
+        }
     }
 }
 

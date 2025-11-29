@@ -14,14 +14,17 @@ import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.databinding.FragmentCollectionBinding
 import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
-import com.tulmunchi.walkingdogapp.utils.GridSpacingItemDecoration
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
-import com.tulmunchi.walkingdogapp.utils.utils.Utils
+import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class CollectionFragment : Fragment() {
     private var _binding: FragmentCollectionBinding? = null
     private val binding get() = _binding!!
@@ -30,13 +33,16 @@ class CollectionFragment : Fragment() {
     private var collections: List<CollectionInfo> = listOf()
     private var mainActivity: MainActivity? = null
 
+    @Inject
+    lateinit var networkChecker: NetworkChecker
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         collectionWhether = mainViewModel.collectionWhether.value ?: Utils.item_whether
         collections = Utils.setCollectionMap().values.toList().sortedBy { it.collectionNum }
 
         context?.let { ctx ->
-            if (!NetworkManager.checkNetworkState(ctx)) {
+            if (!networkChecker.isNetworkAvailable()) {
                 val builder = AlertDialog.Builder(ctx)
                 builder.setTitle("인터넷을 연결해주세요!")
                 builder.setPositiveButton("네", null)

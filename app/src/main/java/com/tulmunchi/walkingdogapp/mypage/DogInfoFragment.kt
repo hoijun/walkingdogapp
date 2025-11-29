@@ -13,13 +13,16 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.FragmentDogInfoBinding
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterDogActivity
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 
+@AndroidEntryPoint
 class DogInfoFragment : Fragment() {
     private var _binding: FragmentDogInfoBinding? = null
     private val binding get() = _binding!!
@@ -27,6 +30,9 @@ class DogInfoFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private var mainActivity: MainActivity? = null
     private var beforepage = ""
+
+    @Inject
+    lateinit var networkChecker: NetworkChecker
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -72,7 +78,7 @@ class DogInfoFragment : Fragment() {
 
             btnSettingdog.setOnClickListener {
                 context?.let { ctx ->
-                    if (!NetworkManager.checkNetworkState(ctx) || !mainViewModel.isSuccessGetData()) {
+                    if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
                         return@setOnClickListener
                     }
                     val registerDogIntent =

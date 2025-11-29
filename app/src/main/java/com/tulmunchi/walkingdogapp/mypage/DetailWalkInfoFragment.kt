@@ -12,12 +12,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
-import com.tulmunchi.walkingdogapp.utils.utils.Utils
+import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.databinding.FragmentDetailWalkInfoBinding
 import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
-import com.tulmunchi.walkingdogapp.utils.GridSpacingItemDecoration
+import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.walking.CurrentCollectionItemListAdapter
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate

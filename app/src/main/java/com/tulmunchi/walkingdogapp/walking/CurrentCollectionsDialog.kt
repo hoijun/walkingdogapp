@@ -10,10 +10,10 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.tulmunchi.walkingdogapp.utils.utils.Utils
+import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.databinding.CurrentcollectionsDialogBinding
 import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
-import com.tulmunchi.walkingdogapp.utils.GridSpacingItemDecoration
+import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
 import androidx.core.graphics.drawable.toDrawable
 
 class CurrentCollectionsDialog: DialogFragment() {

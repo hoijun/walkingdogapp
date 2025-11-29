@@ -12,17 +12,24 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.databinding.FragmentManageDogsBinding
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterDogActivity
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ManageDogsFragment : Fragment() {
     private var _binding: FragmentManageDogsBinding? = null
     private val mainViewModel: MainViewModel by activityViewModels()
     private val binding get() = _binding!!
     private var mainActivity: MainActivity? = null
+
+    @Inject
+    lateinit var networkChecker: NetworkChecker
+
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goMyPage()
@@ -81,7 +88,7 @@ class ManageDogsFragment : Fragment() {
 
             btnAddDog.setOnClickListener {
                 context?.let { ctx ->
-                    if (!NetworkManager.checkNetworkState(ctx) || !mainViewModel.isSuccessGetData()) {
+                    if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
                         return@let
                     }
                     val registerDogIntent = Intent(ctx, RegisterDogActivity::class.java)

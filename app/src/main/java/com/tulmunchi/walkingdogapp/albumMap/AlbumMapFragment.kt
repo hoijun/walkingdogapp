@@ -37,21 +37,27 @@ import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.databinding.FragmentAlbumMapBinding
 import com.tulmunchi.walkingdogapp.datamodel.AlbumMapImgInfo
-import com.tulmunchi.walkingdogapp.utils.HorizonSpacingItemDecoration
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
-import com.tulmunchi.walkingdogapp.utils.utils.Utils
+import com.tulmunchi.walkingdogapp.common.HorizonSpacingItemDecoration
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
+@AndroidEntryPoint
 class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     private var _binding: FragmentAlbumMapBinding? = null
     private val binding get() = _binding!!
     private val imgInfos = mutableListOf<AlbumMapImgInfo>()
     private val mainViewModel: MainViewModel by activityViewModels()
+
+    @Inject
+    lateinit var networkChecker: NetworkChecker
 
     private lateinit var mynavermap: NaverMap
     private lateinit var camera : CameraUpdate
@@ -87,7 +93,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         context?.let { ctx ->
-            if (!NetworkManager.checkNetworkState(ctx)) {
+            if (!networkChecker.isNetworkAvailable()) {
                 val builder = AlertDialog.Builder(ctx)
                 builder.setTitle("인터넷을 연결해주세요!")
                 builder.setPositiveButton("네", null)
@@ -180,7 +186,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
 
     private fun handleDateSelectClick() {
         context?.let { ctx ->
-            if (!NetworkManager.checkNetworkState(ctx)) {
+            if (!networkChecker.isNetworkAvailable()) {
                 return
             }
 

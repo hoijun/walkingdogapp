@@ -24,10 +24,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
-import com.tulmunchi.walkingdogapp.utils.utils.Utils
+import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.databinding.FragmentGalleryBinding
-import com.tulmunchi.walkingdogapp.utils.GridSpacingItemDecoration
+import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.datamodel.GalleryImgInfo
 import com.tulmunchi.walkingdogapp.mypage.MyPageFragment
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel

@@ -1,4 +1,4 @@
-package com.tulmunchi.walkingdogapp.utils
+package com.tulmunchi.walkingdogapp.common
 
 import android.content.Context
 import android.graphics.Color

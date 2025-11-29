@@ -19,7 +19,7 @@ import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.login.LoginActivity
 import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +48,9 @@ class SplashActivity : AppCompatActivity() {
     @Inject
     lateinit var firebaseHelper: FirebaseAnalyticHelper
 
+    @Inject
+    lateinit var networkChecker: NetworkChecker
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
@@ -62,7 +65,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun checkUpdate(context: Context) {
-        if (!NetworkManager.Companion.checkNetworkState(context)) {
+        if (!networkChecker.isNetworkAvailable()) {
             AlertDialog.Builder(context)
                 .setTitle("네트워크 오류")
                 .setMessage("네트워크 연결을 확인해주세요.\n업데이트 확인을 위해 네트워크 연결이 필요합니다.")

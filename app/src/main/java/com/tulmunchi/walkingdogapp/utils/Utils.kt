@@ -1,4 +1,4 @@
-package com.tulmunchi.walkingdogapp.utils.utils
+package com.tulmunchi.walkingdogapp.utils
 
 import android.content.ContentResolver
 import android.content.Context

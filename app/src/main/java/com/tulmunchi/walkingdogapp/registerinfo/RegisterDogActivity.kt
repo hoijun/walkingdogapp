@@ -32,8 +32,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
-import com.tulmunchi.walkingdogapp.utils.utils.Utils
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.utils.Utils
+import javax.inject.Inject
 import com.tulmunchi.walkingdogapp.databinding.ActivityRegisterDogBinding
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
@@ -53,6 +54,9 @@ class RegisterDogActivity : AppCompatActivity() {
     private var dogInfo = DogInfo()
     private var imguri: Uri? = null
     private val registerDogViewModel: RegisterDogViewModel by viewModels()
+
+    @Inject
+    lateinit var networkChecker: NetworkChecker
 
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -182,7 +186,7 @@ class RegisterDogActivity : AppCompatActivity() {
             }
 
             registerDog.setOnClickListener {
-                if(!NetworkManager.checkNetworkState(this@RegisterDogActivity)) {
+                if(!networkChecker.isNetworkAvailable()) {
                     return@setOnClickListener
                 }
                 dogInfo.apply {
@@ -246,7 +250,7 @@ class RegisterDogActivity : AppCompatActivity() {
 
             removeBtn.setOnClickListener {
                 if (beforeName == "") return@setOnClickListener
-                if(!NetworkManager.checkNetworkState(this@RegisterDogActivity)) {
+                if(!networkChecker.isNetworkAvailable()) {
                     return@setOnClickListener
                 }
                 val builder = AlertDialog.Builder(this@RegisterDogActivity)

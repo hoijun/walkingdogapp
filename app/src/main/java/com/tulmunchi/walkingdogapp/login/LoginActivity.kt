@@ -8,7 +8,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
@@ -23,12 +22,13 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
-import com.tulmunchi.walkingdogapp.commom.utils.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.MainActivity
+import com.tulmunchi.walkingdogapp.core.datastore.UserPreferencesDataStore
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialog
+import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.databinding.ActivityLoginBinding
 import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
-import com.tulmunchi.walkingdogapp.utils.utils.NetworkManager
-import com.tulmunchi.walkingdogapp.utils.utils.Utils.Companion.LOADING_DIALOG_TAG
 import com.tulmunchi.walkingdogapp.viewmodel.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -47,15 +47,32 @@ class LoginActivity : AppCompatActivity() {
     private var backPressedTime: Long = 0
     private var shouldShowPermissionDialog = false
 
+    companion object {
+        private const val SNS_KAKAO = "kakao"
+        private const val SNS_NAVER = "naver"
+        private const val BACK_PRESS_INTERVAL = 2500L
+    }
+
     @Inject
     lateinit var firebaseHelper: FirebaseAnalyticHelper
 
+    @Inject
+    lateinit var networkChecker: NetworkChecker
+
+    @Inject
+    lateinit var loadingDialogFactory: LoadingDialogFactory
+
+    @Inject
+    lateinit var userPreferencesDataStore: UserPreferencesDataStore
+
+    private var loadingDialog: LoadingDialog? = null
+
     private val kakaoLoginCallback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
         if (error != null) {
-            setLoginIngView(false)
+            setLoadingState(false)
             toastFailSignUp("Kakao", error.message.toString())
         } else if (token != null) {
-            loginApp("kakao")
+            loginApp(SNS_KAKAO)
         }
     }
 
@@ -65,19 +82,19 @@ class LoginActivity : AppCompatActivity() {
         }
 
         override fun onFailure(httpStatus: Int, message: String) {
-            setLoginIngView(false)
+            setLoadingState(false)
             toastFailSignUp("Naver", message)
         }
 
         override fun onSuccess() {
-            loginApp("naver")
+            loginApp(SNS_NAVER)
         }
     }
 
     private val naverProfileCallback = object : NidProfileCallback<NidProfileResponse> {
         override fun onSuccess(result: NidProfileResponse) {
             if (result.profile?.email == null || result.profile?.id == null) {
-                setLoginIngView(false)
+                setLoadingState(false)
                 return
             }
             signupFirebase(result.profile!!.email!!, result.profile!!.id!!)
@@ -89,13 +106,13 @@ class LoginActivity : AppCompatActivity() {
 
         override fun onFailure(httpStatus: Int, message: String) {
             toastFailSignUp("Naver", message)
-            setLoginIngView(false)
+            setLoadingState(false)
         }
     }
 
     private val backPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (System.currentTimeMillis() - backPressedTime < 2500) {
+            if (System.currentTimeMillis() - backPressedTime < BACK_PRESS_INTERVAL) {
                 moveTaskToBack(true)
                 finishAndRemoveTask()
                 exitProcess(0)
@@ -112,20 +129,24 @@ class LoginActivity : AppCompatActivity() {
         this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
         auth = FirebaseAuth.getInstance()
 
+        loadingDialog = loadingDialogFactory.create(supportFragmentManager)
+
         binding.apply {
             KakaoLoginBtn.setOnClickListener {
-                if (!NetworkManager.checkNetworkState(this@LoginActivity)) {
+                if (!networkChecker.isNetworkAvailable()) {
+                    Toast.makeText(this@LoginActivity, "네트워크 연결을 확인해주세요", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-                setLoginIngView(true)
+                setLoadingState(true)
                 loginKakao()
             }
 
             NaverLoginBtn.setOnClickListener {
-                if (!NetworkManager.checkNetworkState(this@LoginActivity)) {
+                if (!networkChecker.isNetworkAvailable()) {
+                    Toast.makeText(this@LoginActivity, "네트워크 연결을 확인해주세요", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-                setLoginIngView(true)
+                setLoadingState(true)
                 NaverIdLoginSDK.authenticate(this@LoginActivity, naverLoginCallback)
             }
         }
@@ -133,7 +154,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        hideLoadingDialog()
+        setLoadingState(false)
     }
 
     override fun onResume() {
@@ -155,7 +176,7 @@ class LoginActivity : AppCompatActivity() {
 
         UserApiClient.instance.loginWithKakaoTalk(this) { token, error ->
             if (error != null) {
-                setLoginIngView(false)
+                setLoadingState(false)
                 if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
                     toastFailSignUp("Kakao", error.message.toString())
                     return@loginWithKakaoTalk
@@ -166,26 +187,29 @@ class LoginActivity : AppCompatActivity() {
                     )
                 }
             } else if (token != null) {
-                loginApp("kakao")
+                loginApp(SNS_KAKAO)
             }
         }
     }
 
 
     private fun loginApp(sns: String) {
-        if (sns == "kakao") {
-            UserApiClient.instance.me { user, error1 ->
-                if (error1 != null) {
-                    toastFailSignUp("Kakao", error1.message.toString())
-                    setLoginIngView(false)
-                } else if (user?.kakaoAccount?.email != null) {
-                    signupFirebase(user.kakaoAccount!!.email!!, user.id.toString())
-                } else if (user?.kakaoAccount?.email == null) {
-                    setLoginIngView(false)
+        when (sns) {
+            SNS_KAKAO -> {
+                UserApiClient.instance.me { user, error1 ->
+                    if (error1 != null) {
+                        toastFailSignUp("Kakao", error1.message.toString())
+                        setLoadingState(false)
+                    } else if (user?.kakaoAccount?.email != null) {
+                        signupFirebase(user.kakaoAccount!!.email!!, user.id.toString())
+                    } else {
+                        setLoadingState(false)
+                    }
                 }
             }
-        } else if (sns == "naver") {
-            NidOAuthLogin().callProfileApi(naverProfileCallback)
+            SNS_NAVER -> {
+                NidOAuthLogin().callProfileApi(naverProfileCallback)
+            }
         }
     }
 
@@ -194,28 +218,28 @@ class LoginActivity : AppCompatActivity() {
             if (!it.isSuccessful) {
                 if (it.exception is FirebaseAuthUserCollisionException) {
                     //이미 가입된 이메일일 경우
-                    saveEmail(this, myEmail, password)
+                    saveEmail(myEmail, password)
                     signInFirebase(myEmail, password)
                 } else {
                     toastFailSignUp("Firebase", it.exception?.message.toString())
-                    setLoginIngView(false)
+                    setLoadingState(false)
                 }
                 return@addOnCompleteListener
             }
 
             auth.currentUser?.delete()?.addOnCompleteListener {
-                setLoginIngView(false)
+                setLoadingState(false)
                 val termsOfServiceDialog = TermOfServiceDialog()
                 termsOfServiceDialog.onClickYesListener = TermOfServiceDialog.OnClickYesListener { agree ->
-                    setLoginIngView(true)
+                    setLoadingState(true)
                     auth.createUserWithEmailAndPassword(myEmail, password).addOnCompleteListener {
                         if (agree) {
                             loginViewModel.signUp(myEmail)
                             loginViewModel.successSignUp.observe(this@LoginActivity) { success ->
                                 lifecycleScope.launch(Dispatchers.Main) {
                                     if (success) {
-                                        setLoginIngView(false)
-                                        saveEmail(this@LoginActivity, myEmail, password)
+                                        setLoadingState(false)
+                                        saveEmail(myEmail, password)
                                         startMain()
                                         return@launch
                                     }
@@ -228,7 +252,7 @@ class LoginActivity : AppCompatActivity() {
                                     auth.currentUser?.delete()
                                     withContext(Dispatchers.Main) {
                                         toastFailSignUp("Firebase", "")
-                                        setLoginIngView(false)
+                                        setLoadingState(false)
                                         return@withContext
                                     }
                                     return@launch
@@ -237,7 +261,7 @@ class LoginActivity : AppCompatActivity() {
                         }
                     }.addOnFailureListener { error ->
                         toastFailSignUp("Firebase", error.toString())
-                        setLoginIngView(false)
+                        setLoadingState(false)
                     }
                 }
                 termsOfServiceDialog.show(supportFragmentManager, "terms")
@@ -256,7 +280,7 @@ class LoginActivity : AppCompatActivity() {
                 startMain()
             } else {
                 Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-                setLoginIngView(false)
+                setLoadingState(false)
             }
         }
     }
@@ -289,40 +313,15 @@ class LoginActivity : AppCompatActivity() {
         startActivity(mainIntent)
     }
 
-    private fun setLoginIngView(loginIng: Boolean) {
+    private fun setLoadingState(isLoading: Boolean) {
         if (isFinishing || isDestroyed) {
             return
         }
 
-        if (loginIng) {
-            showLoadingFragment()
+        if (isLoading) {
+            loadingDialog?.show()
         } else {
-            hideLoadingDialog()
-        }
-    }
-
-    private fun showLoadingFragment() {
-        val existingDialog = supportFragmentManager.findFragmentByTag(LOADING_DIALOG_TAG)
-        if (existingDialog != null && !existingDialog.isDetached) {
-            return
-        }
-
-        try {
-            if (!supportFragmentManager.isStateSaved) {
-                val loadingDialog = LoadingDialogFragment()
-                loadingDialog.show(supportFragmentManager, LOADING_DIALOG_TAG)
-            }
-        } catch (_: IllegalStateException) { }
-    }
-
-    private fun hideLoadingDialog() {
-        val loadingDialog = supportFragmentManager.findFragmentByTag(LOADING_DIALOG_TAG) as? DialogFragment
-        loadingDialog?.let {
-            try {
-                if (it.isAdded && !it.isDetached) {
-                    it.dismissAllowingStateLoss()
-                }
-            } catch (_: IllegalStateException) { }
+            loadingDialog?.dismiss()
         }
     }
 
@@ -344,11 +343,9 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveEmail(context: Context, email: String, password: String) {
-        val sharedPreferences = context.getSharedPreferences("UserEmail", Context.MODE_PRIVATE)
-        sharedPreferences.edit {
-            putString("email", email)
-            putString("password", password)
+    private fun saveEmail(email: String, password: String) {
+        lifecycleScope.launch {
+            userPreferencesDataStore.saveCredentials(email, password)
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.tulmunchi.walkingdogapp.core.di
 
+import com.tulmunchi.walkingdogapp.core.datastore.UserPreferencesDataStore
+import com.tulmunchi.walkingdogapp.core.datastore.UserPreferencesDataStoreImpl
 import com.tulmunchi.walkingdogapp.core.location.LocationProvider
 import com.tulmunchi.walkingdogapp.core.location.LocationProviderImpl
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
@@ -45,4 +47,12 @@ abstract class CoreModule {
     @Binds
     @Singleton
     abstract fun bindLocationProvider(impl: LocationProviderImpl): LocationProvider
+
+    /**
+     * UserPreferencesDataStore 바인딩
+     * UserPreferencesDataStoreImpl을 UserPreferencesDataStore 인터페이스에 바인딩
+     */
+    @Binds
+    @Singleton
+    abstract fun bindUserPreferencesDataStore(impl: UserPreferencesDataStoreImpl): UserPreferencesDataStore
 }
