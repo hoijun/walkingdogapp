@@ -48,6 +48,7 @@ import com.naver.maps.map.overlay.PathOverlay
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.databinding.ActivityWalkingBinding
@@ -84,6 +85,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @Inject
     lateinit var loadingDialogFactory: LoadingDialogFactory
+
+    @Inject
+    lateinit var permissionHandler: PermissionHandler
 
     private var loadingDialog: LoadingDialog? = null
 
@@ -230,15 +234,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onResume() {
         super.onResume()
         this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
+        val locationPermissions = arrayOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+        if (!permissionHandler.checkPermissions(this, locationPermissions)) {
             Toast.makeText(this, "오류가 생겨 산책이 종료 되었습니다", Toast.LENGTH_SHORT).show()
             stopWalkingService()
             goHome()
@@ -661,18 +661,13 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun checkPermission(permissions : Array<out String>, code: Int) : Boolean{
-        for (permission in permissions) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    permission
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(this, permissions, code)
-                return false
-            }
+    private fun checkPermission(permissions : Array<String>, code: Int) : Boolean{
+        return if (!permissionHandler.checkPermissions(this, permissions)) {
+            permissionHandler.requestPermissions(this, permissions, code)
+            false
+        } else {
+            true
         }
-        return true
     }
 
     private fun showLoadingFragment() {
@@ -713,8 +708,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     builder.setNegativeButton("아니오", null)
                     builder.show()
                 } else {
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                            takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+                    if (permissionHandler.checkPermissions(this, cameraPermission)) {
+                        takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
                     }
                 }
             }

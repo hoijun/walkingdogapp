@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import com.tulmunchi.walkingdogapp.albumMap.AlbumMapFragment
 import com.tulmunchi.walkingdogapp.collection.CollectionFragment
+import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.databinding.ActivityMainBinding
@@ -41,6 +42,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var loadingDialogFactory: LoadingDialogFactory
+
+    @Inject
+    lateinit var permissionHandler: PermissionHandler
 
     private var loadingDialog: LoadingDialog? = null
 
@@ -119,7 +123,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 위치 권한
-        ActivityCompat.requestPermissions(this, permissions, locationPermissionRequestCode)
+        permissionHandler.requestPermissions(this, permissions, locationPermissionRequestCode)
 
 
         this.onBackPressedDispatcher.addCallback(this, callback)

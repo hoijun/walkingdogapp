@@ -34,6 +34,7 @@ import com.bumptech.glide.load.DecodeFormat
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.databinding.ActivityRegisterDogBinding
@@ -62,6 +63,9 @@ class RegisterDogActivity : AppCompatActivity() {
 
     @Inject
     lateinit var loadingDialogFactory: LoadingDialogFactory
+
+    @Inject
+    lateinit var permissionHandler: PermissionHandler
 
     private var loadingDialog: LoadingDialog? = null
 
@@ -379,18 +383,13 @@ class RegisterDogActivity : AppCompatActivity() {
         loadingDialog?.dismiss()
     }
 
-    private fun checkPermission(permissions : Array<out String>, code: Int) : Boolean{
-        for (permission in permissions) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    permission
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(this, permissions, code)
-                return false
-            }
+    private fun checkPermission(permissions : Array<String>, code: Int) : Boolean{
+        return if (!permissionHandler.checkPermissions(this, permissions)) {
+            permissionHandler.requestPermissions(this, permissions, code)
+            false
+        } else {
+            true
         }
-        return true
     }
 
     override fun onRequestPermissionsResult(

@@ -25,6 +25,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.alarm.SettingAlarmFragment
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentHomeBinding
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterDogActivity
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
@@ -45,6 +46,9 @@ class HomeFragment : Fragment() {
 
     @Inject
     lateinit var networkChecker: NetworkChecker
+
+    @Inject
+    lateinit var permissionHandler: PermissionHandler
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,7 +148,7 @@ class HomeFragment : Fragment() {
             return
         }
 
-        if (checkLocationPermissions(ctx)) {
+        if (checkLocationPermissions()) {
             showPermissionDialog(ctx)
             return
         }
@@ -195,15 +199,12 @@ class HomeFragment : Fragment() {
         builder.show()
     }
 
-    private fun checkLocationPermissions(context: Context): Boolean {
-        return ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
+    private fun checkLocationPermissions(): Boolean {
+        val locationPermissions = arrayOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+        return !permissionHandler.checkPermissions(requireActivity(), locationPermissions)
     }
 
     override fun onStart() {

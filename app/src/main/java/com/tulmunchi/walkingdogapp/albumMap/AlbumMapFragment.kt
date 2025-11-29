@@ -37,6 +37,7 @@ import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.common.HorizonSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentAlbumMapBinding
 import com.tulmunchi.walkingdogapp.datamodel.AlbumMapImgInfo
 import com.tulmunchi.walkingdogapp.utils.Utils
@@ -58,6 +59,9 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
 
     @Inject
     lateinit var networkChecker: NetworkChecker
+
+    @Inject
+    lateinit var permissionHandler: PermissionHandler
 
     private lateinit var mynavermap: NaverMap
     private lateinit var camera : CameraUpdate
@@ -148,8 +152,8 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     override fun onStart() {
         super.onStart()
         mainActivity?.setMenuVisibility(View.VISIBLE)
-        context?.let { ctx ->
-            if (checkPermission(storagePermission, ctx)) {
+        context?.let {
+            if (checkPermission(storagePermission)) {
                 setAlbumMap(selectday.value ?: "")
                 if (markers.isNotEmpty()) {
                     lifecycleScope.launch(Dispatchers.Main) {
@@ -355,18 +359,13 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun checkPermission(permissions : Array<out String>, context: Context) : Boolean{
-        for (permission in permissions) {
-            if (ContextCompat.checkSelfPermission(
-                    context,
-                    permission
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestStoragePermission.launch(permission)
-                return false
-            }
+    private fun checkPermission(permissions : Array<String>) : Boolean{
+        return if (!permissionHandler.checkPermissions(requireActivity(), permissions)) {
+            requestStoragePermission.launch(permissions[0])
+            false
+        } else {
+            true
         }
-        return true
     }
 
     override fun onMapReady(map: NaverMap) {

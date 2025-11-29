@@ -27,14 +27,18 @@ import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.overlay.InfoWindow
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
+import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.utils.Utils
+import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Timer
+import javax.inject.Inject
 import kotlin.concurrent.timer
 import kotlin.math.abs
 import kotlin.math.atan2
 
+@AndroidEntryPoint
 class WalkingService : Service() {
     companion object {
         private var isWalkingServiceRunning = false
@@ -48,6 +52,9 @@ class WalkingService : Service() {
     private var walkTimer: Timer? = Timer()
     private var totalTime = 0
     private var angleThreshold = 30
+
+    @Inject
+    lateinit var permissionHandler: PermissionHandler
 
     val coordList = MutableLiveData<MutableList<LatLng>>()
     val isTracking = MutableLiveData<Boolean>()
@@ -160,15 +167,11 @@ class WalkingService : Service() {
     }
 
     private fun startLocationService() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
+        val locationPermissions = arrayOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+        if (!permissionHandler.checkPermissions(this, locationPermissions)) {
             return
         }
 

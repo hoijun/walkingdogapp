@@ -22,6 +22,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentMyPageBinding
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 import com.tulmunchi.walkingdogapp.datamodel.TotalWalkInfo
@@ -47,6 +48,9 @@ class MyPageFragment : Fragment() {
 
     @Inject
     lateinit var networkChecker: NetworkChecker
+
+    @Inject
+    lateinit var permissionHandler: PermissionHandler
 
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
@@ -180,7 +184,7 @@ class MyPageFragment : Fragment() {
 
             managepicturesBtn.setOnClickListener {
                 context?.let { ctx ->
-                    if (checkPermission(storagePermission, ctx)) {
+                    if (checkPermission(storagePermission)) {
                         mainActivity?.changeFragment(GalleryFragment())
                     } else {
                         Toast.makeText(
@@ -207,8 +211,8 @@ class MyPageFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         mainActivity?.setMenuVisibility(View.VISIBLE)
-        context?.let { ctx ->
-            if (checkPermission(storagePermission, ctx)) {
+        context?.let {
+            if (checkPermission(storagePermission)) {
                 binding.countImg = getAlbumImageCount()
             }
         }
@@ -220,18 +224,13 @@ class MyPageFragment : Fragment() {
         _binding = null
     }
 
-    private fun checkPermission(permissions: Array<out String>, context: Context): Boolean {
-        for (permission in permissions) {
-            if (ContextCompat.checkSelfPermission(
-                    context,
-                    permission
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestStoragePermission.launch(permission)
-                return false
-            }
+    private fun checkPermission(permissions: Array<String>): Boolean {
+        return if (!permissionHandler.checkPermissions(requireActivity(), permissions)) {
+            requestStoragePermission.launch(permissions[0])
+            false
+        } else {
+            true
         }
-        return true
     }
 
     private fun getAlbumImageCount(): Int {

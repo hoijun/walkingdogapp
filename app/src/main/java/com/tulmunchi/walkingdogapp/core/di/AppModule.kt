@@ -1,4 +1,4 @@
-package com.tulmunchi.walkingdogapp
+package com.tulmunchi.walkingdogapp.core.di
 
 import android.content.Context
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -33,7 +33,7 @@ class AppModule {
     @Provides
     @Singleton
     fun provideAlarmDao(@ApplicationContext context: Context): AlarmDao {
-        return LocalUserDatabase.getInstance(context)!!.alarmDao()
+        return LocalUserDatabase.Companion.getInstance(context)!!.alarmDao()
     }
 
     @Provides

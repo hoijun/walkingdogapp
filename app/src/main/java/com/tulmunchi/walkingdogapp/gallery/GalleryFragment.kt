@@ -29,11 +29,15 @@ import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.databinding.FragmentGalleryBinding
 import com.tulmunchi.walkingdogapp.datamodel.GalleryImgInfo
 import com.tulmunchi.walkingdogapp.mypage.MyPageFragment
+import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class GalleryFragment : Fragment() {
     private var _binding: FragmentGalleryBinding? = null
     private val binding get() = _binding!!
@@ -43,6 +47,9 @@ class GalleryFragment : Fragment() {
     private val removeImgList = mutableListOf<Uri>()
     private var itemDecoration: GridSpacingItemDecoration? = null
     private var selectMode = MutableLiveData(false)
+
+    @Inject
+    lateinit var permissionHandler: PermissionHandler
 
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
@@ -105,8 +112,8 @@ class GalleryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentGalleryBinding.inflate(inflater, container, false)
-        context?.let { ctx ->
-            if (checkPermission(storagePermission, ctx)) {
+        context?.let {
+            if (checkPermission(storagePermission)) {
                 setGallery()
             }
         }
@@ -129,8 +136,8 @@ class GalleryFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         mainActivity?.setMenuVisibility(View.GONE)
-        context?.let { ctx ->
-            if (checkPermission(storagePermission, ctx)) {
+        context?.let {
+            if (checkPermission(storagePermission)) {
                 updateRecyclerView()
             }
         }
@@ -340,18 +347,13 @@ class GalleryFragment : Fragment() {
         }
     }
 
-    private fun checkPermission(permissions: Array<out String>, context: Context): Boolean {
-        for (permission in permissions) {
-            if (ContextCompat.checkSelfPermission(
-                    context,
-                    permission
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestStoragePermission.launch(permission)
-                return false
-            }
+    private fun checkPermission(permissions: Array<String>): Boolean {
+        return if (!permissionHandler.checkPermissions(requireActivity(), permissions)) {
+            requestStoragePermission.launch(permissions[0])
+            false
+        } else {
+            true
         }
-        return true
     }
 
     private fun unSelectMode() {
