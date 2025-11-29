@@ -7,11 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tulmunchi.walkingdogapp.common.WriteDialog
 import com.tulmunchi.walkingdogapp.databinding.DoglistDialogBinding
-import androidx.core.graphics.drawable.toDrawable
 
 class DogListDialog : DialogFragment(){
     private var _binding: DoglistDialogBinding? = null

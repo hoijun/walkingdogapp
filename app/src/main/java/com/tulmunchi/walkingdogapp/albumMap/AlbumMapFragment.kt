@@ -35,19 +35,19 @@ import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.InfoWindow
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
-import com.tulmunchi.walkingdogapp.databinding.FragmentAlbumMapBinding
-import com.tulmunchi.walkingdogapp.datamodel.AlbumMapImgInfo
 import com.tulmunchi.walkingdogapp.common.HorizonSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.databinding.FragmentAlbumMapBinding
+import com.tulmunchi.walkingdogapp.datamodel.AlbumMapImgInfo
 import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AlbumMapFragment : Fragment(), OnMapReadyCallback {

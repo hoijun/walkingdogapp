@@ -10,21 +10,21 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import com.tulmunchi.walkingdogapp.albumMap.AlbumMapFragment
 import com.tulmunchi.walkingdogapp.collection.CollectionFragment
+import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialog
+import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.databinding.ActivityMainBinding
 import com.tulmunchi.walkingdogapp.mainhome.HomeFragment
 import com.tulmunchi.walkingdogapp.mypage.ManageDogsFragment
 import com.tulmunchi.walkingdogapp.mypage.MyPageFragment
-import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
-import com.tulmunchi.walkingdogapp.utils.Utils.Companion.LOADING_DIALOG_TAG
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import com.tulmunchi.walkingdogapp.walking.WalkingActivity
 import com.tulmunchi.walkingdogapp.walking.WalkingService
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint
@@ -38,6 +38,11 @@ class MainActivity : AppCompatActivity() {
         Manifest.permission.POST_NOTIFICATIONS
     )
     private var backPressedTime: Long = 0
+
+    @Inject
+    lateinit var loadingDialogFactory: LoadingDialogFactory
+
+    private var loadingDialog: LoadingDialog? = null
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -71,6 +76,8 @@ class MainActivity : AppCompatActivity() {
 
         if (preFragment =="AlbumMap")
             binding.menuBn.selectedItemId = R.id.navigation_albummap
+
+        loadingDialog = loadingDialogFactory.create(supportFragmentManager)
 
         // 화면 전환
         binding.menuBn.apply {
@@ -201,28 +208,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showLoadingFragment() {
-        val existingDialog = supportFragmentManager.findFragmentByTag(LOADING_DIALOG_TAG)
-        if (existingDialog != null && !existingDialog.isDetached) {
+        if (isFinishing || isDestroyed) {
             return
         }
-
-        try {
-            if (!supportFragmentManager.isStateSaved) {
-                val loadingDialog = LoadingDialogFragment()
-                loadingDialog.show(supportFragmentManager, LOADING_DIALOG_TAG)
-            }
-        } catch (_: IllegalStateException) { }
+        loadingDialog?.show()
     }
 
     private fun hideLoadingDialog() {
-        val loadingDialog = supportFragmentManager.findFragmentByTag(LOADING_DIALOG_TAG) as? DialogFragment
-        loadingDialog?.let {
-            try {
-                if (it.isAdded && !it.isDetached) {
-                    it.dismiss()
-                }
-            } catch (_: IllegalStateException) { }
+        if (isFinishing || isDestroyed) {
+            return
         }
+        loadingDialog?.dismiss()
     }
 
     fun changeFragment(fragment: Fragment) {

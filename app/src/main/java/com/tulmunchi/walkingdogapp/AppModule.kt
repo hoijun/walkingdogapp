@@ -1,13 +1,13 @@
 package com.tulmunchi.walkingdogapp
 
 import android.content.Context
-import com.tulmunchi.walkingdogapp.database.LocalUserDatabase
-import com.tulmunchi.walkingdogapp.datamodel.AlarmDao
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import com.tulmunchi.walkingdogapp.database.LocalUserDatabase
+import com.tulmunchi.walkingdogapp.datamodel.AlarmDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -21,19 +21,19 @@ import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.gallery.GalleryFragment
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.FragmentMyPageBinding
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 import com.tulmunchi.walkingdogapp.datamodel.TotalWalkInfo
 import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
+import com.tulmunchi.walkingdogapp.gallery.GalleryFragment
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterUserActivity
-import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 @AndroidEntryPoint

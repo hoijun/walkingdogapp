@@ -8,12 +8,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.MypagedoglistItemBinding
-import com.tulmunchi.walkingdogapp.registerinfo.RegisterDogActivity
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
+import com.tulmunchi.walkingdogapp.registerinfo.RegisterDogActivity
+import com.tulmunchi.walkingdogapp.utils.Utils
 
 class MyPageDogListAdapter(
     private val dogsList: List<DogInfo>,

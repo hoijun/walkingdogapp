@@ -17,9 +17,6 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
-import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.utils.Utils
-import com.tulmunchi.walkingdogapp.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -28,6 +25,9 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.overlay.InfoWindow
+import com.tulmunchi.walkingdogapp.MainActivity
+import com.tulmunchi.walkingdogapp.R
+import com.tulmunchi.walkingdogapp.utils.Utils
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Timer

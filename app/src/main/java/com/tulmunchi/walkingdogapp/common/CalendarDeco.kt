@@ -4,11 +4,11 @@ import android.content.Context
 import android.graphics.Color
 import android.text.style.ForegroundColorSpan
 import androidx.core.content.ContextCompat
-import com.tulmunchi.walkingdogapp.R
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.DayViewDecorator
 import com.prolificinteractive.materialcalendarview.DayViewFacade
 import com.prolificinteractive.materialcalendarview.spans.DotSpan
+import com.tulmunchi.walkingdogapp.R
 import org.threeten.bp.DayOfWeek
 
 class DayDecorator(context: Context): DayViewDecorator {

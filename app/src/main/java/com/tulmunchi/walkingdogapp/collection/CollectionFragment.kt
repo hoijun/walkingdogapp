@@ -12,17 +12,17 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
-import com.tulmunchi.walkingdogapp.databinding.FragmentCollectionBinding
-import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
 import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.databinding.FragmentCollectionBinding
+import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
 import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CollectionFragment : Fragment() {

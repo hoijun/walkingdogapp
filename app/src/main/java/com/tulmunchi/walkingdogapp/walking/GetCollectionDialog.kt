@@ -2,17 +2,16 @@ package com.tulmunchi.walkingdogapp.walking
 
 import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import com.tulmunchi.walkingdogapp.databinding.GetcollectionDialogBinding
 import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
-import androidx.core.graphics.drawable.toDrawable
 
 class GetCollectionDialog: DialogFragment() {
     private var _binding: GetcollectionDialogBinding? = null

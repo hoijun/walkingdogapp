@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
+import com.naver.maps.geometry.LatLng
 import com.tulmunchi.walkingdogapp.databinding.AlbummapItemBinding
 import com.tulmunchi.walkingdogapp.datamodel.AlbumMapImgInfo
-import com.naver.maps.geometry.LatLng
 
 class AlbumMapItemListAdapter(private val imgInfoList: MutableList<AlbumMapImgInfo>): RecyclerView.Adapter<AlbumMapItemListAdapter.AlbumMapItemListViewHolder>() {
     private lateinit var context: Context

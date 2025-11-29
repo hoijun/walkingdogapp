@@ -14,9 +14,9 @@ import android.view.WindowManager
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import com.tulmunchi.walkingdogapp.databinding.FragmentGalleryBottomSheetBinding
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import androidx.core.graphics.drawable.toDrawable
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.tulmunchi.walkingdogapp.databinding.FragmentGalleryBottomSheetBinding
 
 class GalleryBottomSheetFragment : BottomSheetDialogFragment() {
 

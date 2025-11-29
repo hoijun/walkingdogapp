@@ -7,18 +7,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import com.prolificinteractive.materialcalendarview.CalendarDay
+import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
-import com.tulmunchi.walkingdogapp.databinding.DateDialogBinding
 import com.tulmunchi.walkingdogapp.common.SelectedMonthDecorator
 import com.tulmunchi.walkingdogapp.common.ToDayDecorator
 import com.tulmunchi.walkingdogapp.common.WalkDayDecorator
+import com.tulmunchi.walkingdogapp.databinding.DateDialogBinding
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
-import com.prolificinteractive.materialcalendarview.CalendarDay
-import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
-import androidx.core.graphics.drawable.toDrawable
 
 class DateDialog : DialogFragment() {
     private var _binding: DateDialogBinding? = null

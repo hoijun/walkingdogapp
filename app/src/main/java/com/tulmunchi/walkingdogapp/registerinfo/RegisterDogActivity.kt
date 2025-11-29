@@ -26,18 +26,20 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.MainActivity
+import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
-import com.tulmunchi.walkingdogapp.utils.Utils
-import javax.inject.Inject
+import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialog
+import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.databinding.ActivityRegisterDogBinding
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
+import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.viewmodel.RegisterDogViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +48,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
-import androidx.core.graphics.toColorInt
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegisterDogActivity : AppCompatActivity() {
@@ -57,6 +59,11 @@ class RegisterDogActivity : AppCompatActivity() {
 
     @Inject
     lateinit var networkChecker: NetworkChecker
+
+    @Inject
+    lateinit var loadingDialogFactory: LoadingDialogFactory
+
+    private var loadingDialog: LoadingDialog? = null
 
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -91,6 +98,8 @@ class RegisterDogActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         this.onBackPressedDispatcher.addCallback(this, backPressCallback)
+
+        loadingDialog = loadingDialogFactory.create(supportFragmentManager)
 
         val userDogInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra("doginfo", DogInfo::class.java)
@@ -258,13 +267,12 @@ class RegisterDogActivity : AppCompatActivity() {
                 val listener = DialogInterface.OnClickListener { _, ans ->
                     when (ans) {
                         DialogInterface.BUTTON_POSITIVE -> {
-                            val loadingDialogFragment = LoadingDialogFragment()
-                            loadingDialogFragment.show(this@RegisterDogActivity.supportFragmentManager, "loading")
+                            showLoadingFragment()
 
                             lifecycleScope.launch { // 강아지 정보 등록
                                 registerDogViewModel.removeDogInfo(beforeName, MainActivity.dogUriList)
                                 withContext(Dispatchers.Main) {
-                                    loadingDialogFragment.dismiss()
+                                    hideLoadingDialog()
                                     goMain(true)
                                 }
                             }
@@ -355,6 +363,20 @@ class RegisterDogActivity : AppCompatActivity() {
         val contentResolver = contentResolver
         val mimeTypeMap = MimeTypeMap.getSingleton()
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri))
+    }
+
+    private fun showLoadingFragment() {
+        if (isFinishing || isDestroyed) {
+            return
+        }
+        loadingDialog?.show()
+    }
+
+    private fun hideLoadingDialog() {
+        if (isFinishing || isDestroyed) {
+            return
+        }
+        loadingDialog?.dismiss()
     }
 
     private fun checkPermission(permissions : Array<out String>, code: Int) : Boolean{

@@ -7,12 +7,13 @@ import android.location.Address
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.maps.model.LatLng
 import com.tulmunchi.walkingdogapp.datamodel.AlarmDataModel
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
 import com.tulmunchi.walkingdogapp.datamodel.GalleryImgInfo
@@ -20,8 +21,6 @@ import com.tulmunchi.walkingdogapp.datamodel.TotalWalkInfo
 import com.tulmunchi.walkingdogapp.datamodel.UserInfo
 import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
 import com.tulmunchi.walkingdogapp.repository.UserInfoRepository
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope

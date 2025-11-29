@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
 import androidx.core.graphics.drawable.toDrawable
+import androidx.fragment.app.DialogFragment
 import com.tulmunchi.walkingdogapp.R
 
 class LoadingDialogFragment : DialogFragment() {

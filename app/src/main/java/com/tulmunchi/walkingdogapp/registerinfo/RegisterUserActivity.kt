@@ -13,22 +13,23 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.lifecycleScope
-import com.tulmunchi.walkingdogapp.utils.Utils
-import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialog
+import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.databinding.ActivityRegisterUserBinding
-import javax.inject.Inject
 import com.tulmunchi.walkingdogapp.datamodel.UserInfo
+import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.viewmodel.RegisterUserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
-import androidx.core.graphics.toColorInt
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegisterUserActivity : AppCompatActivity() {
@@ -38,16 +39,24 @@ class RegisterUserActivity : AppCompatActivity() {
     @Inject
     lateinit var networkChecker: NetworkChecker
 
+    @Inject
+    lateinit var loadingDialogFactory: LoadingDialogFactory
+
+    private var loadingDialog: LoadingDialog? = null
+
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             selectGoMain()
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterUserBinding.inflate(layoutInflater)
         setContentView(binding.root)
         this.onBackPressedDispatcher.addCallback(this, backPressCallback)
+
+        loadingDialog = loadingDialogFactory.create(supportFragmentManager)
 
         val currentUserInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra("userinfo", UserInfo::class.java)
@@ -116,18 +125,17 @@ class RegisterUserActivity : AppCompatActivity() {
                 val listener = DialogInterface.OnClickListener { _, ans ->
                     when (ans) {
                         DialogInterface.BUTTON_POSITIVE -> {
-                            val loadingDialogFragment = LoadingDialogFragment()
-                            loadingDialogFragment.show(this@RegisterUserActivity.supportFragmentManager, "loading")
+                            showLoadingFragment()
                             lifecycleScope.launch(Dispatchers.IO) {
                                 try {
                                     registerUserViewModel.updateUserInfo(userInfo)
                                     withContext(Dispatchers.Main) {
-                                        loadingDialogFragment.dismiss()
+                                        hideLoadingDialog()
                                         goHome()
                                     }
                                 } catch (e: Exception) {
                                     withContext(Dispatchers.Main) {
-                                        loadingDialogFragment.dismiss()
+                                        hideLoadingDialog()
                                     }
                                 }
                             }
@@ -168,6 +176,20 @@ class RegisterUserActivity : AppCompatActivity() {
         }
         startActivity(backIntent)
         finish()
+    }
+
+    private fun showLoadingFragment() {
+        if (isFinishing || isDestroyed) {
+            return
+        }
+        loadingDialog?.show()
+    }
+
+    private fun hideLoadingDialog() {
+        if (isFinishing || isDestroyed) {
+            return
+        }
+        loadingDialog?.dismiss()
     }
 
     object RegisterUserBindingAdapter {

@@ -3,16 +3,15 @@ package com.tulmunchi.walkingdogapp.login
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import com.tulmunchi.walkingdogapp.databinding.TermofserviceDialogBinding
 import com.tulmunchi.walkingdogapp.mypage.PrivacyWebViewActivity
-import androidx.core.graphics.drawable.toDrawable
 
 class TermOfServiceDialog: DialogFragment() {
     private var _binding: TermofserviceDialogBinding? = null

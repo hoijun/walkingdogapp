@@ -11,6 +11,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
 import com.google.firebase.storage.FirebaseStorage
 import com.naver.maps.geometry.LatLng
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.datamodel.AlarmDao
 import com.tulmunchi.walkingdogapp.datamodel.AlarmDataModel
 import com.tulmunchi.walkingdogapp.datamodel.DogInfo
@@ -20,7 +21,6 @@ import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
 import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfoInSave
 import com.tulmunchi.walkingdogapp.datamodel.WalkLatLng
 import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
-import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.utils.Utils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CompletableDeferred

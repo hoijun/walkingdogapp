@@ -19,12 +19,13 @@ import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
-import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
 import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.common.WriteDialog
 import com.tulmunchi.walkingdogapp.alarm.AlarmFunctions
+import com.tulmunchi.walkingdogapp.common.WriteDialog
 import com.tulmunchi.walkingdogapp.core.datastore.UserPreferencesDataStore
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialog
+import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.databinding.FragmentSettingBinding
 import com.tulmunchi.walkingdogapp.login.LoginActivity
 import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
@@ -62,6 +63,11 @@ class SettingFragment : Fragment() {
     @Inject
     lateinit var networkChecker: NetworkChecker
 
+    @Inject
+    lateinit var loadingDialogFactory: LoadingDialogFactory
+
+    private var loadingDialog: LoadingDialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activity?.let {
@@ -75,6 +81,7 @@ class SettingFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentSettingBinding.inflate(inflater, container, false)
+        loadingDialog = loadingDialogFactory.create(parentFragmentManager)
         binding.apply {
             btnGoMypage.setOnClickListener {
                 goMyPage()
@@ -144,10 +151,9 @@ class SettingFragment : Fragment() {
                     return@setOnClickListener
                 }
 
-                val loadingDialogFragment = LoadingDialogFragment()
                 parentFragmentManager.let {
                     try {
-                        loadingDialogFragment.show(it, "loading")
+                        showLoadingFragment()
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -155,7 +161,7 @@ class SettingFragment : Fragment() {
 
                 val credential = EmailAuthProvider.getCredential(email, password)
                 auth.currentUser?.reauthenticate(credential)?.addOnSuccessListener {
-                    loadingDialogFragment.dismiss()
+                    hideLoadingDialog()
                     val writeDialog = WriteDialog()
                     writeDialog.clickYesListener = WriteDialog.OnClickYesListener { writeText ->
                         if (userEmail != writeText) {
@@ -165,7 +171,7 @@ class SettingFragment : Fragment() {
 
                         parentFragmentManager.let {
                             try {
-                                loadingDialogFragment.show(it, "loading")
+                                hideLoadingDialog()
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
@@ -175,7 +181,7 @@ class SettingFragment : Fragment() {
                             if (email.contains("@naver.com")) { // 네이버로 로그인 했을 경우
                                 if (!mainViewModel.removeAccount()) {
                                     toastMsg("탈퇴가 재대로 안됐어요..")
-                                    loadingDialogFragment.dismiss()
+                                    hideLoadingDialog()
                                     return@launch
                                 }
 
@@ -191,33 +197,33 @@ class SettingFragment : Fragment() {
                                             message: String,
                                         ) {
                                             completeDeleteAccount()
-                                            loadingDialogFragment.dismiss()
+                                            hideLoadingDialog()
                                         }
 
                                         override fun onSuccess() {
                                             completeDeleteAccount()
-                                            loadingDialogFragment.dismiss()
+                                            hideLoadingDialog()
                                         }
                                     })
                                 }?.addOnFailureListener {
                                     toastMsg("탈퇴가 재대로 안됐어요..")
-                                    loadingDialogFragment.dismiss()
+                                    hideLoadingDialog()
                                 }
                             } else { // 카카오로 로그인 했을 경우
                                 if (!mainViewModel.removeAccount()) {
                                     toastMsg("탈퇴가 재대로 안됐어요..")
-                                    loadingDialogFragment.dismiss()
+                                    hideLoadingDialog()
                                     return@launch
                                 }
 
                                 auth.currentUser?.delete()?.addOnSuccessListener {
                                     UserApiClient.instance.unlink {
                                         completeDeleteAccount()
-                                        loadingDialogFragment.dismiss()
+                                        hideLoadingDialog()
                                     }
                                 }?.addOnFailureListener {
                                     toastMsg("탈퇴가 재대로 안됐어요..")
-                                    loadingDialogFragment.dismiss()
+                                    hideLoadingDialog()
                                 }
                             }
                         }
@@ -347,4 +353,17 @@ class SettingFragment : Fragment() {
         }
     }
 
+    private fun showLoadingFragment() {
+        if (isDetached) {
+            return
+        }
+        loadingDialog?.show()
+    }
+
+    private fun hideLoadingDialog() {
+        if (isDetached) {
+            return
+        }
+        loadingDialog?.dismiss()
+    }
 }

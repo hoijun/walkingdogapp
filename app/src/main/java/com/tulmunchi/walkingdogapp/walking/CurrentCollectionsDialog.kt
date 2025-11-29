@@ -8,13 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.tulmunchi.walkingdogapp.utils.Utils
+import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.databinding.CurrentcollectionsDialogBinding
 import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
-import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
-import androidx.core.graphics.drawable.toDrawable
+import com.tulmunchi.walkingdogapp.utils.Utils
 
 class CurrentCollectionsDialog: DialogFragment() {
     private var _binding: CurrentcollectionsDialogBinding? = null

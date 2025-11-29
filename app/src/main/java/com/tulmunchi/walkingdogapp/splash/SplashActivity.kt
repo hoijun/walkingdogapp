@@ -17,9 +17,9 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.firebase.auth.FirebaseAuth
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.login.LoginActivity
 import com.tulmunchi.walkingdogapp.utils.FirebaseAnalyticHelper
-import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

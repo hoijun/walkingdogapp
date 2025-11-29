@@ -35,15 +35,6 @@ import androidx.core.content.FileProvider
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.tulmunchi.walkingdogapp.common.LoadingDialogFragment
-import com.tulmunchi.walkingdogapp.MainActivity
-import com.tulmunchi.walkingdogapp.R
-import com.tulmunchi.walkingdogapp.databinding.ActivityWalkingBinding
-import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
-import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
-import com.tulmunchi.walkingdogapp.utils.Utils
-import javax.inject.Inject
-import com.tulmunchi.walkingdogapp.viewmodel.WalkingViewModel
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
@@ -54,6 +45,15 @@ import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
+import com.tulmunchi.walkingdogapp.MainActivity
+import com.tulmunchi.walkingdogapp.R
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialog
+import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialogFactory
+import com.tulmunchi.walkingdogapp.databinding.ActivityWalkingBinding
+import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
+import com.tulmunchi.walkingdogapp.utils.Utils
+import com.tulmunchi.walkingdogapp.viewmodel.WalkingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -66,6 +66,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.Random
+import javax.inject.Inject
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -80,6 +81,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @Inject
     lateinit var networkChecker: NetworkChecker
+
+    @Inject
+    lateinit var loadingDialogFactory: LoadingDialogFactory
+
+    private var loadingDialog: LoadingDialog? = null
 
     private var coordList = mutableListOf<LatLng>()
     private var trackingMarker = Marker()
@@ -142,6 +148,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         walkingViewModel.getLastLocation()
 
         selectedDogs = intent.getStringArrayListExtra("selectedDogs") ?: arrayListOf()
+
+        loadingDialog = loadingDialogFactory.create(supportFragmentManager)
 
         // 백그라운드 위치 서비스 시작
         try {
@@ -481,6 +489,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             putExtra("isImgChanged", false)
         }
 
+        hideLoadingDialog()
         unbindService(connection)
         startActivity(backIntent)
         finish()
@@ -533,8 +542,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         collections: List<String>
     ) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val loadingDialogFragment = LoadingDialogFragment()
-            loadingDialogFragment.show(this@WalkingActivity.supportFragmentManager, "loading")
+            loadingDialog
             val error = walkingViewModel.saveWalkInfo(
                 walkDogs,
                 startTime,
@@ -545,7 +553,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             )
 
             withContext(Dispatchers.Main) {
-                loadingDialogFragment.dismiss()
+                showLoadingFragment()
                 if (error) {
                     Toast.makeText(this@WalkingActivity, "산책 기록 저장 실패", Toast.LENGTH_SHORT).show()
                 }
@@ -665,6 +673,20 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
         return true
+    }
+
+    private fun showLoadingFragment() {
+        if (isFinishing || isDestroyed) {
+            return
+        }
+        loadingDialog?.show()
+    }
+
+    private fun hideLoadingDialog() {
+        if (isFinishing || isDestroyed) {
+            return
+        }
+        loadingDialog?.dismiss()
     }
 
     override fun onRequestPermissionsResult(

@@ -2,7 +2,6 @@ package com.tulmunchi.walkingdogapp.collection
 
 import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,12 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
+import androidx.core.graphics.drawable.toDrawable
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
 import com.tulmunchi.walkingdogapp.databinding.DetailcollectionDialogBinding
 import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
-import androidx.core.graphics.drawable.toDrawable
 
 class DetailCollectionDialog: DialogFragment() {
     private var _binding: DetailcollectionDialogBinding? = null

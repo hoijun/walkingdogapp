@@ -10,10 +10,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
-import com.tulmunchi.walkingdogapp.mainhome.HomeFragment
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.databinding.FragmentSettingAlarmBinding
 import com.tulmunchi.walkingdogapp.datamodel.AlarmDataModel
+import com.tulmunchi.walkingdogapp.mainhome.HomeFragment
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
