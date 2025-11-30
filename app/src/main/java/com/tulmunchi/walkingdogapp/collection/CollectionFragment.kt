@@ -39,7 +39,7 @@ class CollectionFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         collectionWhether = mainViewModel.collectionWhether.value ?: Utils.item_whether
-        collections = Utils.setCollectionMap().values.toList().sortedBy { it.collectionNum }
+        collections = Utils.collectionMap.values.toList().sortedBy { it.collectionNum }
 
         context?.let { ctx ->
             if (!networkChecker.isNetworkAvailable()) {

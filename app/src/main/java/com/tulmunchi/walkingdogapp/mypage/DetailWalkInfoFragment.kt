@@ -70,7 +70,6 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             (arguments?.getSerializable("selectDateRecord") ?: WalkDateInfo()) as WalkDateInfo
         }
 
-        val collectionsMap = Utils.setCollectionMap()
         val currentCollections = arrayListOf<CollectionInfo>()
 
         val itemDecoration = context?.let { ctx ->
@@ -78,7 +77,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
         } ?: GridSpacingItemDecoration(3, 20) // 기본값
 
         walkDateInfo.collections.toList().forEach {
-            currentCollections.add(collectionsMap[it]?: CollectionInfo())
+            currentCollections.add(Utils.collectionMap[it]?: CollectionInfo())
         }
 
         val emptyCollections = arrayListOf(CollectionInfo())

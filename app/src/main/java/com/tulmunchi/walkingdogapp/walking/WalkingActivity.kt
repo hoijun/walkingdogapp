@@ -155,6 +155,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         loadingDialog = loadingDialogFactory.create(supportFragmentManager)
 
+        setupViewModelObservers()
+
         // 백그라운드 위치 서비스 시작
         try {
             startWalkingService()
@@ -163,8 +165,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             goHome()
         }
 
-        collectionsMap = Utils.setCollectionMap()
-        setCollectionImageView(collectionsMap)
+        setCollectionImageView(Utils.collectionMap)
 
         val mapFragment: MapFragment =
             supportFragmentManager.findFragmentById(R.id.Map) as MapFragment?
@@ -227,6 +228,31 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
 
                 collectionListDialog.show(supportFragmentManager, "collectionList")
+            }
+        }
+    }
+
+    private fun setupViewModelObservers() {
+        // 로딩 상태 관찰
+        walkingViewModel.isLoading.observe(this) { isLoading ->
+            if (isLoading) showLoadingFragment() else hideLoadingDialog()
+        }
+
+        // 에러 관찰
+        walkingViewModel.error.observe(this) { errorMessage ->
+            errorMessage?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // 산책 저장 결과 관찰
+        walkingViewModel.walkSaved.observe(this) { saved ->
+            if (saved != null) {
+                if (!saved) {
+                    Toast.makeText(this, "산책 기록 저장 실패", Toast.LENGTH_SHORT).show()
+                }
+                stopWalkingService()
+                goHome()
             }
         }
     }
@@ -362,7 +388,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-    private fun setCollectionImageView(collectionsMap: HashMap<String, CollectionInfo>) {
+    private fun setCollectionImageView(collectionsMap: Map<String, CollectionInfo>) {
         collectionsMap.forEach { (key, value) ->
             val imgView = ImageView(this)
             imgView.layoutParams = ViewGroup.LayoutParams(200, 200)
@@ -541,26 +567,15 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         walkDogs: ArrayList<String>,
         collections: List<String>
     ) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            loadingDialog
-            val error = walkingViewModel.saveWalkInfo(
-                walkDogs,
-                startTime,
-                distance,
-                time,
-                coords,
-                collections
-            )
-
-            withContext(Dispatchers.Main) {
-                showLoadingFragment()
-                if (error) {
-                    Toast.makeText(this@WalkingActivity, "산책 기록 저장 실패", Toast.LENGTH_SHORT).show()
-                }
-                stopWalkingService()
-                goHome()
-            }
-        }
+        // ViewModel의 saveWalkRecord 호출
+        walkingViewModel.saveWalkRecord(
+            dogNames = walkDogs,
+            startTime = startTime,
+            distance = distance,
+            time = time,
+            coords = coords,
+            collections = collections
+        )
     }
 
     private fun setSaveScreen() {

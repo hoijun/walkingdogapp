@@ -29,48 +29,8 @@ class Utils {
             }
         }
 
-        fun dpToPx(dp: Float, context: Context): Int {
-            val metrics = context.resources.displayMetrics;
-            return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, metrics).toInt()
-        }
-
-        fun getAge(date: String): Int {
-            val currentDate = Calendar.getInstance()
-
-            val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-            val birthDate = dateFormat.parse(date)
-            val calBirthDate = Calendar.getInstance().apply { time = birthDate?: Date() }
-
-            var age = currentDate.get(Calendar.YEAR) - calBirthDate.get(Calendar.YEAR)
-            if (currentDate.get(Calendar.DAY_OF_YEAR) < calBirthDate.get(Calendar.DAY_OF_YEAR)) {
-                age--
-            }
-            return age
-        }
-
-        fun convertLongToTime(format: SimpleDateFormat, time: Long): String {
-            val calendar = Calendar.getInstance()
-            calendar.timeInMillis = time * 1000;
-            return format.format(calendar.time)
-        }
-
-        fun isImageExists(uri: Uri , context: Context): Boolean {
-            val contentResolver: ContentResolver = context.contentResolver
-            try {
-                val inputStream = contentResolver.openInputStream(uri)
-                if (inputStream != null) {
-                    inputStream.close()
-                    return true // 이미지가 존재함
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-                return false
-            }
-            return false // 이미지가 존재하지 않음
-        }
-
-        fun setCollectionMap(): HashMap<String, CollectionInfo> {
-            return hashMapOf(
+        val collectionMap: Map<String, CollectionInfo> by lazy {
+            hashMapOf(
                 "001" to CollectionInfo(
                     "001",
                     "밥알 곰",
@@ -218,5 +178,44 @@ class Utils {
             )
         }
 
+        fun dpToPx(dp: Float, context: Context): Int {
+            val metrics = context.resources.displayMetrics;
+            return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, metrics).toInt()
+        }
+
+        fun getAge(date: String): Int {
+            val currentDate = Calendar.getInstance()
+
+            val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+            val birthDate = dateFormat.parse(date)
+            val calBirthDate = Calendar.getInstance().apply { time = birthDate ?: Date() }
+
+            var age = currentDate.get(Calendar.YEAR) - calBirthDate.get(Calendar.YEAR)
+            if (currentDate.get(Calendar.DAY_OF_YEAR) < calBirthDate.get(Calendar.DAY_OF_YEAR)) {
+                age--
+            }
+            return age
+        }
+
+        fun convertLongToTime(format: SimpleDateFormat, time: Long): String {
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = time * 1000;
+            return format.format(calendar.time)
+        }
+
+        fun isImageExists(uri: Uri, context: Context): Boolean {
+            val contentResolver: ContentResolver = context.contentResolver
+            try {
+                val inputStream = contentResolver.openInputStream(uri)
+                if (inputStream != null) {
+                    inputStream.close()
+                    return true // 이미지가 존재함
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return false
+            }
+            return false // 이미지가 존재하지 않음
+        }
     }
 }
