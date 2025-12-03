@@ -66,14 +66,6 @@ class WalkRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getWalkHistory(dogName: String): Result<List<WalkRecord>> {
-        if (!networkChecker.isNetworkAvailable()) {
-            return Result.failure(DomainError.NetworkError())
-        }
-        return firebaseWalkDataSource.getWalkHistory(uid, dogName)
-            .map { WalkRecordMapper.toDomainList(it) }
-    }
-
     override suspend fun getAllWalkHistory(): Result<Map<String, List<WalkRecord>>> {
         if (!networkChecker.isNetworkAvailable()) {
             return Result.failure(DomainError.NetworkError())
@@ -92,18 +84,5 @@ class WalkRepositoryImpl @Inject constructor(
         }
         return firebaseUserDataSource.getTotalWalkStats(uid)
             .map { WalkStatsMapper.toDomain(it) }
-    }
-
-    override suspend fun getDogWalkStats(dogName: String): Result<WalkStats> {
-        if (!networkChecker.isNetworkAvailable()) {
-            return Result.failure(DomainError.NetworkError())
-        }
-        // Get walk history and calculate stats
-        return getWalkHistory(dogName)
-            .map { records ->
-                val totalDistance = records.sumOf { it.distance.toDouble() }.toFloat()
-                val totalTime = records.sumOf { it.time }
-                WalkStats(distance = totalDistance, time = totalTime)
-            }
     }
 }

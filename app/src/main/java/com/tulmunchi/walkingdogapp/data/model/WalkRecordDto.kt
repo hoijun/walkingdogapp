@@ -8,11 +8,8 @@ import com.google.gson.annotations.SerializedName
  */
 @Keep
 data class WalkRecordDto(
-    @SerializedName("day")
     val day: String = "",
-    @SerializedName("startTime")
     val startTime: String = "",
-    @SerializedName("endTime")
     val endTime: String = "",
     @SerializedName("distance")
     val distance: Float = 0f,

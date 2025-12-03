@@ -1,7 +1,7 @@
 package com.tulmunchi.walkingdogapp.domain.repository
 
 import com.tulmunchi.walkingdogapp.domain.model.Dog
-import com.tulmunchi.walkingdogapp.domain.model.DogWithStats
+import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
 
 /**
  * Repository interface for dog-related operations
@@ -13,26 +13,25 @@ interface DogRepository {
     suspend fun getAllDogs(): Result<List<Dog>>
 
     /**
-     * Get all dogs with their walk statistics
-     */
-    suspend fun getAllDogsWithStats(): Result<List<DogWithStats>>
-
-    /**
      * Get a specific dog by name
      */
     suspend fun getDog(name: String): Result<Dog>
 
     /**
-     * Save a new dog (with optional image)
-     * @param imageUriString Optional image URI as string (file path or content URI)
-     */
-    suspend fun saveDog(dog: Dog, imageUriString: String?): Result<Unit>
-
-    /**
      * Update existing dog information
-     * @param imageUriString Optional image URI as string (file path or content URI)
+     * @param oldName Previous dog name (empty string for new dog)
+     * @param dog Updated dog information
+     * @param imageUriString New image URI (null to keep existing image)
+     * @param walkRecords Walk records to transfer to new dog name
+     * @param existingDogNames List of existing dog names to check for duplicates
      */
-    suspend fun updateDog(oldName: String, dog: Dog, imageUriString: String?): Result<Unit>
+    suspend fun updateDog(
+        oldName: String,
+        dog: Dog,
+        imageUriString: String?,
+        walkRecords: List<WalkRecord>,
+        existingDogNames: List<String>
+    ): Result<Unit>
 
     /**
      * Delete a dog

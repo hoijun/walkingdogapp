@@ -2,8 +2,6 @@ package com.tulmunchi.walkingdogapp.data.mapper
 
 import com.tulmunchi.walkingdogapp.data.model.DogDto
 import com.tulmunchi.walkingdogapp.domain.model.Dog
-import com.tulmunchi.walkingdogapp.domain.model.DogWithStats
-import com.tulmunchi.walkingdogapp.domain.model.WalkStats
 
 /**
  * Mapper between DogDto and Dog domain model
@@ -18,15 +16,11 @@ object DogMapper {
         vaccination = dto.vaccination,
         weight = dto.weight,
         feature = dto.feature,
-        creationTime = dto.creationTime
+        creationTime = dto.creationTime,
+        dogWithStats = WalkStatsMapper.toDomain(dto.totalWalkInfo)
     )
 
-    fun toDomainWithStats(dto: DogDto): DogWithStats = DogWithStats(
-        dog = toDomain(dto),
-        stats = WalkStatsMapper.toDomain(dto.totalWalkInfo)
-    )
-
-    fun toDto(domain: Dog, stats: WalkStats = WalkStats()): DogDto = DogDto(
+    fun toDto(domain: Dog): DogDto = DogDto(
         name = domain.name,
         breed = domain.breed,
         gender = domain.gender,
@@ -36,6 +30,6 @@ object DogMapper {
         weight = domain.weight,
         feature = domain.feature,
         creationTime = domain.creationTime,
-        totalWalkInfo = WalkStatsMapper.toDto(stats)
+        totalWalkInfo = WalkStatsMapper.toDto(domain.dogWithStats)
     )
 }

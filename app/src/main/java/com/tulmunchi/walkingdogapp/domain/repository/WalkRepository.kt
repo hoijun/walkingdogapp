@@ -21,11 +21,6 @@ interface WalkRepository {
     ): Result<Unit>
 
     /**
-     * Get all walk history for a specific dog
-     */
-    suspend fun getWalkHistory(dogName: String): Result<List<WalkRecord>>
-
-    /**
      * Get all walk history for all dogs
      */
     suspend fun getAllWalkHistory(): Result<Map<String, List<WalkRecord>>>
@@ -34,9 +29,4 @@ interface WalkRepository {
      * Get total walk statistics for all dogs
      */
     suspend fun getTotalWalkStats(): Result<WalkStats>
-
-    /**
-     * Get walk statistics for a specific dog
-     */
-    suspend fun getDogWalkStats(dogName: String): Result<WalkStats>
 }
