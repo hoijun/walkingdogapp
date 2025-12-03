@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.databinding.FragmentSettingAlarmBinding
 import com.tulmunchi.walkingdogapp.datamodel.AlarmDataModel
+import com.tulmunchi.walkingdogapp.domain.model.Alarm
 import com.tulmunchi.walkingdogapp.mainhome.HomeFragment
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +34,22 @@ class SettingAlarmFragment : Fragment() {
     private var adaptar: AlarmListAdapter? = null
     private var selectMode = false
     private var alarmFunctions: AlarmFunctions? = null
+
+    // Helper function to convert AlarmDataModel to Alarm
+    private fun AlarmDataModel.toAlarm() = Alarm(
+        alarmCode = this.alarm_code,
+        time = this.time,
+        weeks = this.weeks.toList(),
+        isEnabled = this.alarmOn
+    )
+
+    // Helper function to convert Alarm to AlarmDataModel
+    private fun Alarm.toAlarmDataModel() = AlarmDataModel(
+        alarm_code = this.alarmCode,
+        time = this.time,
+        weeks = this.weeks.toTypedArray(),
+        alarmOn = this.isEnabled
+    )
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -80,7 +97,7 @@ class SettingAlarmFragment : Fragment() {
                                         alarm.alarm_code,
                                         alarm.weeks
                                     )
-                                    mainViewModel.addAlarm(alarm)
+                                    mainViewModel.addAlarm(alarm.toAlarm())
                                     alarmList.add(alarm)
                                     alarmList.sortBy { alarmTimeToString(it.time).toInt() }
                                     withContext(Dispatchers.Main) {
@@ -108,7 +125,7 @@ class SettingAlarmFragment : Fragment() {
             }
 
             coroutineScope.launch {
-                alarmList = mainViewModel.getAlarmList().sortedBy { alarmTimeToString(it.time).toInt() }.toMutableList()
+                alarmList = (mainViewModel.alarms.value?.map { it.toAlarmDataModel() } ?: emptyList()).sortedBy { alarmTimeToString(it.time).toInt() }.toMutableList()
                 adaptar = AlarmListAdapter(alarmList)
                 withContext(Dispatchers.Main) {
                     adaptar?.onItemClickListener = object : AlarmListAdapter.OnItemClickListener {
@@ -137,8 +154,8 @@ class SettingAlarmFragment : Fragment() {
                                             coroutineScope.launch {
                                                 functions.cancelAlarm(oldAlarm.alarm_code)
 
-                                                mainViewModel.deleteAlarm(oldAlarm)
-                                                mainViewModel.addAlarm(newAlarm)
+                                                mainViewModel.deleteAlarm(oldAlarm.alarm_code)
+                                                mainViewModel.addAlarm(newAlarm.toAlarm())
 
                                                 if (oldAlarm.alarmOn) {
                                                     functions.callAlarm(
@@ -217,7 +234,7 @@ class SettingAlarmFragment : Fragment() {
                                     alarmFunctions?.cancelAlarm(alarm.alarm_code)
                                 }
                                 alarmList[alarmList.indexOf(alarm)].alarmOn = isChecked
-                                mainViewModel.onOffAlarm(alarm, isChecked)
+                                mainViewModel.toggleAlarm(alarm.alarm_code, isChecked)
                             }
                         }
                     }
@@ -268,7 +285,7 @@ class SettingAlarmFragment : Fragment() {
                         coroutineScope.launch {
                             for (alarm in removeAlarmList) {
                                 functions.cancelAlarm(alarm.alarm_code)
-                                mainViewModel.deleteAlarm(alarm)
+                                mainViewModel.deleteAlarm(alarm.alarm_code)
                             }
                             removeItems()
                             unSelectMode()

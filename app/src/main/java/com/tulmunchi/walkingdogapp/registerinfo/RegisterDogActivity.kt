@@ -38,8 +38,8 @@ import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.databinding.ActivityRegisterDogBinding
-import com.tulmunchi.walkingdogapp.datamodel.DogInfo
-import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
+import com.tulmunchi.walkingdogapp.domain.model.Dog
+import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
 import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.viewmodel.RegisterDogViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,8 +54,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class RegisterDogActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterDogBinding
-    private var dogInfo = DogInfo()
-    private var imguri: Uri? = null
+    private var dog = Dog()
+    private var imgUri: Uri? = null
     private val registerDogViewModel: RegisterDogViewModel by viewModels()
 
     @Inject
@@ -80,7 +80,7 @@ class RegisterDogActivity : AppCompatActivity() {
             getExtension(uri)?.let { Log.d("extension", it) }
         }
         if (uri != null && getExtension(uri) == "jpg") {
-            imguri = pressImage(uri,this)
+            imgUri = pressImage(uri,this)
             Glide.with(this@RegisterDogActivity).load(uri)
                 .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(binding.registerImage)
         } else {
@@ -105,60 +105,60 @@ class RegisterDogActivity : AppCompatActivity() {
 
         loadingDialog = loadingDialogFactory.create(supportFragmentManager)
 
-        val userDogInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getSerializableExtra("doginfo", DogInfo::class.java)
+        val userDog = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra("doginfo", Dog::class.java)
         } else {
-            intent.getSerializableExtra("doginfo") as DogInfo?
+            intent.getSerializableExtra("doginfo") as? Dog
         }
 
-        val walkRecords = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableArrayListExtra("walkRecord", WalkDateInfo::class.java) ?: arrayListOf()
+        val walkRecords: ArrayList<WalkRecord> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableArrayListExtra("walkRecord", WalkRecord::class.java) ?: arrayListOf()
         } else {
             intent.getParcelableArrayListExtra("walkRecord") ?: arrayListOf()
         }
 
-        dogInfo = userDogInfo?: DogInfo()
-        val beforeName = dogInfo.name
-
-        if (dogInfo.creationTime == 0L) {
-            dogInfo.creationTime = System.currentTimeMillis()
-        }
+        userDog?.let { dog = it }
+        val beforeName = dog.name
+        setUpViewModelObservers()
 
 
         binding.apply {
-            dog = dogInfo
+            dogInfo = dog
             beforeDogName = beforeName
 
-            if (MainActivity.dogUriList[beforeName] != null) {
-                Glide.with(this@RegisterDogActivity).load(MainActivity.dogUriList[beforeName])
+            if (MainActivity.dogImageUrls[beforeName] != null) {
+                Glide.with(this@RegisterDogActivity).load(MainActivity.dogImageUrls[beforeName])
                     .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(registerImage)
             }
 
             btnDogismale.setOnClickListener {
-                dogInfo.gender = "남"
-                dog = dogInfo
+                dog = dog.copy(gender = "남")
+                binding.dogInfo = dog
             }
+
             btnDogisfemale.setOnClickListener {
-                dogInfo.gender = "여"
-                dog = dogInfo
+                dog = dog.copy(gender = "여")
+                binding.dogInfo = dog
             }
 
             btnNeuteryes.setOnClickListener {
-                dogInfo.neutering = "예"
-                dog = dogInfo
+                dog = dog.copy(neutering = "예")
+                binding.dogInfo = dog
             }
+
             btnNeuterno.setOnClickListener {
-                dogInfo.neutering = "아니요"
-                dog = dogInfo
+                dog = dog.copy(neutering = "아니요")
+                binding.dogInfo = dog
             }
 
             btnVaccyes.setOnClickListener {
-                dogInfo.vaccination = "예"
-                dog = dogInfo
+                dog = dog.copy(vaccination = "예")
+                binding.dogInfo = dog
             }
+
             btnVaccno.setOnClickListener {
-                dogInfo.vaccination = "아니요"
-                dog = dogInfo
+                dog = dog.copy(vaccination = "아니요")
+                binding.dogInfo = dog
             }
 
             editBreed.setOnClickListener {
@@ -177,8 +177,8 @@ class RegisterDogActivity : AppCompatActivity() {
                         ).show()
                         return@OnDateSetListener
                     }
-                    dogInfo.birth = birth
-                    dog = dogInfo
+                    dog = dog.copy(birth = birth)
+                    binding.dogInfo = dog
                 }
 
                 val datePicker = DatePickerDialog(
@@ -202,20 +202,27 @@ class RegisterDogActivity : AppCompatActivity() {
                 if(!networkChecker.isNetworkAvailable()) {
                     return@setOnClickListener
                 }
-                dogInfo.apply {
-                    if (editName.text.toString() == "" || editBreed.text == "" || editBirth.text == "" || editWeight.text.toString() == ""
-                        || gender == "" || neutering == "" || vaccination == ""
-                    ) {
-                        val builder = AlertDialog.Builder(this@RegisterDogActivity)
-                        builder.setTitle("빈칸이 남아있어요.")
-                        builder.setPositiveButton("확인", null)
-                        builder.show()
-                        return@setOnClickListener
-                    }
+
+                // 강아지 정보 업데이트
+                dog = dog.copy(
+                    name = editName.text.toString(),
+                    weight = editWeight.text.toString(),
+                    feature = editFeature.text.toString()
+                )
+
+                if (dog.name.isEmpty() || dog.breed.isEmpty() || dog.birth.isEmpty() ||
+                    dog.weight.isEmpty() || dog.gender.isEmpty() || dog.neutering.isEmpty() ||
+                    dog.vaccination.isEmpty()
+                ) {
+                    val builder = AlertDialog.Builder(this@RegisterDogActivity)
+                    builder.setTitle("빈칸이 남아있어요.")
+                    builder.setPositiveButton("확인", null)
+                    builder.show()
+                    return@setOnClickListener
                 }
 
-                if (beforeName != dogInfo.name) {
-                    if (MainActivity.dogNameList.contains(dogInfo.name)) {
+                if (beforeName != dog.name) {
+                    if (MainActivity.dogNameList.contains(dog.name)) {
                         Toast.makeText(
                             this@RegisterDogActivity,
                             "같은 이름의 강아지가 있어요!",
@@ -239,18 +246,16 @@ class RegisterDogActivity : AppCompatActivity() {
                 val listener = DialogInterface.OnClickListener { _, ans ->
                     when (ans) {
                         DialogInterface.BUTTON_POSITIVE -> {
-                            val loadingDialogFragment = LoadingDialogFragment()
-                            loadingDialogFragment.show(this@RegisterDogActivity.supportFragmentManager, "loading")
-                            lifecycleScope.launch { // 강아지 정보 등록
-                                withContext(Dispatchers.Main) {
-                                    val onFailed = registerDogViewModel.updateDogInfo(dogInfo, beforeName, imguri, walkRecords, MainActivity.dogUriList, MainActivity.dogNameList)
-                                    loadingDialogFragment.dismiss()
-                                    if (onFailed) {
-                                        Toast.makeText(this@RegisterDogActivity, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
-                                        goMain(false)
-                                    }
-                                    goMain(true)
-                                }
+                            showLoadingFragment()
+
+                            lifecycleScope.launch {
+                                registerDogViewModel.updateDog(
+                                    oldName = beforeName,
+                                    dog = dog,
+                                    imageUriString = imgUri?.toString(),
+                                    walkRecords = walkRecords,
+                                    existingDogNames = MainActivity.dogNameList
+                                )
                             }
                         }
                     }
@@ -273,8 +278,8 @@ class RegisterDogActivity : AppCompatActivity() {
                         DialogInterface.BUTTON_POSITIVE -> {
                             showLoadingFragment()
 
-                            lifecycleScope.launch { // 강아지 정보 등록
-                                registerDogViewModel.removeDogInfo(beforeName, MainActivity.dogUriList)
+                            lifecycleScope.launch { // 강아지 정보 삭제
+                                registerDogViewModel.deleteDog(beforeName)
                                 withContext(Dispatchers.Main) {
                                     hideLoadingDialog()
                                     goMain(true)
@@ -294,6 +299,35 @@ class RegisterDogActivity : AppCompatActivity() {
         }
     }
 
+    private fun setUpViewModelObservers() {
+        registerDogViewModel.isLoading.observe(this) { isLoading ->
+            if (isLoading) {
+                showLoadingFragment()
+            } else {
+                hideLoadingDialog()
+            }
+        }
+
+        // Observe ViewModel
+        registerDogViewModel.dogUpdated.observe(this) { isUpdated ->
+            if (isUpdated) {
+                goMain(true)
+            } else {
+                Toast.makeText(this, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                goMain(false)
+            }
+        }
+
+        registerDogViewModel.dogDeleted.observe(this) { isDeleted ->
+            if (isDeleted) {
+                goMain(true)
+            } else {
+                Toast.makeText(this, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                goMain(false)
+            }
+        }
+    }
+
     private fun pressImage(uri: Uri, context: Context): Uri {
         try {
             val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -309,7 +343,7 @@ class RegisterDogActivity : AppCompatActivity() {
             } else {
                 1.0f
             }
-            
+
             val targetWidth = (bitmap.width * ratio).toInt()
             val targetHeight = (bitmap.height * ratio).toInt()
 
@@ -358,7 +392,8 @@ class RegisterDogActivity : AppCompatActivity() {
         val dialog = DogListDialog()
         dialog.onClickItemListener = DogListDialog.OnClickItemListener {
             binding.editBreed.text = it
-            dogInfo.breed = it
+            dog = dog.copy(breed = it)
+            binding.dogInfo = dog
         }
         dialog.show(supportFragmentManager, "doglist")
     }

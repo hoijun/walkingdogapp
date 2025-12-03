@@ -34,17 +34,19 @@ class DateDialog : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val walkRecordList = userDataViewModel.walkDates.value?: hashMapOf()
+        val walkRecordList = userDataViewModel.walkHistory.value ?: hashMapOf()
         for(dog in MainActivity.dogNameList) {
-            for(date in walkRecordList[dog] ?: mutableListOf()) {
-                val dayInfo = date.day.split("-")
-                walkdates.add(
-                    CalendarDay.from(
-                        dayInfo[0].toInt(),
-                        dayInfo[1].toInt(),
-                        dayInfo[2].toInt()
-                    )
-                ) // 산책한 날 얻음
+            for(record in walkRecordList[dog] ?: mutableListOf()) {
+                val dayInfo = record.startTime.split(" ").firstOrNull()?.split("-") ?: continue
+                if (dayInfo.size >= 3) {
+                    walkdates.add(
+                        CalendarDay.from(
+                            dayInfo[0].toInt(),
+                            dayInfo[1].toInt(),
+                            dayInfo[2].toInt()
+                        )
+                    ) // 산책한 날 얻음
+                }
             }
         }
 

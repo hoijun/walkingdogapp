@@ -3,6 +3,7 @@ package com.tulmunchi.walkingdogapp.mypage
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,8 +16,8 @@ import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.FragmentDogInfoBinding
-import com.tulmunchi.walkingdogapp.datamodel.DogInfo
-import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
+import com.tulmunchi.walkingdogapp.domain.model.Dog
+import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterDogActivity
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,10 +60,10 @@ class DogInfoFragment : Fragment() {
         _binding = FragmentDogInfoBinding.inflate(inflater, container, false)
 
         val userDogInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable("doginfo", DogInfo::class.java) ?: DogInfo()
+            arguments?.getSerializable("doginfo", Dog::class.java)
         } else {
-            (arguments?.getSerializable("doginfo") ?: DogInfo()) as DogInfo
-        }
+            arguments?.getSerializable("doginfo") as? Dog
+        } ?: return binding.root  // Dog가 없으면 빈 화면 반환
 
         beforepage = arguments?.getString("before", "mypage") ?: "mypage"
 
@@ -81,21 +82,18 @@ class DogInfoFragment : Fragment() {
                     if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
                         return@setOnClickListener
                     }
-                    val registerDogIntent =
-                        Intent(ctx, RegisterDogActivity::class.java)
-                    val walkDateInfoArrayLists: ArrayList<WalkDateInfo> =
-                        (mainViewModel.walkDates.value?.get(userDogInfo.name)
-                            ?: mutableListOf()) as ArrayList<WalkDateInfo>
+                    val registerDogIntent = Intent(ctx, RegisterDogActivity::class.java)
+                    val walkRecords: ArrayList<WalkRecord> = ArrayList(mainViewModel.walkHistory.value?.get(userDogInfo.name) ?: emptyList())
                     registerDogIntent.putExtra("doginfo", userDogInfo)
                     registerDogIntent.putParcelableArrayListExtra(
                         "walkRecord",
-                        walkDateInfoArrayLists
+                        walkRecords
                     )
                     startActivity(registerDogIntent)
                 }
             }
 
-            val dogImg = mainViewModel.dogsImg.value?.get(userDogInfo.name)
+            val dogImg = MainActivity.dogImageUrls[userDogInfo.name]
             if (dogImg != null) {
                 context?.let { ctx ->
                     try {
@@ -104,10 +102,10 @@ class DogInfoFragment : Fragment() {
                             .format(DecodeFormat.PREFER_ARGB_8888)
                             .override(300, 300)
                             .error(R.drawable.collection_003) // 에러 시 기본 이미지
-                            .into(doginfoImage)
+                            .into(dogInfoImage)
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        doginfoImage.setImageResource(R.drawable.collection_003)
+                        dogInfoImage.setImageResource(R.drawable.collection_003)
                     }
                 }
             }

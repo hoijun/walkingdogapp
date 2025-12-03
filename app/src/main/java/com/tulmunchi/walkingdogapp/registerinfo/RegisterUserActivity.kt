@@ -17,11 +17,19 @@ import androidx.core.graphics.toColorInt
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.lifecycleScope
 import com.tulmunchi.walkingdogapp.MainActivity
+import com.tulmunchi.walkingdogapp.MainActivity.Companion.dogImageUrls
+import com.tulmunchi.walkingdogapp.MainActivity.Companion.dogNameList
+import com.tulmunchi.walkingdogapp.MainActivity.Companion.preFragment
+import com.tulmunchi.walkingdogapp.albumMap.AlbumMapFragment
+import com.tulmunchi.walkingdogapp.collection.CollectionFragment
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.core.ui.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.databinding.ActivityRegisterUserBinding
-import com.tulmunchi.walkingdogapp.datamodel.UserInfo
+import com.tulmunchi.walkingdogapp.domain.model.User
+import com.tulmunchi.walkingdogapp.mainhome.HomeFragment
+import com.tulmunchi.walkingdogapp.mypage.ManageDogsFragment
+import com.tulmunchi.walkingdogapp.mypage.MyPageFragment
 import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.viewmodel.RegisterUserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,28 +66,28 @@ class RegisterUserActivity : AppCompatActivity() {
 
         loadingDialog = loadingDialogFactory.create(supportFragmentManager)
 
-        val currentUserInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getSerializableExtra("userinfo", UserInfo::class.java)
-        } else {
-            intent.getSerializableExtra("userinfo") as UserInfo?
-        }
+        setupViewModelObservers()
 
-        val userInfo = currentUserInfo ?: UserInfo()
+        var currentUser = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra("userinfo", User::class.java)
+        } else {
+            intent.getSerializableExtra("userinfo") as? User
+        } ?: User("", "", "", "")
 
         binding.apply {
-            user = userInfo
+            user = currentUser
 
-            btnUserisfemale.setOnClickListener {
-                userInfo.gender = "여"
-                user = userInfo
+            btnUserIsFemale.setOnClickListener {
+                currentUser = currentUser.copy(gender = "여")
+                user = currentUser
             }
 
-            btnUserismale.setOnClickListener {
-                userInfo.gender = "남"
-                user = userInfo
+            btnUserIsMale.setOnClickListener {
+                currentUser = currentUser.copy(gender = "남")
+                user = currentUser
             }
 
-            editBirth.setOnClickListener {
+            editUserBirth.setOnClickListener {
                 val cal = Calendar.getInstance()
                 val dateCallback = DatePickerDialog.OnDateSetListener { _, year, month, day ->
                     val birth = "${year}/${month + 1}/${day}"
@@ -91,8 +99,8 @@ class RegisterUserActivity : AppCompatActivity() {
                         ).show()
                         return@OnDateSetListener
                     }
-                    userInfo.birth = birth
-                    user = userInfo
+                    currentUser = currentUser.copy(birth = birth)
+                    user = currentUser
                 }
 
                 val datePicker = DatePickerDialog(
@@ -107,10 +115,10 @@ class RegisterUserActivity : AppCompatActivity() {
             }
 
             registerUser.setOnClickListener {
-                if(!networkChecker.isNetworkAvailable()) {
+                if (!networkChecker.isNetworkAvailable()) {
                     return@setOnClickListener
                 }
-                userInfo.apply {
+                currentUser.apply {
                     if (editName.text.toString() == "" || birth == "" || gender == "") {
                         val builder = AlertDialog.Builder(this@RegisterUserActivity)
                         builder.setTitle("빈칸이 남아있어요.")
@@ -122,26 +130,15 @@ class RegisterUserActivity : AppCompatActivity() {
 
                 val builder = AlertDialog.Builder(this@RegisterUserActivity)
                 builder.setTitle("등록 할까요?")
+
                 val listener = DialogInterface.OnClickListener { _, ans ->
                     when (ans) {
                         DialogInterface.BUTTON_POSITIVE -> {
-                            showLoadingFragment()
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                try {
-                                    registerUserViewModel.updateUserInfo(userInfo)
-                                    withContext(Dispatchers.Main) {
-                                        hideLoadingDialog()
-                                        goHome()
-                                    }
-                                } catch (e: Exception) {
-                                    withContext(Dispatchers.Main) {
-                                        hideLoadingDialog()
-                                    }
-                                }
-                            }
+                            registerUserViewModel.updateUserInfo(currentUser)
                         }
                     }
                 }
+
                 builder.setPositiveButton("네", listener)
                 builder.setNegativeButton("아니요", null)
                 builder.show()
@@ -151,6 +148,22 @@ class RegisterUserActivity : AppCompatActivity() {
             btnBack.setOnClickListener {
                 selectGoMain()
             }
+        }
+    }
+
+    private fun setupViewModelObservers() {
+        registerUserViewModel.isLoading.observe(this) { isLoading ->
+            if (isLoading) showLoadingFragment() else hideLoadingDialog()
+        }
+
+        registerUserViewModel.userUpdated.observe(this) { userUpdated ->
+            if (userUpdated) {
+                Toast.makeText(this, "정보가 수정 되었습니다.", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+            }
+
+            goHome()
         }
     }
 

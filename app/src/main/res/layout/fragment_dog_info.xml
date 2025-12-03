@@ -6,7 +6,7 @@
     <data>
         <variable
             name="dogInfo"
-            type="com.tulmunchi.walkingdogapp.datamodel.DogInfo" />
+            type="com.tulmunchi.walkingdogapp.domain.model.Dog" />
     </data>
 
 
@@ -72,7 +72,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/dogInfo_top">
 
                 <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/doginfo_image"
+                    android:id="@+id/dogInfo_image"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_marginTop="20dp"
@@ -98,7 +98,7 @@
                     android:layout_height="0dp"
                     app:layout_constraintHeight_percent="0.025"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/doginfo_image"
+                    app:layout_constraintTop_toBottomOf="@id/dogInfo_image"
                     app:layout_constraintWidth_percent="1" />
 
                 <TextView
@@ -125,7 +125,7 @@
                     app:layout_constraintWidth_percent="0.08" />
 
                 <TextView
-                    android:id="@+id/doginfo_breed"
+                    android:id="@+id/dogInfo_breed"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
@@ -162,7 +162,7 @@
                     app:layout_constraintWidth_percent="0.08" />
 
                 <TextView
-                    android:id="@+id/doginfo_name"
+                    android:id="@+id/dogInfo_name"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
@@ -199,7 +199,7 @@
                     app:layout_constraintWidth_percent="0.08" />
 
                 <TextView
-                    android:id="@+id/doginfo_gender"
+                    android:id="@+id/dogInfo_gender"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
@@ -236,7 +236,7 @@
                     app:layout_constraintWidth_percent="0.08" />
 
                 <TextView
-                    android:id="@+id/doginfo_birth"
+                    android:id="@+id/dogInfo_birth"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
@@ -273,7 +273,7 @@
                     app:layout_constraintWidth_percent="0.08" />
 
                 <TextView
-                    android:id="@+id/doginfo_neutering"
+                    android:id="@+id/dogInfo_neutering"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
@@ -310,7 +310,7 @@
                     app:layout_constraintWidth_percent="0.08" />
 
                 <TextView
-                    android:id="@+id/doginfo_vaccination"
+                    android:id="@+id/dogInfo_vaccination"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
@@ -347,7 +347,7 @@
                     app:layout_constraintWidth_percent="0.08" />
 
                 <TextView
-                    android:id="@+id/doginfo_weight"
+                    android:id="@+id/dogInfo_weight"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
@@ -385,7 +385,7 @@
                     app:layout_constraintWidth_percent="0.08" />
 
                 <TextView
-                    android:id="@+id/doginfo_feature"
+                    android:id="@+id/dogInfo_feature"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"

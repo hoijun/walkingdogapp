@@ -38,7 +38,7 @@ class CollectionFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        collectionWhether = mainViewModel.collectionWhether.value ?: Utils.item_whether
+        collectionWhether = HashMap(mainViewModel.collections.value ?: Utils.item_whether)
         collections = Utils.collectionMap.values.toList().sortedBy { it.collectionNum }
 
         context?.let { ctx ->
@@ -69,7 +69,7 @@ class CollectionFragment : Fragment() {
 
         val adapter = CollectionListAdapter(collections, collectionWhether)
         adapter.itemClickListener = CollectionListAdapter.OnItemClickListener { collection ->
-            if (mainViewModel.collectionWhether.value?.get(collection.collectionNum) == true) {
+            if (mainViewModel.collections.value?.get(collection.collectionNum) == true) {
                 val detailCollectionDialog = DetailCollectionDialog().apply {
                     val bundle = Bundle()
                     bundle.putSerializable("collectionInfo", collection)
@@ -99,11 +99,9 @@ class CollectionFragment : Fragment() {
                 }
 
                 this.setOnRefreshListener {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        mainViewModel.observeUser()
-                    }
+                    mainViewModel.loadUserData()
                 }
-                mainViewModel.successGetData.observe(viewLifecycleOwner) {
+                mainViewModel.dataLoadSuccess.observe(viewLifecycleOwner) {
                     refresh.isRefreshing = false
                 }
             }

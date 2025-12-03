@@ -1,30 +1,30 @@
 package com.tulmunchi.walkingdogapp.viewmodel
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
-import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.maps.model.LatLng
-import com.tulmunchi.walkingdogapp.datamodel.AlarmDataModel
-import com.tulmunchi.walkingdogapp.datamodel.DogInfo
+import androidx.lifecycle.viewModelScope
+import com.naver.maps.geometry.LatLng
+import com.tulmunchi.walkingdogapp.core.location.LocationProvider
 import com.tulmunchi.walkingdogapp.datamodel.GalleryImgInfo
-import com.tulmunchi.walkingdogapp.datamodel.TotalWalkInfo
-import com.tulmunchi.walkingdogapp.datamodel.UserInfo
-import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
-import com.tulmunchi.walkingdogapp.repository.UserInfoRepository
+import com.tulmunchi.walkingdogapp.domain.model.Alarm
+import com.tulmunchi.walkingdogapp.domain.model.Dog
+import com.tulmunchi.walkingdogapp.domain.model.User
+import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
+import com.tulmunchi.walkingdogapp.domain.model.WalkStats
+import com.tulmunchi.walkingdogapp.domain.usecase.LoadInitialDataUseCase
+import com.tulmunchi.walkingdogapp.domain.usecase.alarm.AddAlarmUseCase
+import com.tulmunchi.walkingdogapp.domain.usecase.alarm.DeleteAlarmUseCase
+import com.tulmunchi.walkingdogapp.domain.usecase.alarm.GetAllAlarmsUseCase
+import com.tulmunchi.walkingdogapp.domain.usecase.alarm.ToggleAlarmUseCase
+import com.tulmunchi.walkingdogapp.domain.usecase.user.DeleteAccountUseCase
+import com.tulmunchi.walkingdogapp.presentation.ui.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Locale
@@ -33,157 +33,239 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val repository: UserInfoRepository,
-    private val fusedLocationProviderClient: FusedLocationProviderClient
-) : ViewModel() {
-    private val _dogsInfo = MutableLiveData<List<DogInfo>>()
-    private val _userInfo = MutableLiveData<UserInfo>()
-    private val _totalTotalWalkInfo = MutableLiveData<TotalWalkInfo>()
-    private val _walkDates = MutableLiveData<HashMap<String, MutableList<WalkDateInfo>>>()
-    private val _collectionWhether = MutableLiveData<HashMap<String, Boolean>>()
-    private val _dogsImg = MutableLiveData<HashMap<String, Uri>>()
+    private val loadInitialDataUseCase: LoadInitialDataUseCase,
+    private val getAllAlarmsUseCase: GetAllAlarmsUseCase,
+    private val addAlarmUseCase: AddAlarmUseCase,
+    private val deleteAlarmUseCase: DeleteAlarmUseCase,
+    private val toggleAlarmUseCase: ToggleAlarmUseCase,
+    private val deleteAccountUseCase: DeleteAccountUseCase,
+    private val locationProvider: LocationProvider
+) : BaseViewModel() {
+
+    // User data
+    private val _user = MutableLiveData<User?>()
+    val user: LiveData<User?> get() = _user
+
+    // Dogs data
+    private val _dogs = MutableLiveData<List<Dog>>()
+    val dogs: LiveData<List<Dog>> get() = _dogs
+
+
     private val _dogNames = MutableLiveData<List<String>>()
-    private val _successGetData = MutableLiveData<Boolean>()
+    val dogNames: LiveData<List<String>> get() = _dogNames
 
+    private val _dogImages = MutableLiveData<Map<String, String>>()
+    val dogImages: LiveData<Map<String, String>> get() = _dogImages
+
+    // Walk data
+    private val _totalWalkStats = MutableLiveData<WalkStats>()
+    val totalWalkStats: LiveData<WalkStats> get() = _totalWalkStats
+
+    private val _walkHistory = MutableLiveData<Map<String, List<WalkRecord>>>()
+    val walkHistory: LiveData<Map<String, List<WalkRecord>>> get() = _walkHistory
+
+    // Collections
+    private val _collections = MutableLiveData<Map<String, Boolean>>()
+    val collections: LiveData<Map<String, Boolean>> get() = _collections
+
+    // Alarms
+    private val _alarms = MutableLiveData<List<Alarm>>()
+    val alarms: LiveData<List<Alarm>> get() = _alarms
+
+    // Location
     private val _currentCoord = MutableLiveData<LatLng>()
+    val currentCoord: LiveData<LatLng> get() = _currentCoord
+
     private val _currentRegion = MutableLiveData<String>()
+    val currentRegion: LiveData<String> get() = _currentRegion
+
+    // Success flags
+    private val _dataLoadSuccess = MutableLiveData<Boolean>()
+    val dataLoadSuccess: LiveData<Boolean> get() = _dataLoadSuccess
+
+    // Album images
     private val _albumImgs = MutableLiveData<List<GalleryImgInfo>>()
-    private val _successGetImg = MutableLiveData(false)
+    val albumImgs: LiveData<List<GalleryImgInfo>> get() = _albumImgs
 
-    val currentCoord: LiveData<LatLng>
-        get() = _currentCoord
+    /**
+     * Load all initial user data
+     */
+    fun loadUserData(loadImages: Boolean = true) {
+        viewModelScope.launch {
+            _isLoading.value = true
 
-    val dogsInfo: LiveData<List<DogInfo>>
-        get() = _dogsInfo
+            loadInitialDataUseCase(loadImages).handle(
+                onSuccess = { initialData ->
+                    _user.value = initialData.user
+                    _dogs.value = initialData.dogs
+                    _dogNames.value = initialData.dogs.map { it.name }
+                    _dogImages.value = initialData.dogImages
+                    _totalWalkStats.value = initialData.totalWalkStats
+                    _walkHistory.value = initialData.walkHistory
+                    _collections.value = initialData.collections
+                    _alarms.value = initialData.alarms
+                    _dataLoadSuccess.value = true
+                    _isLoading.value = false
+                },
+                onError = {
+                    _dataLoadSuccess.value = false
+                    _isLoading.value = false
+                }
+            )
 
-    val userInfo: LiveData<UserInfo>
-        get() = _userInfo
-
-    val totalWalkInfo: LiveData<TotalWalkInfo>
-        get() = _totalTotalWalkInfo
-
-    val walkDates: LiveData<HashMap<String, MutableList<WalkDateInfo>>>
-        get() = _walkDates
-
-    val collectionWhether: LiveData<HashMap<String, Boolean>>
-        get() = _collectionWhether
-
-    val albumImgs: LiveData<List<GalleryImgInfo>>
-        get() = _albumImgs
-
-    val dogsImg: LiveData<HashMap<String, Uri>>
-        get() = _dogsImg
-
-    val dogsNames: LiveData<List<String>>
-        get() = _dogNames
-
-    val currentRegion: LiveData<String>
-        get() = _currentRegion
-
-    val successGetData: LiveData<Boolean>
-        get() = _successGetData
-
-    private val successGetImg: LiveData<Boolean>
-        get() = _successGetImg
-
-    fun isSuccessGetData(): Boolean = successGetData.value ?: false
-
-    fun isSuccessGetImg(): Boolean = successGetImg.value ?: false
-
-    fun setDogsImg(dogsImg: HashMap<String, Uri>) {
-        _dogsImg.value = dogsImg
+            // Load location
+            getLastLocation()
+        }
     }
 
-    fun saveAlbumImgs(albumImgs: List<GalleryImgInfo>) {
-        _albumImgs.value = albumImgs
+    /**
+     * Refresh only dog images
+     */
+    fun refreshDogImages() {
+        loadUserData(loadImages = true)
     }
 
-    fun deleteAlarm(alarm: AlarmDataModel) {
-        repository.delete(alarm)
-    }
-
-    fun addAlarm(alarm: AlarmDataModel) {
-        repository.add(alarm)
-    }
-
-    fun getAlarmList(): List<AlarmDataModel> {
-        return repository.getAll()
-    }
-
-    fun onOffAlarm(alarm: AlarmDataModel, isChecked: Boolean) {
-        repository.onOffAlarm(alarm.alarm_code, isChecked)
-    }
-
-    fun observeUser(isImgChanged: Boolean = true) {
-        CoroutineScope(Dispatchers.IO).launch {
-            repository.observeUser(
-                _dogsInfo,
-                _userInfo,
-                _totalTotalWalkInfo,
-                _walkDates,
-                _collectionWhether,
-                _dogsImg,
-                _dogNames,
-                _successGetData,
-                isImgChanged,
-                _successGetImg
+    /**
+     * Get all alarms
+     */
+    fun loadAlarms() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            getAllAlarmsUseCase().handle(
+                onSuccess = { alarms ->
+                    _alarms.value = alarms
+                    _isLoading.value = false
+                }
             )
         }
-        getLastLocation()
     }
 
-    suspend fun removeAccount() : Boolean {
-        return repository.removeAccount()
-    }
-
-    private fun updateLocateInfo(input: LatLng) {
-        _currentCoord.value = input
-    }
-
-
-    // 현재 좌표
-    fun getLastLocation() {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED
-        ) {
-            fusedLocationProviderClient.lastLocation.addOnSuccessListener {
-                if (it != null) {
-                    updateLocateInfo(LatLng(it.latitude, it.longitude))
-                    getCurrentAddress(LatLng(it.latitude, it.longitude))
+    /**
+     * Add new alarm
+     */
+    fun addAlarm(alarm: Alarm) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            addAlarmUseCase(alarm).handle(
+                onSuccess = {
+                    loadAlarms()
+                    _isLoading.value = false
                 }
+            )
+        }
+    }
+
+    /**
+     * Delete alarm
+     */
+    fun deleteAlarm(alarmCode: Int) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            deleteAlarmUseCase(alarmCode).handle(
+                onSuccess = {
+                    loadAlarms()
+                    _isLoading.value = false
+                }
+            )
+        }
+    }
+
+    /**
+     * Toggle alarm on/off
+     */
+    fun toggleAlarm(alarmCode: Int, isEnabled: Boolean) {
+        viewModelScope.launch {
+            toggleAlarmUseCase(alarmCode, isEnabled).handle(
+                onSuccess = {
+                    loadAlarms()
+                }
+            )
+        }
+    }
+
+    /**
+     * Delete user account
+     */
+    suspend fun deleteAccount(): Boolean {
+        return try {
+            deleteAccountUseCase().isSuccess
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Get current location
+     */
+    fun getLastLocation() {
+        viewModelScope.launch {
+            locationProvider.getLastLocation()?.let { latLng ->
+                _currentCoord.value = latLng
+                getCurrentAddress(latLng)
             }
         }
     }
 
-    // 현재 좌표를 주소로 변경
+    /**
+     * Check if data has been successfully loaded
+     */
+    fun isSuccessGetData(): Boolean {
+        return _dataLoadSuccess.value == true
+    }
+
+    /**
+     * Save album images
+     */
+    fun saveAlbumImgs(images: List<GalleryImgInfo>) {
+        _albumImgs.value = images
+    }
+
+    /**
+     * Convert coordinates to address
+     */
     private fun getCurrentAddress(coord: LatLng) {
         val geocoder = Geocoder(context, Locale.getDefault())
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             try {
                 val addresses: MutableList<Address> = geocoder.getFromLocation(
                     coord.latitude,
-                    coord.longitude, 7) ?: mutableListOf()
-                val address = addresses[0].getAddressLine(0).split(" ").takeLast(3)
-                val nameofLoc = address[0] + " " + address[1]
-                _currentRegion.postValue(nameofLoc)
-            } catch(e: IOException) {
+                    coord.longitude, 7
+                ) ?: mutableListOf()
+
+                if (addresses.isNotEmpty()) {
+                    val address = addresses[0].getAddressLine(0).split(" ").takeLast(3)
+                    val nameofLoc = address.getOrNull(0)?.let { first ->
+                        address.getOrNull(1)?.let { second ->
+                            "$first $second"
+                        }
+                    } ?: ""
+                    _currentRegion.postValue(nameofLoc)
+                }
+            } catch (e: IOException) {
                 _currentRegion.postValue("")
             }
         } else {
-            geocoder.getFromLocation(coord.latitude, coord.longitude,
-                7,
-                @RequiresApi(33) object :
-                Geocoder.GeocodeListener {
-                override fun onGeocode(addresses: MutableList<Address>) {
-                    val address = addresses[0].getAddressLine(0).split(" ").takeLast(3)
-                    val nameofLoc = address[0] + " " + address[1]
-                    _currentRegion.postValue(nameofLoc)
+            geocoder.getFromLocation(
+                coord.latitude, coord.longitude, 7,
+                @RequiresApi(33) object : Geocoder.GeocodeListener {
+                    override fun onGeocode(addresses: MutableList<Address>) {
+                        if (addresses.isNotEmpty()) {
+                            val address = addresses[0].getAddressLine(0).split(" ").takeLast(3)
+                            val nameofLoc = address.getOrNull(0)?.let { first ->
+                                address.getOrNull(1)?.let { second ->
+                                    "$first $second"
+                                }
+                            } ?: ""
+                            _currentRegion.postValue(nameofLoc)
+                        }
+                    }
+
+                    override fun onError(errorMessage: String?) {
+                        super.onError(errorMessage)
+                        _currentRegion.postValue("")
+                    }
                 }
-                override fun onError(errorMessage: String?) {
-                    super.onError(errorMessage)
-                    _currentRegion.postValue("")
-                }
-            })
+            )
         }
     }
 }

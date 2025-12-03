@@ -11,11 +11,11 @@ import com.bumptech.glide.load.DecodeFormat
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.HomedoglistItemBinding
-import com.tulmunchi.walkingdogapp.datamodel.DogInfo
+import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterDogActivity
 
 class HomeDogListAdapter(
-    private val dogsList: List<DogInfo>,
+    private val dogsList: List<Dog>,
     private val successGetData: Boolean,
     private val networkChecker: NetworkChecker
 ): RecyclerView.Adapter<HomeDogListAdapter.HomeDogListViewHolder>() {
@@ -44,12 +44,12 @@ class HomeDogListAdapter(
 
     inner class HomeDogListViewHolder(private val binding: HomedoglistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(dog: DogInfo) {
+        fun bind(dog: Dog) {
             binding.apply {
                 dogInfo = dog
                 homeAddDogBtn.visibility = View.GONE
-                if (MainActivity.dogUriList[dog.name] != null) {
-                    Glide.with(context).load(MainActivity.dogUriList[dog.name])
+                if (MainActivity.dogImageUrls[dog.name] != null) {
+                    Glide.with(context).load(MainActivity.dogImageUrls[dog.name])
                         .format(DecodeFormat.PREFER_ARGB_8888).override(500, 500).into(homeDogImage)
                 }
 

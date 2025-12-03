@@ -5,7 +5,7 @@
     <data>
         <variable
             name="dogInfo"
-            type="com.tulmunchi.walkingdogapp.datamodel.DogInfo" />
+            type="com.tulmunchi.walkingdogapp.domain.model.Dog" />
 
         <variable
             name="dogAge"
@@ -19,7 +19,7 @@
         android:paddingBottom="20dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/manage_dogimg"
+            android:id="@+id/manage_dogImg"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_marginStart="20dp"
@@ -33,12 +33,12 @@
             android:layout_marginStart="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHeight_percent="0.75"
-            app:layout_constraintStart_toEndOf="@+id/manage_dogimg"
+            app:layout_constraintStart_toEndOf="@+id/manage_dogImg"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_percent="0.4">
 
             <TextView
-                android:id="@+id/manage_dogname"
+                android:id="@+id/manage_dogName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center|start"
@@ -51,7 +51,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/manage_dogfeature"
+                android:id="@+id/manage_dogFeature"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -61,7 +61,7 @@
                 android:textStyle="bold"
                 app:layout_constraintHeight_percent="0.35"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/manage_dogname" />
+                app:layout_constraintTop_toBottomOf="@+id/manage_dogName" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

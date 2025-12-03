@@ -5,7 +5,12 @@
     <data>
         <variable
             name="selectDogInfo"
-            type="com.tulmunchi.walkingdogapp.datamodel.DogInfo" />
+            type="com.tulmunchi.walkingdogapp.domain.model.Dog" />
+
+        <variable
+            name="selectDogWalkStats"
+            type="com.tulmunchi.walkingdogapp.domain.model.WalkStats" />
+
         <variable
             name="viewmodel"
             type="com.tulmunchi.walkingdogapp.viewmodel.MainViewModel" />
@@ -135,7 +140,7 @@
                                 android:id="@+id/dogInfo_WalkCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text='@{"산책 횟수: " + viewmodel.walkDates.get(selectDogInfo.name).size + "회"}'
+                                android:text='@{"산책 횟수: " + viewmodel.walkHistory.get(selectDogInfo.name).size + "회"}'
                                 android:textColor="@color/black"
                                 android:textSize="18sp"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -146,7 +151,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="25dp"
-                                android:text="@{String.format(`산책 거리: %.1fkm`, selectDogInfo.totalWalkInfo.distance / 1000.0f)}"
+                                android:text="@{String.format(`산책 거리: %.1fkm`, selectDogWalkStats.distance / 1000.0f)}"
                                 android:textColor="@color/black"
                                 android:textSize="18sp"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -157,7 +162,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="25dp"
-                                android:text='@{"산책 시간: " + selectDogInfo.totalWalkInfo.time / 60 + "분"}'
+                                android:text='@{"산책 시간: " + selectDogWalkStats.time / 60 + "분"}'
                                 android:textColor="@color/black"
                                 android:textSize="18sp"
                                 app:layout_constraintStart_toStartOf="parent"

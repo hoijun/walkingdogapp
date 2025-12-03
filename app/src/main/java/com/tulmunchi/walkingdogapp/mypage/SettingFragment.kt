@@ -179,7 +179,7 @@ class SettingFragment : Fragment() {
 
                         lifecycleScope.launch {
                             if (email.contains("@naver.com")) { // 네이버로 로그인 했을 경우
-                                if (!mainViewModel.removeAccount()) {
+                                if (!mainViewModel.deleteAccount()) {
                                     toastMsg("탈퇴가 재대로 안됐어요..")
                                     hideLoadingDialog()
                                     return@launch
@@ -210,7 +210,7 @@ class SettingFragment : Fragment() {
                                     hideLoadingDialog()
                                 }
                             } else { // 카카오로 로그인 했을 경우
-                                if (!mainViewModel.removeAccount()) {
+                                if (!mainViewModel.deleteAccount()) {
                                     toastMsg("탈퇴가 재대로 안됐어요..")
                                     hideLoadingDialog()
                                     return@launch
@@ -308,9 +308,10 @@ class SettingFragment : Fragment() {
         context?.let { ctx ->
             val alarmFunctions = AlarmFunctions(ctx)
             coroutineScope.launch {
-                for (alarm in mainViewModel.getAlarmList()) {
-                    alarmFunctions.cancelAlarm(alarm.alarm_code)
-                    mainViewModel.deleteAlarm(alarm)
+                val alarms = mainViewModel.alarms.value ?: emptyList()
+                for (alarm in alarms) {
+                    alarmFunctions.cancelAlarm(alarm.alarmCode)
+                    mainViewModel.deleteAlarm(alarm.alarmCode)
                 }
             }
         }

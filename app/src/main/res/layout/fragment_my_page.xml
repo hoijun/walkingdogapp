@@ -6,7 +6,7 @@
     <data>
 
         <variable
-            name="viewmodel"
+            name="viewModel"
             type="com.tulmunchi.walkingdogapp.viewmodel.MainViewModel" />
 
         <variable
@@ -68,7 +68,7 @@
                     android:layout_height="0dp"
                     android:layout_marginStart="18dp"
                     android:gravity="center|start"
-                    android:text='@{viewmodel.UserInfo.name.empty ? "털뭉치" : viewmodel.UserInfo.name  + "님"}'
+                    android:text='@{viewModel.user.name.empty ? "털뭉치" : viewModel.user.name  + "님"}'
                     android:textColor="@color/black"
                     android:textSize="30sp"
                     android:textStyle="bold"
@@ -138,7 +138,7 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
-                    android:text='@{viewmodel.dogsInfo.size() + "마리"}'
+                    android:text='@{viewModel.dogs.size() + "마리"}'
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold"
@@ -164,7 +164,7 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
-                    android:text='@{@string/totaldistance(viewmodel.totalWalkInfo.distance / 1000.0f)}'
+                    android:text='@{@string/totaldistance(viewModel.totalWalkStats.distance / 1000.0f)}'
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold"
@@ -318,19 +318,20 @@
                         android:gravity="center"
                         android:textColor="@color/black"
                         android:textSize="15sp"
-                        app:dogs="@{viewmodel.dogsInfo}"
+                        app:dogs="@{viewModel.dogs}"
                         app:layout_constraintHeight_percent="0.33"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintWidth_percent="1"
-                        app:walkDates="@{viewmodel.walkDates}" />
+                        app:walkDates="@{viewModel.walkHistory}" />
+
 
                     <TextView
                         android:id="@+id/walk_distance"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center"
-                        android:text='@{@string/totaldistance(viewmodel.totalWalkInfo.distance / 1000.0f)}'
+                        android:text='@{@string/totaldistance(viewModel.totalWalkStats.distance / 1000.0f)}'
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         app:layout_constraintHeight_percent="0.33"
@@ -343,7 +344,7 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center"
-                        android:text='@{viewmodel.totalWalkInfo.time / 60 + "분"}'
+                        android:text='@{viewModel.totalWalkStats.time / 60 + "분"}'
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         app:layout_constraintHeight_percent="0.33"

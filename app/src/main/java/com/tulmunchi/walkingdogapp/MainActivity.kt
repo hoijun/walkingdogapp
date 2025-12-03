@@ -60,10 +60,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    companion object { // 다른 액티비티로 변경 시 어떤 프래그먼트에서 변경했는지 
+    companion object { // 다른 액티비티로 변경 시 어떤 프래그먼트에서 변경했는지
         var preFragment = "Home"
         var dogNameList = listOf<String>()
-        var dogUriList = HashMap<String, Uri>()
+        var dogImageUrls = HashMap<String, String>()  // Uri → String (URL)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -168,45 +168,47 @@ class MainActivity : AppCompatActivity() {
         }
 
         val isImgChanged = intent.getBooleanExtra("isImgChanged", true)
-        mainViewModel.observeUser(isImgChanged)
-        mainViewModel.successGetData.observe(this) {
-            try {
-                hideLoadingDialog()
-                dogNameList = mainViewModel.dogsNames.value ?: listOf()
-                if (mainViewModel.isSuccessGetImg()) {
-                    dogUriList = mainViewModel.dogsImg.value ?: hashMapOf()
-                } else {
-                    mainViewModel.setDogsImg(dogUriList)
+        setupViewModelObservers(isImgChanged)
+        mainViewModel.loadUserData(loadImages = isImgChanged)
+    }
+
+    private fun setupViewModelObservers(isImgChanged: Boolean) {
+        // 로딩 상태 관찰
+        mainViewModel.isLoading.observe(this) { isLoading ->
+            if (isLoading) showLoadingFragment() else hideLoadingDialog()
+        }
+
+        // 에러 관찰
+        mainViewModel.error.observe(this) { errorMessage ->
+            errorMessage?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                mainViewModel.clearError()
+            }
+        }
+
+        // 데이터 로드 성공 관찰
+        mainViewModel.dataLoadSuccess.observe(this) { success ->
+            if (success) {
+                try {
+                    // 강아지 이름 목록 저장
+                    dogNameList = mainViewModel.dogNames.value ?: listOf()
+
+                    // 강아지 이미지 URL 저장
+                    if (isImgChanged) dogImageUrls = HashMap(mainViewModel.dogImages.value ?: emptyMap())
+
+                } catch (e: Exception) {
+                    Toast.makeText(this, "데이터 로드 중 오류 발생", Toast.LENGTH_SHORT).show()
+                } finally {
+                    val targetFragment = when (preFragment) {
+                        "Mypage" -> MyPageFragment()
+                        "Home" -> HomeFragment()
+                        "Manage" -> ManageDogsFragment()
+                        "Collection" -> CollectionFragment()
+                        "AlbumMap" -> AlbumMapFragment()
+                        else -> HomeFragment()
+                    }
+                    changeFragment(targetFragment)
                 }
-            } catch (_: Exception) { }
-            finally {
-               val targetFragment = when (preFragment) {
-                    "Mypage" -> {
-                        MyPageFragment()
-                    }
-
-                    "Home" -> {
-                        HomeFragment()
-                    }
-
-                    "Manage" -> {
-                        ManageDogsFragment()
-                    }
-
-                    "Collection" -> {
-                        CollectionFragment()
-                    }
-
-                    "AlbumMap" -> {
-                        AlbumMapFragment()
-                    }
-
-                    else -> {
-                        HomeFragment()
-                    }
-                }
-
-                changeFragment(targetFragment)
             }
         }
     }

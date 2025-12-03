@@ -129,11 +129,9 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
 
             refresh.apply {
                 this.setOnRefreshListener {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        mainViewModel.observeUser()
-                    }
+                    mainViewModel.loadUserData()
                 }
-                mainViewModel.successGetData.observe(viewLifecycleOwner) {
+                mainViewModel.dataLoadSuccess.observe(viewLifecycleOwner) {
                     refresh.isRefreshing = false
                 }
             }

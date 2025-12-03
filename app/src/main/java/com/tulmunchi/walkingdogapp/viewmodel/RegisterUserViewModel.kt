@@ -1,14 +1,40 @@
 package com.tulmunchi.walkingdogapp.viewmodel
 
-import androidx.lifecycle.ViewModel
-import com.tulmunchi.walkingdogapp.datamodel.UserInfo
-import com.tulmunchi.walkingdogapp.repository.UserInfoRepository
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import com.tulmunchi.walkingdogapp.domain.model.User
+import com.tulmunchi.walkingdogapp.domain.usecase.user.UpdateUserInfoUseCase
+import com.tulmunchi.walkingdogapp.presentation.ui.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RegisterUserViewModel @Inject constructor(private val repository: UserInfoRepository): ViewModel() {
-    suspend fun updateUserInfo(userInfo: UserInfo) {
-        repository.updateUserInfo(userInfo)
+class RegisterUserViewModel @Inject constructor(
+    private val updateUserInfoUseCase: UpdateUserInfoUseCase
+) : BaseViewModel() {
+
+    private val _userUpdated = MutableLiveData<Boolean>()
+    val userUpdated: LiveData<Boolean> get() = _userUpdated
+
+    /**
+     * Update user information
+     */
+    fun updateUserInfo(user: User) {
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            updateUserInfoUseCase(user).handle(
+                onSuccess = {
+                    _userUpdated.value = true
+                    _isLoading.value = false
+                },
+                onError = {
+                    _userUpdated.value = false
+                    _isLoading.value = false
+                }
+            )
+        }
     }
 }

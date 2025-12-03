@@ -11,7 +11,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_HIGH
 import com.tulmunchi.walkingdogapp.R
-import com.tulmunchi.walkingdogapp.repository.UserInfoRepository
+import com.tulmunchi.walkingdogapp.domain.usecase.alarm.UpdateAlarmTimeUseCase
 import com.tulmunchi.walkingdogapp.splash.SplashActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +23,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AlarmReceiver: BroadcastReceiver() {
     @Inject
-    lateinit var userInfoRepository: UserInfoRepository
+    lateinit var updateAlarmTimeUseCase: UpdateAlarmTimeUseCase
 
     companion object{
         const val CHANNEL_ID = "WalkingDogApp_Channel"
@@ -96,7 +96,7 @@ class AlarmReceiver: BroadcastReceiver() {
         alarmFunctions.cancelAlarm(requestCode)
         alarmFunctions.callAlarm(calendar.timeInMillis, requestCode, weeks)
         CoroutineScope(Dispatchers.IO).launch {
-            userInfoRepository.updateAlarmTime(requestCode, calendar.timeInMillis)
+            updateAlarmTimeUseCase(requestCode, calendar.timeInMillis)
         }
     }
 }

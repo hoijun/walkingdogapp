@@ -129,6 +129,8 @@ class LoginActivity : AppCompatActivity() {
 
         loadingDialog = loadingDialogFactory.create(supportFragmentManager)
 
+        setupViewModelObservers()
+
         binding.apply {
             KakaoLoginBtn.setOnClickListener {
                 if (!networkChecker.isNetworkAvailable()) {
@@ -146,6 +148,44 @@ class LoginActivity : AppCompatActivity() {
                 }
                 setLoadingState(true)
                 NaverIdLoginSDK.authenticate(this@LoginActivity, naverLoginCallback)
+            }
+        }
+    }
+
+    private fun setupViewModelObservers() {
+        // 로딩 상태 관찰
+        loginViewModel.isLoading.observe(this) { isLoading ->
+            setLoadingState(isLoading)
+        }
+
+        // 에러 관찰
+        loginViewModel.error.observe(this) { errorMessage ->
+            errorMessage?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // 회원가입 성공 관찰
+        loginViewModel.signUpSuccess.observe(this) { success ->
+            lifecycleScope.launch(Dispatchers.Main) {
+                if (success) {
+                    setLoadingState(false)
+                    auth.currentUser?.email?.let { email ->
+                        saveEmail(email, "")
+                    }
+                    startMain()
+                } else {
+                    try {
+                        val uid = auth.currentUser?.uid
+                        val userRef = db.getReference("Users")
+                        userRef.child("$uid").removeValue().await()
+                    } catch (_: Exception) { }
+                    auth.currentUser?.delete()
+                    withContext(Dispatchers.Main) {
+                        toastFailSignUp("Firebase", "")
+                        setLoadingState(false)
+                    }
+                }
             }
         }
     }
@@ -232,30 +272,8 @@ class LoginActivity : AppCompatActivity() {
                     setLoadingState(true)
                     auth.createUserWithEmailAndPassword(myEmail, password).addOnCompleteListener {
                         if (agree) {
+                            saveEmail(myEmail, password)
                             loginViewModel.signUp(myEmail)
-                            loginViewModel.successSignUp.observe(this@LoginActivity) { success ->
-                                lifecycleScope.launch(Dispatchers.Main) {
-                                    if (success) {
-                                        setLoadingState(false)
-                                        saveEmail(myEmail, password)
-                                        startMain()
-                                        return@launch
-                                    }
-
-                                    try {
-                                        val uid = auth.currentUser?.uid
-                                        val userRef = db.getReference("Users")
-                                        userRef.child("$uid").removeValue().await()
-                                    } catch (_: Exception) { }
-                                    auth.currentUser?.delete()
-                                    withContext(Dispatchers.Main) {
-                                        toastFailSignUp("Firebase", "")
-                                        setLoadingState(false)
-                                        return@withContext
-                                    }
-                                    return@launch
-                                }
-                            }
                         }
                     }.addOnFailureListener { error ->
                         toastFailSignUp("Firebase", error.toString())
@@ -274,7 +292,6 @@ class LoginActivity : AppCompatActivity() {
             if (isFinishing || isDestroyed) return@addOnCompleteListener
 
             if (task.isSuccessful) {
-                loginViewModel.setUser()
                 startMain()
             } else {
                 Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()

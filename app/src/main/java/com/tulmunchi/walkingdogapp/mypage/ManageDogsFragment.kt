@@ -50,7 +50,7 @@ class ManageDogsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentManageDogsBinding.inflate(inflater,container, false)
-        val dogsList = mainViewModel.dogsInfo.value?: listOf()
+        val dogsList = mainViewModel.dogs.value?: listOf()
 
         val manageDogListAdapter = ManageDogListAdapter(dogsList)
         manageDogListAdapter.onItemClickListener = ManageDogListAdapter.OnItemClickListener {
@@ -77,11 +77,9 @@ class ManageDogsFragment : Fragment() {
                 }
 
                 this.setOnRefreshListener {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        mainViewModel.observeUser()
-                    }
+                    mainViewModel.loadUserData()
                 }
-                mainViewModel.successGetData.observe(viewLifecycleOwner) {
+                mainViewModel.dataLoadSuccess.observe(viewLifecycleOwner) {
                     refresh.isRefreshing = false
                 }
             }

@@ -11,19 +11,19 @@ import com.bumptech.glide.load.DecodeFormat
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.MypagedoglistItemBinding
-import com.tulmunchi.walkingdogapp.datamodel.DogInfo
+import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterDogActivity
 import com.tulmunchi.walkingdogapp.utils.Utils
 
 class MyPageDogListAdapter(
-    private val dogsList: List<DogInfo>,
+    private val dogsList: List<Dog>,
     private val successGetData: Boolean,
     private val networkChecker: NetworkChecker
 ): RecyclerView.Adapter<MyPageDogListAdapter.MyPageDogListViewHolder>() {
     private lateinit var context: Context
 
     fun interface OnItemClickListener {
-        fun onItemClick(dog: DogInfo)
+        fun onItemClick(dog: Dog)
     }
 
     var onItemClickListener: OnItemClickListener? = null
@@ -60,14 +60,14 @@ class MyPageDogListAdapter(
             }
         }
 
-        fun bind(dog: DogInfo) {
+        fun bind(dog: Dog) {
             binding.apply {
-                mypageAddDogBtn.visibility = View.GONE
+                myPageAddDogBtn.visibility = View.GONE
                 dogInfo = dog
                 dogAge = Utils.getAge(dog.birth)
 
-                if (MainActivity.dogUriList[dog.name] != null) {
-                    Glide.with(context).load(MainActivity.dogUriList[dog.name])
+                if (MainActivity.dogImageUrls[dog.name] != null) {
+                    Glide.with(context).load(MainActivity.dogImageUrls[dog.name])
                         .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(menuDogimg)
                 }
                 root.setOnClickListener {

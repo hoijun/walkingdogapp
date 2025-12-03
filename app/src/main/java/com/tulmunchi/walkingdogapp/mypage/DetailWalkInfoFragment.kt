@@ -21,8 +21,8 @@ import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.databinding.FragmentDetailWalkInfoBinding
 import com.tulmunchi.walkingdogapp.datamodel.CollectionInfo
-import com.tulmunchi.walkingdogapp.datamodel.DogInfo
-import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
+import com.tulmunchi.walkingdogapp.domain.model.Dog
+import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
 import com.tulmunchi.walkingdogapp.utils.Utils
 import com.tulmunchi.walkingdogapp.walking.CurrentCollectionItemListAdapter
 
@@ -34,7 +34,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
     private var walkPath = PathOverlay()
     private lateinit var camera : CameraUpdate
     private var day = listOf<String>()
-    private var walkDateInfo = WalkDateInfo()
+    private var walkRecord: WalkRecord? = null
 
     private var mainActivity: MainActivity? = null
     private val callback = object : OnBackPressedCallback(true) {
@@ -64,10 +64,10 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
     ): View {
         _binding = FragmentDetailWalkInfoBinding.inflate(inflater,container, false)
 
-        walkDateInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable("selectDateRecord", WalkDateInfo::class.java)?: WalkDateInfo()
+        walkRecord = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelable("selectDateRecord", WalkRecord::class.java)
         } else {
-            (arguments?.getSerializable("selectDateRecord") ?: WalkDateInfo()) as WalkDateInfo
+            arguments?.getParcelable("selectDateRecord")
         }
 
         val currentCollections = arrayListOf<CollectionInfo>()
@@ -76,7 +76,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             GridSpacingItemDecoration(3, Utils.dpToPx(20f, ctx))
         } ?: GridSpacingItemDecoration(3, 20) // 기본값
 
-        walkDateInfo.collections.toList().forEach {
+        walkRecord?.collections?.forEach {
             currentCollections.add(Utils.collectionMap[it]?: CollectionInfo())
         }
 
@@ -88,9 +88,9 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
                 goWalkInfo()
             }
 
-            day = walkDateInfo.day.split("-")
+            day = walkRecord?.day?.split("-") ?: listOf()
             walkDay = day
-            walkRecordInfo = walkDateInfo
+            walkRecordInfo = walkRecord
 
             val collectionAdapter = if (currentCollections.isEmpty()) CurrentCollectionItemListAdapter(emptyCollections) else CurrentCollectionItemListAdapter(currentCollections)
             context?.let { ctx ->
@@ -131,7 +131,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
 
         val walkCoords = mutableListOf<LatLng>()
 
-        for (coord in walkDateInfo.coords) {
+        walkRecord?.coords?.forEach { coord ->
             walkCoords.add(LatLng(coord.latitude, coord.longitude))
         }
 
@@ -147,9 +147,9 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
 
     private fun goWalkInfo() {
         val selectDog = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable("selectDog", DogInfo::class.java)?: DogInfo()
+            arguments?.getSerializable("selectDog", Dog::class.java)?: Dog("", "", "", "", "", "", "", "", 0L)
         } else {
-            (arguments?.getSerializable("selectDog") ?: DogInfo()) as DogInfo
+            (arguments?.getSerializable("selectDog") ?: Dog("", "", "", "", "", "", "", "", 0L)) as Dog
         }
         val bundle = Bundle()
         bundle.putStringArrayList("selectDateRecord", day as ArrayList<String>)

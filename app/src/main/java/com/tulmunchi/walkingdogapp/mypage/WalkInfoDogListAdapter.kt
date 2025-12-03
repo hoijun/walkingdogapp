@@ -1,19 +1,18 @@
 package com.tulmunchi.walkingdogapp.mypage
 
 import android.content.Context
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.tulmunchi.walkingdogapp.databinding.WalkinfodoglistItemBinding
-import com.tulmunchi.walkingdogapp.datamodel.DogInfo
+import com.tulmunchi.walkingdogapp.domain.model.Dog
 
-class WalkInfoDogListAdapter(private val dogsInfo: List<DogInfo>, private val dogsImg: HashMap<String, Uri>):  RecyclerView.Adapter<WalkInfoDogListAdapter.WalkInfoDogListViewHolder>(){
+class WalkInfoDogListAdapter(private val dogsInfo: List<Dog>, private val dogsImg: Map<String, String>):  RecyclerView.Adapter<WalkInfoDogListAdapter.WalkInfoDogListViewHolder>(){
     private lateinit var context: Context
     fun interface OnItemClickListener {
-        fun onItemClick(dog: DogInfo)
+        fun onItemClick(dog: Dog)
     }
 
     var onItemClickListener: OnItemClickListener? = null
@@ -32,7 +31,7 @@ class WalkInfoDogListAdapter(private val dogsInfo: List<DogInfo>, private val do
 
     inner class WalkInfoDogListViewHolder(private val binding: WalkinfodoglistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(dog: DogInfo) {
+        fun bind(dog: Dog) {
             if (dogsImg.get(dog.name) != null) {
                 Glide.with(context).load(dogsImg.get(dog.name))
                     .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(binding.WalkInfoDogImg)

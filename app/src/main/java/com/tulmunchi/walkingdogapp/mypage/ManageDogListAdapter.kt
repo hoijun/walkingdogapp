@@ -1,6 +1,7 @@
 package com.tulmunchi.walkingdogapp.mypage
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -8,13 +9,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.databinding.ManagedoglistItemBinding
-import com.tulmunchi.walkingdogapp.datamodel.DogInfo
+import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.utils.Utils
 
-class ManageDogListAdapter(private val dogsList: List<DogInfo>): RecyclerView.Adapter<ManageDogListAdapter.ManageDogListViewHolder>() {
+class ManageDogListAdapter(private val dogsList: List<Dog>): RecyclerView.Adapter<ManageDogListAdapter.ManageDogListViewHolder>() {
     private lateinit var context: Context
     fun interface OnItemClickListener {
-        fun onItemClick(dog: DogInfo)
+        fun onItemClick(dog: Dog)
     }
 
     var onItemClickListener: OnItemClickListener? = null
@@ -33,14 +34,14 @@ class ManageDogListAdapter(private val dogsList: List<DogInfo>): RecyclerView.Ad
 
     inner class ManageDogListViewHolder(private val binding: ManagedoglistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(dog: DogInfo) {
+        fun bind(dog: Dog) {
             binding.apply {
                 dogInfo = dog
                 dogAge = Utils.getAge(dog.birth)
 
-                if (MainActivity.dogUriList[dog.name] != null) {
-                    Glide.with(context).load(MainActivity.dogUriList[dog.name])
-                        .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(manageDogimg)
+                if (MainActivity.dogImageUrls[dog.name] != null) {
+                    Glide.with(context).load(MainActivity.dogImageUrls[dog.name])
+                        .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(manageDogImg)
                 }
 
                 root.setOnClickListener {

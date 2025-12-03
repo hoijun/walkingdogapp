@@ -83,11 +83,9 @@ class HomeFragment : Fragment() {
 
             refresh.apply {
                 this.setOnRefreshListener {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        mainViewModel.observeUser()
-                    }
+                    mainViewModel.loadUserData()
                 }
-                mainViewModel.successGetData.observe(viewLifecycleOwner) {
+                mainViewModel.dataLoadSuccess.observe(viewLifecycleOwner) {
                     refresh.isRefreshing = false
                 }
             }
@@ -108,7 +106,7 @@ class HomeFragment : Fragment() {
                 }
             }
 
-            val dogsList = mainViewModel.dogsInfo.value ?: listOf()
+            val dogsList = mainViewModel.dogs.value ?: listOf()
             val homeDogListAdapter = HomeDogListAdapter(dogsList, mainViewModel.isSuccessGetData(), networkChecker)
             homeDogListAdapter.onClickDogListener =
                 HomeDogListAdapter.OnClickDogListener { dogName ->

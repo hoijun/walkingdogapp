@@ -24,9 +24,8 @@ import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentMyPageBinding
-import com.tulmunchi.walkingdogapp.datamodel.DogInfo
-import com.tulmunchi.walkingdogapp.datamodel.TotalWalkInfo
-import com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo
+import com.tulmunchi.walkingdogapp.domain.model.Dog
+import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
 import com.tulmunchi.walkingdogapp.gallery.GalleryFragment
 import com.tulmunchi.walkingdogapp.registerinfo.RegisterUserActivity
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
@@ -42,8 +41,6 @@ class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
-    private var totalWalkInfo = TotalWalkInfo()
-    private var walkdates = mutableListOf<WalkDateInfo>()
     private var mainActivity: MainActivity? = null
 
     @Inject
@@ -89,15 +86,6 @@ class MyPageFragment : Fragment() {
                 builder.show()
             }
         }
-
-        val walkRecordList = mainViewModel.walkDates.value?: hashMapOf()
-        for(dog in MainActivity.dogNameList) {
-            for(date in walkRecordList[dog] ?: listOf()) {
-                walkdates.add(date)
-            }
-        }
-
-        walkdates = walkdates.toMutableSet().toMutableList()
     }
 
     override fun onCreateView(
@@ -105,19 +93,16 @@ class MyPageFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMyPageBinding.inflate(inflater,container, false)
-        totalWalkInfo = mainViewModel.totalWalkInfo.value ?: TotalWalkInfo()
 
         binding.apply {
-            viewmodel = mainViewModel
+            viewModel = mainViewModel
             lifecycleOwner = viewLifecycleOwner
 
             refresh.apply {
                 this.setOnRefreshListener {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        mainViewModel.observeUser()
-                    }
+                    mainViewModel.loadUserData()
                 }
-                mainViewModel.successGetData.observe(viewLifecycleOwner) {
+                mainViewModel.dataLoadSuccess.observe(viewLifecycleOwner) {
                     refresh.isRefreshing = false
                 }
             }
@@ -138,7 +123,7 @@ class MyPageFragment : Fragment() {
                 mainActivity?.changeFragment(SettingFragment())
             }
 
-            val dogsList = mainViewModel.dogsInfo.value ?: listOf()
+            val dogsList = mainViewModel.dogs.value ?: listOf()
             val myPageDogListAdapter = MyPageDogListAdapter(dogsList, mainViewModel.isSuccessGetData(), networkChecker)
             myPageDogListAdapter.onItemClickListener = MyPageDogListAdapter.OnItemClickListener {
                 context?.let { ctx ->
@@ -177,7 +162,7 @@ class MyPageFragment : Fragment() {
                     }
 
                     val registerUserIntent = Intent(ctx, RegisterUserActivity::class.java)
-                    registerUserIntent.putExtra("userinfo", mainViewModel.userInfo.value)
+                    registerUserIntent.putExtra("userinfo", mainViewModel.user.value)
                     startActivity(registerUserIntent)
                 }
             }
@@ -277,11 +262,11 @@ class MyPageFragment : Fragment() {
     object MyPageBindingAdapter {
         @BindingAdapter("walkDates", "dogs")
         @JvmStatic
-        fun setWalkCountText(textView: TextView, walkDates: HashMap<String, MutableList<WalkDateInfo>>?, dogs: List<DogInfo>?) {
+        fun setWalkCountText(textView: TextView, walkDates: Map<String, List<WalkRecord>>?, dogs: List<Dog>?) {
             if (walkDates != null && dogs != null) {
-                val totalWalk = mutableListOf<WalkDateInfo>()
+                val totalWalk = mutableListOf<WalkRecord>()
                 for (dog in dogs) {
-                    totalWalk.addAll(walkDates.get(dog.name) ?: mutableListOf())
+                    totalWalk.addAll(walkDates[dog.name] ?: listOf())
                 }
 
                 val counts = totalWalk.groupingBy { it }.eachCount()

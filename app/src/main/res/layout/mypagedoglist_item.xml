@@ -5,7 +5,7 @@
     <data>
         <variable
             name="dogInfo"
-            type="com.tulmunchi.walkingdogapp.datamodel.DogInfo" />
+            type="com.tulmunchi.walkingdogapp.domain.model.Dog" />
 
         <variable
             name="dogAge"
@@ -53,7 +53,7 @@
                 app:layout_constraintWidth_percent="0.4">
 
                 <TextView
-                    android:id="@+id/menu_dogname"
+                    android:id="@+id/menu_dogName"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center|start"
@@ -68,7 +68,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/menu_dogfeature"
+                    android:id="@+id/menu_dogFeature"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center|start"
@@ -79,7 +79,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHeight_percent="0.35"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/menu_dogname" />
+                    app:layout_constraintTop_toBottomOf="@+id/menu_dogName" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
@@ -99,7 +99,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
-            android:id="@+id/mypageAddDog_btn"
+            android:id="@+id/myPageAddDog_btn"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:src="@drawable/add"
