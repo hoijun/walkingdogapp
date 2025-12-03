@@ -1,24 +1,19 @@
 package com.tulmunchi.walkingdogapp.domain.model
 
+import java.io.Serializable
+
 /**
  * Domain model representing a dog
  */
 data class Dog(
-    val name: String,
-    val breed: String,
-    val gender: String,
-    val birth: String,
-    val neutering: String,
-    val vaccination: String,
-    val weight: String,
-    val feature: String,
-    val creationTime: Long
-)
-
-/**
- * Domain model representing a dog with its walk statistics
- */
-data class DogWithStats(
-    val dog: Dog,
-    val stats: WalkStats
-)
+    var name: String = "",
+    val breed: String = "",
+    val gender: String = "",
+    val birth: String = "",
+    val neutering: String = "",
+    val vaccination: String = "",
+    var weight: String = "",
+    var feature: String = "",
+    val creationTime: Long = 0L,
+    val dogWithStats: WalkStats = WalkStats()
+) : Serializable

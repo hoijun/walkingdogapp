@@ -17,11 +17,11 @@ interface FirebaseStorageDataSource {
     suspend fun getDogImageUrl(uid: String, dogName: String): Result<String>
     suspend fun getAllDogImageUrls(uid: String, dogNames: List<String>): Result<Map<String, String>>
     suspend fun deleteDogImage(uid: String, dogName: String): Result<Unit>
+    suspend fun copyDogImage(uid: String, oldName: String, newName: String): Result<Unit>
 }
 
 class FirebaseStorageDataSourceImpl @Inject constructor(
-    private val storage: FirebaseStorage,
-    private val auth: FirebaseAuth
+    private val storage: FirebaseStorage
 ) : FirebaseStorageDataSource {
 
     override suspend fun uploadDogImage(uid: String, dogName: String, imageUri: Uri): Result<String> {
@@ -72,6 +72,23 @@ class FirebaseStorageDataSourceImpl @Inject constructor(
         return try {
             val storageRef = storage.getReference(uid).child("images").child(dogName)
             storageRef.delete().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun copyDogImage(uid: String, oldName: String, newName: String): Result<Unit> {
+        return try {
+            val oldRef = storage.getReference(uid).child("images").child(oldName)
+            val newRef = storage.getReference(uid).child("images").child(newName)
+
+            // Download the old image
+            val bytes = oldRef.getBytes(Long.MAX_VALUE).await()
+
+            // Upload to new location
+            newRef.putBytes(bytes).await()
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

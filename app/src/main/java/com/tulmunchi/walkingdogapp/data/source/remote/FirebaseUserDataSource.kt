@@ -1,13 +1,10 @@
 package com.tulmunchi.walkingdogapp.data.source.remote
 
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.tulmunchi.walkingdogapp.data.model.UserDto
 import com.tulmunchi.walkingdogapp.data.model.WalkStatsDto
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Firebase DataSource for User operations
@@ -21,20 +18,19 @@ interface FirebaseUserDataSource {
 }
 
 class FirebaseUserDataSourceImpl @Inject constructor(
-    private val database: FirebaseDatabase,
-    private val auth: FirebaseAuth
+    private val database: FirebaseDatabase
 ) : FirebaseUserDataSource {
 
-    override suspend fun getUser(uid: String): Result<UserDto> = suspendCoroutine { cont ->
-        database.getReference("Users").child(uid).child("user")
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val user = snapshot.getValue(UserDto::class.java) ?: UserDto()
-                cont.resume(Result.success(user))
-            }
-            .addOnFailureListener { exception ->
-                cont.resume(Result.failure(exception))
-            }
+    override suspend fun getUser(uid: String): Result<UserDto> {
+        return try {
+            val snapshot = database.getReference("Users").child(uid).child("user")
+                .get()
+                .await()
+            val user = snapshot.getValue(UserDto::class.java) ?: UserDto()
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     override suspend fun saveUser(uid: String, user: UserDto): Result<Unit> {
@@ -81,15 +77,15 @@ class FirebaseUserDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getTotalWalkStats(uid: String): Result<WalkStatsDto> = suspendCoroutine { cont ->
-        database.getReference("Users").child(uid).child("totalWalkInfo")
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val stats = snapshot.getValue(WalkStatsDto::class.java) ?: WalkStatsDto()
-                cont.resume(Result.success(stats))
-            }
-            .addOnFailureListener { exception ->
-                cont.resume(Result.failure(exception))
-            }
+    override suspend fun getTotalWalkStats(uid: String): Result<WalkStatsDto> {
+        return try {
+            val snapshot = database.getReference("Users").child(uid).child("totalWalkInfo")
+                .get()
+                .await()
+            val stats = snapshot.getValue(WalkStatsDto::class.java) ?: WalkStatsDto()
+            Result.success(stats)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

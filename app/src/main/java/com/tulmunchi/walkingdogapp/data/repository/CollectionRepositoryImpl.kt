@@ -28,13 +28,6 @@ class CollectionRepositoryImpl @Inject constructor(
         return firebaseCollectionDataSource.getAllCollections(uid)
     }
 
-    override suspend fun updateCollections(collections: Map<String, Boolean>): Result<Unit> {
-        if (!networkChecker.isNetworkAvailable()) {
-            return Result.failure(DomainError.NetworkError())
-        }
-        return firebaseCollectionDataSource.updateCollections(uid, collections)
-    }
-
     override suspend fun isCollectionOwned(collectionNum: String): Result<Boolean> {
         if (!networkChecker.isNetworkAvailable()) {
             return Result.failure(DomainError.NetworkError())
