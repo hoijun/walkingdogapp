@@ -13,7 +13,7 @@ import android.widget.Toast
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import com.tulmunchi.walkingdogapp.databinding.SettingalarmDialogBinding
-import com.tulmunchi.walkingdogapp.datamodel.AlarmDataModel
+import com.tulmunchi.walkingdogapp.domain.model.Alarm
 import java.util.Calendar
 
 class SettingAlarmDialog : DialogFragment() {
@@ -21,8 +21,8 @@ class SettingAlarmDialog : DialogFragment() {
     private val binding get() = _binding!!
 
     interface OnAddAlarmListener {
-        fun onAddAlarm(alarm: AlarmDataModel)
-        fun onChangeAlarm(newAlarm: AlarmDataModel, oldAlarm: AlarmDataModel)
+        fun onAddAlarm(alarm: Alarm)
+        fun onChangeAlarm(newAlarm: Alarm, oldAlarm: Alarm)
     }
 
     var onAddAlarmListener: OnAddAlarmListener? = null
@@ -34,10 +34,11 @@ class SettingAlarmDialog : DialogFragment() {
     ): View {
         _binding = SettingalarmDialogBinding.inflate(inflater, container, false)
 
-        val alarmInfo = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable("alarmInfo", AlarmDataModel::class.java)
+        val alarmInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelable("alarmInfo", Alarm::class.java)
         } else {
-            (arguments?.getSerializable("alarmInfo") as AlarmDataModel?)
+            @Suppress("DEPRECATION")
+            arguments?.getParcelable("alarmInfo")
         }
 
         binding.apply {
@@ -57,7 +58,7 @@ class SettingAlarmDialog : DialogFragment() {
             saveAlarm.setOnClickListener {
                 val calendar = Calendar.getInstance()
 
-                val weeks = arrayOf(
+                val weeksList = listOf(
                     sunday.isChecked,
                     monday.isChecked,
                     tuesday.isChecked,
@@ -86,29 +87,29 @@ class SettingAlarmDialog : DialogFragment() {
                     hour.toString() + String.format("%02d", minute)
                 }
 
-                code += if (weeksToCode(weeks) == "") {
+                code += if (weeksToCode(weeksList) == "") {
                     Toast.makeText(requireContext(), "요일을 선택 해주세요!", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 } else {
-                    weeksToCode(weeks)
+                    weeksToCode(weeksList)
                 }
 
                 if (alarmInfo != null) {
                     onAddAlarmListener?.onChangeAlarm(
-                        AlarmDataModel(
-                            code.toInt(),
-                            calendar.timeInMillis,
-                            weeks,
-                            alarmInfo.alarmOn
+                        Alarm(
+                            alarmCode = code.toInt(),
+                            time = calendar.timeInMillis,
+                            weeks = weeksList,
+                            isEnabled = alarmInfo.isEnabled
                         ), alarmInfo
                     )
                 } else {
                     onAddAlarmListener?.onAddAlarm(
-                        AlarmDataModel(
-                            code.toInt(),
-                            calendar.timeInMillis,
-                            weeks,
-                            true
+                        Alarm(
+                            alarmCode = code.toInt(),
+                            time = calendar.timeInMillis,
+                            weeks = weeksList,
+                            isEnabled = true
                         )
                     )
                 }
@@ -139,7 +140,7 @@ class SettingAlarmDialog : DialogFragment() {
         this.dialog?.window?.attributes = params as WindowManager.LayoutParams
     }
 
-    private fun weeksToCode(weeks: Array<Boolean>): String {
+    private fun weeksToCode(weeks: List<Boolean>): String {
         var code = ""
         for (i: Int in weeks.indices) {
             if (weeks[i]) {

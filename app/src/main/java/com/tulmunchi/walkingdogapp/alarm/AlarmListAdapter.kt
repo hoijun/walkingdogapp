@@ -4,23 +4,23 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tulmunchi.walkingdogapp.databinding.AlarmlistItemBinding
-import com.tulmunchi.walkingdogapp.datamodel.AlarmDataModel
+import com.tulmunchi.walkingdogapp.domain.model.Alarm
 import java.util.Calendar
 
-class AlarmListAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerView.Adapter<AlarmListAdapter.AlarmItemListViewHolder>() {
+class AlarmListAdapter(private val alarmList: List<Alarm>) : RecyclerView.Adapter<AlarmListAdapter.AlarmItemListViewHolder>() {
 
     interface OnItemClickListener {
-        fun onItemClick(alarm: AlarmDataModel)
-        fun onItemLongClick(alarm: AlarmDataModel)
-        fun onItemClickInSelectMode(alarm: AlarmDataModel)
+        fun onItemClick(alarm: Alarm)
+        fun onItemLongClick(alarm: Alarm)
+        fun onItemClickInSelectMode(alarm: Alarm)
         fun onSwitchCheckedChangeListener(
-            alarm: AlarmDataModel,
+            alarm: Alarm,
             isChecked: Boolean
         )
     }
 
     private var selectMode = false
-    private val selectedItems = mutableListOf<AlarmDataModel>()
+    private val selectedItems = mutableListOf<Alarm>()
     var onItemClickListener: OnItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlarmItemListViewHolder {
@@ -55,7 +55,7 @@ class AlarmListAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerVi
             }
         }
 
-        fun bind(alarm: AlarmDataModel) {
+        fun bind(alarm: Alarm) {
             val alarmInfos = getAlarmInfo(alarm)
             var time = ""
             val hour = alarmInfos[0].toInt()
@@ -93,7 +93,7 @@ class AlarmListAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerVi
                     toggleSelection(alarmList[bindingAdapterPosition])
                 }
 
-                Onoff.isChecked = alarm.alarmOn
+                Onoff.isChecked = alarm.isEnabled
                 Onoff.setOnCheckedChangeListener { _, isChecked ->
                     onItemClickListener?.onSwitchCheckedChangeListener(
                         alarmList[bindingAdapterPosition],
@@ -104,7 +104,7 @@ class AlarmListAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerVi
         }
     }
 
-    private fun toggleSelection(alarm: AlarmDataModel) {
+    private fun toggleSelection(alarm: Alarm) {
         if (selectedItems.contains(alarm)) {
             selectedItems.remove(alarm)
         } else {
@@ -113,7 +113,7 @@ class AlarmListAdapter(private val alarmList: List<AlarmDataModel>) : RecyclerVi
         notifyItemRangeChanged(0, itemCount, null)
     }
 
-    private fun getAlarmInfo(alarm: AlarmDataModel): List<String> {
+    private fun getAlarmInfo(alarm: Alarm): List<String> {
         val time = alarm.time
         val setCalendar = Calendar.getInstance().apply {
             timeInMillis = time

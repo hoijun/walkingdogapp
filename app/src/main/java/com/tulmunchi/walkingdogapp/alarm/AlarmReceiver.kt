@@ -32,13 +32,15 @@ class AlarmReceiver: BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         val weeks = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent?.getSerializableExtra("week", Array<Boolean>::class.java)
-        } else
-            intent?.getSerializableExtra("week") as Array<Boolean>
+            intent?.getSerializableExtra("week", ArrayList::class.java) as? ArrayList<Boolean>
+        } else {
+            @Suppress("DEPRECATION", "UNCHECKED_CAST")
+            intent?.getSerializableExtra("week") as? ArrayList<Boolean>
+        }
 
         if (weeks != null) {
             val calendar = Calendar.getInstance()
-            if (!weeks.get(calendar.get(Calendar.DAY_OF_WEEK) - 1))
+            if (!weeks[calendar.get(Calendar.DAY_OF_WEEK) - 1])
                 return
         }
 

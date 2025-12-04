@@ -1,15 +1,15 @@
-package com.tulmunchi.walkingdogapp.database
+package com.tulmunchi.walkingdogapp.data.source.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.tulmunchi.walkingdogapp.datamodel.AlarmDao
-import com.tulmunchi.walkingdogapp.datamodel.AlarmDataModel
-import com.tulmunchi.walkingdogapp.datamodel.WeekListConverters
+import com.tulmunchi.walkingdogapp.data.source.local.entity.AlarmDao
+import com.tulmunchi.walkingdogapp.data.source.local.entity.AlarmEntity
+import com.tulmunchi.walkingdogapp.data.source.local.entity.WeekListConverters
 
-@Database(entities = [AlarmDataModel::class], version = 1, exportSchema = false)
+@Database(entities = [AlarmEntity::class], version = 1, exportSchema = false)
 @TypeConverters(WeekListConverters::class)
 abstract class LocalUserDatabase: RoomDatabase() {
     abstract fun alarmDao(): AlarmDao

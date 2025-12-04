@@ -12,7 +12,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
 import com.tulmunchi.walkingdogapp.MainActivity
 import com.tulmunchi.walkingdogapp.databinding.FragmentSettingAlarmBinding
-import com.tulmunchi.walkingdogapp.datamodel.AlarmDataModel
 import com.tulmunchi.walkingdogapp.domain.model.Alarm
 import com.tulmunchi.walkingdogapp.mainhome.HomeFragment
 import com.tulmunchi.walkingdogapp.viewmodel.MainViewModel
@@ -29,27 +28,11 @@ class SettingAlarmFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val binding get() = _binding!!
     private var mainActivity: MainActivity? = null
-    private var removeAlarmList = mutableListOf<AlarmDataModel>()
-    private var alarmList = mutableListOf<AlarmDataModel>()
+    private var removeAlarmList = mutableListOf<Alarm>()
+    private var alarmList = mutableListOf<Alarm>()
     private var adaptar: AlarmListAdapter? = null
     private var selectMode = false
     private var alarmFunctions: AlarmFunctions? = null
-
-    // Helper function to convert AlarmDataModel to Alarm
-    private fun AlarmDataModel.toAlarm() = Alarm(
-        alarmCode = this.alarm_code,
-        time = this.time,
-        weeks = this.weeks.toList(),
-        isEnabled = this.alarmOn
-    )
-
-    // Helper function to convert Alarm to AlarmDataModel
-    private fun Alarm.toAlarmDataModel() = AlarmDataModel(
-        alarm_code = this.alarmCode,
-        time = this.time,
-        weeks = this.weeks.toTypedArray(),
-        alarmOn = this.isEnabled
-    )
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -85,8 +68,8 @@ class SettingAlarmFragment : Fragment() {
                 val settingAlarmDialog = SettingAlarmDialog()
                 settingAlarmDialog.onAddAlarmListener =
                     object : SettingAlarmDialog.OnAddAlarmListener {
-                        override fun onAddAlarm(alarm: AlarmDataModel) {
-                            if (alarmList.any { it.alarm_code == alarm.alarm_code }) {
+                        override fun onAddAlarm(alarm: Alarm) {
+                            if (alarmList.any { it.alarmCode == alarm.alarmCode }) {
                                 return
                             }
 
@@ -94,10 +77,10 @@ class SettingAlarmFragment : Fragment() {
                                 coroutineScope.launch {
                                     functions.callAlarm(
                                         alarm.time,
-                                        alarm.alarm_code,
+                                        alarm.alarmCode,
                                         alarm.weeks
                                     )
-                                    mainViewModel.addAlarm(alarm.toAlarm())
+                                    mainViewModel.addAlarm(alarm)
                                     alarmList.add(alarm)
                                     alarmList.sortBy { alarmTimeToString(it.time).toInt() }
                                     withContext(Dispatchers.Main) {
@@ -108,8 +91,8 @@ class SettingAlarmFragment : Fragment() {
                         }
 
                         override fun onChangeAlarm(
-                            newAlarm: AlarmDataModel,
-                            oldAlarm: AlarmDataModel
+                            newAlarm: Alarm,
+                            oldAlarm: Alarm
                         ) {
                             return
                         }
@@ -125,42 +108,42 @@ class SettingAlarmFragment : Fragment() {
             }
 
             coroutineScope.launch {
-                alarmList = (mainViewModel.alarms.value?.map { it.toAlarmDataModel() } ?: emptyList()).sortedBy { alarmTimeToString(it.time).toInt() }.toMutableList()
+                alarmList = (mainViewModel.alarms.value ?: emptyList()).sortedBy { alarmTimeToString(it.time).toInt() }.toMutableList()
                 adaptar = AlarmListAdapter(alarmList)
                 withContext(Dispatchers.Main) {
                     adaptar?.onItemClickListener = object : AlarmListAdapter.OnItemClickListener {
-                        override fun onItemClick(alarm: AlarmDataModel) {
+                        override fun onItemClick(alarm: Alarm) {
                             val settingAlarmDialog = SettingAlarmDialog().apply {
                                 val bundle = Bundle()
-                                bundle.putSerializable("alarmInfo", alarm)
+                                bundle.putParcelable("alarmInfo", alarm)
                                 arguments = bundle
                             }
 
                             settingAlarmDialog.onAddAlarmListener =
                                 object : SettingAlarmDialog.OnAddAlarmListener {
-                                    override fun onAddAlarm(alarm: AlarmDataModel) {
+                                    override fun onAddAlarm(alarm: Alarm) {
                                         return
                                     }
 
                                     override fun onChangeAlarm(
-                                        newAlarm: AlarmDataModel,
-                                        oldAlarm: AlarmDataModel
+                                        newAlarm: Alarm,
+                                        oldAlarm: Alarm
                                     ) {
-                                        if (alarmList.any { it.alarm_code == newAlarm.alarm_code }) {
+                                        if (alarmList.any { it.alarmCode == newAlarm.alarmCode }) {
                                             return
                                         }
 
                                         alarmFunctions?.let { functions ->
                                             coroutineScope.launch {
-                                                functions.cancelAlarm(oldAlarm.alarm_code)
+                                                functions.cancelAlarm(oldAlarm.alarmCode)
 
-                                                mainViewModel.deleteAlarm(oldAlarm.alarm_code)
-                                                mainViewModel.addAlarm(newAlarm.toAlarm())
+                                                // 순차적으로 실행: 삭제 → 추가
+                                                mainViewModel.updateAlarm(oldAlarm.alarmCode, newAlarm)
 
-                                                if (oldAlarm.alarmOn) {
+                                                if (oldAlarm.isEnabled) {
                                                     functions.callAlarm(
                                                         newAlarm.time,
-                                                        newAlarm.alarm_code,
+                                                        newAlarm.alarmCode,
                                                         newAlarm.weeks,
                                                     )
                                                 }
@@ -191,7 +174,7 @@ class SettingAlarmFragment : Fragment() {
                             }
                         }
 
-                        override fun onItemLongClick(alarm: AlarmDataModel) {
+                        override fun onItemLongClick(alarm: Alarm) {
                             btnAlarmremove.visibility = View.VISIBLE
                             btnAddAlarm.visibility = View.GONE
                             selectMode = true
@@ -202,7 +185,7 @@ class SettingAlarmFragment : Fragment() {
                             }
                         }
 
-                        override fun onItemClickInSelectMode(alarm: AlarmDataModel) {
+                        override fun onItemClickInSelectMode(alarm: Alarm) {
                             if (removeAlarmList.contains(alarm)) {
                                 removeAlarmList.remove(alarm)
                             } else {
@@ -211,7 +194,7 @@ class SettingAlarmFragment : Fragment() {
                         }
 
                         override fun onSwitchCheckedChangeListener(
-                            alarm: AlarmDataModel,
+                            alarm: Alarm,
                             isChecked: Boolean
                         ) {
                             coroutineScope.launch {
@@ -227,14 +210,13 @@ class SettingAlarmFragment : Fragment() {
 
                                     alarmFunctions?.callAlarm(
                                         calendar.timeInMillis,
-                                        alarm.alarm_code,
+                                        alarm.alarmCode,
                                         alarm.weeks,
                                     )
                                 } else {
-                                    alarmFunctions?.cancelAlarm(alarm.alarm_code)
+                                    alarmFunctions?.cancelAlarm(alarm.alarmCode)
                                 }
-                                alarmList[alarmList.indexOf(alarm)].alarmOn = isChecked
-                                mainViewModel.toggleAlarm(alarm.alarm_code, isChecked)
+                                mainViewModel.toggleAlarm(alarm.alarmCode, isChecked)
                             }
                         }
                     }
@@ -284,8 +266,8 @@ class SettingAlarmFragment : Fragment() {
                     DialogInterface.BUTTON_POSITIVE -> {
                         coroutineScope.launch {
                             for (alarm in removeAlarmList) {
-                                functions.cancelAlarm(alarm.alarm_code)
-                                mainViewModel.deleteAlarm(alarm.alarm_code)
+                                functions.cancelAlarm(alarm.alarmCode)
+                                mainViewModel.deleteAlarm(alarm.alarmCode)
                             }
                             removeItems()
                             unSelectMode()

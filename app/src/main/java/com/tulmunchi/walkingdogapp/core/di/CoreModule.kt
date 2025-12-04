@@ -1,5 +1,8 @@
 package com.tulmunchi.walkingdogapp.core.di
 
+import android.content.Context
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.tulmunchi.walkingdogapp.core.datastore.UserPreferencesDataStore
 import com.tulmunchi.walkingdogapp.core.datastore.UserPreferencesDataStoreImpl
 import com.tulmunchi.walkingdogapp.core.location.LocationProvider
@@ -10,7 +13,9 @@ import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandlerImpl
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -55,4 +60,18 @@ abstract class CoreModule {
     @Binds
     @Singleton
     abstract fun bindUserPreferencesDataStore(impl: UserPreferencesDataStoreImpl): UserPreferencesDataStore
+
+    companion object {
+        /**
+         * FusedLocationProviderClient 제공
+         * Google Play Services의 위치 서비스 클라이언트
+         */
+        @Provides
+        @Singleton
+        fun provideFusedLocationProviderClient(
+            @ApplicationContext context: Context
+        ): FusedLocationProviderClient {
+            return LocationServices.getFusedLocationProviderClient(context)
+        }
+    }
 }

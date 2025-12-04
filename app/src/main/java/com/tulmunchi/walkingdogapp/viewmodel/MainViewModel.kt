@@ -130,11 +130,9 @@ class MainViewModel @Inject constructor(
      */
     fun loadAlarms() {
         viewModelScope.launch {
-            _isLoading.value = true
             getAllAlarmsUseCase().handle(
                 onSuccess = { alarms ->
                     _alarms.value = alarms
-                    _isLoading.value = false
                 }
             )
         }
@@ -167,6 +165,26 @@ class MainViewModel @Inject constructor(
                     _isLoading.value = false
                 }
             )
+        }
+    }
+
+    /**
+     * Update alarm (delete old and add new)
+     */
+    fun updateAlarm(oldAlarmCode: Int, newAlarm: Alarm) {
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            try {
+                // 순차적으로 실행: 삭제 → 추가
+                deleteAlarmUseCase(oldAlarmCode).getOrThrow()
+                addAlarmUseCase(newAlarm).getOrThrow()
+                loadAlarms()
+            } catch (e: Exception) {
+                _error.postValue("알람 수정에 실패했습니다")
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 
