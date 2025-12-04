@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.tulmunchi.walkingdogapp.viewmodel.MainViewModel" />
+            type="com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel" />
 
         <variable
             name="countImg"
@@ -18,7 +18,7 @@
         android:id="@+id/refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".mypage.MyPageFragment">
+        tools:context=".presentation.ui.mypage.myPagePage.MyPageFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

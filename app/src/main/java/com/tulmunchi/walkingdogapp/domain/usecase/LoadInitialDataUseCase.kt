@@ -1,8 +1,8 @@
 package com.tulmunchi.walkingdogapp.domain.usecase
 
 import com.tulmunchi.walkingdogapp.domain.model.Alarm
-import com.tulmunchi.walkingdogapp.domain.model.DomainError
 import com.tulmunchi.walkingdogapp.domain.model.Dog
+import com.tulmunchi.walkingdogapp.domain.model.DomainError
 import com.tulmunchi.walkingdogapp.domain.model.InitialData
 import com.tulmunchi.walkingdogapp.domain.model.User
 import com.tulmunchi.walkingdogapp.domain.model.WalkRecord

@@ -3,10 +3,8 @@ package com.tulmunchi.walkingdogapp.data.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.data.source.remote.FirebaseCollectionDataSource
-import com.tulmunchi.walkingdogapp.domain.model.Collection
 import com.tulmunchi.walkingdogapp.domain.model.DomainError
 import com.tulmunchi.walkingdogapp.domain.repository.CollectionRepository
-import com.tulmunchi.walkingdogapp.utils.Utils
 import javax.inject.Inject
 
 /**

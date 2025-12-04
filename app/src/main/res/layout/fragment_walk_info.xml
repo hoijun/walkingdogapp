@@ -13,13 +13,13 @@
 
         <variable
             name="viewmodel"
-            type="com.tulmunchi.walkingdogapp.viewmodel.MainViewModel" />
+            type="com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".mypage.WalkInfoFragment">
+        tools:context=".presentation.ui.mypage.walkInfoOfDogsPage.walkInfoWithCalendarPage.WalkInfoFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/walkinfo_top"

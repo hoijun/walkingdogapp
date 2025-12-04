@@ -1,0 +1,493 @@
+package com.tulmunchi.walkingdogapp.presentation.ui.register.registerDogPage
+
+import android.Manifest
+import android.app.DatePickerDialog
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.graphics.drawable.GradientDrawable
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.provider.MediaStore
+import android.provider.Settings
+import android.util.Log
+import android.webkit.MimeTypeMap
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
+import androidx.databinding.BindingAdapter
+import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DecodeFormat
+import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
+import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
+import com.tulmunchi.walkingdogapp.databinding.ActivityRegisterDogBinding
+import com.tulmunchi.walkingdogapp.domain.model.Dog
+import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
+import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.viewmodel.RegisterDogViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.util.Calendar
+import javax.inject.Inject
+
+@AndroidEntryPoint
+class RegisterDogActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityRegisterDogBinding
+    private var dog = Dog()
+    private var imgUri: Uri? = null
+    private val registerDogViewModel: RegisterDogViewModel by viewModels()
+
+    @Inject
+    lateinit var networkChecker: NetworkChecker
+
+    @Inject
+    lateinit var loadingDialogFactory: LoadingDialogFactory
+
+    @Inject
+    lateinit var permissionHandler: PermissionHandler
+
+    private var loadingDialog: LoadingDialog? = null
+
+    private val backPressCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            selectGoMain()
+        }
+    }
+
+    private val pickMedia = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            getExtension(uri)?.let { Log.d("extension", it) }
+        }
+        if (uri != null && getExtension(uri) == "jpg") {
+            imgUri = pressImage(uri,this)
+            Glide.with(this@RegisterDogActivity).load(uri)
+                .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(binding.registerImage)
+        } else {
+            return@registerForActivityResult
+        }
+    }
+
+    private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
+    } else {
+        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    }
+
+    private val storageCode = 99
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityRegisterDogBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        this.onBackPressedDispatcher.addCallback(this, backPressCallback)
+
+        loadingDialog = loadingDialogFactory.create(supportFragmentManager)
+
+        val userDog = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra("doginfo", Dog::class.java)
+        } else {
+            intent.getSerializableExtra("doginfo") as? Dog
+        }
+
+        val walkRecords: ArrayList<WalkRecord> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableArrayListExtra("walkRecord", WalkRecord::class.java) ?: arrayListOf()
+        } else {
+            intent.getParcelableArrayListExtra("walkRecord") ?: arrayListOf()
+        }
+
+        userDog?.let { dog = it }
+        val beforeName = dog.name
+        setUpViewModelObservers()
+
+
+        binding.apply {
+            dogInfo = dog
+            beforeDogName = beforeName
+
+            if (MainActivity.dogImageUrls[beforeName] != null) {
+                Glide.with(this@RegisterDogActivity).load(MainActivity.dogImageUrls[beforeName])
+                    .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(registerImage)
+            }
+
+            btnDogismale.setOnClickListener {
+                dog = dog.copy(gender = "남")
+                binding.dogInfo = dog
+            }
+
+            btnDogisfemale.setOnClickListener {
+                dog = dog.copy(gender = "여")
+                binding.dogInfo = dog
+            }
+
+            btnNeuteryes.setOnClickListener {
+                dog = dog.copy(neutering = "예")
+                binding.dogInfo = dog
+            }
+
+            btnNeuterno.setOnClickListener {
+                dog = dog.copy(neutering = "아니요")
+                binding.dogInfo = dog
+            }
+
+            btnVaccyes.setOnClickListener {
+                dog = dog.copy(vaccination = "예")
+                binding.dogInfo = dog
+            }
+
+            btnVaccno.setOnClickListener {
+                dog = dog.copy(vaccination = "아니요")
+                binding.dogInfo = dog
+            }
+
+            editBreed.setOnClickListener {
+                showDogList()
+            }
+
+            editBirth.setOnClickListener {
+                val cal = Calendar.getInstance()
+                val dateCallback = DatePickerDialog.OnDateSetListener { _, year, month, day ->
+                    val birth = "${year}/${month + 1}/${day}"
+                    if (DateUtils.getAge(birth) == -1) {
+                        Toast.makeText(
+                            this@RegisterDogActivity,
+                            "올바른 생일을 입력 해주세요!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@OnDateSetListener
+                    }
+                    dog = dog.copy(birth = birth)
+                    binding.dogInfo = dog
+                }
+
+                val datePicker = DatePickerDialog(
+                    this@RegisterDogActivity,
+                    dateCallback,
+                    cal.get(Calendar.YEAR),
+                    cal.get(Calendar.MONTH),
+                    cal.get(Calendar.DAY_OF_MONTH)
+                )
+                datePicker.datePicker.maxDate = cal.timeInMillis
+                datePicker.show()
+            }
+
+            registerImage.setOnClickListener {
+                if (checkPermission(storagePermission, storageCode)) {
+                    pickMedia.launch("image/jpeg")
+                }
+            }
+
+            registerDog.setOnClickListener {
+                if(!networkChecker.isNetworkAvailable()) {
+                    return@setOnClickListener
+                }
+
+                // 강아지 정보 업데이트
+                dog = dog.copy(
+                    name = editName.text.toString(),
+                    weight = editWeight.text.toString(),
+                    feature = editFeature.text.toString()
+                )
+
+                if (dog.name.isEmpty() || dog.breed.isEmpty() || dog.birth.isEmpty() ||
+                    dog.weight.isEmpty() || dog.gender.isEmpty() || dog.neutering.isEmpty() ||
+                    dog.vaccination.isEmpty()
+                ) {
+                    val builder = AlertDialog.Builder(this@RegisterDogActivity)
+                    builder.setTitle("빈칸이 남아있어요.")
+                    builder.setPositiveButton("확인", null)
+                    builder.show()
+                    return@setOnClickListener
+                }
+
+                if (beforeName != dog.name) {
+                    if (MainActivity.dogNameList.contains(dog.name)) {
+                        Toast.makeText(
+                            this@RegisterDogActivity,
+                            "같은 이름의 강아지가 있어요!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@setOnClickListener
+                    }
+                }
+
+                if(MainActivity.dogNameList.size > 2 && beforeName == "") {
+                    Toast.makeText(
+                        this@RegisterDogActivity,
+                        "3마리 까지 등록 가능해요!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+                }
+
+                val builder = AlertDialog.Builder(this@RegisterDogActivity)
+                builder.setTitle("등록 할까요?")
+                val listener = DialogInterface.OnClickListener { _, ans ->
+                    when (ans) {
+                        DialogInterface.BUTTON_POSITIVE -> {
+                            showLoadingFragment()
+
+                            lifecycleScope.launch {
+                                registerDogViewModel.updateDog(
+                                    oldName = beforeName,
+                                    dog = dog,
+                                    imageUriString = imgUri?.toString(),
+                                    walkRecords = walkRecords,
+                                    existingDogNames = MainActivity.dogNameList
+                                )
+                            }
+                        }
+                    }
+                }
+                builder.setPositiveButton("네", listener)
+                builder.setNegativeButton("아니요", null)
+                builder.show()
+                return@setOnClickListener
+            }
+
+            removeBtn.setOnClickListener {
+                if (beforeName == "") return@setOnClickListener
+                if(!networkChecker.isNetworkAvailable()) {
+                    return@setOnClickListener
+                }
+                val builder = AlertDialog.Builder(this@RegisterDogActivity)
+                builder.setTitle("정보를 삭제 하시겠어요?")
+                val listener = DialogInterface.OnClickListener { _, ans ->
+                    when (ans) {
+                        DialogInterface.BUTTON_POSITIVE -> {
+                            showLoadingFragment()
+
+                            lifecycleScope.launch { // 강아지 정보 삭제
+                                registerDogViewModel.deleteDog(beforeName)
+                                withContext(Dispatchers.Main) {
+                                    hideLoadingDialog()
+                                    goMain(true)
+                                }
+                            }
+                        }
+                    }
+                }
+                builder.setPositiveButton("네", listener)
+                builder.setNegativeButton("아니요", null)
+                builder.show()
+            }
+
+            btnBack.setOnClickListener {
+                selectGoMain()
+            }
+        }
+    }
+
+    private fun setUpViewModelObservers() {
+        registerDogViewModel.isLoading.observe(this) { isLoading ->
+            if (isLoading) {
+                showLoadingFragment()
+            } else {
+                hideLoadingDialog()
+            }
+        }
+
+        // Observe ViewModel
+        registerDogViewModel.dogUpdated.observe(this) { isUpdated ->
+            if (isUpdated) {
+                goMain(true)
+            } else {
+                Toast.makeText(this, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                goMain(false)
+            }
+        }
+
+        registerDogViewModel.dogDeleted.observe(this) { isDeleted ->
+            if (isDeleted) {
+                goMain(true)
+            } else {
+                Toast.makeText(this, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                goMain(false)
+            }
+        }
+    }
+
+    private fun pressImage(uri: Uri, context: Context): Uri {
+        try {
+            val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri))
+            } else {
+                MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+            }
+
+            val maxSize = 1400f
+
+            val ratio = if (maxOf(bitmap.width, bitmap.height) > maxSize) {
+                maxSize / maxOf(bitmap.width, bitmap.height)
+            } else {
+                1.0f
+            }
+
+            val targetWidth = (bitmap.width * ratio).toInt()
+            val targetHeight = (bitmap.height * ratio).toInt()
+
+            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true)
+            bitmap.recycle()
+
+            val tempFile = File.createTempFile("profile_img", ".jpg", context.cacheDir)
+            FileOutputStream(tempFile).use { fileOutputStream ->
+                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, fileOutputStream)
+                scaledBitmap.recycle()
+            }
+
+            return Uri.fromFile(tempFile)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return Uri.EMPTY
+        }
+    }
+
+    private fun selectGoMain() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("나가시겠어요?")
+        val listener = DialogInterface.OnClickListener { _, ans ->
+            when (ans) {
+                DialogInterface.BUTTON_POSITIVE -> {
+                    goMain(false)
+                }
+            }
+        }
+        builder.setPositiveButton("네", listener)
+        builder.setNegativeButton("아니요", null)
+        builder.show()
+    }
+
+    private fun goMain(isUpdateImg: Boolean) {
+        val backIntent = Intent(this, MainActivity::class.java).apply {
+            this.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            putExtra("isImgChanged", isUpdateImg)
+        }
+
+        startActivity(backIntent)
+        finish()
+    }
+
+    private fun showDogList() {
+        val dialog = DogListDialog()
+        dialog.onClickItemListener = DogListDialog.OnClickItemListener {
+            binding.editBreed.text = it
+            dog = dog.copy(breed = it)
+            binding.dogInfo = dog
+        }
+        dialog.show(supportFragmentManager, "doglist")
+    }
+
+    private fun getExtension(uri: Uri): String? { // 파일 확장자
+        val contentResolver = contentResolver
+        val mimeTypeMap = MimeTypeMap.getSingleton()
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri))
+    }
+
+    private fun showLoadingFragment() {
+        if (isFinishing || isDestroyed) {
+            return
+        }
+        loadingDialog?.show()
+    }
+
+    private fun hideLoadingDialog() {
+        if (isFinishing || isDestroyed) {
+            return
+        }
+        loadingDialog?.dismiss()
+    }
+
+    private fun checkPermission(permissions : Array<String>, code: Int) : Boolean{
+        return if (!permissionHandler.checkPermissions(this, permissions)) {
+            permissionHandler.requestPermissions(this, permissions, code)
+            false
+        } else {
+            true
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        when (requestCode) {
+            storageCode -> {
+                if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    val builder = AlertDialog.Builder(this)
+                    builder.setTitle("사진 설정을 위해 권한을 \n허용으로 해주세요!")
+                    val listener = DialogInterface.OnClickListener { _, ans ->
+                        when (ans) {
+                            DialogInterface.BUTTON_POSITIVE -> {
+                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                intent.data = Uri.fromParts("package", packageName, null)
+                                startActivity(intent)
+                            }
+                        }
+                    }
+                    builder.setPositiveButton("네", listener)
+                    builder.setNegativeButton("아니오", null)
+                    builder.show()
+                } else {
+                    pickMedia.launch("image/jpeg")
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    object RegisterDogBindingAdapter {
+        private fun setButtonBackground(btn: Button, state: String) {
+            val color = if (state == btn.text.toString()) "#ff444444" else "#ff888888"
+            val shape = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = 10f * btn.resources.displayMetrics.density  // 10dp를 픽셀로 변환
+                setColor(color.toColorInt())
+            }
+            btn.background = shape
+        }
+
+        @BindingAdapter("dogGender")
+        @JvmStatic
+        fun setGenderBackground(btn: Button, gender: String) {
+            setButtonBackground(btn, gender)
+        }
+
+        @BindingAdapter("dogNeutering")
+        @JvmStatic
+        fun setNeuteringBackground(btn: Button, neutering: String) {
+            setButtonBackground(btn, neutering)
+        }
+
+        @BindingAdapter("dogVaccination")
+        @JvmStatic
+        fun setVaccinationBackground(btn: Button, vaccination: String) {
+            setButtonBackground(btn, vaccination)
+        }
+
+        @BindingAdapter("dogNameLength")
+        @JvmStatic
+        fun setSelection(editText: EditText, length: Int) {
+            editText.setSelection(length)
+        }
+    }
+}

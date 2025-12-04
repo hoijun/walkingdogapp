@@ -1,7 +1,5 @@
 package com.tulmunchi.walkingdogapp.domain.repository
 
-import com.tulmunchi.walkingdogapp.domain.model.Collection
-
 /**
  * Repository interface for collection-related operations
  */

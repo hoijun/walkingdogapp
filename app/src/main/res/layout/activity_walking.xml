@@ -6,7 +6,7 @@
     <data>
         <variable
             name="WalkingService"
-            type="com.tulmunchi.walkingdogapp.walking.WalkingService" />
+            type="com.tulmunchi.walkingdogapp.presentation.ui.walking.WalkingService" />
 
         <variable
             name="isTrackingCameraMode"
@@ -16,7 +16,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".walking.WalkingActivity">
+        tools:context=".presentation.ui.walking.WalkingActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/walkingscreen"

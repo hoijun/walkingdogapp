@@ -7,7 +7,7 @@
 
         <variable
             name="viewmodel"
-            type="com.tulmunchi.walkingdogapp.viewmodel.MainViewModel" />
+            type="com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel" />
 
         <variable
             name="selectedDogs"
@@ -18,7 +18,7 @@
         android:id="@+id/refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".mainhome.HomeFragment">
+        tools:context=".presentation.ui.home.HomeFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
