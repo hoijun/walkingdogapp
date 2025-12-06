@@ -22,7 +22,6 @@ import com.tulmunchi.walkingdogapp.domain.usecase.alarm.GetAllAlarmsUseCase
 import com.tulmunchi.walkingdogapp.domain.usecase.alarm.ToggleAlarmUseCase
 import com.tulmunchi.walkingdogapp.domain.usecase.user.DeleteAccountUseCase
 import com.tulmunchi.walkingdogapp.presentation.model.GalleryImgInfo
-import com.tulmunchi.walkingdogapp.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -99,7 +98,7 @@ class MainViewModel @Inject constructor(
                     _user.value = initialData.user
                     _dogs.value = initialData.dogs
                     _dogNames.value = initialData.dogs.map { it.name }
-                    _dogImages.value = initialData.dogImages
+                    if (loadImages) _dogImages.value = initialData.dogImages
                     _totalWalkStats.value = initialData.totalWalkStats
                     _walkHistory.value = initialData.walkHistory
                     _collections.value = initialData.collections
@@ -123,6 +122,42 @@ class MainViewModel @Inject constructor(
      */
     fun refreshDogImages() {
         loadUserData(loadImages = true)
+    }
+
+    fun updateUser(updatedUser: User) {
+        viewModelScope.launch {
+            _user.value = updatedUser
+        }
+    }
+
+    fun updateDog(updatedDog: Dog, beforeName: String, uri: String?) {
+        viewModelScope.launch {
+            if (beforeName == updatedDog.name && uri == null) {
+                _dogs.value = _dogs.value?.map { if (it.name == beforeName) updatedDog else it }
+            }
+
+            if (beforeName != updatedDog.name && uri == null) {
+                _dogNames.value = _dogNames.value?.map { if (it == beforeName) updatedDog.name else it }
+                _dogs.value = _dogs.value?.map { if (it.name == beforeName) updatedDog else it }
+                _dogImages.value = _dogImages.value?.toMutableMap()?.apply {
+                    this[updatedDog.name] = this[beforeName] ?: ""
+                    this.remove(beforeName)
+                }
+            }
+
+            if (beforeName == updatedDog.name && uri != null) {
+                _dogImages.value = _dogImages.value?.toMutableMap()?.apply { this[beforeName] = uri }
+            }
+
+            if (beforeName != updatedDog.name && uri != null) {
+                _dogNames.value = _dogNames.value?.map { if (it == beforeName) updatedDog.name else it }
+                _dogs.value = _dogs.value?.map { if (it.name == beforeName) updatedDog else it }
+                _dogImages.value = _dogImages.value?.toMutableMap()?.apply {
+                    this[updatedDog.name] = uri
+                    this.remove(beforeName)
+                }
+            }
+        }
     }
 
     /**

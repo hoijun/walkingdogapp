@@ -207,7 +207,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/view2"
                         app:layout_constraintWidth_percent="1.0"
-                        app:isTracking="@{WalkingService.isTracking()}"/>
+                        app:isTracking="@{WalkingService.isTracking}"/>
 
                     <TextView
                         android:id="@+id/text_isTracking"
@@ -215,7 +215,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
                         android:gravity="center"
-                        android:text='@{WalkingService.isTracking() ? "산책중지" : "산책시작"}'
+                        android:text='@{WalkingService.isTracking ? "산책중지" : "산책시작"}'
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold"

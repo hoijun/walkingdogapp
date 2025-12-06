@@ -10,8 +10,8 @@ import android.view.WindowManager
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tulmunchi.walkingdogapp.presentation.core.dialog.WriteDialog
 import com.tulmunchi.walkingdogapp.databinding.DoglistDialogBinding
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.WriteDialog
 
 class DogListDialog : DialogFragment(){
     private var _binding: DoglistDialogBinding? = null

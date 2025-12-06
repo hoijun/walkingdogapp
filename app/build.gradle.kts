@@ -67,6 +67,15 @@ android {
     }
 
     buildTypes {
+        debug {
+            extra.set("enableCrashlytics", false)
+            extra.set("alwaysUpdateBuildId", false)
+            splits {
+                abi.isEnable = false
+                density.isEnable = false
+            }
+        }
+
         release {
             isMinifyEnabled = true
             isShrinkResources = true

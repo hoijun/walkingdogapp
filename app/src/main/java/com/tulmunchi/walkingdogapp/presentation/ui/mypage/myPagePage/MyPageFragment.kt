@@ -1,7 +1,6 @@
 package com.tulmunchi.walkingdogapp.presentation.ui.mypage.myPagePage
 
 import android.Manifest
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -22,13 +21,9 @@ import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentMyPageBinding
 import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
-import com.tulmunchi.walkingdogapp.presentation.ui.gallery.galleryPage.GalleryFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
-import com.tulmunchi.walkingdogapp.presentation.ui.mypage.settingPage.SettingFragment
-import com.tulmunchi.walkingdogapp.presentation.ui.mypage.dogInfoPafge.DogInfoFragment
-import com.tulmunchi.walkingdogapp.presentation.ui.mypage.manageDogPage.ManageDogsFragment
-import com.tulmunchi.walkingdogapp.presentation.ui.mypage.walkInfoOfDogsPage.walkInfoWithCalendarPage.WalkInfoFragment
-import com.tulmunchi.walkingdogapp.presentation.ui.register.registerUserPage.RegisterUserActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -46,6 +41,9 @@ class MyPageFragment : Fragment() {
 
     @Inject
     lateinit var permissionHandler: PermissionHandler
+
+    @Inject
+    lateinit var navigationManager: NavigationManager
 
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
@@ -72,8 +70,6 @@ class MyPageFragment : Fragment() {
         activity?.let {
             mainActivity = it as? MainActivity
         }
-
-        MainActivity.preFragment = "Mypage"  // 다른 액티비티로 이동 할 때 마이페이지에서 이동을 표시
 
         context?.let { ctx ->
             if (!networkChecker.isNetworkAvailable()) {
@@ -113,17 +109,15 @@ class MyPageFragment : Fragment() {
             })
 
             btnSetting.setOnClickListener {
-                context?.let { ctx ->
-                    if (!networkChecker.isNetworkAvailable()) {
-                        return@setOnClickListener
-                    }
+                if (!networkChecker.isNetworkAvailable()) {
+                    return@setOnClickListener
                 }
-                mainActivity?.changeFragment(SettingFragment())
+                navigationManager.navigateTo(NavigationState.WithoutBottomNav.Setting)
             }
 
             val dogsList = mainViewModel.dogs.value ?: listOf()
-            val myPageDogListAdapter =
-                MyPageDogListAdapter(dogsList, mainViewModel.isSuccessGetData(), networkChecker)
+            val dogImages = mainViewModel.dogImages.value ?: emptyMap()
+            val myPageDogListAdapter = MyPageDogListAdapter(dogsList, mainViewModel.isSuccessGetData(), networkChecker, dogImages)
             myPageDogListAdapter.onItemClickListener = MyPageDogListAdapter.OnItemClickListener {
                 context?.let { ctx ->
                     if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
@@ -131,45 +125,45 @@ class MyPageFragment : Fragment() {
                     }
                 }
 
-                val dogInfoFragment = DogInfoFragment().apply {
-                    val bundle = Bundle()
-                    bundle.putSerializable("doginfo", it)
-                    bundle.putString("before", "mypage")
-                    arguments = bundle
-                }
-                mainActivity?.changeFragment(dogInfoFragment)
+                navigationManager.navigateTo(
+                    NavigationState.WithoutBottomNav.DogInfo(
+                        dog = it,
+                        before = "mypage"
+                    )
+                )
             }
+
+            myPageDogListAdapter.onAddDogClickListener =
+                MyPageDogListAdapter.OnAddDogClickListener {
+                    navigationManager.navigateTo(
+                        NavigationState.WithoutBottomNav.RegisterDog(
+                            dog = null,
+                            from = "mypage"
+                        )
+                    )
+                }
 
             mypageDogsViewPager.adapter = myPageDogListAdapter
             TabLayoutMediator(mypageDogsIndicator, mypageDogsViewPager) { _, _ -> }.attach()
 
             managedoginfoBtn.setOnClickListener {
-                context?.let { ctx ->
-                    if (!networkChecker.isNetworkAvailable()) {
-                        return@setOnClickListener
-                    }
+                if (!networkChecker.isNetworkAvailable()) {
+                    return@setOnClickListener
                 }
-
-                val manageDogsFragment = ManageDogsFragment()
-                mainActivity?.changeFragment(manageDogsFragment)
+                navigationManager.navigateTo(NavigationState.WithoutBottomNav.ManageDogs)
             }
 
             modifyuserinfoBtn.setOnClickListener {
-                context?.let { ctx ->
-                    if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
-                        return@setOnClickListener
-                    }
-
-                    val registerUserIntent = Intent(ctx, RegisterUserActivity::class.java)
-                    registerUserIntent.putExtra("userinfo", mainViewModel.user.value)
-                    startActivity(registerUserIntent)
+                if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
+                    return@setOnClickListener
                 }
+                navigationManager.navigateTo(NavigationState.WithoutBottomNav.RegisterUser(from = "mypage"))
             }
 
             managepicturesBtn.setOnClickListener {
                 context?.let { ctx ->
                     if (checkPermission(storagePermission)) {
-                        mainActivity?.changeFragment(GalleryFragment())
+                        navigationManager.navigateTo(NavigationState.WithoutBottomNav.Gallery)
                     } else {
                         Toast.makeText(
                             ctx,
@@ -181,12 +175,15 @@ class MyPageFragment : Fragment() {
             }
 
             menuWalkinfo.setOnClickListener {
-                context?.let { ctx ->
-                    if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
-                        return@setOnClickListener
-                    }
+                if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
+                    return@setOnClickListener
                 }
-                mainActivity?.changeFragment(WalkInfoFragment())
+                navigationManager.navigateTo(
+                    NavigationState.WithoutBottomNav.WalkInfo(
+                        selectDateRecord = null,
+                        selectDog = null
+                    )
+                )
             }
         }
         return binding.root

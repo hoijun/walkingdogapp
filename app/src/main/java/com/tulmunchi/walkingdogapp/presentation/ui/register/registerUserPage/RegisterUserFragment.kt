@@ -2,35 +2,45 @@ package com.tulmunchi.walkingdogapp.presentation.ui.register.registerUserPage
 
 import android.app.DatePickerDialog
 import android.content.DialogInterface
-import android.content.Intent
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
 import androidx.databinding.BindingAdapter
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.ActivityRegisterUserBinding
 import com.tulmunchi.walkingdogapp.domain.model.User
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
+import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.RegisterUserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class RegisterUserActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityRegisterUserBinding
+class RegisterUserFragment : Fragment() {
+    private var _binding: ActivityRegisterUserBinding? = null
+    private val binding get() = _binding!!
+
+    private var from: String = "mypage"  // 어디서 왔는지 기억
+    private var currentUser: User = User("", "", "", "",)
     private val registerUserViewModel: RegisterUserViewModel by viewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     @Inject
     lateinit var networkChecker: NetworkChecker
@@ -38,7 +48,11 @@ class RegisterUserActivity : AppCompatActivity() {
     @Inject
     lateinit var loadingDialogFactory: LoadingDialogFactory
 
+    @Inject
+    lateinit var navigationManager: NavigationManager
+
     private var loadingDialog: LoadingDialog? = null
+    private var mainActivity: MainActivity? = null
 
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -48,21 +62,36 @@ class RegisterUserActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityRegisterUserBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        this.onBackPressedDispatcher.addCallback(this, backPressCallback)
+        activity?.let {
+            mainActivity = it as? MainActivity
+        }
+    }
 
-        loadingDialog = loadingDialogFactory.create(supportFragmentManager)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = ActivityRegisterUserBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressCallback)
+
+        loadingDialog = loadingDialogFactory.create(parentFragmentManager)
+
+        from = arguments?.getString("from") ?: "mypage"  // 어디서 왔는지 읽기
 
         setupViewModelObservers()
 
-        var currentUser = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getSerializableExtra("userinfo", User::class.java)
-        } else {
-            intent.getSerializableExtra("userinfo") as? User
-        } ?: User("", "", "", "")
-
         binding.apply {
+            mainViewModel.user.value?.apply {
+                currentUser = this.copy()
+            }
+
             user = currentUser
 
             btnUserIsFemale.setOnClickListener {
@@ -81,7 +110,7 @@ class RegisterUserActivity : AppCompatActivity() {
                     val birth = "${year}/${month + 1}/${day}"
                     if (DateUtils.getAge(birth) == -1) {
                         Toast.makeText(
-                            this@RegisterUserActivity,
+                            requireContext(),
                             "올바른 생일을 입력 해주세요!",
                             Toast.LENGTH_SHORT
                         ).show()
@@ -92,7 +121,7 @@ class RegisterUserActivity : AppCompatActivity() {
                 }
 
                 val datePicker = DatePickerDialog(
-                    this@RegisterUserActivity,
+                    requireContext(),
                     dateCallback,
                     cal.get(Calendar.YEAR),
                     cal.get(Calendar.MONTH),
@@ -108,7 +137,7 @@ class RegisterUserActivity : AppCompatActivity() {
                 }
                 currentUser.apply {
                     if (editName.text.toString() == "" || birth == "" || gender == "") {
-                        val builder = AlertDialog.Builder(this@RegisterUserActivity)
+                        val builder = AlertDialog.Builder(requireContext())
                         builder.setTitle("빈칸이 남아있어요.")
                         builder.setPositiveButton("확인", null)
                         builder.show()
@@ -116,7 +145,7 @@ class RegisterUserActivity : AppCompatActivity() {
                     }
                 }
 
-                val builder = AlertDialog.Builder(this@RegisterUserActivity)
+                val builder = AlertDialog.Builder(requireContext())
                 builder.setTitle("등록 할까요?")
 
                 val listener = DialogInterface.OnClickListener { _, ans ->
@@ -139,16 +168,27 @@ class RegisterUserActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        mainActivity?.setMenuVisibility(View.GONE)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mainActivity = null
+        _binding = null
+    }
+
     private fun setupViewModelObservers() {
-        registerUserViewModel.isLoading.observe(this) { isLoading ->
+        registerUserViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             if (isLoading) showLoadingFragment() else hideLoadingDialog()
         }
 
-        registerUserViewModel.userUpdated.observe(this) { userUpdated ->
-            if (userUpdated) {
-                Toast.makeText(this, "정보가 수정 되었습니다.", Toast.LENGTH_SHORT).show()
+        registerUserViewModel.userUpdated.observe(viewLifecycleOwner) { userUpdated ->
+            if (!userUpdated) {
+                Toast.makeText(requireContext(), "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                mainViewModel.updateUser(currentUser)
             }
 
             goHome()
@@ -156,7 +196,7 @@ class RegisterUserActivity : AppCompatActivity() {
     }
 
     private fun selectGoMain() {
-        val builder = AlertDialog.Builder(this)
+        val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("나가시겠어요?")
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
@@ -171,23 +211,22 @@ class RegisterUserActivity : AppCompatActivity() {
     }
 
     private fun goHome() {
-        val backIntent = Intent(this, MainActivity::class.java).apply {
-            this.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            putExtra("isImgChanged", false)
+        // 어디서 왔는지에 따라 다른 화면으로 돌아가기 (보통은 mypage)
+        when (from) {
+            "mypage" -> navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
+            else -> navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
         }
-        startActivity(backIntent)
-        finish()
     }
 
     private fun showLoadingFragment() {
-        if (isFinishing || isDestroyed) {
+        if (isDetached) {
             return
         }
         loadingDialog?.show()
     }
 
     private fun hideLoadingDialog() {
-        if (isFinishing || isDestroyed) {
+        if (isDetached) {
             return
         }
         loadingDialog?.dismiss()
@@ -200,7 +239,7 @@ class RegisterUserActivity : AppCompatActivity() {
             val color = if (gender == btn.text.toString()) "#ff444444" else "#ff888888"
             val shape = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
-                cornerRadius = 10f * btn.resources.displayMetrics.density  // 10dp를 픽셀로 변환
+                cornerRadius = 10f * btn.resources.displayMetrics.density
                 setColor(color.toColorInt())
             }
             btn.background = shape

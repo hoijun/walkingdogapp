@@ -1,7 +1,6 @@
 package com.tulmunchi.walkingdogapp.presentation.core.dialog
 
 import androidx.fragment.app.FragmentManager
-import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFragment
 import javax.inject.Inject
 
 /**

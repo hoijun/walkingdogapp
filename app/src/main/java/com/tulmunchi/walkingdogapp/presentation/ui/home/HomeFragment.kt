@@ -20,14 +20,15 @@ import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentHomeBinding
 import com.tulmunchi.walkingdogapp.presentation.ui.alarm.SettingAlarmFragment
-import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
-import com.tulmunchi.walkingdogapp.presentation.ui.register.registerDogPage.RegisterDogActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.ui.walking.WalkingActivity
+import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -38,12 +39,16 @@ class HomeFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private var mainActivity: MainActivity? = null
     private val selectedDogList = mutableListOf<String>()
+    private var homeDogListAdapter: HomeDogListAdapter? = null
 
     @Inject
     lateinit var networkChecker: NetworkChecker
 
     @Inject
     lateinit var permissionHandler: PermissionHandler
+
+    @Inject
+    lateinit var navigationManager: NavigationManager
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,7 +74,6 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        MainActivity.preFragment = "Home" // 다른 액티비티로 이동 할 때 홈에서 이동을 표시
 
         binding.apply {
             viewmodel = mainViewModel
@@ -102,9 +106,9 @@ class HomeFragment : Fragment() {
             }
 
             val dogsList = mainViewModel.dogs.value ?: listOf()
-            val homeDogListAdapter =
-                HomeDogListAdapter(dogsList, mainViewModel.isSuccessGetData(), networkChecker)
-            homeDogListAdapter.onClickDogListener =
+            val dogImages = mainViewModel.dogImages.value ?: emptyMap()
+            homeDogListAdapter = HomeDogListAdapter(dogsList, mainViewModel.isSuccessGetData(), networkChecker, dogImages)
+            homeDogListAdapter?.onClickDogListener =
                 HomeDogListAdapter.OnClickDogListener { dogName ->
                     if (selectedDogList.contains(dogName)) {
                         selectedDogList.remove(dogName)
@@ -113,6 +117,15 @@ class HomeFragment : Fragment() {
                     }
 
                     selectedDogs = selectedDogList.joinToString(", ")
+                }
+            homeDogListAdapter?.onAddDogClickListener =
+                HomeDogListAdapter.OnAddDogClickListener {
+                    navigationManager.navigateTo(
+                        NavigationState.WithoutBottomNav.RegisterDog(
+                            dog = null,
+                            from = "home"
+                        )
+                    )
                 }
 
             homeDogsViewPager.adapter = homeDogListAdapter
@@ -151,6 +164,15 @@ class HomeFragment : Fragment() {
             this.putStringArrayListExtra("selectedDogs", ArrayList(selectedDogList))
         }
         startActivity(intent)
+
+        // 화면 전환 애니메이션 시작 후 체크 초기화 (안 보이게)
+        binding.root.postDelayed({
+            selectedDogList.clear()
+            if (_binding != null) {
+                binding.selectedDogs = selectedDogList.joinToString(", ")
+            }
+            homeDogListAdapter?.clearSelection()
+        }, 200)
     }
 
     private fun showRegisterDogDialog(context: Context) {
@@ -162,9 +184,12 @@ class HomeFragment : Fragment() {
                     if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
                         return@OnClickListener
                     }
-                    val registerDogIntent =
-                        Intent(context, RegisterDogActivity::class.java)
-                    startActivity(registerDogIntent)
+                    navigationManager.navigateTo(
+                        NavigationState.WithoutBottomNav.RegisterDog(
+                            dog = null,
+                            from = "home"
+                        )
+                    )
                 }
             }
         }
@@ -206,9 +231,11 @@ class HomeFragment : Fragment() {
         mainActivity?.setMenuVisibility(View.VISIBLE)
     }
 
+
     override fun onDestroyView() {
         super.onDestroyView()
         mainActivity = null
+        homeDogListAdapter = null
         _binding = null
     }
 }

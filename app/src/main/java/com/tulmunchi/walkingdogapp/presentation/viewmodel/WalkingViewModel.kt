@@ -7,7 +7,6 @@ import com.naver.maps.geometry.LatLng
 import com.tulmunchi.walkingdogapp.core.location.LocationProvider
 import com.tulmunchi.walkingdogapp.domain.model.Coordinate
 import com.tulmunchi.walkingdogapp.domain.usecase.walk.SaveWalkRecordUseCase
-import com.tulmunchi.walkingdogapp.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

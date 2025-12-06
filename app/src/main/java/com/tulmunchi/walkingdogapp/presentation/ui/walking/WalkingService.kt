@@ -12,7 +12,6 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
@@ -55,7 +54,7 @@ class WalkingService : Service() {
     lateinit var permissionHandler: PermissionHandler
 
     val coordList = MutableLiveData<MutableList<LatLng>>()
-    val isTracking = MutableLiveData<Boolean>()
+    val isTracking = MutableLiveData(true)
     val walkTime = MutableLiveData<Int>()
     var getCollectionItems = mutableListOf<String>()
     var walkingDogs = MutableLiveData<ArrayList<String>>()
@@ -135,6 +134,7 @@ class WalkingService : Service() {
         return binder
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if(intent != null) {
             val action = intent.action
@@ -255,7 +255,6 @@ class WalkingService : Service() {
         walkTimer = timer(initialDelay = 500, period = 1000) {
             totalTime++
             walkTime.postValue(totalTime)
-            Log.d("walktime", totalTime.toString())
         }
     }
 

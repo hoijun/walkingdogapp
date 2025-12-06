@@ -43,7 +43,7 @@ class WalkRepositoryImpl @Inject constructor(
         }
         return try {
             val currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
-            val day = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+            val day = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
             val recordDto = WalkRecordDto(
                 day = day,

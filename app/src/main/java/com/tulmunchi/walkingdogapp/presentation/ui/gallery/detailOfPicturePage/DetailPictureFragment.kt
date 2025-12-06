@@ -14,7 +14,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.databinding.FragmentDetailPictureBinding
 import com.tulmunchi.walkingdogapp.presentation.model.GalleryImgInfo
-import com.tulmunchi.walkingdogapp.presentation.ui.gallery.detailOfPicturePage.DetailPictureItemListAdapter
 import com.tulmunchi.walkingdogapp.presentation.ui.gallery.galleryPage.GalleryBottomSheetFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.gallery.galleryPage.GalleryFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity

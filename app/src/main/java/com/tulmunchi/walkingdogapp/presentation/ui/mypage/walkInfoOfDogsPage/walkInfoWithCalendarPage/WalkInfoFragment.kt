@@ -20,23 +20,22 @@ import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.common.HorizonSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.databinding.FragmentWalkInfoBinding
+import com.tulmunchi.walkingdogapp.domain.model.Dog
+import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
+import com.tulmunchi.walkingdogapp.domain.model.WalkStats
 import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.core.components.DayDecorator
 import com.tulmunchi.walkingdogapp.presentation.core.components.SaturdayDecorator
 import com.tulmunchi.walkingdogapp.presentation.core.components.SelectedMonthDecorator
 import com.tulmunchi.walkingdogapp.presentation.core.components.SundayDecorator
 import com.tulmunchi.walkingdogapp.presentation.core.components.WalkDayDecorator
-import com.tulmunchi.walkingdogapp.databinding.FragmentWalkInfoBinding
-import com.tulmunchi.walkingdogapp.domain.model.Dog
-import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
-import com.tulmunchi.walkingdogapp.domain.model.WalkStats
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
-import com.tulmunchi.walkingdogapp.presentation.ui.mypage.walkInfoOfDogsPage.detailWalkInfoPage.DetailWalkInfoFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.mypage.myPagePage.MyPageFragment
+import com.tulmunchi.walkingdogapp.presentation.ui.mypage.walkInfoOfDogsPage.detailWalkInfoPage.DetailWalkInfoFragment
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.collections.get
 
 data class DogsWalkRecord(
     val walkDateList: MutableList<CalendarDay> = mutableListOf(),
@@ -137,7 +136,7 @@ class WalkInfoFragment : Fragment() { // 수정
                 }
             }
             val walkInfoDogListAdapter = WalkInfoDogListAdapter(
-                mainViewModel.dogs.value ?: listOf(), MainActivity.dogImageUrls
+                mainViewModel.dogs.value ?: listOf(), mainViewModel.dogImages.value ?: emptyMap()
             ).also {
                 it.onItemClickListener = WalkInfoDogListAdapter.OnItemClickListener { selectedDogInfo ->
                     context?.let { ctx ->
@@ -205,7 +204,8 @@ class WalkInfoFragment : Fragment() { // 수정
                 calendarHeaderBuilder.toString()
             }
 
-            if (MainActivity.dogNameList.isNotEmpty()) {
+            val dogNames = mainViewModel.dogNames.value ?: emptyList()
+            if (dogNames.isNotEmpty()) {
                 if (selectedDog == null) {
                     selectedDog = previouslySelectedDog ?: mainViewModel.dogs.value?.firstOrNull()
                     selectDogInfo = selectedDog
@@ -263,7 +263,7 @@ class WalkInfoFragment : Fragment() { // 수정
                 }
                 walkinfoRecyclerview.adapter = adapter
 
-                if (MainActivity.dogNameList.isNotEmpty()) {
+                if (dogNames.isNotEmpty()) {
                     walkDayDecorator = WalkDayDecorator(dogsWalkRecordMap[selectedDog?.name]?.walkDateList ?: listOf()) // 산책한 날 표시
                     walkcalendar.addDecorators(walkDayDecorator)
                 }
@@ -295,7 +295,8 @@ class WalkInfoFragment : Fragment() { // 수정
     }
 
     private fun setDogsWalkDate() {
-        for (dog in MainActivity.dogNameList) {
+        val dogNames = mainViewModel.dogNames.value ?: emptyList()
+        for (dog in dogNames) {
             dogsWalkRecordMap[dog] = DogsWalkRecord()
 
             val walkDateInfoFirstSelectedDay = mutableListOf<WalkRecord>()
@@ -344,7 +345,7 @@ class WalkInfoFragment : Fragment() { // 수정
             if (iv.context == null) return
 
             try {
-                val dogImage = MainActivity.dogImageUrls[selectedDog?.name ?: ""]
+                val dogImage = viewModel.dogImages.value?.get(selectedDog?.name ?: "")
                 if (dogImage != null) {
                     Glide.with(iv.context).load(dogImage)
                         .format(DecodeFormat.PREFER_ARGB_8888)

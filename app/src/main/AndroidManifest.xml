@@ -49,18 +49,6 @@
             android:configChanges="uiMode"/>
 
         <activity
-            android:name=".presentation.ui.register.registerUserPage.RegisterUserActivity"
-            android:exported="false"
-            android:configChanges="uiMode"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".presentation.ui.register.registerDogPage.RegisterDogActivity"
-            android:exported="false"
-            android:configChanges="uiMode"
-            android:screenOrientation="portrait" />
-
-        <activity
             android:name=".presentation.ui.splash.SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait"

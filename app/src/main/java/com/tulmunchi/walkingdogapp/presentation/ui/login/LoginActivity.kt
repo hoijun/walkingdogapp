@@ -20,13 +20,13 @@ import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.core.analytics.FirebaseAnalyticHelper
 import com.tulmunchi.walkingdogapp.core.datastore.UserPreferencesDataStore
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.databinding.ActivityLoginBinding
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
-import com.tulmunchi.walkingdogapp.databinding.ActivityLoginBinding
+import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers

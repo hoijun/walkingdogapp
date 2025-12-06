@@ -1,6 +1,5 @@
 package com.tulmunchi.walkingdogapp.presentation.ui.mypage.manageDogPage
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,10 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.FragmentManageDogsBinding
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.ui.mypage.myPagePage.MyPageFragment
-import com.tulmunchi.walkingdogapp.presentation.ui.mypage.dogInfoPafge.DogInfoFragment
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
-import com.tulmunchi.walkingdogapp.presentation.ui.register.registerDogPage.RegisterDogActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -29,6 +28,9 @@ class ManageDogsFragment : Fragment() {
     @Inject
     lateinit var networkChecker: NetworkChecker
 
+    @Inject
+    lateinit var navigationManager: NavigationManager
+
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             goMyPage()
@@ -40,8 +42,6 @@ class ManageDogsFragment : Fragment() {
         activity?.let {
             mainActivity = it as? MainActivity
         }
-
-        MainActivity.preFragment = "Manage"
     }
 
     override fun onCreateView(
@@ -50,16 +50,16 @@ class ManageDogsFragment : Fragment() {
     ): View {
         _binding = FragmentManageDogsBinding.inflate(inflater,container, false)
         val dogsList = mainViewModel.dogs.value?: listOf()
+        val dogImages = mainViewModel.dogImages.value ?: emptyMap()
 
-        val manageDogListAdapter = ManageDogListAdapter(dogsList)
+        val manageDogListAdapter = ManageDogListAdapter(dogsList, dogImages)
         manageDogListAdapter.onItemClickListener = ManageDogListAdapter.OnItemClickListener {
-            val dogInfoFragment = DogInfoFragment().apply {
-                val bundle = Bundle()
-                bundle.putSerializable("doginfo", it)
-                bundle.putString("before", "manage")
-                arguments = bundle
-            }
-            goDogInfoPage(dogInfoFragment)
+            navigationManager.navigateTo(
+                NavigationState.WithoutBottomNav.DogInfo(
+                    dog = it,
+                    before = "manage"
+                )
+            )
         }
 
         binding.apply {
@@ -84,13 +84,15 @@ class ManageDogsFragment : Fragment() {
             }
 
             btnAddDog.setOnClickListener {
-                context?.let { ctx ->
-                    if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
-                        return@let
-                    }
-                    val registerDogIntent = Intent(ctx, RegisterDogActivity::class.java)
-                    startActivity(registerDogIntent)
+                if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
+                    return@setOnClickListener
                 }
+                navigationManager.navigateTo(
+                    NavigationState.WithoutBottomNav.RegisterDog(
+                        dog = null,
+                        from = "manage"
+                    )
+                )
             }
 
             btnBack.setOnClickListener {
@@ -118,9 +120,5 @@ class ManageDogsFragment : Fragment() {
 
     private fun goMyPage() {
         mainActivity?.changeFragment(MyPageFragment())
-    }
-
-    private fun goDogInfoPage(fragment: DogInfoFragment) {
-        mainActivity?.changeFragment(fragment)
     }
 }

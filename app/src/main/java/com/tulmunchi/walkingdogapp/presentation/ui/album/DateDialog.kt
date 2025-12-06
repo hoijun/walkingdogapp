@@ -12,12 +12,11 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.R
+import com.tulmunchi.walkingdogapp.databinding.DateDialogBinding
 import com.tulmunchi.walkingdogapp.presentation.core.components.SelectedMonthDecorator
 import com.tulmunchi.walkingdogapp.presentation.core.components.ToDayDecorator
 import com.tulmunchi.walkingdogapp.presentation.core.components.WalkDayDecorator
-import com.tulmunchi.walkingdogapp.databinding.DateDialogBinding
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 
 class DateDialog : DialogFragment() {
@@ -35,7 +34,8 @@ class DateDialog : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val walkRecordList = userDataViewModel.walkHistory.value ?: hashMapOf()
-        for(dog in MainActivity.dogNameList) {
+        val dogNames = userDataViewModel.dogNames.value ?: emptyList()
+        for(dog in dogNames) {
             for(record in walkRecordList[dog] ?: mutableListOf()) {
                 val dayInfo = record.startTime.split(" ").firstOrNull()?.split("-") ?: continue
                 if (dayInfo.size >= 3) {

@@ -1,6 +1,5 @@
 package com.tulmunchi.walkingdogapp.presentation.ui.mypage.dogInfoPafge
 
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,11 +14,11 @@ import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.FragmentDogInfoBinding
 import com.tulmunchi.walkingdogapp.domain.model.Dog
-import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.ui.mypage.manageDogPage.ManageDogsFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.mypage.myPagePage.MyPageFragment
-import com.tulmunchi.walkingdogapp.presentation.ui.register.registerDogPage.RegisterDogActivity
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -35,6 +34,9 @@ class DogInfoFragment : Fragment() {
 
     @Inject
     lateinit var networkChecker: NetworkChecker
+
+    @Inject
+    lateinit var navigationManager: NavigationManager
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -79,22 +81,19 @@ class DogInfoFragment : Fragment() {
             }
 
             btnSettingdog.setOnClickListener {
-                context?.let { ctx ->
-                    if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
-                        return@setOnClickListener
-                    }
-                    val registerDogIntent = Intent(ctx, RegisterDogActivity::class.java)
-                    val walkRecords: ArrayList<WalkRecord> = ArrayList(mainViewModel.walkHistory.value?.get(userDogInfo.name) ?: emptyList())
-                    registerDogIntent.putExtra("doginfo", userDogInfo)
-                    registerDogIntent.putParcelableArrayListExtra(
-                        "walkRecord",
-                        walkRecords
-                    )
-                    startActivity(registerDogIntent)
+                if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
+                    return@setOnClickListener
                 }
+
+                navigationManager.navigateTo(
+                    NavigationState.WithoutBottomNav.RegisterDog(
+                        dog = userDogInfo,
+                        from = "doginfo:$beforepage",  // "doginfo:mypage" 또는 "doginfo:manage"
+                    )
+                )
             }
 
-            val dogImg = MainActivity.Companion.dogImageUrls[userDogInfo.name]
+            val dogImg = mainViewModel.dogImages.value?.get(userDogInfo.name)
             if (dogImg != null) {
                 context?.let { ctx ->
                     try {

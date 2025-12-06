@@ -1,23 +1,21 @@
 package com.tulmunchi.walkingdogapp.presentation.ui.home
 
 import android.content.Context
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.HomedoglistItemBinding
 import com.tulmunchi.walkingdogapp.domain.model.Dog
-import com.tulmunchi.walkingdogapp.presentation.ui.register.registerDogPage.RegisterDogActivity
 
 class HomeDogListAdapter(
     private val dogsList: List<Dog>,
     private val successGetData: Boolean,
-    private val networkChecker: NetworkChecker
+    private val networkChecker: NetworkChecker,
+    private val dogImages: Map<String, String>
 ): RecyclerView.Adapter<HomeDogListAdapter.HomeDogListViewHolder>() {
     lateinit var context: Context
 
@@ -25,8 +23,13 @@ class HomeDogListAdapter(
         fun onClickDog(dogName: String)
     }
 
+    fun interface OnAddDogClickListener {
+        fun onAddDogClick()
+    }
+
     private val selectedItems = mutableListOf<String>()
     var onClickDogListener: OnClickDogListener? = null
+    var onAddDogClickListener: OnAddDogClickListener? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeDogListViewHolder {
         val binding = HomedoglistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         context = parent.context
@@ -48,8 +51,12 @@ class HomeDogListAdapter(
             binding.apply {
                 dogInfo = dog
                 homeAddDogBtn.visibility = View.GONE
-                if (MainActivity.dogImageUrls[dog.name] != null) {
-                    Glide.with(context).load(MainActivity.dogImageUrls[dog.name])
+
+                // 체크박스 초기 상태 설정
+                dogCheckBox.isChecked = selectedItems.contains(dog.name)
+
+                if (dogImages[dog.name] != null) {
+                    Glide.with(context).load(dogImages[dog.name])
                         .format(DecodeFormat.PREFER_ARGB_8888).override(500, 500).into(homeDogImage)
                 }
 
@@ -62,6 +69,7 @@ class HomeDogListAdapter(
                 dogCheckBox.setOnClickListener {
                     onClickDogListener?.onClickDog(dogsList[bindingAdapterPosition].name)
                     toggleSelection(dogsList[bindingAdapterPosition].name)
+                    dogCheckBox.isChecked = selectedItems.contains(dogsList[bindingAdapterPosition].name)
                 }
             }
         }
@@ -73,8 +81,7 @@ class HomeDogListAdapter(
                     if(!networkChecker.isNetworkAvailable() || !successGetData) {
                         return@setOnClickListener
                     }
-                    val registerDogIntent = Intent(context, RegisterDogActivity::class.java)
-                    context.startActivity(registerDogIntent)
+                    onAddDogClickListener?.onAddDogClick()
                 }
             }
         }
@@ -85,6 +92,26 @@ class HomeDogListAdapter(
             selectedItems.remove(dogName)
         } else {
             selectedItems.add(dogName)
+        }
+    }
+
+    fun clearSelection() {
+        if (selectedItems.isEmpty()) return
+
+        // 선택된 항목들의 position 찾기
+        val positionsToUpdate = mutableListOf<Int>()
+        selectedItems.forEach { dogName ->
+            val position = dogsList.indexOfFirst { it.name == dogName }
+            if (position != -1) {
+                positionsToUpdate.add(position)
+            }
+        }
+
+        selectedItems.clear()
+
+        // 각 position만 업데이트
+        positionsToUpdate.forEach { position ->
+            notifyItemChanged(position)
         }
     }
 }

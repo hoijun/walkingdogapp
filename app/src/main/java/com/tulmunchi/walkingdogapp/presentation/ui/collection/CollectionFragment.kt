@@ -11,14 +11,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
-import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.databinding.FragmentCollectionBinding
+import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionData
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
+import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -49,8 +49,6 @@ class CollectionFragment : Fragment() {
                 builder.show()
             }
         }
-
-        MainActivity.preFragment = "Collection"
 
         activity?.let {
             mainActivity = it as? MainActivity

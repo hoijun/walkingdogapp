@@ -12,8 +12,8 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
-import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.databinding.CurrentcollectionsDialogBinding
+import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 
 class CurrentCollectionsDialog: DialogFragment() {

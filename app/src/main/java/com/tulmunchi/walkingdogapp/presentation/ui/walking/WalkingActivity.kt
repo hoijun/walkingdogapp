@@ -46,9 +46,9 @@ import com.naver.maps.map.overlay.PathOverlay
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
+import com.tulmunchi.walkingdogapp.databinding.ActivityWalkingBinding
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
-import com.tulmunchi.walkingdogapp.databinding.ActivityWalkingBinding
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionData
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
@@ -73,6 +73,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityWalkingBinding
     private lateinit var mynavermap: NaverMap
     private lateinit var wService: WalkingService
+    private var isObserverSet = false
 
     private val walkingViewModel: WalkingViewModel by viewModels()
     private var randomMarkerJob: Job? = null
@@ -111,14 +112,19 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var startTime = ""
     private var selectedDogs = arrayListOf<String>()
-    private var collectionsMap = hashMapOf<String, CollectionInfo>()
+    private var collectionsMap = mapOf<String, CollectionInfo>()
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as WalkingService.LocalBinder
             wService = binder.getService()
             binding.walkingService = wService
-            setObserve()
+
+            // 맵도 준비되었고 아직 설정 안했으면 setObserve 호출
+            if (::mynavermap.isInitialized && !isObserverSet) {
+                isObserverSet = true
+                setObserve()
+            }
         }
 
         override fun onServiceDisconnected(name: ComponentName?) { }
@@ -162,7 +168,13 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             goHome()
         }
 
+        // Service와 즉시 bind (UI 깜빡임 방지)
+        Intent(this, WalkingService::class.java).also { intent ->
+            bindService(intent, connection, BIND_AUTO_CREATE)
+        }
+
         setCollectionImageView(CollectionData.collectionMap)
+        collectionsMap = CollectionData.collectionMap
 
         val mapFragment: MapFragment =
             supportFragmentManager.findFragmentById(R.id.Map) as MapFragment?
@@ -245,11 +257,14 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         // 산책 저장 결과 관찰
         walkingViewModel.walkSaved.observe(this) { saved ->
             if (saved != null) {
+                stopWalkingService()
                 if (!saved) {
                     Toast.makeText(this, "산책 기록 저장 실패", Toast.LENGTH_SHORT).show()
+                    goHome(shouldRefreshData = false)
+                } else {
+                    // 산책 저장 성공 - 이미지는 유지하고 데이터만 업데이트
+                    goHome(shouldRefreshData = true)
                 }
-                stopWalkingService()
-                goHome()
             }
         }
     }
@@ -292,8 +307,10 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             trackingMarker.map = mynavermap
         } // 현재 위치로 맵 이동
 
-        Intent(this, WalkingService::class.java).also { intent ->
-            bindService(intent, connection, BIND_AUTO_CREATE)
+        // Service도 연결되었고 아직 설정 안했으면 setObserve 호출
+        if (::wService.isInitialized && !isObserverSet) {
+            isObserverSet = true
+            setObserve()
         }
     }
 
@@ -506,10 +523,10 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun goHome() {
+    private fun goHome(shouldRefreshData: Boolean = false) {
         val backIntent = Intent(this, MainActivity::class.java).apply {
-            this.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            putExtra("isImgChanged", false)
+            this.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            putExtra("shouldRefreshData", shouldRefreshData)
         }
 
         hideLoadingDialog()

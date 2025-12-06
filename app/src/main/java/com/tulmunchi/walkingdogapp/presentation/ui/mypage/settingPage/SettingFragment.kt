@@ -22,10 +22,10 @@ import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.tulmunchi.walkingdogapp.core.analytics.FirebaseAnalyticHelper
 import com.tulmunchi.walkingdogapp.core.datastore.UserPreferencesDataStore
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
-import com.tulmunchi.walkingdogapp.presentation.core.dialog.WriteDialog
+import com.tulmunchi.walkingdogapp.databinding.FragmentSettingBinding
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
-import com.tulmunchi.walkingdogapp.databinding.FragmentSettingBinding
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.WriteDialog
 import com.tulmunchi.walkingdogapp.presentation.ui.alarm.AlarmFunctions
 import com.tulmunchi.walkingdogapp.presentation.ui.login.LoginActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
@@ -273,7 +273,6 @@ class SettingFragment : Fragment() {
             val loginIntent = Intent(ctx, LoginActivity::class.java)
             loginIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(loginIntent)
-            MainActivity.preFragment = "Home" // 로그아웃 바로 후에 홈 부터 시작하기 위함
         }
     }
 

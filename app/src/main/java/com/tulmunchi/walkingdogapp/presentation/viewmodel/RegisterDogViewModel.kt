@@ -7,7 +7,6 @@ import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
 import com.tulmunchi.walkingdogapp.domain.usecase.dog.DeleteDogUseCase
 import com.tulmunchi.walkingdogapp.domain.usecase.dog.UpdateDogUseCase
-import com.tulmunchi.walkingdogapp.presentation.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

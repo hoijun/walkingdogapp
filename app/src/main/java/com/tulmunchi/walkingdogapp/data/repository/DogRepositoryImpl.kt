@@ -1,6 +1,6 @@
 package com.tulmunchi.walkingdogapp.data.repository
 
-import android.net.Uri
+import androidx.core.net.toUri
 import com.google.firebase.auth.FirebaseAuth
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.data.mapper.DogMapper
@@ -23,7 +23,7 @@ class DogRepositoryImpl @Inject constructor(
     private val firebaseStorageDataSource: FirebaseStorageDataSource,
     private val firebaseWalkDataSource: FirebaseWalkDataSource,
     private val auth: FirebaseAuth,
-    private val networkChecker: NetworkChecker
+    private val networkChecker: NetworkChecker,
 ) : DogRepository {
 
     private val uid: String
@@ -50,7 +50,7 @@ class DogRepositoryImpl @Inject constructor(
         dog: Dog,
         imageUriString: String?,
         walkRecords: List<WalkRecord>,
-        existingDogNames: List<String>
+        existingDogNames: List<String>,
     ): Result<Unit> {
         if (!networkChecker.isNetworkAvailable()) {
             return Result.failure(DomainError.NetworkError())
@@ -70,9 +70,9 @@ class DogRepositoryImpl @Inject constructor(
             }
 
             // Step 3: Handle image
-            if (imageUriString != null) {
+            if (imageUriString != null && imageUriString.isNotEmpty()) {
                 // Upload new image
-                val imageUri = Uri.parse(imageUriString)
+                val imageUri = imageUriString.toUri()
                 firebaseStorageDataSource.uploadDogImage(uid, dog.name, imageUri).getOrThrow()
             } else if (isNameChanged) {
                 // Copy existing image to new name

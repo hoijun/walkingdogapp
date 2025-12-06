@@ -31,15 +31,15 @@ import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.InfoWindow
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.common.HorizonSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
-import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
-import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
 import com.tulmunchi.walkingdogapp.databinding.FragmentAlbumMapBinding
+import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.model.AlbumMapImgInfo
+import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -104,7 +104,6 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        MainActivity.preFragment = "AlbumMap"
         activity?.let {
             mainActivity = it as? MainActivity
         }

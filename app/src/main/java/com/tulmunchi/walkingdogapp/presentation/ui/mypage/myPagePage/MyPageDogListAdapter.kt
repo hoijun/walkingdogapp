@@ -1,7 +1,6 @@
 package com.tulmunchi.walkingdogapp.presentation.ui.mypage.myPagePage
 
 import android.content.Context
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,16 +8,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
-import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
 import com.tulmunchi.walkingdogapp.databinding.MypagedoglistItemBinding
 import com.tulmunchi.walkingdogapp.domain.model.Dog
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
-import com.tulmunchi.walkingdogapp.presentation.ui.register.registerDogPage.RegisterDogActivity
+import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
 
 class MyPageDogListAdapter(
     private val dogsList: List<Dog>,
     private val successGetData: Boolean,
-    private val networkChecker: NetworkChecker
+    private val networkChecker: NetworkChecker,
+    private val dogImages: Map<String, String>
 ): RecyclerView.Adapter<MyPageDogListAdapter.MyPageDogListViewHolder>() {
     private lateinit var context: Context
 
@@ -26,7 +24,12 @@ class MyPageDogListAdapter(
         fun onItemClick(dog: Dog)
     }
 
+    fun interface OnAddDogClickListener {
+        fun onAddDogClick()
+    }
+
     var onItemClickListener: OnItemClickListener? = null
+    var onAddDogClickListener: OnAddDogClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyPageDogListViewHolder {
         val binding =
@@ -54,8 +57,7 @@ class MyPageDogListAdapter(
                     if (!networkChecker.isNetworkAvailable() || !successGetData) {
                         return@setOnClickListener
                     }
-                    val registerDogIntent = Intent(context, RegisterDogActivity::class.java)
-                    context.startActivity(registerDogIntent)
+                    onAddDogClickListener?.onAddDogClick()
                 }
             }
         }
@@ -66,8 +68,8 @@ class MyPageDogListAdapter(
                 dogInfo = dog
                 dogAge = DateUtils.getAge(dog.birth)
 
-                if (MainActivity.dogImageUrls[dog.name] != null) {
-                    Glide.with(context).load(MainActivity.dogImageUrls[dog.name])
+                if (dogImages[dog.name] != null) {
+                    Glide.with(context).load(dogImages[dog.name])
                         .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(menuDogimg)
                 }
                 root.setOnClickListener {
