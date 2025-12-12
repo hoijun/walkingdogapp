@@ -66,7 +66,7 @@ class AlarmReceiver: BroadcastReceiver() {
         }
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.appicon)
+            .setSmallIcon(R.drawable.app_icon)
             .setContentTitle("털뭉치")
             .setContentText("산책 할 시간 이에요!")
             .setContentIntent(pendingIntent)

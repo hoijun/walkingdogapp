@@ -8,27 +8,27 @@
     tools:context=".presentation.ui.login.LoginActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/loginscreen"
+        android:id="@+id/Login_Screen"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/view9"
+            android:id="@+id/Top_Bar"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.1"
+            app:layout_constraintHeight_percent="0.08"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" >
 
             <TextView
-                android:id="@+id/login_text"
+                android:id="@+id/TopBar_Text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="털뭉치 시작하기"
+                android:text="로그인"
                 android:textColor="@color/black"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -37,68 +37,76 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
-            android:id="@+id/view10"
+            android:id="@+id/TopBar_Divide"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#e4e4e4"
-            app:layout_constraintTop_toBottomOf="@+id/view9" />
+            app:layout_constraintTop_toBottomOf="@+id/Top_Bar" />
 
         <ImageView
-            android:id="@+id/logo"
+            android:id="@+id/Logo_Icon"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:src="@drawable/collection_004"
+            android:src="@drawable/logo_img"
+            android:layout_marginTop="40dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view10"
-            app:layout_constraintWidth_percent="0.6"
+            app:layout_constraintTop_toBottomOf="@+id/TopBar_Divide"
+            app:layout_constraintWidth_percent="0.8"
             app:layout_constraintDimensionRatio="1:1"/>
 
         <TextView
-            android:id="@+id/logintext1"
+            android:id="@+id/Login_Introduction1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="소셜 로그인으로"
+            android:text="오늘도 함께"
             android:textColor="@color/black"
-            android:textSize="30sp"
+            android:textSize="25sp"
             android:textStyle="bold"
-            android:layout_marginTop="30dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/logo" />
+            app:layout_constraintTop_toBottomOf="@+id/Logo_Icon" />
 
         <TextView
-            android:id="@+id/logintext2"
+            android:id="@+id/Login_Introduction2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="간편하게 산책하자!"
+            android:text="반려견과 함께하는 행복한 산책"
             android:textColor="@color/black"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            android:layout_marginTop="15dp"
+            android:textSize="20sp"
+            android:layout_marginTop="5dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/logintext1" />
+            app:layout_constraintTop_toBottomOf="@+id/Login_Introduction1" />
+
+        <View
+            android:id="@+id/divideLineLoginBtn"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#e4e4e4"
+            android:layout_marginBottom="25dp"
+            android:layout_marginHorizontal="25dp"
+            app:layout_constraintBottom_toTopOf="@+id/Naver_LoginBtn" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/Naver_LoginBtn"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/naverlogin_roundstyle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.07"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/logintext2"
+            app:layout_constraintBottom_toTopOf="@+id/Kakao_LoginBtn"
             app:layout_constraintWidth_percent="0.85">
 
             <ImageView
                 android:id="@+id/NaverIcon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/naver_symbol"
+                android:src="@drawable/sns_naver_symbol"
                 android:layout_marginStart="40dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -109,7 +117,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="네이버로 시작하기"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="17sp"
                 android:textStyle="bold"
                 android:layout_marginStart="40dp"
@@ -123,19 +131,19 @@
             android:id="@+id/Kakao_LoginBtn"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="25dp"
+            android:layout_marginBottom="100dp"
             android:background="@drawable/kakaologin_roundstyle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.07"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/Naver_LoginBtn"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintWidth_percent="0.85">
 
             <ImageView
                 android:id="@+id/kakaoIcon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/kakao_symbol"
+                android:src="@drawable/sns_kakao_symbol"
                 android:layout_marginStart="40dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
