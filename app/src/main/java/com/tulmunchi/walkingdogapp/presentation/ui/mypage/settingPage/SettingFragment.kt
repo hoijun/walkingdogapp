@@ -268,14 +268,6 @@ class SettingFragment : Fragment() {
         mainActivity?.changeFragment(MyPageFragment())
     }
 
-    private fun goLogin() {
-        context?.let { ctx ->
-            val loginIntent = Intent(ctx, LoginActivity::class.java)
-            loginIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(loginIntent)
-        }
-    }
-
     private fun completeDeleteAccount() {
         lifecycleScope.launch {
             userPreferencesDataStore.clearAll()
@@ -291,6 +283,14 @@ class SettingFragment : Fragment() {
         goLogin()
         removeAlarms()
         toastMsg("로그아웃 성공")
+    }
+
+    private fun goLogin() {
+        context?.let { ctx ->
+            val loginIntent = Intent(ctx, LoginActivity::class.java)
+            loginIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(loginIntent)
+        }
     }
 
     private fun failLogout(msg: String, api: String) {

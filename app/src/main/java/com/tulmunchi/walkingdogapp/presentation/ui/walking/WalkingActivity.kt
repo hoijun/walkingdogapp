@@ -30,6 +30,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -151,6 +153,14 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding = ActivityWalkingBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Edge-to-edge 대응: 시스템 네비게이션 바와 겹치지 않도록 패딩 추가
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(0, 0, 0, systemBars.bottom)
+            insets
+        }
+
         this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
         walkingViewModel.getLastLocation()
 

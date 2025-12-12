@@ -83,6 +83,8 @@ class MainActivity : AppCompatActivity() {
         loadingDialog = loadingDialogFactory.create(supportFragmentManager)
 
         if (savedInstanceState == null) {
+            // NavigationManager 초기 상태 설정 (로그아웃/탈퇴 후 재진입 시 Home으로 시작)
+            navigationManager.navigateTo(NavigationState.WithBottomNav.Home)
             setupNavigation()
             setupBottomNavigation()
             requestPermissions()
