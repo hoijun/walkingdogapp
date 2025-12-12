@@ -18,11 +18,11 @@ sealed class NavigationState {
         // Register 화면들
         data class RegisterDog(
             val dog: Dog? = null,              // null이면 새 등록, 값이 있으면 수정
-            val from: String = "home"         // "home", "mypage", "manage", "doginfo:mypage", "doginfo:manage" - 뒤로가기 위치 판단용
+            val from: String = "home"         // "home", "myPage", "manage", "dogInfo:mypage", "dogInfo:manage" - 뒤로가기 위치 판단용
         ) : WithoutBottomNav()
 
         data class RegisterUser(
-            val from: String = "mypage"        // "mypage" - 뒤로가기 위치 판단용
+            val from: String = "myPage"        // "myPage" - 뒤로가기 위치 판단용
         ) : WithoutBottomNav()
 
         // MyPage 하위 화면들
@@ -30,7 +30,7 @@ sealed class NavigationState {
 
         data class DogInfo(
             val dog: Dog,
-            val before: String  // "manage" 또는 "mypage" - 뒤로가기 위치 판단용
+            val before: String  // "manage" 또는 "myPage" - 뒤로가기 위치 판단용
         ) : WithoutBottomNav()
 
         data class WalkInfo(
@@ -44,7 +44,9 @@ sealed class NavigationState {
         ) : WithoutBottomNav()
 
         // Gallery 화면들
-        object Gallery : WithoutBottomNav()
+        data class Gallery(
+            val currentImgIndex: Int? = null    // DetailPicture에서 복귀 시만 사용
+        ) : WithoutBottomNav()
 
         data class DetailPicture(
             val selectImageIndex: Int  // 선택한 이미지 번호

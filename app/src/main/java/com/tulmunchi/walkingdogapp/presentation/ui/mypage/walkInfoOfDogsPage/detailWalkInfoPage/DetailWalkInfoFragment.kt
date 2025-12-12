@@ -25,9 +25,14 @@ import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionData
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.ui.mypage.walkInfoOfDogsPage.walkInfoWithCalendarPage.WalkInfoFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.walking.CurrentCollectionItemListAdapter
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
     private var _binding: FragmentDetailWalkInfoBinding? = null
     private val binding get() = _binding!!
@@ -38,19 +43,17 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
     private var day = listOf<String>()
     private var walkRecord: WalkRecord? = null
 
-    private var mainActivity: MainActivity? = null
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            goWalkInfo()
+            navigateToWalkInfo()
         }
     }
 
+    @Inject
+    lateinit var navigationManager: NavigationManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activity?.let {
-            mainActivity = it as? MainActivity
-        }
-
         val mapFragment: MapFragment =
             childFragmentManager.findFragmentById(R.id.Map) as MapFragment?
                 ?: MapFragment.newInstance().also {
@@ -87,7 +90,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
 
         binding.apply {
             btnGoMypage.setOnClickListener {
-                goWalkInfo()
+                navigateToWalkInfo()
             }
 
             day = walkRecord?.day?.split("-") ?: listOf()
@@ -107,11 +110,6 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-        mainActivity?.setMenuVisibility(View.GONE)
-    }
-
     override fun onResume() {
         super.onResume()
         activity?.onBackPressedDispatcher?.addCallback(this, callback)
@@ -119,7 +117,6 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainActivity = null
         _binding = null
     }
 
@@ -149,7 +146,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
         }
     }
 
-    private fun goWalkInfo() {
+    private fun navigateToWalkInfo() {
         val selectDog = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable("selectDog", Dog::class.java)?: Dog(
                 "",
@@ -175,12 +172,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
                 0L
             )) as Dog
         }
-        val bundle = Bundle()
-        bundle.putStringArrayList("selectDateRecord", day as ArrayList<String>)
-        bundle.putSerializable("selectDog", selectDog)
-        val walkInfoFragment = WalkInfoFragment().apply {
-            arguments = bundle
-        }
-        mainActivity?.changeFragment(walkInfoFragment)
+
+        navigationManager.navigateTo(NavigationState.WithoutBottomNav.WalkInfo(day, selectDog))
     }
 }

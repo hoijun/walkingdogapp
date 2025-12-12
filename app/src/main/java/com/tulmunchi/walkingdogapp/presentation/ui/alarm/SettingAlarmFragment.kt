@@ -14,20 +14,23 @@ import com.tulmunchi.walkingdogapp.databinding.FragmentSettingAlarmBinding
 import com.tulmunchi.walkingdogapp.domain.model.Alarm
 import com.tulmunchi.walkingdogapp.presentation.ui.home.HomeFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class SettingAlarmFragment : Fragment() {
     private var _binding: FragmentSettingAlarmBinding? = null
     private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
     private val mainViewModel: MainViewModel by activityViewModels()
     private val binding get() = _binding!!
-    private var mainActivity: MainActivity? = null
     private var removeAlarmList = mutableListOf<Alarm>()
     private var alarmList = mutableListOf<Alarm>()
     private var adaptar: AlarmListAdapter? = null
@@ -37,7 +40,7 @@ class SettingAlarmFragment : Fragment() {
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if(!selectMode) {
-                goHome()
+                navigateToHome()
             } else {
                 binding.btnAlarmremove.visibility = View.GONE
                 binding.btnAddAlarm.visibility = View.VISIBLE
@@ -46,12 +49,8 @@ class SettingAlarmFragment : Fragment() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        activity?.let {
-            mainActivity = it as? MainActivity
-        }
-    }
+    @Inject
+    lateinit var navigationManager: NavigationManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -235,15 +234,10 @@ class SettingAlarmFragment : Fragment() {
             }
 
             btnBack.setOnClickListener {
-                goHome()
+                navigateToHome()
             }
         }
         return binding.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        mainActivity?.setMenuVisibility(View.GONE)
     }
 
     override fun onResume() {
@@ -253,7 +247,6 @@ class SettingAlarmFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainActivity = null
         _binding = null
     }
 
@@ -283,8 +276,8 @@ class SettingAlarmFragment : Fragment() {
         }
     }
 
-    private fun goHome() {
-        mainActivity?.changeFragment(HomeFragment())
+    private fun navigateToHome() {
+        navigationManager.navigateTo(NavigationState.WithBottomNav.Home)
     }
 
     private fun alarmTimeToString(time: Long): String {

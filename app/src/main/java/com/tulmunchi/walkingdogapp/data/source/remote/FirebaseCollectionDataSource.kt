@@ -9,6 +9,7 @@ import javax.inject.Inject
  */
 interface FirebaseCollectionDataSource {
     suspend fun getAllCollections(uid: String): Result<Map<String, Boolean>>
+    suspend fun updateCollection(uid: String, collection: List<String>): Result<Unit>
 }
 
 class FirebaseCollectionDataSourceImpl @Inject constructor(
@@ -29,6 +30,17 @@ class FirebaseCollectionDataSourceImpl @Inject constructor(
                 }
             }
             Result.success(collections)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateCollection(uid: String, collection: List<String>): Result<Unit> {
+        return try {
+            val collectionRef = database.getReference("Users").child(uid).child("collection")
+            val updateCollection = collection.associateWith { true }
+            collectionRef.updateChildren(updateCollection).await()
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }

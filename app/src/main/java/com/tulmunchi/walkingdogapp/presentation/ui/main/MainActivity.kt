@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity() {
             is NavigationState.WithoutBottomNav.RegisterDog -> {
                 RegisterDogFragment().apply {
                     arguments = Bundle().apply {
-                        state.dog?.let { putSerializable("doginfo", it) }
+                        state.dog?.let { putSerializable("dogInfo", it) }
                         putString("from", state.from)
                     }
                 }
@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity() {
             is NavigationState.WithoutBottomNav.DogInfo -> {
                 DogInfoFragment().apply {
                     arguments = Bundle().apply {
-                        putSerializable("doginfo", state.dog)
+                        putSerializable("dogInfo", state.dog)
                         putString("before", state.before)
                     }
                 }
@@ -163,7 +163,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             // WithoutBottomNav - Gallery
-            is NavigationState.WithoutBottomNav.Gallery -> GalleryFragment()
+            is NavigationState.WithoutBottomNav.Gallery -> {
+                GalleryFragment().apply {
+                    arguments = Bundle().apply {
+                        state.currentImgIndex?.let { putInt("currentImgIndex", it) }
+                    }
+                }
+            }
 
             is NavigationState.WithoutBottomNav.DetailPicture -> {
                 DetailPictureFragment().apply {
@@ -289,13 +295,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun setMenuVisibility(visibility: Int) {
-        if (::binding.isInitialized) {
-            binding.menuBn.visibility = visibility
-        }
-    }
-
-    fun changeFragment(fragment: Fragment) {
+    private fun changeFragment(fragment: Fragment) {
         if (!::binding.isInitialized) {
             return
         }

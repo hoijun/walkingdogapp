@@ -29,8 +29,7 @@ class DogInfoFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val mainViewModel: MainViewModel by activityViewModels()
-    private var mainActivity: MainActivity? = null
-    private var beforepage = ""
+    private var beforePage = ""
 
     @Inject
     lateinit var networkChecker: NetworkChecker
@@ -40,21 +39,13 @@ class DogInfoFragment : Fragment() {
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if(beforepage == "mypage") {
-                goMypage()
+            if(beforePage == "myPage") {
+                navigateToMyPage()
             } else {
-                goManage()
+                navigateToManage()
             }
         }
     }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        activity?.let {
-            mainActivity = it as? MainActivity
-        }
-    }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,20 +54,20 @@ class DogInfoFragment : Fragment() {
         _binding = FragmentDogInfoBinding.inflate(inflater, container, false)
 
         val userDogInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable("doginfo", Dog::class.java)
+            arguments?.getSerializable("dogInfo", Dog::class.java)
         } else {
-            arguments?.getSerializable("doginfo") as? Dog
+            arguments?.getSerializable("dogInfo") as? Dog
         } ?: return binding.root  // Dog가 없으면 빈 화면 반환
 
-        beforepage = arguments?.getString("before", "mypage") ?: "mypage"
+        beforePage = arguments?.getString("before", "myPage") ?: "myPage"
 
         binding.apply {
             dogInfo = userDogInfo
             btnBack.setOnClickListener {
-                if (beforepage == "mypage") {
-                    goMypage()
+                if (beforePage == "myPage") {
+                    navigateToMyPage()
                 } else {
-                    goManage()
+                    navigateToManage()
                 }
             }
 
@@ -88,7 +79,7 @@ class DogInfoFragment : Fragment() {
                 navigationManager.navigateTo(
                     NavigationState.WithoutBottomNav.RegisterDog(
                         dog = userDogInfo,
-                        from = "doginfo:$beforepage",  // "doginfo:mypage" 또는 "doginfo:manage"
+                        from = "dogInfo:$beforePage",  // "dogInfo:mypage" 또는 "dogInfo:manage"
                     )
                 )
             }
@@ -114,12 +105,6 @@ class DogInfoFragment : Fragment() {
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-        mainActivity?.setMenuVisibility(View.GONE)
-    }
-
-
     override fun onResume() {
         super.onResume()
         activity?.onBackPressedDispatcher?.addCallback(this, callback)
@@ -127,15 +112,14 @@ class DogInfoFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainActivity = null
         _binding = null
     }
 
-    private fun goMypage() {
-        mainActivity?.changeFragment(MyPageFragment())
+    private fun navigateToMyPage() {
+        navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
     }
 
-    private fun goManage() {
-        mainActivity?.changeFragment(ManageDogsFragment())
+    private fun navigateToManage() {
+        navigationManager.navigateTo(NavigationState.WithoutBottomNav.ManageDogs)
     }
 }

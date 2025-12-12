@@ -12,6 +12,7 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import com.tulmunchi.walkingdogapp.databinding.TermofserviceDialogBinding
 import com.tulmunchi.walkingdogapp.presentation.ui.mypage.settingPage.PrivacyWebViewActivity
+import androidx.core.graphics.toColorInt
 
 class TermOfServiceDialog: DialogFragment() {
     private var _binding: TermofserviceDialogBinding? = null
@@ -124,7 +125,7 @@ class TermOfServiceDialog: DialogFragment() {
     private fun updateFinishButtonState(isEnabled: Boolean) {
         binding.finishButton.apply {
             this.isEnabled = isEnabled
-            setTextColor(if (isEnabled) Color.BLACK else Color.parseColor("#D3D3D3"))
+            setTextColor(if (isEnabled) Color.BLACK else "#D3D3D3".toColorInt())
         }
     }
 }

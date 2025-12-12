@@ -17,30 +17,30 @@ import com.tulmunchi.walkingdogapp.presentation.model.GalleryImgInfo
 import com.tulmunchi.walkingdogapp.presentation.ui.gallery.galleryPage.GalleryBottomSheetFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.gallery.galleryPage.GalleryFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.util.ImageUtils
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class DetailPictureFragment : Fragment() {
     private var _binding: FragmentDetailPictureBinding? = null
     private val binding get() = _binding!!
-    private var mainActivity: MainActivity? = null
     private val mainViewModel: MainViewModel by activityViewModels()
     private var imgList = mutableListOf<GalleryImgInfo>()
     private var bottomSheetFragment: BottomSheetDialogFragment? = null
 
+    @Inject
+    lateinit var navigationManager: NavigationManager
+
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            goGallery()
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        activity?.let {
-            mainActivity = it as? MainActivity
+            navigateToGallery()
         }
     }
 
@@ -77,10 +77,10 @@ class DetailPictureFragment : Fragment() {
                                     )
                                 }
                             } else {
-                                mainActivity?.changeFragment(GalleryFragment())
+                                navigationManager.navigateTo(NavigationState.WithoutBottomNav.Gallery())
                             }
                         } catch (e: Exception) {
-                            mainActivity?.changeFragment(GalleryFragment())
+                            navigationManager.navigateTo(NavigationState.WithoutBottomNav.Gallery())
                         }
                     }
                 }
@@ -107,26 +107,24 @@ class DetailPictureFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        mainActivity?.setMenuVisibility(View.GONE)
         lifecycleScope.launch {
             try {
                 val itemsToRemove = mutableListOf<GalleryImgInfo>()
 
                 for (img in imgList) {
                     try {
-                        val activity = mainActivity
-                        if (activity != null && !ImageUtils.isImageExists(img.uri, activity)) {
+                        if (!ImageUtils.isImageExists(img.uri, requireContext())) {
                             itemsToRemove.add(img)
                         } else if (activity == null) {
                             // Activity가 null이면 Fragment로 돌아가기
                             withContext(Dispatchers.Main) {
-                                mainActivity?.changeFragment(GalleryFragment())
+                                navigationManager.navigateTo(NavigationState.WithoutBottomNav.Gallery())
                             }
                             return@launch
                         }
                     } catch (e: Exception) {
                         withContext(Dispatchers.Main) {
-                            mainActivity?.changeFragment(GalleryFragment())
+                            navigationManager.navigateTo(NavigationState.WithoutBottomNav.Gallery())
                         }
                         return@launch
                     }
@@ -157,11 +155,11 @@ class DetailPictureFragment : Fragment() {
                                         )
                                     }
                                 } else if (recyclerViewAdapter.itemCount == 0) {
-                                    mainActivity?.changeFragment(GalleryFragment())
+                                    navigationManager.navigateTo(NavigationState.WithoutBottomNav.Gallery())
                                 }
                             }
                         } catch (e: Exception) {
-                            mainActivity?.changeFragment(GalleryFragment())
+                            navigationManager.navigateTo(NavigationState.WithoutBottomNav.Gallery())
                             return@withContext
                         }
                     }
@@ -169,7 +167,7 @@ class DetailPictureFragment : Fragment() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    mainActivity?.changeFragment(GalleryFragment())
+                   navigationManager.navigateTo(NavigationState.WithoutBottomNav.Gallery())
                 }
             }
         }
@@ -194,17 +192,11 @@ class DetailPictureFragment : Fragment() {
         }
         bottomSheetFragment = null
 
-        mainActivity = null
         _binding = null
     }
 
-    private fun goGallery() {
-        val bundle = Bundle()
-        bundle.putInt("select", binding.detailViewpager2.currentItem)
-        val galleryFragment = GalleryFragment().apply {
-            arguments = bundle
-        }
-        mainActivity?.changeFragment(galleryFragment)
+    private fun navigateToGallery() {
+        navigationManager.navigateTo(NavigationState.WithoutBottomNav.Gallery(binding.detailViewpager2.currentItem))
     }
 
     private fun removePicture(position: Int) {

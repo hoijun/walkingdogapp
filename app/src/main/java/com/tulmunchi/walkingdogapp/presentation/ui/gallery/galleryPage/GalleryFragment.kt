@@ -28,6 +28,8 @@ import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.model.GalleryImgInfo
 import com.tulmunchi.walkingdogapp.presentation.ui.gallery.detailOfPicturePage.DetailPictureFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.ui.mypage.myPagePage.MyPageFragment
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
 import com.tulmunchi.walkingdogapp.presentation.util.ImageUtils
@@ -40,7 +42,6 @@ import javax.inject.Inject
 class GalleryFragment : Fragment() {
     private var _binding: FragmentGalleryBinding? = null
     private val binding get() = _binding!!
-    private var mainActivity: MainActivity? = null
     private val mainViewModel: MainViewModel by activityViewModels()
     private val imgInfos = mutableListOf<GalleryImgInfo>()
     private val removeImgList = mutableListOf<Uri>()
@@ -49,6 +50,9 @@ class GalleryFragment : Fragment() {
 
     @Inject
     lateinit var permissionHandler: PermissionHandler
+
+    @Inject
+    lateinit var navigationManager: NavigationManager
 
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
@@ -97,10 +101,6 @@ class GalleryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activity?.let {
-            mainActivity = it as? MainActivity
-        }
-
         context?.let { ctx ->
             itemDecoration = GridSpacingItemDecoration(3, UiUtils.dpToPx(15f, ctx))
         }
@@ -134,7 +134,6 @@ class GalleryFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        mainActivity?.setMenuVisibility(View.GONE)
         context?.let {
             if (checkPermission(storagePermission)) {
                 updateRecyclerView()
@@ -160,7 +159,6 @@ class GalleryFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainActivity = null
         _binding = null
     }
 
@@ -223,17 +221,12 @@ class GalleryFragment : Fragment() {
             itemAnimator.supportsChangeAnimations = false
             galleryRecyclerview.itemAnimator = itemAnimator
 
-            val imgNum = arguments?.getInt("select", 0) ?: 0
+            val imgNum = arguments?.getInt("currentImgIndex", 0) ?: 0
             val adapter = GalleryItemListAdapter(imgInfos)
             adapter.itemClickListener = object : GalleryItemListAdapter.OnItemClickListener {
                 override fun onItemClick(imgNum: Int) {
                     if (selectMode.value == false) {
-                        val bundle = Bundle()
-                        bundle.putInt("select", imgNum)
-                        val detailPictureFragment = DetailPictureFragment().apply {
-                            arguments = bundle
-                        }
-                        mainActivity?.changeFragment(detailPictureFragment)
+                        navigationManager.navigateTo(NavigationState.WithoutBottomNav.DetailPicture(imgNum))
                     }
                 }
 
@@ -362,7 +355,7 @@ class GalleryFragment : Fragment() {
     }
 
     private fun goMyPage() {
-        mainActivity?.changeFragment(MyPageFragment())
+        navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
     }
 
     private fun updateRecyclerView() {

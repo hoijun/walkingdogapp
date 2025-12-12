@@ -76,11 +76,10 @@ class RegisterDogFragment : Fragment() {
     lateinit var navigationManager: NavigationManager
 
     private var loadingDialog: LoadingDialog? = null
-    private var mainActivity: MainActivity? = null
 
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            selectGoMain()
+            selectNavigateToMain()
         }
     }
 
@@ -108,13 +107,6 @@ class RegisterDogFragment : Fragment() {
 
     private val storageCode = 99
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        activity?.let {
-            mainActivity = it as? MainActivity
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -132,10 +124,10 @@ class RegisterDogFragment : Fragment() {
         loadingDialog = loadingDialogFactory.create(parentFragmentManager)
 
         val userDog = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getSerializable("doginfo", Dog::class.java)
+            arguments?.getSerializable("dogInfo", Dog::class.java)
         } else {
             @Suppress("DEPRECATION")
-            arguments?.getSerializable("doginfo") as? Dog
+            arguments?.getSerializable("dogInfo") as? Dog
         }
 
         val walkRecords = userDog?.let { dog -> mainViewModel.walkHistory.value?.get(dog.name) ?: emptyList() } ?: emptyList()
@@ -309,19 +301,13 @@ class RegisterDogFragment : Fragment() {
             }
 
             btnBack.setOnClickListener {
-                selectGoMain()
+                selectNavigateToMain()
             }
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        mainActivity?.setMenuVisibility(View.GONE)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
-        mainActivity = null
         _binding = null
     }
 
@@ -340,7 +326,7 @@ class RegisterDogFragment : Fragment() {
                 Toast.makeText(requireContext(), "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
             }
 
-            goMain(true)
+            navigateToMain(true)
         }
 
         registerDogViewModel.dogDeleted.observe(viewLifecycleOwner) { isDeleted ->
@@ -348,7 +334,7 @@ class RegisterDogFragment : Fragment() {
                 Toast.makeText(requireContext(), "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
             }
 
-            goMain(false)
+            navigateToMain(false)
         }
     }
 
@@ -396,13 +382,13 @@ class RegisterDogFragment : Fragment() {
         }
     }
 
-    private fun selectGoMain() {
+    private fun selectNavigateToMain() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("나가시겠어요?")
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    goMain(false)
+                    navigateToMain(false)
                 }
             }
         }
@@ -411,28 +397,28 @@ class RegisterDogFragment : Fragment() {
         builder.show()
     }
 
-    private fun goMain(isUpdateImg: Boolean) {
+    private fun navigateToMain(isUpdateImg: Boolean) {
         if (isUpdateImg) {
             mainViewModel.updateDog(dog, beforeName, imgUri?.toString())
         }
 
         // 어디서 왔는지에 따라 다른 화면으로 돌아가기
         when {
-            from.startsWith("doginfo") -> {
+            from.startsWith("dogInfo") -> {
                 // DogInfo에서 왔으면 원래 페이지(MyPage 또는 ManageDogs)로 이동
                 val before = when (from) {
-                    "doginfo:mypage" -> "mypage"
-                    "doginfo:manage" -> "manage"
-                    else -> "mypage"
+                    "dogInfo:myPage" -> "myPage"
+                    "dogInfo:manage" -> "manage"
+                    else -> "myPage"
                 }
-                if (before == "mypage") {
+                if (before == "myPage") {
                     navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
                 } else {
                     navigationManager.navigateTo(NavigationState.WithoutBottomNav.ManageDogs)
                 }
             }
             from == "home" -> navigationManager.navigateTo(NavigationState.WithBottomNav.Home)
-            from == "mypage" -> navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
+            from == "myPage" -> navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
             from == "manage" -> navigationManager.navigateTo(NavigationState.WithoutBottomNav.ManageDogs)
             else -> navigationManager.navigateTo(NavigationState.WithBottomNav.Home)
         }

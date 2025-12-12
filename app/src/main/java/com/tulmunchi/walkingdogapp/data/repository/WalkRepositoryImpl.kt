@@ -6,6 +6,7 @@ import com.tulmunchi.walkingdogapp.data.mapper.CoordinateMapper
 import com.tulmunchi.walkingdogapp.data.mapper.WalkRecordMapper
 import com.tulmunchi.walkingdogapp.data.mapper.WalkStatsMapper
 import com.tulmunchi.walkingdogapp.data.model.WalkRecordDto
+import com.tulmunchi.walkingdogapp.data.source.remote.FirebaseCollectionDataSource
 import com.tulmunchi.walkingdogapp.data.source.remote.FirebaseUserDataSource
 import com.tulmunchi.walkingdogapp.data.source.remote.FirebaseWalkDataSource
 import com.tulmunchi.walkingdogapp.domain.model.Coordinate
@@ -23,6 +24,7 @@ import javax.inject.Inject
 class WalkRepositoryImpl @Inject constructor(
     private val firebaseWalkDataSource: FirebaseWalkDataSource,
     private val firebaseUserDataSource: FirebaseUserDataSource,
+    private val firebaseCollectionDataSource: FirebaseCollectionDataSource,
     private val auth: FirebaseAuth,
     private val networkChecker: NetworkChecker
 ) : WalkRepository {
@@ -59,6 +61,8 @@ class WalkRepositoryImpl @Inject constructor(
             for (dogName in dogNames) {
                 firebaseWalkDataSource.saveWalkRecord(uid, dogName, recordDto).getOrThrow()
             }
+
+            firebaseCollectionDataSource.updateCollection(uid, collections).getOrThrow()
 
             Result.success(Unit)
         } catch (e: Exception) {

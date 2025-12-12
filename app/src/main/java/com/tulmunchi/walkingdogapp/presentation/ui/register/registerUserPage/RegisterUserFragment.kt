@@ -22,7 +22,6 @@ import com.tulmunchi.walkingdogapp.databinding.ActivityRegisterUserBinding
 import com.tulmunchi.walkingdogapp.domain.model.User
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
@@ -37,8 +36,8 @@ class RegisterUserFragment : Fragment() {
     private var _binding: ActivityRegisterUserBinding? = null
     private val binding get() = _binding!!
 
-    private var from: String = "mypage"  // 어디서 왔는지 기억
-    private var currentUser: User = User("", "", "", "",)
+    private var from: String = "myPage"  // 어디서 왔는지 기억
+    private var currentUser: User = User("", "", "", "")
     private val registerUserViewModel: RegisterUserViewModel by viewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
 
@@ -52,18 +51,10 @@ class RegisterUserFragment : Fragment() {
     lateinit var navigationManager: NavigationManager
 
     private var loadingDialog: LoadingDialog? = null
-    private var mainActivity: MainActivity? = null
 
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             selectGoMain()
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        activity?.let {
-            mainActivity = it as? MainActivity
         }
     }
 
@@ -83,7 +74,7 @@ class RegisterUserFragment : Fragment() {
 
         loadingDialog = loadingDialogFactory.create(parentFragmentManager)
 
-        from = arguments?.getString("from") ?: "mypage"  // 어디서 왔는지 읽기
+        from = arguments?.getString("from") ?: "myPage"  // 어디서 왔는지 읽기
 
         setupViewModelObservers()
 
@@ -168,14 +159,8 @@ class RegisterUserFragment : Fragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        mainActivity?.setMenuVisibility(View.GONE)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
-        mainActivity = null
         _binding = null
     }
 
@@ -191,7 +176,7 @@ class RegisterUserFragment : Fragment() {
                 mainViewModel.updateUser(currentUser)
             }
 
-            goHome()
+            navigateToMyPage()
         }
     }
 
@@ -201,7 +186,7 @@ class RegisterUserFragment : Fragment() {
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    goHome()
+                    navigateToMyPage()
                 }
             }
         }
@@ -210,10 +195,10 @@ class RegisterUserFragment : Fragment() {
         builder.show()
     }
 
-    private fun goHome() {
+    private fun navigateToMyPage() {
         // 어디서 왔는지에 따라 다른 화면으로 돌아가기 (보통은 mypage)
         when (from) {
-            "mypage" -> navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
+            "myPage" -> navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
             else -> navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
         }
     }

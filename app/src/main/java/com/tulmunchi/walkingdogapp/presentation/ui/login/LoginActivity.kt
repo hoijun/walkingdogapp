@@ -173,7 +173,7 @@ class LoginActivity : AppCompatActivity() {
                     auth.currentUser?.email?.let { email ->
                         saveEmail(email, "")
                     }
-                    startMain()
+                    showPermissionDialog()
                 } else {
                     try {
                         val uid = auth.currentUser?.uid
@@ -199,7 +199,7 @@ class LoginActivity : AppCompatActivity() {
         super.onResume()
         if (shouldShowPermissionDialog) {
             shouldShowPermissionDialog = false
-            startMain()
+            showPermissionDialog()
         }
     }
 
@@ -292,7 +292,7 @@ class LoginActivity : AppCompatActivity() {
             if (isFinishing || isDestroyed) return@addOnCompleteListener
 
             if (task.isSuccessful) {
-                startMain()
+                showPermissionDialog()
             } else {
                 Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                 setLoadingState(false)
@@ -300,7 +300,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun startMain() {
+    private fun showPermissionDialog() {
         if (isFinishing || isDestroyed || supportFragmentManager.isStateSaved) {
             shouldShowPermissionDialog = true
             return
@@ -309,18 +309,18 @@ class LoginActivity : AppCompatActivity() {
         val permissionGuideDialog = PermissionGuideDialog()
 
         permissionGuideDialog.onClickYesListener = PermissionGuideDialog.OnClickYesListener {
-            goMain()
+            navigateToMain()
         }
 
         try {
             permissionGuideDialog.show(supportFragmentManager, "permission")
         } catch (e: IllegalStateException) {
             // Dialog 실패 시 바로 메인으로 이동
-            goMain()
+            navigateToMain()
         }
     }
 
-    private fun goMain() {
+    private fun navigateToMain() {
         val mainIntent = Intent(this, MainActivity::class.java)
         mainIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
                 Intent.FLAG_ACTIVITY_CLEAR_TASK or

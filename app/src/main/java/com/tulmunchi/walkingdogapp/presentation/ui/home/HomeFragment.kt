@@ -37,7 +37,6 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
-    private var mainActivity: MainActivity? = null
     private val selectedDogList = mutableListOf<String>()
     private var homeDogListAdapter: HomeDogListAdapter? = null
 
@@ -53,9 +52,6 @@ class HomeFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activity?.let {
-            mainActivity = it as? MainActivity
-        }
 
         context?.let { ctx ->
             if (!networkChecker.isNetworkAvailable()) {
@@ -101,8 +97,9 @@ class HomeFragment : Fragment() {
                     if (!networkChecker.isNetworkAvailable()) {
                         return@setOnClickListener
                     }
-                    mainActivity?.changeFragment(SettingAlarmFragment())
                 }
+
+                navigateToSettingAlarm()
             }
 
             val dogsList = mainViewModel.dogs.value ?: listOf()
@@ -136,6 +133,12 @@ class HomeFragment : Fragment() {
             }
         }
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        homeDogListAdapter = null
+        _binding = null
     }
 
     private fun handleWalkButtonClick(dogsList: List<Any>) {
@@ -226,16 +229,7 @@ class HomeFragment : Fragment() {
         return !permissionHandler.checkPermissions(requireActivity(), locationPermissions)
     }
 
-    override fun onStart() {
-        super.onStart()
-        mainActivity?.setMenuVisibility(View.VISIBLE)
-    }
-
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mainActivity = null
-        homeDogListAdapter = null
-        _binding = null
+    private fun navigateToSettingAlarm() {
+        navigationManager.navigateTo(NavigationState.WithoutBottomNav.SettingAlarm)
     }
 }

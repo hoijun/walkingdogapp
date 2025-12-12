@@ -34,7 +34,6 @@ class AlarmReceiver: BroadcastReceiver() {
         val weeks = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent?.getSerializableExtra("week", ArrayList::class.java) as? ArrayList<Boolean>
         } else {
-            @Suppress("DEPRECATION", "UNCHECKED_CAST")
             intent?.getSerializableExtra("week") as? ArrayList<Boolean>
         }
 

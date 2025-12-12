@@ -175,7 +175,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             startWalkingService()
         } catch (e: Exception) {
             Toast.makeText(this, "오류로 인해 산책이 종료 됩니다.", Toast.LENGTH_SHORT).show()
-            goHome()
+            navigateToHome()
         }
 
         // Service와 즉시 bind (UI 깜빡임 방지)
@@ -270,10 +270,10 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 stopWalkingService()
                 if (!saved) {
                     Toast.makeText(this, "산책 기록 저장 실패", Toast.LENGTH_SHORT).show()
-                    goHome(shouldRefreshData = false)
+                    navigateToHome(shouldRefreshData = false)
                 } else {
                     // 산책 저장 성공 - 이미지는 유지하고 데이터만 업데이트
-                    goHome(shouldRefreshData = true)
+                    navigateToHome(shouldRefreshData = true)
                 }
             }
         }
@@ -289,7 +289,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         if (!permissionHandler.checkPermissions(this, locationPermissions)) {
             Toast.makeText(this, "오류가 생겨 산책이 종료 되었습니다", Toast.LENGTH_SHORT).show()
             stopWalkingService()
-            goHome()
+            navigateToHome()
         }
     }
 
@@ -533,7 +533,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun goHome(shouldRefreshData: Boolean = false) {
+    private fun navigateToHome(shouldRefreshData: Boolean = false) {
         val backIntent = Intent(this, MainActivity::class.java).apply {
             this.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             putExtra("shouldRefreshData", shouldRefreshData)
@@ -563,7 +563,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     if (wService.walkDistance.value!! < 300 && wService.walkTime.value!! < 300) {
                         Toast.makeText(this, "거리 또는 시간이 너무 부족해요!", Toast.LENGTH_SHORT).show()
                         stopWalkingService()
-                        goHome()
+                        navigateToHome()
                     } else {
                         startTime = wService.startTime
                         setSaveScreen()

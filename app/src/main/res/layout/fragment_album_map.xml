@@ -17,7 +17,7 @@
 
         <variable
             name="selectDay"
-            type="androidx.lifecycle.MutableLiveData&lt;String>" />
+            type="String" />
     </data>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

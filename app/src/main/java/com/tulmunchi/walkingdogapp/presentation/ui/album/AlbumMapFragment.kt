@@ -61,14 +61,13 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     @Inject
     lateinit var permissionHandler: PermissionHandler
 
-    private lateinit var mynavermap: NaverMap
+    private lateinit var myNaverMap: NaverMap
     private lateinit var camera : CameraUpdate
     private var markers = mutableListOf<InfoWindow>()
-    private var mainActivity: MainActivity? = null
 
     private var itemDecoration: HorizonSpacingItemDecoration? = null
 
-    private var selectday = MutableLiveData("")
+    private var selectedDay = ""
 
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
@@ -79,7 +78,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     private val requestStoragePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permission ->
         when(permission) {
             true -> {
-                setAlbumMap(selectday.value ?: "")
+                setAlbumMap(selectedDay)
             }
             false -> return@registerForActivityResult
         }
@@ -103,10 +102,6 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                 builder.show()
             }
         }
-
-        activity?.let {
-            mainActivity = it as? MainActivity
-        }
     }
 
     override fun onCreateView(
@@ -121,7 +116,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         binding.apply {
             isStoragePermitted = false
             isImgExisted = false
-            selectDay = selectday
+            selectDay = selectedDay
             lifecycleOwner = viewLifecycleOwner
 
             refresh.apply {
@@ -146,10 +141,9 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onStart() {
         super.onStart()
-        mainActivity?.setMenuVisibility(View.VISIBLE)
         context?.let {
             if (checkPermission(storagePermission)) {
-                setAlbumMap(selectday.value ?: "")
+                setAlbumMap(selectedDay)
                 if (markers.isNotEmpty()) {
                     lifecycleScope.launch(Dispatchers.Main) {
                         removeMarker()
@@ -170,7 +164,6 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainActivity = null
         _binding = null
     }
 
@@ -196,8 +189,8 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                         binding.imgRecyclerView.removeItemDecoration(decoration)
                     }
                     imgInfos.clear()
-                    selectday.value = date
-                    setAlbumMap(selectday.value ?: "")
+                    selectedDay = date
+                    setAlbumMap(selectedDay)
                     removeMarker()
                     setMarker()
                     if (imgInfos.isNotEmpty()) {
@@ -364,11 +357,11 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(map: NaverMap) {
-        this.mynavermap = map
-        mynavermap.uiSettings.setAllGesturesEnabled(false)
-        mynavermap.uiSettings.isZoomControlEnabled = false
+        this.myNaverMap = map
+        myNaverMap.uiSettings.setAllGesturesEnabled(false)
+        myNaverMap.uiSettings.isZoomControlEnabled = false
 
-        binding.zoom.map = mynavermap
+        binding.zoom.map = myNaverMap
 
         if(imgInfos.isNotEmpty()) {
             moveCamera(imgInfos[0].latLng, CameraAnimation.None)
@@ -382,7 +375,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
 
     private fun moveCamera(latLng: LatLng, animation: CameraAnimation) {
         camera = CameraUpdate.scrollAndZoomTo(latLng, 17.0).animate(animation)
-        mynavermap.moveCamera(camera)
+        myNaverMap.moveCamera(camera)
     }
 
     private suspend fun setMarker() {
@@ -399,7 +392,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                 imgMarker.tag = markerNum
                 imgInfo.tag = imgMarker.tag as Int
                 imgMarker.position = imgInfo.latLng
-                imgMarker.map = mynavermap
+                imgMarker.map = myNaverMap
                 markers.add(imgMarker)
             }
             if (markers.isNotEmpty()) {

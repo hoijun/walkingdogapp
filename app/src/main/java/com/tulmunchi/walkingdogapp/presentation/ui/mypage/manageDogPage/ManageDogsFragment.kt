@@ -23,7 +23,6 @@ class ManageDogsFragment : Fragment() {
     private var _binding: FragmentManageDogsBinding? = null
     private val mainViewModel: MainViewModel by activityViewModels()
     private val binding get() = _binding!!
-    private var mainActivity: MainActivity? = null
 
     @Inject
     lateinit var networkChecker: NetworkChecker
@@ -33,14 +32,7 @@ class ManageDogsFragment : Fragment() {
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            goMyPage()
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        activity?.let {
-            mainActivity = it as? MainActivity
+            navigateToMyPage()
         }
     }
 
@@ -96,15 +88,10 @@ class ManageDogsFragment : Fragment() {
             }
 
             btnBack.setOnClickListener {
-                goMyPage()
+                navigateToMyPage()
             }
         }
         return binding.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        mainActivity?.setMenuVisibility(View.GONE)
     }
 
     override fun onResume() {
@@ -114,11 +101,10 @@ class ManageDogsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainActivity = null
         _binding = null
     }
 
-    private fun goMyPage() {
-        mainActivity?.changeFragment(MyPageFragment())
+    private fun navigateToMyPage() {
+        navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
     }
 }

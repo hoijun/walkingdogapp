@@ -29,6 +29,8 @@ import com.tulmunchi.walkingdogapp.presentation.core.dialog.WriteDialog
 import com.tulmunchi.walkingdogapp.presentation.ui.alarm.AlarmFunctions
 import com.tulmunchi.walkingdogapp.presentation.ui.login.LoginActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.ui.mypage.myPagePage.MyPageFragment
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,7 +45,6 @@ class SettingFragment : Fragment() {
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
-    private var mainActivity: MainActivity? = null
     private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
     private val auth = FirebaseAuth.getInstance()
     private var email = ""
@@ -51,7 +52,7 @@ class SettingFragment : Fragment() {
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            goMyPage()
+            navigateToMyPage()
         }
     }
 
@@ -67,15 +68,10 @@ class SettingFragment : Fragment() {
     @Inject
     lateinit var loadingDialogFactory: LoadingDialogFactory
 
+    @Inject
+    lateinit var navigationManager: NavigationManager
+
     private var loadingDialog: LoadingDialog? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        activity?.let {
-            mainActivity = it as? MainActivity
-        }
-    }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -85,7 +81,7 @@ class SettingFragment : Fragment() {
         loadingDialog = loadingDialogFactory.create(parentFragmentManager)
         binding.apply {
             btnGoMypage.setOnClickListener {
-                goMyPage()
+                navigateToMyPage()
             }
 
             // 버전 정보 설정
@@ -132,19 +128,19 @@ class SettingFragment : Fragment() {
             }
 
             settingPrivacyPolicy.setOnClickListener {
-                goWebView("https://hoitho.tistory.com/1")
+                navigateToWebView("https://hoitho.tistory.com/1")
             }
 
             settingTermsofservice.setOnClickListener {
-                goWebView("https://hoitho.tistory.com/2")
+                navigateToWebView("https://hoitho.tistory.com/2")
             }
 
             settingTermofLocation.setOnClickListener {
-                goWebView("https://hoitho.tistory.com/3")
+                navigateToWebView("https://hoitho.tistory.com/3")
             }
 
             settingCopyright.setOnClickListener {
-                goWebView("https://hoitho.tistory.com/4")
+                navigateToWebView("https://hoitho.tistory.com/4")
             }
 
             settingWithdrawal.setOnClickListener {
@@ -248,10 +244,6 @@ class SettingFragment : Fragment() {
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-        mainActivity?.setMenuVisibility(View.GONE)
-    }
 
     override fun onResume() {
         super.onResume()
@@ -260,12 +252,11 @@ class SettingFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainActivity = null
         _binding = null
     }
 
-    private fun goMyPage() {
-        mainActivity?.changeFragment(MyPageFragment())
+    private fun navigateToMyPage() {
+        navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
     }
 
     private fun completeDeleteAccount() {
@@ -273,19 +264,19 @@ class SettingFragment : Fragment() {
             userPreferencesDataStore.clearAll()
         }
         removeAlarms()
-        goLogin()
+        navigateToLogin()
     }
 
     private fun successLogout() {
         lifecycleScope.launch {
             userPreferencesDataStore.clearAll()
         }
-        goLogin()
+        navigateToLogin()
         removeAlarms()
         toastMsg("로그아웃 성공")
     }
 
-    private fun goLogin() {
+    private fun navigateToLogin() {
         context?.let { ctx ->
             val loginIntent = Intent(ctx, LoginActivity::class.java)
             loginIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -323,7 +314,7 @@ class SettingFragment : Fragment() {
         }
     }
 
-    private fun goWebView(uri: String) {
+    private fun navigateToWebView(uri: String) {
         context?.let { ctx ->
             val intent = Intent(ctx, PrivacyWebViewActivity::class.java).apply {
                 putExtra("uri", uri)

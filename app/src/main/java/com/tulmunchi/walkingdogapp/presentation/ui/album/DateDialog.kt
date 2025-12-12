@@ -22,7 +22,7 @@ import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 class DateDialog : DialogFragment() {
     private var _binding: DateDialogBinding? = null
     private val binding get() = _binding!!
-    private var walkdates = mutableListOf<CalendarDay>()
+    private var walkDates = mutableListOf<CalendarDay>()
     private val userDataViewModel: MainViewModel by activityViewModels()
 
     fun interface OnDateClickListener {
@@ -39,7 +39,7 @@ class DateDialog : DialogFragment() {
             for(record in walkRecordList[dog] ?: mutableListOf()) {
                 val dayInfo = record.startTime.split(" ").firstOrNull()?.split("-") ?: continue
                 if (dayInfo.size >= 3) {
-                    walkdates.add(
+                    walkDates.add(
                         CalendarDay.from(
                             dayInfo[0].toInt(),
                             dayInfo[1].toInt(),
@@ -50,7 +50,7 @@ class DateDialog : DialogFragment() {
             }
         }
 
-        walkdates = walkdates.toMutableSet().toMutableList()
+        walkDates = walkDates.toMutableSet().toMutableList()
     }
 
     override fun onCreateView(
@@ -61,7 +61,7 @@ class DateDialog : DialogFragment() {
         _binding = DateDialogBinding.inflate(inflater, container, false)
         val todayDecorator = ToDayDecorator(requireContext(), CalendarDay.today())
         var selectedMonthDecorator = SelectedMonthDecorator(CalendarDay.today().month)
-        val walkDayDecorator = WalkDayDecorator(walkdates) // 산책한 날 표시
+        val walkDayDecorator = WalkDayDecorator(walkDates) // 산책한 날 표시
 
         binding.apply {
             walkcalendar.addDecorators(walkDayDecorator, selectedMonthDecorator, todayDecorator)

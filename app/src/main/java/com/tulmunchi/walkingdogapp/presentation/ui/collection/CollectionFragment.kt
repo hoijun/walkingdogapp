@@ -19,6 +19,7 @@ import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionData
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -28,16 +29,15 @@ class CollectionFragment : Fragment() {
     private var _binding: FragmentCollectionBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
-    private var collectionWhether = HashMap<String, Boolean>()
+    private var collectionWhether = mapOf<String, Boolean>()
     private var collections: List<CollectionInfo> = listOf()
-    private var mainActivity: MainActivity? = null
 
     @Inject
     lateinit var networkChecker: NetworkChecker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        collectionWhether = HashMap(mainViewModel.collections.value ?: CollectionData.itemWhether)
+        collectionWhether = mainViewModel.collections.value ?: mapOf()
         collections = CollectionData.collectionMap.values.toList().sortedBy { it.collectionNum }
 
         context?.let { ctx ->
@@ -48,10 +48,6 @@ class CollectionFragment : Fragment() {
                 builder.setCancelable(false)
                 builder.show()
             }
-        }
-
-        activity?.let {
-            mainActivity = it as? MainActivity
         }
     }
 
@@ -138,14 +134,8 @@ class CollectionFragment : Fragment() {
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-        mainActivity?.setMenuVisibility(View.VISIBLE)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
-        mainActivity = null
         _binding = null
     }
 }

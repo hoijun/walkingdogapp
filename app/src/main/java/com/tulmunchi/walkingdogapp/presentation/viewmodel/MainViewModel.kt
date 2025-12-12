@@ -132,6 +132,13 @@ class MainViewModel @Inject constructor(
 
     fun updateDog(updatedDog: Dog, beforeName: String, uri: String?) {
         viewModelScope.launch {
+            if (beforeName == "") {
+                _dogs.value = _dogs.value?.toMutableList()?.apply { add(updatedDog) }
+                _dogNames.value = _dogNames.value?.toMutableList()?.apply { add(updatedDog.name) }
+                uri?.let { _dogImages.value = _dogImages.value?.toMutableMap()?.apply { this[updatedDog.name] = it } }
+                return@launch
+            }
+
             if (beforeName == updatedDog.name && uri == null) {
                 _dogs.value = _dogs.value?.map { if (it.name == beforeName) updatedDog else it }
             }

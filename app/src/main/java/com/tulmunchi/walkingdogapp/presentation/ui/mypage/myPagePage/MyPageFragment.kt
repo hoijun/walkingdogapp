@@ -34,7 +34,6 @@ class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
-    private var mainActivity: MainActivity? = null
 
     @Inject
     lateinit var networkChecker: NetworkChecker
@@ -67,10 +66,6 @@ class MyPageFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activity?.let {
-            mainActivity = it as? MainActivity
-        }
-
         context?.let { ctx ->
             if (!networkChecker.isNetworkAvailable()) {
                 val builder = AlertDialog.Builder(ctx)
@@ -128,7 +123,7 @@ class MyPageFragment : Fragment() {
                 navigationManager.navigateTo(
                     NavigationState.WithoutBottomNav.DogInfo(
                         dog = it,
-                        before = "mypage"
+                        before = "myPage"
                     )
                 )
             }
@@ -138,7 +133,7 @@ class MyPageFragment : Fragment() {
                     navigationManager.navigateTo(
                         NavigationState.WithoutBottomNav.RegisterDog(
                             dog = null,
-                            from = "mypage"
+                            from = "myPage"
                         )
                     )
                 }
@@ -157,13 +152,13 @@ class MyPageFragment : Fragment() {
                 if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }
-                navigationManager.navigateTo(NavigationState.WithoutBottomNav.RegisterUser(from = "mypage"))
+                navigationManager.navigateTo(NavigationState.WithoutBottomNav.RegisterUser(from = "myPage"))
             }
 
             managepicturesBtn.setOnClickListener {
                 context?.let { ctx ->
                     if (checkPermission(storagePermission)) {
-                        navigationManager.navigateTo(NavigationState.WithoutBottomNav.Gallery)
+                        navigationManager.navigateTo(NavigationState.WithoutBottomNav.Gallery())
                     } else {
                         Toast.makeText(
                             ctx,
@@ -191,7 +186,6 @@ class MyPageFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        mainActivity?.setMenuVisibility(View.VISIBLE)
         context?.let {
             if (checkPermission(storagePermission)) {
                 binding.countImg = getAlbumImageCount()
@@ -201,7 +195,6 @@ class MyPageFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainActivity = null
         _binding = null
     }
 

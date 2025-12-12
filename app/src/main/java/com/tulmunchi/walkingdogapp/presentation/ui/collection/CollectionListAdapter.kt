@@ -17,7 +17,7 @@ import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 
 class CollectionListAdapter(
     private val collections: List<CollectionInfo>,
-    private val collectionWhether: HashMap<String, Boolean>
+    private val collectionWhether: Map<String, Boolean>
 ) : RecyclerView.Adapter<CollectionListAdapter.CollectionListViewHolder>(), Filterable {
     private lateinit var context: Context
     fun interface OnItemClickListener {
@@ -54,7 +54,7 @@ class CollectionListAdapter(
         fun bind(collectionInfo: CollectionInfo) {
             binding.apply {
                 collectionItem = collectionInfo
-                isOwnedCollection = collectionWhether[collectionInfo.collectionNum]
+                isOwnedCollection = collectionWhether[collectionInfo.collectionNum] ?: false
                 executePendingBindings()
             }
         }

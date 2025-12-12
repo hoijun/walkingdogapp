@@ -31,6 +31,8 @@ import com.tulmunchi.walkingdogapp.presentation.core.components.SelectedMonthDec
 import com.tulmunchi.walkingdogapp.presentation.core.components.SundayDecorator
 import com.tulmunchi.walkingdogapp.presentation.core.components.WalkDayDecorator
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
+import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.ui.mypage.myPagePage.MyPageFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.mypage.walkInfoOfDogsPage.detailWalkInfoPage.DetailWalkInfoFragment
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
@@ -46,7 +48,6 @@ data class DogsWalkRecord(
 
 @AndroidEntryPoint
 class WalkInfoFragment : Fragment() { // 수정
-    private var mainActivity: MainActivity? = null
     private var _binding: FragmentWalkInfoBinding? = null
 
     private val mainViewModel: MainViewModel by activityViewModels()
@@ -63,18 +64,17 @@ class WalkInfoFragment : Fragment() { // 수정
     @Inject
     lateinit var networkChecker: NetworkChecker
 
+    @Inject
+    lateinit var navigationManager: NavigationManager
+
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            goMyPage()
+            navigateToMyPage()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activity?.let {
-            mainActivity = it as? MainActivity
-        }
-
         previouslySelectedDog = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable("selectDog", Dog::class.java)
         } else {
@@ -112,7 +112,7 @@ class WalkInfoFragment : Fragment() { // 수정
 
         binding.apply {
             btnGoMypage.setOnClickListener {
-                goMyPage()
+                navigateToMyPage()
             }
 
             walkinfoRecyclerviewLayout.setOnTouchListener { _, event -> // 리사이클러 뷰, 스크롤 뷰 스크롤 겹침 방지
@@ -163,7 +163,7 @@ class WalkInfoFragment : Fragment() { // 수정
 
                     adapter = WalkDatesListAdapter(selectedDayWalkRecords)
                     adapter.itemClickListener = WalkDatesListAdapter.OnItemClickListener { selectDate ->
-                        goDetail(selectDate)
+                        navigateToDetailWalkInfo(selectDate)
                     }
                     binding.walkinfoRecyclerview.adapter = adapter
                 }
@@ -220,7 +220,7 @@ class WalkInfoFragment : Fragment() { // 수정
                     dogsWalkRecordMap[selectedDog?.name]?.walkDateInfoFirstSelectedDay ?: listOf()
                 )
                 adapter.itemClickListener = WalkDatesListAdapter.OnItemClickListener { selectDate ->
-                    goDetail(selectDate)
+                    navigateToDetailWalkInfo(selectDate)
                 }
                 walkinfoRecyclerview.adapter = adapter
                 walkcalendar.addDecorators(walkDayDecorator)
@@ -236,7 +236,7 @@ class WalkInfoFragment : Fragment() { // 수정
 
                     adapter = WalkDatesListAdapter(walkDateInfoOfDate)
                     adapter.itemClickListener = WalkDatesListAdapter.OnItemClickListener { selectDate ->
-                        goDetail(selectDate)
+                        navigateToDetailWalkInfo(selectDate)
                     }
                     walkinfoRecyclerview.adapter = adapter
                 }
@@ -259,7 +259,7 @@ class WalkInfoFragment : Fragment() { // 수정
 
                 selectedMonthDecorator = SelectedMonthDecorator(date.month)
                 adapter.itemClickListener = WalkDatesListAdapter.OnItemClickListener { selectDate ->
-                    goDetail(selectDate)
+                    navigateToDetailWalkInfo(selectDate)
                 }
                 walkinfoRecyclerview.adapter = adapter
 
@@ -274,11 +274,6 @@ class WalkInfoFragment : Fragment() { // 수정
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-        mainActivity?.setMenuVisibility(View.GONE)
-    }
-
     override fun onResume() {
         super.onResume()
         activity?.onBackPressedDispatcher?.addCallback(this, callback)
@@ -286,12 +281,7 @@ class WalkInfoFragment : Fragment() { // 수정
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainActivity = null
         _binding = null
-    }
-
-    private fun goMyPage() {
-        mainActivity?.changeFragment(MyPageFragment())
     }
 
     private fun setDogsWalkDate() {
@@ -327,25 +317,29 @@ class WalkInfoFragment : Fragment() { // 수정
 
     }
 
-    private fun goDetail(walkRecord: WalkRecord) {
-        val bundle = Bundle()
-        bundle.putParcelable("selectDateRecord", walkRecord)
-        bundle.putSerializable("selectDog", selectedDog)
-        val detailWalkInfoFragment = DetailWalkInfoFragment().apply {
-            arguments = bundle
-        }
-        mainActivity?.changeFragment(detailWalkInfoFragment)
-        mainActivity?.setMenuVisibility(View.GONE)
+    private fun navigateToMyPage() {
+        navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
+    }
+
+    private fun navigateToDetailWalkInfo(walkRecord: WalkRecord) {
+        navigationManager.navigateTo(
+            NavigationState.WithoutBottomNav.DetailWalkInfo(
+                walkRecord,
+                selectedDog ?: Dog("", "", "", "", "", "", "", "", 0L)
+            )
+        )
     }
 
     object DogImgBindingAdapter {
         @BindingAdapter("selectedDog", "viewModel")
         @JvmStatic
-        fun loadImage(iv: ImageView, selectedDog: Dog?, viewModel: MainViewModel) {
+        fun loadImage(iv: ImageView, selectedDog: Dog?, viewModel: MainViewModel?) {
             if (iv.context == null) return
+            if (selectedDog == null) return
+            if (viewModel == null) return
 
             try {
-                val dogImage = viewModel.dogImages.value?.get(selectedDog?.name ?: "")
+                val dogImage = viewModel.dogImages.value?.get(selectedDog.name ?: "")
                 if (dogImage != null) {
                     Glide.with(iv.context).load(dogImage)
                         .format(DecodeFormat.PREFER_ARGB_8888)
