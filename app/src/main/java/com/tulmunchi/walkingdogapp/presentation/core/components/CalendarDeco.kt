@@ -12,7 +12,7 @@ import com.tulmunchi.walkingdogapp.R
 import org.threeten.bp.DayOfWeek
 
 class DayDecorator(context: Context): DayViewDecorator {
-    var drawable = ContextCompat.getDrawable(context, R.drawable.calendar_selector)
+    var drawable = ContextCompat.getDrawable(context, R.drawable.custom_calendar_selector)
     // true를 리턴 시 모든 요일에 내가 설정한 드로어블이 적용된다
     override fun shouldDecorate(day: CalendarDay): Boolean {
         return true
@@ -26,7 +26,7 @@ class DayDecorator(context: Context): DayViewDecorator {
 }
 
 class ToDayDecorator(context: Context, private val today: CalendarDay): DayViewDecorator {
-    var drawable = ContextCompat.getDrawable(context, R.drawable.transparent_calendar_element)
+    var drawable = ContextCompat.getDrawable(context, R.drawable.custom_transparent_calendar_element)
     // true를 리턴 시 모든 요일에 내가 설정한 드로어블이 적용된다
     override fun shouldDecorate(day: CalendarDay): Boolean {
         return day == today

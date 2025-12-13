@@ -37,13 +37,13 @@
                 android:id="@+id/btn_back"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="25dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.1"
-                app:srcCompat="@drawable/undo" />
+                app:layout_constraintWidth_percent="0.08"
+                app:srcCompat="@drawable/icon_undo" />
 
             <TextView
                 android:id="@+id/remove_btn"
@@ -495,7 +495,7 @@
             android:id="@+id/register_dog"
             android:layout_width="0dp"
             android:layout_height="55dp"
-            android:background="@drawable/btn_roundstyle_rad15"
+            android:background="@drawable/round_style_rad15_line"
             android:backgroundTint="#e4e4e4"
             android:gravity="center"
             android:text="등록"

@@ -8,7 +8,7 @@
         android:id="@+id/walkcalendar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/roundstyle_rad15"
+        android:background="@drawable/round_style_rad15"
         android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

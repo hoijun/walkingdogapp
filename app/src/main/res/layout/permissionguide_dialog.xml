@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/roundstyle_rad15"
+    android:background="@drawable/round_style_rad15"
     android:orientation="vertical"
     android:paddingBottom="20dp">
 
@@ -42,7 +42,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="top|center"
-                android:src="@drawable/location" />
+                android:src="@drawable/icon_location" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -77,7 +77,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="top|center"
-                android:src="@drawable/camera" />
+                android:src="@drawable/icon_camera" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -112,7 +112,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="top|center"
-                android:src="@drawable/mapalbum"
+                android:src="@drawable/icon_map_album"
                 app:tint="@color/black" />
 
             <LinearLayout
@@ -148,7 +148,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="top|center"
-                android:src="@drawable/alarm" />
+                android:src="@drawable/icon_alarm" />
 
             <LinearLayout
                 android:layout_width="match_parent"

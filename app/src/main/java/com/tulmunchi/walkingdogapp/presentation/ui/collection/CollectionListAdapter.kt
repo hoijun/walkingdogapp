@@ -104,14 +104,14 @@ class CollectionListAdapter(
             try {
                 if (isOwned) {
                     Glide.with(iv.context).load(resId).format(DecodeFormat.PREFER_ARGB_8888)
-                        .override(400, 400).error(R.drawable.waitimage).into(iv)
+                        .override(400, 400).error(R.drawable.collection_unobtained).into(iv)
                 } else {
-                    Glide.with(iv.context).load(R.drawable.waitimage)
+                    Glide.with(iv.context).load(R.drawable.collection_unobtained)
                         .format(DecodeFormat.PREFER_ARGB_8888)
                         .override(400, 400).into(iv)
                 }
             } catch (e: Exception) {
-                iv.setImageResource(R.drawable.waitimage)
+                iv.setImageResource(R.drawable.collection_unobtained)
             }
         }
     }

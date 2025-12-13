@@ -58,37 +58,37 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginStart="15dp"
-                app:layout_constraintWidth_percent="0.5"
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="25dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.5">
 
-            <ImageView
-                android:id="@+id/btn_selectDate"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
-                android:text="날짜 선택"
-                android:textColor="@color/black"
-                android:visibility="@{isStoragePermitted ? View.VISIBLE : View.GONE}"
-                android:background="@drawable/calendar"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <ImageView
+                    android:id="@+id/btn_selectDate"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/icon_calendar"
+                    android:text="날짜 선택"
+                    android:textColor="@color/black"
+                    android:visibility="@{isStoragePermitted ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/selectDate_Text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginBottom="10dp"
-                android:gravity="center"
-                android:text="@{selectDay}"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:visibility="@{isStoragePermitted ? View.VISIBLE : View.GONE}"
-                app:layout_constraintStart_toEndOf="@+id/btn_selectDate"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                <TextView
+                    android:id="@+id/selectDate_Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center"
+                    android:text="@{selectDay}"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:visibility="@{isStoragePermitted ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/btn_selectDate" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -110,13 +110,13 @@
                     android:id="@+id/permission_btn"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:background="@drawable/round_style_rad15_line"
+                    android:backgroundTint="#dcdcdc"
                     android:text="이미지 권한을 모두 허용으로 해주세요."
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:visibility="@{isStoragePermitted ? View.GONE : View.VISIBLE}"
-                    android:background="@drawable/btn_roundstyle_rad15"
-                    android:backgroundTint="#dcdcdc"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHeight_percent="0.5"

@@ -19,7 +19,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/roundstyle_rad20">
+        android:background="@drawable/round_style_rad20">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -82,12 +82,12 @@
                     app:layout_constraintTop_toBottomOf="@+id/menu_dogName" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <TextView
+            <ImageView
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginEnd="15dp"
                 android:gravity="center"
-                android:text="  〉"
+                android:src="@drawable/icon_arrow_right"
                 android:textColor="@color/black"
                 android:textSize="25sp"
                 android:textStyle="bold"
@@ -102,13 +102,13 @@
             android:id="@+id/myPageAddDog_btn"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:src="@drawable/add"
+            android:src="@drawable/icon_add"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.2" />
+            app:layout_constraintWidth_percent="0.15" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

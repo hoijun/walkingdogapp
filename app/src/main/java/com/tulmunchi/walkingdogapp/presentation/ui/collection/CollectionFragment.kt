@@ -18,8 +18,6 @@ import com.tulmunchi.walkingdogapp.databinding.FragmentCollectionBinding
 import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionData
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
-import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -112,10 +110,10 @@ class CollectionFragment : Fragment() {
                 // 입력창이 보이는 지 안보이는 지에 따라
                 if(collectionSearch.isGone) {
                     collectionSearch.visibility = View.VISIBLE
-                    openSearching.setImageResource(R.drawable.arrow_drop_up)
+                    openSearching.setImageResource(R.drawable.icon_arrow_up)
                 } else {
                     collectionSearch.visibility = View.GONE
-                    openSearching.setImageResource(R.drawable.search)
+                    openSearching.setImageResource(R.drawable.icon_search)
                 }
             }
 

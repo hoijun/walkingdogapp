@@ -14,6 +14,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintDimensionRatio="1:1"
-        android:src="@drawable/collection_003" />
+        android:src="@drawable/collection_unobtained" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

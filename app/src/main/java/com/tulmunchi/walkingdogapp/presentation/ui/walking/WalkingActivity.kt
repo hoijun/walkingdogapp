@@ -299,7 +299,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         mynavermap.uiSettings.isCompassEnabled = false
         mynavermap.uiSettings.isTiltGesturesEnabled = false
 
-        trackingMarker.icon = OverlayImage.fromResource(R.drawable.walkicon)
+        trackingMarker.icon = OverlayImage.fromResource(R.drawable.walk_icon)
         trackingMarker.width = 200
         trackingMarker.height = 200
         trackingMarker.anchor = PointF(0.5f, 0.5f)
@@ -375,7 +375,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         object : InfoWindow.DefaultViewAdapter(this@WalkingActivity) {
                             override fun getContentView(p0: InfoWindow): View {
                                 return collectionImgViews[animalMarker.tag.toString()] ?: ImageView(this@WalkingActivity).apply {
-                                    setImageResource(R.drawable.walkicon)
+                                    setImageResource(R.drawable.walk_icon)
                                     layoutParams = ViewGroup.LayoutParams(200, 200)
                                 }
                             }
@@ -444,7 +444,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                                 object : InfoWindow.DefaultViewAdapter(this@WalkingActivity) {
                                     override fun getContentView(p0: InfoWindow): View {
                                         return collectionImgViews[randomKey] ?: ImageView(this@WalkingActivity).apply {
-                                            setImageResource(R.drawable.walkicon)
+                                            setImageResource(R.drawable.walk_icon)
                                             layoutParams = ViewGroup.LayoutParams(200, 200)
                                         }
                                     }
@@ -785,9 +785,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         fun setStartBtnImg(iv: ImageView, isTracking: Boolean?) {
             if (iv.context == null) return
             if(isTracking == true) {
-                Glide.with(iv.context).load(R.drawable.pause).into(iv)
+                Glide.with(iv.context).load(R.drawable.icon_pause).into(iv)
             } else {
-                Glide.with(iv.context).load(R.drawable.play).into(iv)
+                Glide.with(iv.context).load(R.drawable.icon_play).into(iv)
             }
         }
 
@@ -804,9 +804,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         fun setTrackingCameraModeOnBtn(iv: ImageView, isTrackingCameraMode: Boolean) {
             if (iv.context == null) return
             if (isTrackingCameraMode) {
-                Glide.with(iv.context).load(R.drawable.mylocation).into(iv)
+                Glide.with(iv.context).load(R.drawable.icon_location_tracking).into(iv)
             } else {
-                Glide.with(iv.context).load(R.drawable.location_disabled).into(iv)
+                Glide.with(iv.context).load(R.drawable.icon_location_untracking).into(iv)
             }
         }
     }
