@@ -167,6 +167,14 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun removeDog(name: String) {
+        viewModelScope.launch {
+            _dogNames.value = _dogNames.value?.filter { it != name }
+            _dogs.value = _dogs.value?.filter { it.name != name }
+            _dogImages.value = _dogImages.value?.toMutableMap()?.apply { this.remove(name) }
+        }
+    }
+
     /**
      * Get all alarms
      */

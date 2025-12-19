@@ -291,6 +291,7 @@ class RegisterDogFragment : Fragment() {
                 val listener = DialogInterface.OnClickListener { _, ans ->
                     when (ans) {
                         DialogInterface.BUTTON_POSITIVE -> {
+                            mainViewModel.removeDog(beforeName)
                             registerDogViewModel.deleteDog(beforeName)
                         }
                     }

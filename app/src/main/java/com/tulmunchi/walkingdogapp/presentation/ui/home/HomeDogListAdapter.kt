@@ -50,10 +50,10 @@ class HomeDogListAdapter(
         fun bind(dog: Dog) {
             binding.apply {
                 dogInfo = dog
-                homeAddDogBtn.visibility = View.GONE
+                homeAddDogLayout.visibility = View.GONE
 
                 // 체크박스 초기 상태 설정
-                dogCheckBox.isChecked = selectedItems.contains(dog.name)
+                walkDogCheckBox.isChecked = selectedItems.contains(dog.name)
 
                 if (dogImages[dog.name] != null) {
                     Glide.with(context).load(dogImages[dog.name])
@@ -63,13 +63,13 @@ class HomeDogListAdapter(
                 homeDogLayout.setOnClickListener {
                     onClickDogListener?.onClickDog(dogsList[bindingAdapterPosition].name)
                     toggleSelection(dogsList[bindingAdapterPosition].name)
-                    dogCheckBox.isChecked = selectedItems.contains(dogsList[bindingAdapterPosition].name)
+                    walkDogCheckBox.isChecked = selectedItems.contains(dogsList[bindingAdapterPosition].name)
                 }
 
-                dogCheckBox.setOnClickListener {
+                walkDogCheckBox.setOnClickListener {
                     onClickDogListener?.onClickDog(dogsList[bindingAdapterPosition].name)
                     toggleSelection(dogsList[bindingAdapterPosition].name)
-                    dogCheckBox.isChecked = selectedItems.contains(dogsList[bindingAdapterPosition].name)
+                    walkDogCheckBox.isChecked = selectedItems.contains(dogsList[bindingAdapterPosition].name)
                 }
             }
         }

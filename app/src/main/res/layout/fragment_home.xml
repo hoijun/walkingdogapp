@@ -25,7 +25,7 @@
             android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/home_top"
+                android:id="@+id/home_AppBar"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -41,17 +41,17 @@
                     android:layout_marginEnd="25dp"
                     android:src="@drawable/icon_alarm"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintWidth_percent="0.08"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintDimensionRatio="1:1" />
+                    app:layout_constraintWidth_percent="0.08" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#e4e4e4"
-                app:layout_constraintTop_toBottomOf="@+id/home_top" />
+                app:layout_constraintTop_toBottomOf="@+id/home_AppBar" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/home_middle"
@@ -60,11 +60,11 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.65"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/home_top"
+                app:layout_constraintTop_toBottomOf="@+id/home_AppBar"
                 app:layout_constraintWidth_percent="1.0">
 
                 <View
-                    android:id="@+id/View1"
+                    android:id="@+id/Empty_View1"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     app:layout_constraintHeight_percent="0.2"
@@ -76,13 +76,14 @@
                     android:id="@+id/text_location"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:layout_marginTop="15dp"
                     android:gravity="bottom"
                     android:text="@{viewmodel.currentRegion}"
                     android:textColor="@color/black"
-                    android:textSize="25sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     app:layout_constraintHeight_percent="0.1"
-                    app:layout_constraintStart_toEndOf="@id/View1"
+                    app:layout_constraintStart_toEndOf="@id/Empty_View1"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintWidth_percent="0.87" />
 
@@ -90,20 +91,21 @@
                     android:id="@+id/text_hello"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:text="안녕하세요."
+                    android:text="오늘도 즐거운 산책 하세요."
                     android:textColor="@color/black"
-                    android:textSize="30sp"
+                    android:textSize="22sp"
                     android:textStyle="bold"
                     app:layout_constraintHeight_percent="0.1"
-                    app:layout_constraintStart_toEndOf="@id/View1"
+                    app:layout_constraintStart_toEndOf="@id/Empty_View1"
                     app:layout_constraintTop_toBottomOf="@id/text_location"
                     app:layout_constraintWidth_percent="0.87" />
 
 
                 <androidx.viewpager2.widget.ViewPager2
-                    android:id="@+id/homeDogsViewPager"
+                    android:id="@+id/homeDogs_ViewPager"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:layout_marginTop="15dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHeight_percent="0.7"
                     app:layout_constraintHorizontal_bias="0.0"
@@ -115,11 +117,10 @@
                     android:id="@+id/homeDogs_Indicator"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHeight_percent="0.05"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/homeDogsViewPager"
+                    app:layout_constraintTop_toBottomOf="@+id/homeDogs_ViewPager"
                     app:tabBackground="@drawable/tab_layout_indicator"
                     app:tabGravity="center"
                     app:tabIndicatorHeight="0dp"
@@ -139,13 +140,13 @@
                 app:layout_constraintWidth_percent="1.0">
 
                 <TextView
-                    android:id="@+id/selectDogs"
+                    android:id="@+id/text_selectDogs"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
-                    android:text='@{selectedDogs.empty ? "같이 산책할 강아지를 체크 해주세요!" : selectedDogs + " 선택 중.."}'
+                    android:text='@{selectedDogs.empty ? "같이 산책할 반려견을 체크 해주세요!" : selectedDogs + " 선택 중.."}'
                     android:textColor="@color/black"
-                    android:textSize="18sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -157,15 +158,15 @@
                     android:layout_height="0dp"
                     android:background="@drawable/round_style_rad15_line"
                     android:backgroundTint="#e4e4e4"
-                    android:text="산책 시작"
-                    android:textSize="22sp"
+                    android:text="산책 시작하기"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_percent="0.45"
+                    app:layout_constraintHeight_percent="0.35"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/selectDogs"
-                    app:layout_constraintWidth_percent="0.85" />
+                    app:layout_constraintTop_toBottomOf="@+id/text_selectDogs"
+                    app:layout_constraintWidth_percent="0.8" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
