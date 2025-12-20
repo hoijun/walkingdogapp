@@ -26,9 +26,8 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/setting_appBar"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.07"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -55,7 +54,7 @@
                 android:id="@+id/setting_Introduction"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.07"
                 app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +88,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/setting_Email"
                 android:layout_width="0dp"
-                android:layout_height="120dp"
+                android:layout_height="100dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/round_style_rad20"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -116,7 +115,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginEnd="30dp"
                     android:ellipsize="end"
                     android:maxLines="1"
