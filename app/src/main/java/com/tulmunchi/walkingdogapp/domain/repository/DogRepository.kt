@@ -17,6 +17,8 @@ interface DogRepository {
      */
     suspend fun getDog(name: String): Result<Dog>
 
+    suspend fun addDog(dog: Dog, imageUriString: String?): Result<Unit>
+
     /**
      * Update existing dog information
      * @param oldName Previous dog name (empty string for new dog)

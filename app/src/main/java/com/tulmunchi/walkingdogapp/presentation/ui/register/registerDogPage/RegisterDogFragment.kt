@@ -35,11 +35,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
-import com.tulmunchi.walkingdogapp.databinding.ActivityRegisterDogBinding
+import com.tulmunchi.walkingdogapp.databinding.FragmentRegisterDogBinding
 import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
@@ -53,7 +52,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegisterDogFragment : Fragment() {
-    private var _binding: ActivityRegisterDogBinding? = null
+    private var _binding: FragmentRegisterDogBinding? = null
     private val binding get() = _binding!!
 
     private var dog = Dog()
@@ -77,6 +76,10 @@ class RegisterDogFragment : Fragment() {
 
     private var loadingDialog: LoadingDialog? = null
 
+    private enum class ResultOfRegisterDog {
+        IsNotUpdatedDog, IsUpdatedDog, IsDeletedDog
+    }
+
     private val backPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             selectNavigateToMain()
@@ -92,7 +95,7 @@ class RegisterDogFragment : Fragment() {
             if (processedUri != null) {
                 imgUri = processedUri
                 Glide.with(this@RegisterDogFragment).load(uri)
-                    .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(binding.registerImage)
+                    .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(binding.imageProfile)
             }
         } else {
             return@registerForActivityResult
@@ -112,7 +115,7 @@ class RegisterDogFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = ActivityRegisterDogBinding.inflate(inflater, container, false)
+        _binding = FragmentRegisterDogBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -134,7 +137,8 @@ class RegisterDogFragment : Fragment() {
 
         from = arguments?.getString("from") ?: "home"  // 어디서 왔는지 읽기
 
-        userDog?.let { dog = it }
+        // 복사본을 사용하여 원본 객체가 변경되지 않도록 함
+        userDog?.let { dog = it.copy() }
         beforeName = dog.name
         setUpViewModelObservers()
 
@@ -145,35 +149,35 @@ class RegisterDogFragment : Fragment() {
             val dogImage = mainViewModel.dogImages.value?.get(beforeName)
             if (dogImage != null) {
                 Glide.with(this@RegisterDogFragment).load(dogImage)
-                    .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(registerImage)
+                    .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(imageProfile)
             }
 
-            btnDogismale.setOnClickListener {
+            btnDogIsMale.setOnClickListener {
                 dog = dog.copy(gender = "남")
                 binding.dogInfo = dog
             }
 
-            btnDogisfemale.setOnClickListener {
+            btnDogIsFemale.setOnClickListener {
                 dog = dog.copy(gender = "여")
                 binding.dogInfo = dog
             }
 
-            btnNeuteryes.setOnClickListener {
+            btnNeuterIsYes.setOnClickListener {
                 dog = dog.copy(neutering = "예")
                 binding.dogInfo = dog
             }
 
-            btnNeuterno.setOnClickListener {
+            btnNeuterIsNo.setOnClickListener {
                 dog = dog.copy(neutering = "아니요")
                 binding.dogInfo = dog
             }
 
-            btnVaccyes.setOnClickListener {
+            btnVaccIsYes.setOnClickListener {
                 dog = dog.copy(vaccination = "예")
                 binding.dogInfo = dog
             }
 
-            btnVaccno.setOnClickListener {
+            btnVaccIsNo.setOnClickListener {
                 dog = dog.copy(vaccination = "아니요")
                 binding.dogInfo = dog
             }
@@ -209,13 +213,13 @@ class RegisterDogFragment : Fragment() {
                 datePicker.show()
             }
 
-            registerImage.setOnClickListener {
+            btnRegisterProfileImg.setOnClickListener {
                 if (checkPermission(storagePermission, storageCode)) {
                     pickMedia.launch("image/jpeg")
                 }
             }
 
-            registerDog.setOnClickListener {
+            btnRegisterDog.setOnClickListener {
                 if(!networkChecker.isNetworkAvailable()) {
                     return@setOnClickListener
                 }
@@ -265,13 +269,17 @@ class RegisterDogFragment : Fragment() {
                 val listener = DialogInterface.OnClickListener { _, ans ->
                     when (ans) {
                         DialogInterface.BUTTON_POSITIVE -> {
-                            registerDogViewModel.updateDog(
-                                oldName = beforeName,
-                                dog = dog,
-                                imageUriString = imgUri?.toString(),
-                                walkRecords = walkRecords,
-                                existingDogNames = dogNames
-                            )
+                            if (beforeName == "") {
+                                registerDogViewModel.addDog(dog, imgUri?.toString())
+                            } else {
+                                registerDogViewModel.updateDog(
+                                    oldName = beforeName,
+                                    dog = dog,
+                                    imageUriString = imgUri?.toString(),
+                                    walkRecords = walkRecords,
+                                    existingDogNames = dogNames
+                                )
+                            }
                         }
                     }
                 }
@@ -291,7 +299,6 @@ class RegisterDogFragment : Fragment() {
                 val listener = DialogInterface.OnClickListener { _, ans ->
                     when (ans) {
                         DialogInterface.BUTTON_POSITIVE -> {
-                            mainViewModel.removeDog(beforeName)
                             registerDogViewModel.deleteDog(beforeName)
                         }
                     }
@@ -325,17 +332,19 @@ class RegisterDogFragment : Fragment() {
         registerDogViewModel.dogUpdated.observe(viewLifecycleOwner) { isUpdated ->
             if (!isUpdated) {
                 Toast.makeText(requireContext(), "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                navigateToMain(ResultOfRegisterDog.IsNotUpdatedDog)
+            } else {
+                navigateToMain(ResultOfRegisterDog.IsUpdatedDog)
             }
-
-            navigateToMain(true)
         }
 
         registerDogViewModel.dogDeleted.observe(viewLifecycleOwner) { isDeleted ->
             if (!isDeleted) {
                 Toast.makeText(requireContext(), "오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+                navigateToMain(ResultOfRegisterDog.IsNotUpdatedDog)
+            } else {
+                navigateToMain(ResultOfRegisterDog.IsDeletedDog)
             }
-
-            navigateToMain(false)
         }
     }
 
@@ -389,7 +398,7 @@ class RegisterDogFragment : Fragment() {
         val listener = DialogInterface.OnClickListener { _, ans ->
             when (ans) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    navigateToMain(false)
+                    navigateToMain(ResultOfRegisterDog.IsNotUpdatedDog)
                 }
             }
         }
@@ -398,9 +407,16 @@ class RegisterDogFragment : Fragment() {
         builder.show()
     }
 
-    private fun navigateToMain(isUpdateImg: Boolean) {
-        if (isUpdateImg) {
-            mainViewModel.updateDog(dog, beforeName, imgUri?.toString())
+    private fun navigateToMain(result: ResultOfRegisterDog) {
+        when (result) {
+            ResultOfRegisterDog.IsNotUpdatedDog -> { }
+            ResultOfRegisterDog.IsUpdatedDog -> {
+                mainViewModel.updateDog(dog, beforeName, imgUri?.toString())
+            }
+
+            ResultOfRegisterDog.IsDeletedDog -> {
+                mainViewModel.deleteDog(dog.name)
+            }
         }
 
         // 어디서 왔는지에 따라 다른 화면으로 돌아가기
@@ -499,13 +515,27 @@ class RegisterDogFragment : Fragment() {
 
     object RegisterDogBindingAdapter {
         private fun setButtonBackground(btn: Button, state: String) {
-            val color = if (state == btn.text.toString()) "#ff444444" else "#ff888888"
+            val isSelected = state == btn.text.toString()
+            val density = btn.resources.displayMetrics.density
+            
             val shape = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
-                cornerRadius = 10f * btn.resources.displayMetrics.density
-                setColor(color.toColorInt())
+                cornerRadius = 8f * density
+
+                if (isSelected) {
+                    // 선택됨: 회색 배경 채우기
+                    setColor("#e4e4e4".toColorInt())
+                    setStroke((1 * density).toInt(), "#e4e4e4".toColorInt())
+                } else {
+                    // 선택 안됨: 투명 배경 + 테두리만
+                    setColor(android.graphics.Color.TRANSPARENT)
+                    setStroke((1 * density).toInt(), "#e4e4e4".toColorInt())
+                }
             }
+            
             btn.background = shape
+            // 선택된 버튼은 진한 검정색, 선택 안된 버튼은 회색 텍스트
+            btn.setTextColor(if (isSelected) "#000000".toColorInt() else "#888888".toColorInt())
         }
 
         @BindingAdapter("dogGender")

@@ -12,6 +12,7 @@ import javax.inject.Inject
 interface FirebaseDogDataSource {
     suspend fun getAllDogs(uid: String): Result<List<DogDto>>
     suspend fun getDog(uid: String, dogName: String): Result<DogDto>
+    suspend fun addDog(uid: String, dog: DogDto): Result<Unit>
     suspend fun updateDog(uid: String, oldName: String, dog: DogDto): Result<Unit>
     suspend fun deleteDog(uid: String, dogName: String): Result<Unit>
 }
@@ -57,6 +58,20 @@ class FirebaseDogDataSourceImpl @Inject constructor(
                 .await()
             val dog = snapshot.getValue(DogDto::class.java) ?: DogDto()
             Result.success(dog)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun addDog(
+        uid: String,
+        dog: DogDto,
+    ): Result<Unit> {
+        return try {
+            database.getReference("Users").child(uid).child("dog").child(dog.name)
+                .setValue(dog)
+                .await()
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }

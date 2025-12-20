@@ -45,6 +45,20 @@ class DogRepositoryImpl @Inject constructor(
             .map { DogMapper.toDomain(it) }
     }
 
+    override suspend fun addDog(dog: Dog, imageUriString: String?): Result<Unit> {
+        return try {
+            val dogDto = DogMapper.toDto(dog)
+            firebaseDogDataSource.addDog(uid, dogDto).getOrThrow()
+            if (imageUriString != null && imageUriString.isNotEmpty()) {
+                firebaseStorageDataSource.uploadDogImage(uid, dog.name, imageUriString.toUri())
+            }
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun updateDog(
         oldName: String,
         dog: Dog,
@@ -57,7 +71,7 @@ class DogRepositoryImpl @Inject constructor(
         }
 
         return try {
-            val isNameChanged = oldName.isNotEmpty() && oldName != dog.name
+            val isNameChanged = oldName != dog.name
 
             // Step 1: Update dog data (if name changed, delete old and create new)
             val dogDto = DogMapper.toDto(dog)

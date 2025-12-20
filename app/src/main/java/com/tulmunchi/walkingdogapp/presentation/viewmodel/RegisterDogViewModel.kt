@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
+import com.tulmunchi.walkingdogapp.domain.usecase.dog.AddDogUseCase
 import com.tulmunchi.walkingdogapp.domain.usecase.dog.DeleteDogUseCase
 import com.tulmunchi.walkingdogapp.domain.usecase.dog.UpdateDogUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterDogViewModel @Inject constructor(
+    private val addDogUseCase: AddDogUseCase,
     private val updateDogUseCase: UpdateDogUseCase,
     private val deleteDogUseCase: DeleteDogUseCase
 ) : BaseViewModel() {
@@ -21,6 +23,26 @@ class RegisterDogViewModel @Inject constructor(
 
     private val _dogDeleted = MutableLiveData<Boolean>()
     val dogDeleted: LiveData<Boolean> get() = _dogDeleted
+
+    fun addDog(
+        dog: Dog,
+        imageUriString: String?
+    ) {
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            addDogUseCase(dog, imageUriString).handle(
+                onSuccess = {
+                    _dogUpdated.value = true
+                    _isLoading.value = false
+                },
+                onError = {
+                    _dogUpdated.value = false
+                    _isLoading.value = false
+                }
+            )
+        }
+    }
 
     /**
      * Update existing dog

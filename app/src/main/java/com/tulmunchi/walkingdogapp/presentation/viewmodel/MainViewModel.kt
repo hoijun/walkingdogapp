@@ -167,7 +167,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun removeDog(name: String) {
+    fun deleteDog(name: String) {
         viewModelScope.launch {
             _dogNames.value = _dogNames.value?.filter { it != name }
             _dogs.value = _dogs.value?.filter { it.name != name }
