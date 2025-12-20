@@ -80,7 +80,7 @@ class SettingFragment : Fragment() {
         _binding = FragmentSettingBinding.inflate(inflater, container, false)
         loadingDialog = loadingDialogFactory.create(parentFragmentManager)
         binding.apply {
-            btnGoMypage.setOnClickListener {
+            btnNavigateToMyPage.setOnClickListener {
                 navigateToMyPage()
             }
 
@@ -96,7 +96,7 @@ class SettingFragment : Fragment() {
                 userEmail = email
             }
 
-            logoutBtn.setOnClickListener {
+            settingLogout.setOnClickListener {
                 if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }
@@ -131,16 +131,12 @@ class SettingFragment : Fragment() {
                 navigateToWebView("https://hoitho.tistory.com/1")
             }
 
-            settingTermsofservice.setOnClickListener {
+            settingTermsOfService.setOnClickListener {
                 navigateToWebView("https://hoitho.tistory.com/2")
             }
 
-            settingTermofLocation.setOnClickListener {
+            settingTermOfLocation.setOnClickListener {
                 navigateToWebView("https://hoitho.tistory.com/3")
-            }
-
-            settingCopyright.setOnClickListener {
-                navigateToWebView("https://hoitho.tistory.com/4")
             }
 
             settingWithdrawal.setOnClickListener {

@@ -18,7 +18,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
-import com.tulmunchi.walkingdogapp.databinding.ActivityRegisterUserBinding
+import com.tulmunchi.walkingdogapp.databinding.FragmentRegisterUserBinding
 import com.tulmunchi.walkingdogapp.domain.model.User
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
@@ -33,7 +33,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegisterUserFragment : Fragment() {
-    private var _binding: ActivityRegisterUserBinding? = null
+    private var _binding: FragmentRegisterUserBinding? = null
     private val binding get() = _binding!!
 
     private var from: String = "myPage"  // 어디서 왔는지 기억
@@ -63,7 +63,7 @@ class RegisterUserFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = ActivityRegisterUserBinding.inflate(inflater, container, false)
+        _binding = FragmentRegisterUserBinding.inflate(inflater, container, false)
         return binding.root
     }
 

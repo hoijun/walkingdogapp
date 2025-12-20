@@ -1,11 +1,13 @@
 package com.tulmunchi.walkingdogapp.presentation.core.dialog
 
 import android.content.res.Resources
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import com.tulmunchi.walkingdogapp.databinding.WriteDialogBinding
 
@@ -35,7 +37,9 @@ class WriteDialog : DialogFragment() {
                 dismiss()
             }
         }
-        isCancelable = false
+
+        this.dialog?.setCanceledOnTouchOutside(false)
+        this.dialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         return binding.root
     }
 

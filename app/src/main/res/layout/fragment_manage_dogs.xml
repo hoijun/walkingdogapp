@@ -41,7 +41,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintWidth_percent="0.08"
                     app:layout_constraintDimensionRatio="1:1"
-                    app:srcCompat="@drawable/icon_undo" />
+                    app:srcCompat="@drawable/icon_arrow_back" />
 
                 <TextView
                     android:layout_width="0dp"
