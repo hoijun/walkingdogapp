@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/round_style_rad15"
+    android:background="@drawable/custom_dialog_white_border_background"
     android:orientation="vertical"
     android:paddingBottom="20dp">
 
@@ -14,7 +14,7 @@
         android:layout_marginTop="20dp"
         android:text="앱 접근 권한 안내"
         android:textColor="@color/black"
-        android:textSize="25sp"
+        android:textSize="22sp"
         android:textStyle="bold" />
 
     <View

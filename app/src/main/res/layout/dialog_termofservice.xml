@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/round_style_rad15"
+    android:background="@drawable/custom_dialog_white_border_background"
     android:paddingBottom="20dp">
 
     <TextView
@@ -18,10 +18,9 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="1dp"
         android:layout_marginTop="20dp"
-        android:layout_marginHorizontal="10dp"
-        android:background="@color/black"/>
+        android:background="#e4e4e4"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,6 +42,7 @@
             android:layout_height="wrap_content"
             android:text="모두 동의합니다."
             android:textColor="@color/black"
+            android:textStyle="bold"
             android:textSize="17sp"
             android:layout_marginStart="10.dp"
             android:layout_marginTop="2.dp"/>
@@ -53,7 +53,7 @@
         android:layout_height="1dp"
         android:layout_marginTop="20dp"
         android:layout_marginHorizontal="20dp"
-        android:background="@color/black"/>
+        android:background="#e4e4e4"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -76,6 +76,7 @@
             android:text="(필수) 서비스 이용 약관"
             android:textColor="@color/black"
             android:textSize="17sp"
+            android:textStyle="bold"
             android:layout_marginStart="10dp"
             android:layout_marginTop="2dp"/>
 
@@ -84,6 +85,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/detailService"
+            android:textStyle="bold"
             android:textAlignment="textEnd"
             android:layout_weight="1"
             android:textColor="@color/black"
@@ -111,6 +113,7 @@
             android:text="(필수) 개인정보 처리방침"
             android:textColor="@color/black"
             android:textSize="17sp"
+            android:textStyle="bold"
             android:layout_marginStart="10.dp"
             android:layout_marginTop="2.dp"/>
 
@@ -119,6 +122,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/detailService"
+            android:textStyle="bold"
             android:textAlignment="textEnd"
             android:layout_weight="1"
             android:textColor="@color/black"
@@ -146,6 +150,7 @@
             android:text="(필수) 위치기반 서비스 이용 약관"
             android:textColor="@color/black"
             android:textSize="17sp"
+            android:textStyle="bold"
             android:layout_marginStart="10dp"
             android:layout_marginTop="2dp"/>
 
@@ -154,6 +159,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/detailService"
+            android:textStyle="bold"
             android:textAlignment="textEnd"
             android:layout_weight="1"
             android:textColor="@color/black"
