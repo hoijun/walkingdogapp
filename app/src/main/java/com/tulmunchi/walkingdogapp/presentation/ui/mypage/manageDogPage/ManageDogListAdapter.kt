@@ -30,12 +30,12 @@ class ManageDogListAdapter(
 
     override fun getItemCount(): Int = dogsList.size
     override fun onBindViewHolder(holder: ManageDogListViewHolder, position: Int) {
-        holder.bind(dogsList[position])
+        holder.bind(dogsList[position], position == dogsList.size - 1)
     }
 
     inner class ManageDogListViewHolder(private val binding: ManagedoglistItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(dog: Dog) {
+        fun bind(dog: Dog, isLastItem: Boolean) {
             binding.apply {
                 dogInfo = dog
                 dogAge = DateUtils.getAge(dog.birth)
@@ -44,6 +44,8 @@ class ManageDogListAdapter(
                     Glide.with(context).load(dogImages[dog.name])
                         .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(manageDogImg)
                 }
+
+                divider.visibility = if (isLastItem) android.view.View.GONE else android.view.View.VISIBLE
 
                 root.setOnClickListener {
                     onItemClickListener?.onItemClick(dog)

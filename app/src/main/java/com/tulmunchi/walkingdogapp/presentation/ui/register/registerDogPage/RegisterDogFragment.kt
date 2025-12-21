@@ -37,6 +37,7 @@ import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentRegisterDogBinding
 import com.tulmunchi.walkingdogapp.domain.model.Dog
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.BackNavigationDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
@@ -393,18 +394,13 @@ class RegisterDogFragment : Fragment() {
     }
 
     private fun selectNavigateToMain() {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("나가시겠어요?")
-        val listener = DialogInterface.OnClickListener { _, ans ->
-            when (ans) {
-                DialogInterface.BUTTON_POSITIVE -> {
-                    navigateToMain(ResultOfRegisterDog.IsNotUpdatedDog)
-                }
-            }
+        val dialog = BackNavigationDialog.newInstance(
+            title = "등록을 취소할까요?"
+        )
+        dialog.onConfirmListener = BackNavigationDialog.OnConfirmListener {
+            navigateToMain(ResultOfRegisterDog.IsNotUpdatedDog)
         }
-        builder.setPositiveButton("네", listener)
-        builder.setNegativeButton("아니요", null)
-        builder.show()
+        dialog.show(parentFragmentManager, "back_navigation_dialog")
     }
 
     private fun navigateToMain(result: ResultOfRegisterDog) {

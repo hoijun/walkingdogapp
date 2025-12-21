@@ -49,11 +49,13 @@ import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.ActivityWalkingBinding
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.BackNavigationDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionData
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.ui.register.registerDogPage.RegisterDogFragment.ResultOfRegisterDog
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.WalkingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -550,37 +552,32 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("산책 그만 할까요?\n(5분 또는 300m 이상 산책 시 기록 가능)")
+        val dialog = BackNavigationDialog.newInstance(
+            title = "산책을 그만 할까요?\n(5분 또는 300m 이상 산책 시 기록 가능)"
+        )
+        dialog.onConfirmListener = BackNavigationDialog.OnConfirmListener {
+            if (wService.walkDistance.value == null || wService.walkTime.value == null) {
+                return@OnConfirmListener
+            }
 
-        val listener = DialogInterface.OnClickListener { _, ans ->
-            when (ans) {
-                DialogInterface.BUTTON_POSITIVE -> {
-                    if (wService.walkDistance.value == null || wService.walkTime.value == null) {
-                        return@OnClickListener
-                    }
-
-                    if (wService.walkDistance.value!! < 300 && wService.walkTime.value!! < 300) {
-                        Toast.makeText(this, "거리 또는 시간이 너무 부족해요!", Toast.LENGTH_SHORT).show()
-                        stopWalkingService()
-                        navigateToHome()
-                    } else {
-                        startTime = wService.startTime
-                        setSaveScreen()
-                        saveWalkInfo(
-                            wService.walkDistance.value ?: 0f,
-                            wService.walkTime.value!!,
-                            wService.coordList.value!!,
-                            wService.walkingDogs.value ?: arrayListOf(),
-                            wService.getCollectionItems.toMutableSet().toList()
-                        )
-                    }
-                }
+            if (wService.walkDistance.value!! < 300 && wService.walkTime.value!! < 300) {
+                Toast.makeText(this, "거리 또는 시간이 너무 부족해요!", Toast.LENGTH_SHORT).show()
+                stopWalkingService()
+                navigateToHome()
+            } else {
+                startTime = wService.startTime
+                setSaveScreen()
+                saveWalkInfo(
+                    wService.walkDistance.value ?: 0f,
+                    wService.walkTime.value!!,
+                    wService.coordList.value!!,
+                    wService.walkingDogs.value ?: arrayListOf(),
+                    wService.getCollectionItems.toMutableSet().toList()
+                )
             }
         }
-        builder.setPositiveButton("네", listener)
-        builder.setNegativeButton("아니오", null)
-        builder.show()
+
+        dialog.show(supportFragmentManager, "back_navigation_dialog")
     }
 
     // 거리 및 시간 저장, 날짜: 시간 별로 산책 기록 저장

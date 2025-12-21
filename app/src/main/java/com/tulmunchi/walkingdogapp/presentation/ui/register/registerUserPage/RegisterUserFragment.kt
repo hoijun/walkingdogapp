@@ -20,6 +20,7 @@ import androidx.fragment.app.viewModels
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.FragmentRegisterUserBinding
 import com.tulmunchi.walkingdogapp.domain.model.User
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.BackNavigationDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
@@ -181,18 +182,13 @@ class RegisterUserFragment : Fragment() {
     }
 
     private fun selectGoMain() {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("나가시겠어요?")
-        val listener = DialogInterface.OnClickListener { _, ans ->
-            when (ans) {
-                DialogInterface.BUTTON_POSITIVE -> {
-                    navigateToMyPage()
-                }
-            }
+        val dialog = BackNavigationDialog.newInstance(
+            title = "등록을 취소할까요?"
+        )
+        dialog.onConfirmListener = BackNavigationDialog.OnConfirmListener {
+            navigateToMyPage()
         }
-        builder.setPositiveButton("네", listener)
-        builder.setNegativeButton("아니요", null)
-        builder.show()
+        dialog.show(parentFragmentManager, "back_navigation_dialog")
     }
 
     private fun navigateToMyPage() {
@@ -220,14 +216,28 @@ class RegisterUserFragment : Fragment() {
     object RegisterUserBindingAdapter {
         @BindingAdapter("userGender")
         @JvmStatic
-        fun setBackground(btn: Button, gender: String) {
-            val color = if (gender == btn.text.toString()) "#ff444444" else "#ff888888"
+        fun setButtonBackground(btn: Button, gender: String) {
+            val isSelected = gender == btn.text.toString()
+            val density = btn.resources.displayMetrics.density
+
             val shape = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
-                cornerRadius = 10f * btn.resources.displayMetrics.density
-                setColor(color.toColorInt())
+                cornerRadius = 8f * density
+
+                if (isSelected) {
+                    // 선택됨: 회색 배경 채우기
+                    setColor("#e4e4e4".toColorInt())
+                    setStroke((1 * density).toInt(), "#e4e4e4".toColorInt())
+                } else {
+                    // 선택 안됨: 투명 배경 + 테두리만
+                    setColor(android.graphics.Color.TRANSPARENT)
+                    setStroke((1 * density).toInt(), "#e4e4e4".toColorInt())
+                }
             }
+
             btn.background = shape
+            // 선택된 버튼은 진한 검정색, 선택 안된 버튼은 회색 텍스트
+            btn.setTextColor(if (isSelected) "#000000".toColorInt() else "#888888".toColorInt())
         }
 
         @BindingAdapter("userNameLength")

@@ -144,17 +144,8 @@ class SettingFragment : Fragment() {
                     return@setOnClickListener
                 }
 
-                parentFragmentManager.let {
-                    try {
-                        showLoadingFragment()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-
                 val credential = EmailAuthProvider.getCredential(email, password)
                 auth.currentUser?.reauthenticate(credential)?.addOnSuccessListener {
-                    hideLoadingDialog()
                     val writeDialog = WriteDialog()
                     writeDialog.clickYesListener = WriteDialog.OnClickYesListener { writeText ->
                         if (userEmail != writeText) {
@@ -162,13 +153,7 @@ class SettingFragment : Fragment() {
                             return@OnClickYesListener
                         } // 이메일 올바르게 입력x
 
-                        parentFragmentManager.let {
-                            try {
-                                hideLoadingDialog()
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
+                        showLoadingFragment()
 
                         lifecycleScope.launch {
                             if (email.contains("@naver.com")) { // 네이버로 로그인 했을 경우

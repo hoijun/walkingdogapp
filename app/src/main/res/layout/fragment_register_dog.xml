@@ -192,7 +192,7 @@
                         android:layout_width="0dp"
                         android:layout_height="50dp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginEnd="5dp"
+                        android:layout_marginEnd="2.5dp"
                         android:background="@drawable/custom_button_border"
                         android:elevation="0dp"
                         android:gravity="center"
@@ -202,15 +202,15 @@
                         android:textSize="15sp"
                         android:textStyle="bold"
                         app:dogGender="@{dogInfo.gender}"
+                        app:layout_constraintEnd_toStartOf="@+id/btn_dogIsFemale"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/introduction_gender"
-                        app:layout_constraintWidth_percent="0.5" />
+                        app:layout_constraintTop_toBottomOf="@id/introduction_gender" />
 
                     <Button
                         android:id="@+id/btn_dogIsFemale"
                         android:layout_width="0dp"
                         android:layout_height="50dp"
-                        android:layout_marginStart="5dp"
+                        android:layout_marginStart="2.5dp"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/custom_button_border"
                         android:elevation="0dp"
@@ -221,9 +221,9 @@
                         android:textSize="15sp"
                         android:textStyle="bold"
                         app:dogGender="@{dogInfo.gender}"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/btn_dogIsMale"
-                        app:layout_constraintTop_toBottomOf="@id/introduction_gender"
-                        app:layout_constraintWidth_percent="0.5" />
+                        app:layout_constraintTop_toBottomOf="@id/introduction_gender" />
 
                     <TextView
                         android:id="@+id/introduction_birth"
@@ -273,7 +273,7 @@
                         android:layout_width="0dp"
                         android:layout_height="50dp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginEnd="5dp"
+                        android:layout_marginEnd="2.5dp"
                         android:background="@drawable/custom_button_border"
                         android:elevation="0dp"
                         android:gravity="center"
@@ -283,15 +283,15 @@
                         android:textSize="15sp"
                         android:textStyle="bold"
                         app:dogNeutering="@{dogInfo.neutering}"
+                        app:layout_constraintEnd_toStartOf="@+id/btn_neuterIsNo"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/introduction_neutering"
-                        app:layout_constraintWidth_percent="0.5" />
+                        app:layout_constraintTop_toBottomOf="@id/introduction_neutering" />
 
                     <Button
                         android:id="@+id/btn_neuterIsNo"
                         android:layout_width="0dp"
                         android:layout_height="50dp"
-                        android:layout_marginStart="5dp"
+                        android:layout_marginStart="2.5dp"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/custom_button_border"
                         android:elevation="0dp"
@@ -302,9 +302,9 @@
                         android:textSize="15sp"
                         android:textStyle="bold"
                         app:dogNeutering="@{dogInfo.neutering}"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/btn_neuterIsYes"
-                        app:layout_constraintTop_toBottomOf="@id/introduction_neutering"
-                        app:layout_constraintWidth_percent="0.5" />
+                        app:layout_constraintTop_toBottomOf="@id/introduction_neutering" />
 
                     <TextView
                         android:id="@+id/introduction_vaccination"
@@ -324,7 +324,7 @@
                         android:layout_width="0dp"
                         android:layout_height="50dp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginEnd="5dp"
+                        android:layout_marginEnd="2.5dp"
                         android:background="@drawable/custom_button_border"
                         android:elevation="0dp"
                         android:gravity="center"
@@ -334,15 +334,15 @@
                         android:textSize="15sp"
                         android:textStyle="bold"
                         app:dogVaccination="@{dogInfo.vaccination}"
+                        app:layout_constraintEnd_toStartOf="@+id/btn_vaccIsNo"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/introduction_vaccination"
-                        app:layout_constraintWidth_percent="0.5" />
+                        app:layout_constraintTop_toBottomOf="@id/introduction_vaccination" />
 
                     <Button
                         android:id="@+id/btn_vaccIsNo"
                         android:layout_width="0dp"
                         android:layout_height="50dp"
-                        android:layout_marginStart="5dp"
+                        android:layout_marginStart="2.5dp"
                         android:layout_marginTop="10dp"
                         android:background="@drawable/custom_button_border"
                         android:elevation="0dp"
@@ -353,9 +353,9 @@
                         android:textSize="15sp"
                         android:textStyle="bold"
                         app:dogVaccination="@{dogInfo.vaccination}"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/btn_vaccIsYes"
-                        app:layout_constraintTop_toBottomOf="@id/introduction_vaccination"
-                        app:layout_constraintWidth_percent="0.5" />
+                        app:layout_constraintTop_toBottomOf="@id/introduction_vaccination" />
 
                     <TextView
                         android:id="@+id/introduction_weight"
