@@ -171,10 +171,9 @@ class WalkInfoFragment : Fragment() { // 수정
 
             val spacingItemDecoration = context?.let { ctx ->
                 HorizonSpacingItemDecoration(
-                    mainViewModel.dogs.value?.size ?: 0,
                     UiUtils.dpToPx(10f, ctx)
                 )
-            } ?: HorizonSpacingItemDecoration(0, 0) // 리사이클러뷰 아이템 간격
+            } ?: HorizonSpacingItemDecoration(0) // 리사이클러뷰 아이템 간격
 
             selectDogsRecyclerView.addItemDecoration(spacingItemDecoration)
             selectDogsRecyclerView.adapter = walkInfoDogListAdapter

@@ -71,7 +71,7 @@ class DogInfoFragment : Fragment() {
                 }
             }
 
-            btnSettingdog.setOnClickListener {
+            btnUpdateDog.setOnClickListener {
                 if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }
@@ -92,11 +92,11 @@ class DogInfoFragment : Fragment() {
                             .load(dogImg)
                             .format(DecodeFormat.PREFER_ARGB_8888)
                             .override(300, 300)
-                            .error(R.drawable.collection_003) // 에러 시 기본 이미지
-                            .into(dogInfoImage)
+                            .error(R.drawable.collection_unobtained) // 에러 시 기본 이미지
+                            .into(imageDogInfo)
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        dogInfoImage.setImageResource(R.drawable.collection_003)
+                        imageDogInfo.setImageResource(R.drawable.collection_unobtained)
                     }
                 }
             }

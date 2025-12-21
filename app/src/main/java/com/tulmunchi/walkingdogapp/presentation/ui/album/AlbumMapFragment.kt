@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -110,7 +111,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     ): View {
         _binding = FragmentAlbumMapBinding.inflate(inflater, container, false)
         context?.let { ctx ->
-            itemDecoration = HorizonSpacingItemDecoration(3, UiUtils.dpToPx(12f, ctx))
+            itemDecoration = HorizonSpacingItemDecoration(UiUtils.dpToPx(12f, ctx))
         }
 
         binding.apply {
@@ -189,7 +190,9 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                         binding.imgRecyclerView.removeItemDecoration(decoration)
                     }
                     imgInfos.clear()
+                    binding.isImgExisted = false  // 초기화
                     selectedDay = date
+                    binding.selectDay = date  // 데이터 바인딩 변수 업데이트
                     setAlbumMap(selectedDay)
                     removeMarker()
                     setMarker()
@@ -308,6 +311,8 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                     imgRecyclerView.addItemDecoration(decoration)
                 }
                 imgRecyclerView.adapter = adapter
+            } else {
+                isImgExisted = false  // 이미지가 없을 때도 업데이트
             }
         }
     }

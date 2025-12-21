@@ -47,4 +47,10 @@
         <item name="android:statusBarColor">#FFFFFF</item>
     </style>
 
+    <!-- 이미지 라운드 처리 스타일 -->
+    <style name="RoundedImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">15dp</item>
+    </style>
+
 </resources>

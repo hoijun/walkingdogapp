@@ -5,15 +5,16 @@
     android:layout_height="match_parent"
     app:layout_constraintDimensionRatio="1:1">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/album_img"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
+        android:src="@drawable/collection_unobtained"
+        app:shapeAppearanceOverlay="@style/RoundedImageView"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintDimensionRatio="1:1"
-        android:src="@drawable/collection_unobtained" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

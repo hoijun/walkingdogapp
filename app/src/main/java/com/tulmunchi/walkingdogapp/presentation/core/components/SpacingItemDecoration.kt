@@ -46,7 +46,6 @@ class GridSpacingItemDecoration(
 }
 
 class HorizonSpacingItemDecoration(
-    private val itemCount: Int, // 아이템 갯수
     private val spacing: Int // 간격
 ) : ItemDecoration() {
     override fun getItemOffsets(
@@ -56,6 +55,7 @@ class HorizonSpacingItemDecoration(
         state: RecyclerView.State
     ) {
         val position: Int = parent.getChildAdapterPosition(view)
+        val itemCount = parent.adapter?.itemCount ?: 0
 
         if (position >= 0) {
             outRect.apply {
