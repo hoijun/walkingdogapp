@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
-import com.tulmunchi.walkingdogapp.databinding.HomedoglistItemBinding
+import com.tulmunchi.walkingdogapp.databinding.ItemHomeDogListBinding
 import com.tulmunchi.walkingdogapp.domain.model.Dog
 
 class HomeDogListAdapter(
@@ -31,7 +31,7 @@ class HomeDogListAdapter(
     var onClickDogListener: OnClickDogListener? = null
     var onAddDogClickListener: OnAddDogClickListener? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeDogListViewHolder {
-        val binding = HomedoglistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemHomeDogListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         context = parent.context
         return HomeDogListViewHolder(binding)
     }
@@ -45,7 +45,7 @@ class HomeDogListAdapter(
         holder.bind(dogsList[position])
     }
 
-    inner class HomeDogListViewHolder(private val binding: HomedoglistItemBinding) :
+    inner class HomeDogListViewHolder(private val binding: ItemHomeDogListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(dog: Dog) {
             binding.apply {

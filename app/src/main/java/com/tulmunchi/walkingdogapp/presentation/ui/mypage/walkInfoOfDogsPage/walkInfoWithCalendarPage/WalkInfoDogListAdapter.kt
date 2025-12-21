@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.tulmunchi.walkingdogapp.databinding.WalkinfodoglistItemBinding
+import com.tulmunchi.walkingdogapp.databinding.ItemWalkinfoDogListBinding
 import com.tulmunchi.walkingdogapp.domain.model.Dog
 
 class WalkInfoDogListAdapter(private val dogsInfo: List<Dog>, private val dogsImg: Map<String, String>):  RecyclerView.Adapter<WalkInfoDogListAdapter.WalkInfoDogListViewHolder>(){
@@ -19,7 +19,7 @@ class WalkInfoDogListAdapter(private val dogsInfo: List<Dog>, private val dogsIm
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalkInfoDogListViewHolder {
         context = parent.context
-        val binding = WalkinfodoglistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemWalkinfoDogListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return WalkInfoDogListViewHolder(binding)
     }
 
@@ -29,7 +29,7 @@ class WalkInfoDogListAdapter(private val dogsInfo: List<Dog>, private val dogsIm
         holder.bind(dogsInfo[position])
     }
 
-    inner class WalkInfoDogListViewHolder(private val binding: WalkinfodoglistItemBinding) :
+    inner class WalkInfoDogListViewHolder(private val binding: ItemWalkinfoDogListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(dog: Dog) {
             if (dogsImg.get(dog.name) != null) {

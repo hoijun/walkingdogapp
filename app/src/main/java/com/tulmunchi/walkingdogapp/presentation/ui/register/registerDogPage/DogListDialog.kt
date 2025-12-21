@@ -10,11 +10,11 @@ import android.view.WindowManager
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tulmunchi.walkingdogapp.databinding.DoglistDialogBinding
+import com.tulmunchi.walkingdogapp.databinding.DialogDogListBinding
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.WriteDialog
 
 class DogListDialog : DialogFragment(){
-    private var _binding: DoglistDialogBinding? = null
+    private var _binding: DialogDogListBinding? = null
     private val binding get() = _binding!!
     private val dogs = listOf(
         "직접 입력", "말티즈", "푸들", "포메라니안", "믹스견", "치와와", "시츄",
@@ -33,7 +33,7 @@ class DogListDialog : DialogFragment(){
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = DoglistDialogBinding.inflate(inflater, container, false)
+        _binding = DialogDogListBinding.inflate(inflater, container, false)
         val dialogRecyclerView = binding.dialogRecyclerView
         dialogRecyclerView.layoutManager = LinearLayoutManager(context)
         val adapter = DogListAdapter(dogs)

@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.tulmunchi.walkingdogapp.databinding.GallerylistItemBinding
+import com.tulmunchi.walkingdogapp.databinding.ItemGalleryPictureListBinding
 import com.tulmunchi.walkingdogapp.presentation.model.GalleryImgInfo
 
 class GalleryItemListAdapter(private val imgList: MutableList<GalleryImgInfo>): RecyclerView.Adapter<GalleryItemListAdapter.AlbumMapItemListViewHolder>() {
@@ -24,7 +24,7 @@ class GalleryItemListAdapter(private val imgList: MutableList<GalleryImgInfo>): 
     var itemClickListener : OnItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumMapItemListViewHolder {
-        val binding = GallerylistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemGalleryPictureListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         context = parent.context
         return AlbumMapItemListViewHolder(binding)
     }
@@ -35,7 +35,7 @@ class GalleryItemListAdapter(private val imgList: MutableList<GalleryImgInfo>): 
         holder.bind(imgList[position])
     }
 
-    inner class AlbumMapItemListViewHolder(private val binding: GallerylistItemBinding) :
+    inner class AlbumMapItemListViewHolder(private val binding: ItemGalleryPictureListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {

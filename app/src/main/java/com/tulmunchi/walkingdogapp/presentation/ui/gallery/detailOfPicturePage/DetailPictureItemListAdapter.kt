@@ -8,7 +8,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
-import com.tulmunchi.walkingdogapp.databinding.DetailpicturelistItemBinding
+import com.tulmunchi.walkingdogapp.databinding.ItemDetailPictureListBinding
 import com.tulmunchi.walkingdogapp.presentation.model.GalleryImgInfo
 
 class DetailPictureItemListAdapter(private val imgList: List<GalleryImgInfo>) : RecyclerView.Adapter<DetailPictureItemListAdapter.DetailPictureItemListViewHolder>(){
@@ -27,7 +27,7 @@ class DetailPictureItemListAdapter(private val imgList: List<GalleryImgInfo>) : 
         val displayMetrics = context.resources.displayMetrics
         screenWidth = displayMetrics.widthPixels
         screenHeight = displayMetrics.heightPixels
-        val binding = DetailpicturelistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemDetailPictureListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return DetailPictureItemListViewHolder(binding)
     }
 
@@ -37,7 +37,7 @@ class DetailPictureItemListAdapter(private val imgList: List<GalleryImgInfo>) : 
         holder.bind(imgList[position])
     }
 
-    inner class DetailPictureItemListViewHolder(private val binding: DetailpicturelistItemBinding) :
+    inner class DetailPictureItemListViewHolder(private val binding: ItemDetailPictureListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {

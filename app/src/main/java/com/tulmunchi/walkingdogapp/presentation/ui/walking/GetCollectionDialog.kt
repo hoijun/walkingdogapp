@@ -10,11 +10,11 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
-import com.tulmunchi.walkingdogapp.databinding.GetcollectionDialogBinding
+import com.tulmunchi.walkingdogapp.databinding.DialogGetCollectionBinding
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 
 class GetCollectionDialog: DialogFragment() {
-    private var _binding: GetcollectionDialogBinding? = null
+    private var _binding: DialogGetCollectionBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -22,7 +22,7 @@ class GetCollectionDialog: DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = GetcollectionDialogBinding.inflate(inflater, container, false)
+        _binding = DialogGetCollectionBinding.inflate(inflater, container, false)
         val getCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable("getCollection", CollectionInfo::class.java)?: CollectionInfo()
         } else {

@@ -3,7 +3,7 @@ package com.tulmunchi.walkingdogapp.presentation.ui.register.registerDogPage
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.tulmunchi.walkingdogapp.databinding.DoglistDialogItemBinding
+import com.tulmunchi.walkingdogapp.databinding.ItemDogListDialogBinding
 
 class DogListAdapter(private val dogs: List<String>) : RecyclerView.Adapter<DogListAdapter.DogListViewHolder>() {
     fun interface OnItemClickListener {
@@ -14,7 +14,7 @@ class DogListAdapter(private val dogs: List<String>) : RecyclerView.Adapter<DogL
 
     // ViewHolder 생성하는 함수, 최소 생성 횟수만큼만 호출됨 (계속 호출 X)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DogListViewHolder {
-        val binding = DoglistDialogItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemDogListDialogBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return DogListViewHolder(binding)
     }
 
@@ -26,7 +26,7 @@ class DogListAdapter(private val dogs: List<String>) : RecyclerView.Adapter<DogL
 
     override fun getItemCount() : Int = dogs.size
 
-    inner class DogListViewHolder(private val binding: DoglistDialogItemBinding) :
+    inner class DogListViewHolder(private val binding: ItemDogListDialogBinding) :
         RecyclerView.ViewHolder(binding.root) {
             init {
                 binding.root.setOnClickListener {

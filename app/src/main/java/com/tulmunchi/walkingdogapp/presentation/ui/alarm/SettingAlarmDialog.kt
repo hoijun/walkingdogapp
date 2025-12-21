@@ -12,12 +12,12 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
-import com.tulmunchi.walkingdogapp.databinding.SettingalarmDialogBinding
+import com.tulmunchi.walkingdogapp.databinding.DialogSettingAlarmBinding
 import com.tulmunchi.walkingdogapp.domain.model.Alarm
 import java.util.Calendar
 
 class SettingAlarmDialog : DialogFragment() {
-    private var _binding: SettingalarmDialogBinding? = null
+    private var _binding: DialogSettingAlarmBinding? = null
     private val binding get() = _binding!!
 
     interface OnAddAlarmListener {
@@ -32,7 +32,7 @@ class SettingAlarmDialog : DialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = SettingalarmDialogBinding.inflate(inflater, container, false)
+        _binding = DialogSettingAlarmBinding.inflate(inflater, container, false)
 
         val alarmInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelable("alarmInfo", Alarm::class.java)

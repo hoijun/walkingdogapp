@@ -3,7 +3,7 @@ package com.tulmunchi.walkingdogapp.presentation.ui.mypage.walkInfoOfDogsPage.wa
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.tulmunchi.walkingdogapp.databinding.WalkdateslistItemBinding
+import com.tulmunchi.walkingdogapp.databinding.ItemWalkdatesListBinding
 import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
 
 class WalkDatesListAdapter(private val walkRecordList: List<WalkRecord>): RecyclerView.Adapter<WalkDatesListAdapter.WalkDatesListViewHolder>() {
@@ -14,7 +14,7 @@ class WalkDatesListAdapter(private val walkRecordList: List<WalkRecord>): Recycl
 
     var itemClickListener : OnItemClickListener? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalkDatesListViewHolder {
-        val binding = WalkdateslistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemWalkdatesListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return WalkDatesListViewHolder(binding)
     }
 
@@ -24,7 +24,7 @@ class WalkDatesListAdapter(private val walkRecordList: List<WalkRecord>): Recycl
         holder.bind(walkRecordList[position])
     }
 
-    inner class WalkDatesListViewHolder(private val binding: WalkdateslistItemBinding) :
+    inner class WalkDatesListViewHolder(private val binding: ItemWalkdatesListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {

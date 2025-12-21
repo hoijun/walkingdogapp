@@ -3,6 +3,7 @@ package com.tulmunchi.walkingdogapp.presentation.ui.album
 import android.content.res.Resources
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,14 +14,14 @@ import androidx.fragment.app.activityViewModels
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 import com.tulmunchi.walkingdogapp.R
-import com.tulmunchi.walkingdogapp.databinding.DateDialogBinding
+import com.tulmunchi.walkingdogapp.databinding.DialogCalendarBinding
 import com.tulmunchi.walkingdogapp.presentation.core.components.SelectedMonthDecorator
 import com.tulmunchi.walkingdogapp.presentation.core.components.ToDayDecorator
 import com.tulmunchi.walkingdogapp.presentation.core.components.WalkDayDecorator
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 
 class DateDialog : DialogFragment() {
-    private var _binding: DateDialogBinding? = null
+    private var _binding: DialogCalendarBinding? = null
     private val binding get() = _binding!!
     private var walkDates = mutableListOf<CalendarDay>()
     private val userDataViewModel: MainViewModel by activityViewModels()
@@ -58,7 +59,7 @@ class DateDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = DateDialogBinding.inflate(inflater, container, false)
+        _binding = DialogCalendarBinding.inflate(inflater, container, false)
         val todayDecorator = ToDayDecorator(requireContext(), CalendarDay.today())
         var selectedMonthDecorator = SelectedMonthDecorator(CalendarDay.today().month)
         val walkDayDecorator = WalkDayDecorator(walkDates) // 산책한 날 표시
@@ -121,5 +122,11 @@ class DateDialog : DialogFragment() {
         val deviceWidth = Resources.getSystem().displayMetrics.widthPixels
         params?.width = (deviceWidth * 0.8).toInt()
         this.dialog?.window?.attributes = params as WindowManager.LayoutParams
+        this.dialog?.window?.setGravity(Gravity.BOTTOM)
+        
+        // 하단 여백 추가
+        val layoutParams = this.dialog?.window?.attributes as WindowManager.LayoutParams
+        layoutParams.y = (Resources.getSystem().displayMetrics.density * 20).toInt()
+        this.dialog?.window?.attributes = layoutParams
     }
 }

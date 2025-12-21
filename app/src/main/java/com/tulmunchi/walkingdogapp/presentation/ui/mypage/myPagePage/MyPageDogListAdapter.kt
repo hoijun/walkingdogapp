@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
-import com.tulmunchi.walkingdogapp.databinding.MypagedoglistItemBinding
+import com.tulmunchi.walkingdogapp.databinding.ItemMypageDogListBinding
 import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
 
@@ -33,7 +33,7 @@ class MyPageDogListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyPageDogListViewHolder {
         val binding =
-            MypagedoglistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemMypageDogListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         context = parent.context
         return MyPageDogListViewHolder(binding)
     }
@@ -47,7 +47,7 @@ class MyPageDogListAdapter(
         holder.bind(dogsList[position])
     }
 
-    inner class MyPageDogListViewHolder(private val binding: MypagedoglistItemBinding) :
+    inner class MyPageDogListViewHolder(private val binding: ItemMypageDogListBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind() {

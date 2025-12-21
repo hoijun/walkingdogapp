@@ -12,12 +12,12 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
-import com.tulmunchi.walkingdogapp.databinding.CurrentcollectionsDialogBinding
+import com.tulmunchi.walkingdogapp.databinding.DialogCurrentCollectionsBinding
 import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 
 class CurrentCollectionsDialog: DialogFragment() {
-    private var _binding: CurrentcollectionsDialogBinding? = null
+    private var _binding: DialogCurrentCollectionsBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -25,7 +25,7 @@ class CurrentCollectionsDialog: DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = CurrentcollectionsDialogBinding.inflate(inflater, container, false)
+        _binding = DialogCurrentCollectionsBinding.inflate(inflater, container, false)
         val currentCollections = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelableArrayList("currentCollections", CollectionInfo::class.java)?: arrayListOf()
         } else {

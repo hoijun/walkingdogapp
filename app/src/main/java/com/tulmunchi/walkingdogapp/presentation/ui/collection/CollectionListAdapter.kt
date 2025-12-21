@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.tulmunchi.walkingdogapp.R
-import com.tulmunchi.walkingdogapp.databinding.CollectionlistItemBinding
+import com.tulmunchi.walkingdogapp.databinding.ItemCollectionListBinding
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 
 class CollectionListAdapter(
@@ -29,7 +29,7 @@ class CollectionListAdapter(
     var itemClickListener : OnItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CollectionListViewHolder {
-        val binding = CollectionlistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemCollectionListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         context = parent.context
         return CollectionListViewHolder(binding)
     }
@@ -44,7 +44,7 @@ class CollectionListAdapter(
         return position.toLong()
     }
 
-    inner class CollectionListViewHolder(private val binding: CollectionlistItemBinding) :
+    inner class CollectionListViewHolder(private val binding: ItemCollectionListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {

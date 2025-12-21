@@ -9,10 +9,10 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
-import com.tulmunchi.walkingdogapp.databinding.WriteDialogBinding
+import com.tulmunchi.walkingdogapp.databinding.DialogWriteBinding
 
 class WriteDialog : DialogFragment() {
-    private var _binding: WriteDialogBinding? = null
+    private var _binding: DialogWriteBinding? = null
     private val binding get() = _binding!!
     fun interface OnClickYesListener {
         fun onClick(text: String)
@@ -24,7 +24,7 @@ class WriteDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = WriteDialogBinding.inflate(inflater, container, false)
+        _binding = DialogWriteBinding.inflate(inflater, container, false)
         val writeText = arguments?.getString("text")?: ""
         binding.apply {
             write.hint = writeText

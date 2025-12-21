@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
-import com.tulmunchi.walkingdogapp.databinding.ManagedoglistItemBinding
+import com.tulmunchi.walkingdogapp.databinding.ItemManageDogListBinding
 import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
 
@@ -23,7 +23,7 @@ class ManageDogListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ManageDogListViewHolder {
         val binding =
-            ManagedoglistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemManageDogListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         context = parent.context
         return ManageDogListViewHolder(binding)
     }
@@ -33,7 +33,7 @@ class ManageDogListAdapter(
         holder.bind(dogsList[position], position == dogsList.size - 1)
     }
 
-    inner class ManageDogListViewHolder(private val binding: ManagedoglistItemBinding) :
+    inner class ManageDogListViewHolder(private val binding: ItemManageDogListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(dog: Dog, isLastItem: Boolean) {
             binding.apply {

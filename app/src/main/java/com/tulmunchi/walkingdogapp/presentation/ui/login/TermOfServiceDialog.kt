@@ -4,18 +4,19 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
-import com.tulmunchi.walkingdogapp.databinding.TermofserviceDialogBinding
+import com.tulmunchi.walkingdogapp.databinding.DialogTermofserviceBinding
 import com.tulmunchi.walkingdogapp.presentation.ui.mypage.settingPage.PrivacyWebViewActivity
 import androidx.core.graphics.toColorInt
 
 class TermOfServiceDialog: DialogFragment() {
-    private var _binding: TermofserviceDialogBinding? = null
+    private var _binding: DialogTermofserviceBinding? = null
     private val binding get() = _binding!!
     fun interface OnClickYesListener {
         fun onClick(agree: Boolean)
@@ -32,7 +33,7 @@ class TermOfServiceDialog: DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = TermofserviceDialogBinding.inflate(inflater, container, false)
+        _binding = DialogTermofserviceBinding.inflate(inflater, container, false)
         binding.apply {
             useService.setOnCheckedChangeListener { _, isChecked ->
                 isCheckedFirst = isChecked
@@ -98,6 +99,12 @@ class TermOfServiceDialog: DialogFragment() {
         val deviceWidth = Resources.getSystem().displayMetrics.widthPixels
         params?.width = (deviceWidth * 0.95).toInt()
         this.dialog?.window?.attributes = params as WindowManager.LayoutParams
+        this.dialog?.window?.setGravity(Gravity.BOTTOM)
+        
+        // 하단 여백 추가
+        val layoutParams = this.dialog?.window?.attributes as WindowManager.LayoutParams
+        layoutParams.y = (Resources.getSystem().displayMetrics.density * 20).toInt()
+        this.dialog?.window?.attributes = layoutParams
     }
 
     private fun openWebView(url: String) {

@@ -3,7 +3,7 @@ package com.tulmunchi.walkingdogapp.presentation.ui.alarm
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.tulmunchi.walkingdogapp.databinding.AlarmlistItemBinding
+import com.tulmunchi.walkingdogapp.databinding.ItemAlarmListBinding
 import com.tulmunchi.walkingdogapp.domain.model.Alarm
 import java.util.Calendar
 
@@ -25,7 +25,7 @@ class AlarmListAdapter(private val alarmList: List<Alarm>) : RecyclerView.Adapte
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlarmItemListViewHolder {
         val binding =
-            AlarmlistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemAlarmListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return AlarmItemListViewHolder(binding)
     }
 
@@ -35,7 +35,7 @@ class AlarmListAdapter(private val alarmList: List<Alarm>) : RecyclerView.Adapte
         holder.bind(alarmList[position])
     }
 
-    inner class AlarmItemListViewHolder(private val binding: AlarmlistItemBinding) :
+    inner class AlarmItemListViewHolder(private val binding: ItemAlarmListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {

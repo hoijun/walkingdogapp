@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.tulmunchi.walkingdogapp.databinding.CurrentcollectionItemBinding
+import com.tulmunchi.walkingdogapp.databinding.ItemCurrentCollectionBinding
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 
 class CurrentCollectionItemListAdapter(private val getCollectionItemInfos: MutableList<CollectionInfo>): RecyclerView.Adapter<CurrentCollectionItemListAdapter.GetCollectionItemListViewHolder>() {
@@ -15,7 +15,7 @@ class CurrentCollectionItemListAdapter(private val getCollectionItemInfos: Mutab
         parent: ViewGroup,
         viewType: Int,
     ): GetCollectionItemListViewHolder {
-        val binding = CurrentcollectionItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemCurrentCollectionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         context = parent.context
         return GetCollectionItemListViewHolder(binding)
     }
@@ -26,7 +26,7 @@ class CurrentCollectionItemListAdapter(private val getCollectionItemInfos: Mutab
         holder.bind(getCollectionItemInfos[position])
     }
 
-    inner class GetCollectionItemListViewHolder(private val binding: CurrentcollectionItemBinding) :
+    inner class GetCollectionItemListViewHolder(private val binding: ItemCurrentCollectionBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(collectionInfo: CollectionInfo) {
             Glide.with(context).load(collectionInfo.collectionResId).into(binding.getCollectionImg)

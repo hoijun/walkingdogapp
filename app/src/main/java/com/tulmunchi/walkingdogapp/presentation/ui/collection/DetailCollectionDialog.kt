@@ -13,11 +13,11 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
-import com.tulmunchi.walkingdogapp.databinding.DetailcollectionDialogBinding
+import com.tulmunchi.walkingdogapp.databinding.DialogDetailCollectionBinding
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 
 class DetailCollectionDialog: DialogFragment() {
-    private var _binding: DetailcollectionDialogBinding? = null
+    private var _binding: DialogDetailCollectionBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -25,7 +25,7 @@ class DetailCollectionDialog: DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = DetailcollectionDialogBinding.inflate(inflater, container, false)
+        _binding = DialogDetailCollectionBinding.inflate(inflater, container, false)
         val collectionInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable("collectionInfo", CollectionInfo::class.java)?: CollectionInfo()
         } else {
