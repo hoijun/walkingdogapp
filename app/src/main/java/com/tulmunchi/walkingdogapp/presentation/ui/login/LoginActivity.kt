@@ -179,9 +179,6 @@ class LoginActivity : AppCompatActivity() {
             lifecycleScope.launch(Dispatchers.Main) {
                 if (success) {
                     setLoadingState(false)
-                    auth.currentUser?.email?.let { email ->
-                        saveEmail(email, "")
-                    }
                     showPermissionDialog()
                 } else {
                     try {

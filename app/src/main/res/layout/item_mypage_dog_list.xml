@@ -15,11 +15,10 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/round_style_rad20">
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/round_style_rad15_border">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,11 +30,12 @@
             app:layout_constraintWidth_percent="0.925">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/menu_dogimg"
+                android:id="@+id/menu_dogImg"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:src="@drawable/collection_003"
+                android:layout_marginStart="15dp"
+                android:src="@drawable/collection_unobtained"
+                app:civ_border_width="1dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintHeight_percent="0.6"
                 app:layout_constraintStart_toStartOf="parent"
@@ -43,41 +43,34 @@
                 app:layout_constraintWidth_percent="0.2" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintHeight_percent="0.6"
-                app:layout_constraintStart_toEndOf="@+id/menu_dogimg"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.4">
+                app:layout_constraintStart_toEndOf="@+id/menu_dogImg"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
                     android:id="@+id/menu_dogName"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:gravity="center|start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom|start"
                     android:text="@{dogInfo.name}"
                     android:textColor="@color/black"
-                    android:textSize="24sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_percent="0.65"
-                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/menu_dogFeature"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:gravity="center|start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|start"
                     android:text="@{String.format(`%d살 / %skg / %s`, dogAge, dogInfo.weight, dogInfo.breed)}"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:textColor="@color/black"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_percent="0.35"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/menu_dogName" />
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -99,7 +92,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
-            android:id="@+id/myPageAddDog_btn"
+            android:id="@+id/btn_myPageAddDog"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:src="@drawable/icon_add"

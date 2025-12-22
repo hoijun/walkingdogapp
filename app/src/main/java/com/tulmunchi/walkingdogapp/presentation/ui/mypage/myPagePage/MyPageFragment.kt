@@ -83,8 +83,11 @@ class MyPageFragment : Fragment() {
     ): View {
         _binding = FragmentMyPageBinding.inflate(inflater,container, false)
 
+        val currentCountCollection = mainViewModel.collections.value?.count { it.value } ?: 0
+
         binding.apply {
             viewModel = mainViewModel
+            countCollection = currentCountCollection
             lifecycleOwner = viewLifecycleOwner
 
             refresh.apply {
@@ -141,21 +144,21 @@ class MyPageFragment : Fragment() {
             mypageDogsViewPager.adapter = myPageDogListAdapter
             TabLayoutMediator(mypageDogsIndicator, mypageDogsViewPager) { _, _ -> }.attach()
 
-            managedoginfoBtn.setOnClickListener {
+            btnManageDog.setOnClickListener {
                 if (!networkChecker.isNetworkAvailable()) {
                     return@setOnClickListener
                 }
                 navigationManager.navigateTo(NavigationState.WithoutBottomNav.ManageDogs)
             }
 
-            modifyuserinfoBtn.setOnClickListener {
+            btnManageUser.setOnClickListener {
                 if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }
                 navigationManager.navigateTo(NavigationState.WithoutBottomNav.RegisterUser(from = "myPage"))
             }
 
-            managepicturesBtn.setOnClickListener {
+            btnManageGallery.setOnClickListener {
                 context?.let { ctx ->
                     if (checkPermission(storagePermission)) {
                         navigationManager.navigateTo(NavigationState.WithoutBottomNav.Gallery())
@@ -169,7 +172,7 @@ class MyPageFragment : Fragment() {
                 }
             }
 
-            menuWalkinfo.setOnClickListener {
+            menuWalkInfoLayout.setOnClickListener {
                 if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
                     return@setOnClickListener
                 }

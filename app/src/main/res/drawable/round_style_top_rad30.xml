@@ -1,8 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#e4e4e4" />
-    <corners
-        android:topLeftRadius="30dp"
-        android:topRightRadius="30dp" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 배경 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#e4e4e4" />
+            <corners
+                android:topLeftRadius="30dp"
+                android:topRightRadius="30dp" />
+        </shape>
+    </item>
+    
+    <!-- 상단, 좌우 테두리만 (하단 제외) -->
+    <item
+        android:left="0dp"
+        android:right="0dp"
+        android:top="0dp"
+        android:bottom="-1.5dp">
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="1.5dp"
+                android:color="#CCCCCC" />
+            <corners
+                android:topLeftRadius="30dp"
+                android:topRightRadius="30dp" />
+        </shape>
+    </item>
+</layer-list>

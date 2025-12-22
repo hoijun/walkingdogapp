@@ -64,13 +64,13 @@ class MyPageDogListAdapter(
 
         fun bind(dog: Dog) {
             binding.apply {
-                myPageAddDogBtn.visibility = View.GONE
+                btnMyPageAddDog.visibility = View.GONE
                 dogInfo = dog
                 dogAge = DateUtils.getAge(dog.birth)
 
                 if (dogImages[dog.name] != null) {
                     Glide.with(context).load(dogImages[dog.name])
-                        .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(menuDogimg)
+                        .format(DecodeFormat.PREFER_ARGB_8888).override(300, 300).into(menuDogImg)
                 }
                 root.setOnClickListener {
                     onItemClickListener?.onItemClick(dog)

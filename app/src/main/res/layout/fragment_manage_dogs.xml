@@ -23,7 +23,7 @@
             android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/manage_top"
+                android:id="@+id/manage_appBar"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -74,7 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#e4e4e4"
-                app:layout_constraintTop_toBottomOf="@+id/manage_top" />
+                app:layout_constraintTop_toBottomOf="@+id/manage_appBar" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"
@@ -82,7 +82,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.92"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/manage_top">
+                app:layout_constraintTop_toBottomOf="@+id/manage_appBar">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/Dogs_RecyclerView"

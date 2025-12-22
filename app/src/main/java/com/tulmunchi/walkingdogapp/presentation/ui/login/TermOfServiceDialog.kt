@@ -22,10 +22,6 @@ class TermOfServiceDialog: DialogFragment() {
         fun onClick(agree: Boolean)
     }
 
-    private var isCheckedFirst = false
-    private var isCheckedSecond = false
-    private var isCheckedThird = false
-
     var onClickYesListener: OnClickYesListener? = null
 
     override fun onCreateView(
@@ -35,23 +31,20 @@ class TermOfServiceDialog: DialogFragment() {
     ): View {
         _binding = DialogTermofserviceBinding.inflate(inflater, container, false)
         binding.apply {
-            useService.setOnCheckedChangeListener { _, isChecked ->
-                isCheckedFirst = isChecked
-                updateCheckStatus()
-
-            }
-
-            userInfoService.setOnCheckedChangeListener { _, isChecked ->
-                isCheckedSecond = isChecked
+            useService.setOnCheckedChangeListener { _, _ ->
                 updateCheckStatus()
             }
 
-            locationService.setOnCheckedChangeListener { _, isChecked ->
-                isCheckedThird = isChecked
+            userInfoService.setOnCheckedChangeListener { _, _ ->
                 updateCheckStatus()
             }
 
-            allCheck.setOnCheckedChangeListener { _, isChecked ->
+            locationService.setOnCheckedChangeListener { _, _ ->
+                updateCheckStatus()
+            }
+
+            allCheck.setOnClickListener {
+                val isChecked = allCheck.isChecked
                 useService.isChecked = isChecked
                 userInfoService.isChecked = isChecked
                 locationService.isChecked = isChecked
@@ -100,7 +93,7 @@ class TermOfServiceDialog: DialogFragment() {
         params?.width = (deviceWidth * 0.95).toInt()
         this.dialog?.window?.attributes = params as WindowManager.LayoutParams
         this.dialog?.window?.setGravity(Gravity.BOTTOM)
-        
+
         // 하단 여백 추가
         val layoutParams = this.dialog?.window?.attributes as WindowManager.LayoutParams
         layoutParams.y = (Resources.getSystem().displayMetrics.density * 20).toInt()
@@ -116,15 +109,9 @@ class TermOfServiceDialog: DialogFragment() {
 
     private fun updateCheckStatus() {
         binding.apply {
-            if (isCheckedFirst && isCheckedSecond && isCheckedThird) {
-                allCheck.isChecked = true
-            }
-
-            if (!isCheckedFirst && !isCheckedSecond && !isCheckedThird) {
-                allCheck.isChecked = false
-            }
-
-            updateFinishButtonState(allCheck.isChecked)
+            val allChecked = useService.isChecked && userInfoService.isChecked && locationService.isChecked
+            allCheck.isChecked = allChecked
+            updateFinishButtonState(allChecked)
         }
     }
 
