@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="user"
+            type="com.tulmunchi.walkingdogapp.domain.model.User" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/register_appBar"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/btn_back"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="25dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.08"
+                app:srcCompat="@drawable/icon_arrow_back" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/divider_line"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#e4e4e4"
+            app:layout_constraintTop_toBottomOf="@+id/register_appBar" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toTopOf="@+id/register_user"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider_line">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="20dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/registerUser_Layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginEnd="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/introduction_userName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="이름 *"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <EditText
+                        android:id="@+id/edit_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/custom_edittext_border"
+                        android:gravity="center|start"
+                        android:hint="이름을 입력 해주세요."
+                        android:maxLength="10"
+                        android:text="@={user.name}"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/introduction_userName"
+                        app:userNameLength="@{user.name.length()}" />
+
+                    <TextView
+                        android:id="@+id/introduction_gender"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="25dp"
+                        android:gravity="center"
+                        android:text="성별 *"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/edit_name" />
+
+                    <Button
+                        android:id="@+id/btn_userIsMale"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="2.5dp"
+                        android:background="@drawable/custom_button_border"
+                        android:elevation="0dp"
+                        android:gravity="center"
+                        android:stateListAnimator="@null"
+                        android:text="남"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toStartOf="@+id/btn_userIsFemale"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/introduction_gender"
+                        app:userGender="@{user.gender}" />
+
+                    <Button
+                        android:id="@+id/btn_userIsFemale"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="2.5dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/custom_button_border"
+                        android:elevation="0dp"
+                        android:gravity="center"
+                        android:stateListAnimator="@null"
+                        android:text="여"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/btn_userIsMale"
+                        app:layout_constraintTop_toBottomOf="@id/introduction_gender"
+                        app:userGender="@{user.gender}" />
+
+                    <TextView
+                        android:id="@+id/introduction_birth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="25dp"
+                        android:gravity="center"
+                        android:text="생년월일 *"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/btn_userIsMale" />
+
+                    <TextView
+                        android:id="@+id/edit_userBirth"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/custom_edittext_border"
+                        android:gravity="center|start"
+                        android:hint="날짜를 선택 해주세요."
+                        android:text="@{user.birth}"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/introduction_birth" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <Button
+            android:id="@+id/register_user"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/round_style_rad15_line"
+            android:backgroundTint="#e4e4e4"
+            android:gravity="center"
+            android:text="등록"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

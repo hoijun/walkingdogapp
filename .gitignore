@@ -134,3 +134,10 @@ fabric.properties
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/androidstudio
+PROJECT_INFO.md
+/.claude
+/.idea
+/.idea
+/.idea
+/app/.idea
+/.kotlin/sessions

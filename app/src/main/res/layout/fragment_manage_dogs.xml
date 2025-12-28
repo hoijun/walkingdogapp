@@ -16,18 +16,17 @@
         android:id="@+id/refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".alarm.SettingAlarmFragment">
+        tools:context=".presentation.ui.alarm.SettingAlarmFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/manage_top"
+                android:id="@+id/manage_appBar"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.08"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -35,13 +34,13 @@
                     android:id="@+id/btn_back"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="25dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.1"
+                    app:layout_constraintWidth_percent="0.08"
                     app:layout_constraintDimensionRatio="1:1"
-                    app:srcCompat="@drawable/undo" />
+                    app:srcCompat="@drawable/icon_arrow_back" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -49,7 +48,7 @@
                     android:gravity="center"
                     android:text="털뭉치들"
                     android:textColor="@color/black"
-                    android:textSize="22sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -61,13 +60,13 @@
                     android:id="@+id/btn_addDog"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginEnd="20dp"
-                    android:src="@drawable/add"
+                    android:layout_marginEnd="25dp"
+                    android:src="@drawable/icon_add"
                     android:visibility="@{countDog > 2 ? View.GONE : View.VISIBLE}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.1"
+                    app:layout_constraintWidth_percent="0.08"
                     app:layout_constraintDimensionRatio="1:1"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -75,7 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#e4e4e4"
-                app:layout_constraintTop_toBottomOf="@+id/manage_top" />
+                app:layout_constraintTop_toBottomOf="@+id/manage_appBar" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"
@@ -83,7 +82,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.92"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/manage_top">
+                app:layout_constraintTop_toBottomOf="@+id/manage_appBar">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/Dogs_RecyclerView"

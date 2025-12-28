@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/custom_dialog_white_border_background"
+    android:paddingBottom="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="약관 동의"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="20dp"
+        android:background="#e4e4e4"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="20dp"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/allCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:button="@drawable/custom_checkbox" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="모두 동의합니다."
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="17sp"
+            android:layout_marginStart="10.dp"
+            android:layout_marginTop="2.dp"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="20dp"
+        android:background="#e4e4e4"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/useService"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:button="@drawable/custom_checkbox" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="(필수) 서비스 이용 약관"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="2dp"/>
+
+        <TextView
+            android:id="@+id/toUseService_Detail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/detailService"
+            android:textStyle="bold"
+            android:textAlignment="textEnd"
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/userInfoService"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:button="@drawable/custom_checkbox" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="(필수) 개인정보 처리방침"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:layout_marginStart="10.dp"
+            android:layout_marginTop="2.dp"/>
+
+        <TextView
+            android:id="@+id/toUserInfoService_Detail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/detailService"
+            android:textStyle="bold"
+            android:textAlignment="textEnd"
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/locationService"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:button="@drawable/custom_checkbox" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="(필수) 위치기반 서비스 이용 약관"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="2dp"/>
+
+        <TextView
+            android:id="@+id/toLocationService_Detail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/detailService"
+            android:textStyle="bold"
+            android:textAlignment="textEnd"
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="45dp"
+        android:layout_marginEnd="20dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="취소"
+            android:textSize="17sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            style="?android:attr/buttonBarButtonStyle" />
+
+        <Button
+            android:id="@+id/finish_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="완료"
+            android:textSize="17sp"
+            android:textColor="#D3D3D3"
+            android:textStyle="bold"
+            android:enabled="false"
+            style="?android:attr/buttonBarButtonStyle" />
+    </LinearLayout>
+</LinearLayout>

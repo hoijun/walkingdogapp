@@ -5,12 +5,12 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SplashActivity">
+    tools:context=".presentation.ui.splash.SplashActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="털뭉치와 산책"
+        android:text="털뭉치"
         android:textColor="@color/black"
         android:textSize="50sp"
         android:textStyle="bold"
@@ -22,8 +22,9 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="400dp"
-        android:src="@drawable/splashicon"
-        android:layout_marginBottom="-150dp"
+        android:layout_marginBottom="-160dp"
+        android:src="@drawable/splash_img"
+        android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

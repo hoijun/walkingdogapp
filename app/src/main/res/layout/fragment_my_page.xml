@@ -6,11 +6,15 @@
     <data>
 
         <variable
-            name="viewmodel"
-            type="com.tulmunchi.walkingdogapp.viewmodel.MainViewModel" />
+            name="viewModel"
+            type="com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel" />
 
         <variable
             name="countImg"
+            type="Integer" />
+
+        <variable
+            name="countCollection"
             type="Integer" />
     </data>
 
@@ -18,18 +22,17 @@
         android:id="@+id/refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".mypage.MyPageFragment">
+        tools:context=".presentation.ui.mypage.myPagePage.MyPageFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/menu_top"
+                android:id="@+id/mypage_appBar"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.07"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -37,77 +40,69 @@
                     android:id="@+id/btn_setting"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_marginEnd="25dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.1"
+                    app:layout_constraintWidth_percent="0.08"
                     app:layout_constraintDimensionRatio="1:1"
-                    app:srcCompat="@drawable/setting" />
+                    app:srcCompat="@drawable/icon_setting" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#e4e4e4"
-                app:layout_constraintTop_toBottomOf="@+id/menu_top" />
+                app:layout_constraintTop_toBottomOf="@+id/mypage_appBar" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/menu_middle1"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.08"
+
+            <TextView
+                android:id="@+id/mypage_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="25dp"
+                android:gravity="center|start"
+                android:text='@{viewModel.user.name.empty ? "털뭉치" : viewModel.user.name  + "님"}'
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/menu_top"
-                app:layout_constraintWidth_percent="0.95">
-
-                <TextView
-                    android:id="@+id/menu_username"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="18dp"
-                    android:gravity="center|start"
-                    android:text='@{viewmodel.UserInfo.name.empty ? "털뭉치" : viewmodel.UserInfo.name  + "님"}'
-                    android:textColor="@color/black"
-                    android:textSize="30sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.7" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintTop_toBottomOf="@+id/mypage_appBar" />
 
             <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/mypageDogsViewPager"
+                android:id="@+id/mypage_dogsViewPager"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:layout_marginTop="15dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.185"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/menu_middle1" />
+                app:layout_constraintTop_toBottomOf="@+id/mypage_username" />
 
             <com.google.android.material.tabs.TabLayout
-                android:id="@+id/mypageDogs_Indicator"
+                android:id="@+id/mypage_dogs_Indicator"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.03"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/mypageDogsViewPager"
+                app:layout_constraintTop_toBottomOf="@+id/mypage_dogsViewPager"
                 app:tabBackground="@drawable/tab_layout_indicator"
                 app:tabGravity="center"
                 app:tabIndicatorHeight="0dp"
                 app:tabRippleColor="@android:color/transparent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/menu_middle3"
-                android:layout_width="0dp"
+                android:id="@+id/menu_userInfo"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginTop="15dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.11"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/mypageDogs_Indicator"
+                app:layout_constraintTop_toBottomOf="@+id/mypage_dogs_Indicator"
                 app:layout_constraintWidth_percent="0.925">
 
                 <TextView
@@ -117,72 +112,72 @@
                     android:text="털뭉치들"
                     android:textColor="@color/black"
                     android:textSize="15sp"
+                    android:textStyle="bold"
                     app:layout_constraintBottom_toTopOf="@id/menu_dogsCount"
                     app:layout_constraintHeight_percent="0.4"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintWidth_percent="0.331" />
+                    app:layout_constraintWidth_percent="0.333" />
 
                 <View
-                    android:id="@+id/menu_view5"
-                    android:layout_width="0dp"
+                    android:id="@+id/first_divide_line"
+                    android:layout_width="1.5dp"
                     android:layout_height="0dp"
-                    android:background="@color/black"
+                    android:background="#e4e4e4"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintHeight_percent="0.85"
                     app:layout_constraintStart_toEndOf="@+id/menu_dogsCount"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.0035" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/menu_dogsCount"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
-                    android:text='@{viewmodel.dogsInfo.size() + "마리"}'
+                    android:text='@{viewModel.dogs.size() + "마리"}'
                     android:textColor="@color/black"
-                    android:textSize="20sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintHeight_percent="0.6"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintWidth_percent="0.331" />
+                    app:layout_constraintWidth_percent="0.333" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
-                    android:text="거리"
+                    android:text="모은 도감 수"
                     android:textColor="@color/black"
                     android:textSize="15sp"
-                    app:layout_constraintBottom_toTopOf="@id/menu_distance"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@id/menu_countCollection"
                     app:layout_constraintHeight_percent="0.4"
-                    app:layout_constraintStart_toEndOf="@+id/menu_view5"
-                    app:layout_constraintWidth_percent="0.331" />
+                    app:layout_constraintStart_toEndOf="@+id/first_divide_line"
+                    app:layout_constraintWidth_percent="0.333" />
 
                 <TextView
-                    android:id="@+id/menu_distance"
+                    android:id="@+id/menu_countCollection"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
-                    android:text='@{@string/totaldistance(viewmodel.totalWalkInfo.distance / 1000.0f)}'
+                    android:text='@{countCollection + "개/55개"}'
                     android:textColor="@color/black"
-                    android:textSize="20sp"
+                    android:textSize="15sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintHeight_percent="0.6"
-                    app:layout_constraintStart_toEndOf="@+id/menu_view5"
-                    app:layout_constraintWidth_percent="0.331" />
+                    app:layout_constraintStart_toEndOf="@+id/first_divide_line"
+                    app:layout_constraintWidth_percent="0.333" />
 
                 <View
-                    android:id="@+id/menu_view6"
-                    android:layout_width="0dp"
+                    android:id="@+id/second_divide_line"
+                    android:layout_width="1.5dp"
                     android:layout_height="0dp"
-                    android:background="@color/black"
+                    android:background="#e4e4e4"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintHeight_percent="0.85"
-                    app:layout_constraintStart_toEndOf="@+id/menu_distance"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.0035" />
+                    app:layout_constraintStart_toEndOf="@+id/menu_countCollection"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -191,76 +186,77 @@
                     android:text="사진"
                     android:textColor="@color/black"
                     android:textSize="15sp"
-                    app:layout_constraintBottom_toTopOf="@id/numpictures"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@id/menu_picturesCount"
                     app:layout_constraintHeight_percent="0.4"
-                    app:layout_constraintStart_toEndOf="@+id/menu_view6"
-                    app:layout_constraintWidth_percent="0.331" />
+                    app:layout_constraintStart_toEndOf="@+id/second_divide_line"
+                    app:layout_constraintWidth_percent="0.333" />
 
                 <TextView
-                    android:id="@+id/numpictures"
+                    android:id="@+id/menu_picturesCount"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:gravity="center"
-                    android:text='@{countImg != null ? countImg + "개" : "?개"}'
-                    android:textColor="@color/black"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintHeight_percent="0.6"
-                    app:layout_constraintStart_toEndOf="@+id/menu_view6"
-                    app:layout_constraintWidth_percent="0.33" />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <View
-                android:id="@+id/menu_view3"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.02"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/menu_middle3" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/menu_Walkinfo"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:background="@drawable/roundstyle_rad20"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.25"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/menu_view3"
-                app:layout_constraintWidth_percent="0.925">
-
-                <TextView
-                    android:id="@+id/walkinfotext"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center|start"
-                    android:text="우리 산책 기록  〉"
+                    android:text='@{countImg != null ? countImg + "장" : "?장"}'
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    app:layout_constraintHeight_percent="0.175"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHeight_percent="0.6"
+                    app:layout_constraintStart_toEndOf="@+id/second_divide_line"
+                    app:layout_constraintWidth_percent="0.333" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/menu_walkInfo_layout"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/round_style_rad15_border"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.25"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/menu_userInfo">
+
+                <TextView
+                    android:id="@+id/introduction_ourWalkInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center|start"
+                    android:text="우리 산책기록"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.4" />
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon_arrow_right"
+                    app:layout_constraintBottom_toBottomOf="@id/introduction_ourWalkInfo"
+                    app:layout_constraintStart_toEndOf="@id/introduction_ourWalkInfo"
+                    app:layout_constraintTop_toTopOf="@id/introduction_ourWalkInfo" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="0dp"
+                    android:id="@+id/walkInfo_introduction_Layout"
+                    android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="40dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintHeight_percent="0.7"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/walkinfotext"
+                    app:layout_constraintTop_toBottomOf="@+id/introduction_ourWalkInfo"
                     app:layout_constraintWidth_percent="0.25">
 
                     <TextView
-                        android:id="@+id/walk_counttext"
-                        android:layout_width="0dp"
+                        android:id="@+id/introduction_walkCount"
+                        android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:gravity="center"
                         android:text="산책 기록"
@@ -273,8 +269,8 @@
                         app:layout_constraintWidth_percent="1" />
 
                     <TextView
-                        android:id="@+id/walk_distancetext"
-                        android:layout_width="0dp"
+                        android:id="@+id/introduction_walkDistance"
+                        android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:gravity="center"
                         android:text="산책 거리"
@@ -283,12 +279,12 @@
                         android:textStyle="bold"
                         app:layout_constraintHeight_percent="0.33"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/walk_counttext"
+                        app:layout_constraintTop_toBottomOf="@id/introduction_walkCount"
                         app:layout_constraintWidth_percent="1" />
 
                     <TextView
-                        android:id="@+id/walk_timetext"
-                        android:layout_width="0dp"
+                        android:id="@+id/introduction_walkTime"
+                        android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:gravity="center"
                         android:text="산책 시간"
@@ -297,211 +293,203 @@
                         android:textStyle="bold"
                         app:layout_constraintHeight_percent="0.33"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/walk_distancetext"
+                        app:layout_constraintTop_toBottomOf="@id/introduction_walkDistance"
                         app:layout_constraintWidth_percent="1" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:layout_marginEnd="25dp"
+                    android:layout_marginEnd="40dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHeight_percent="0.7"
-                    app:layout_constraintTop_toBottomOf="@+id/walkinfotext"
-                    app:layout_constraintWidth_percent="0.25">
+                    app:layout_constraintTop_toBottomOf="@+id/introduction_ourWalkInfo">
 
                     <TextView
                         android:id="@+id/walk_count"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:gravity="center"
                         android:textColor="@color/black"
                         android:textSize="15sp"
-                        app:dogs="@{viewmodel.dogsInfo}"
+                        android:textStyle="bold"
+                        app:dogs="@{viewModel.dogs}"
                         app:layout_constraintHeight_percent="0.33"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintWidth_percent="1"
-                        app:walkDates="@{viewmodel.walkDates}" />
+                        app:walkDates="@{viewModel.walkHistory}" />
+
 
                     <TextView
                         android:id="@+id/walk_distance"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:gravity="center"
-                        android:text='@{@string/totaldistance(viewmodel.totalWalkInfo.distance / 1000.0f)}'
+                        android:text='@{@string/totaldistance(viewModel.totalWalkStats.distance / 1000.0f)}'
                         android:textColor="@color/black"
                         android:textSize="15sp"
+                        android:textStyle="bold"
                         app:layout_constraintHeight_percent="0.33"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/walk_count"
-                        app:layout_constraintWidth_percent="1" />
+                        app:layout_constraintTop_toBottomOf="@id/walk_count" />
 
                     <TextView
                         android:id="@+id/walk_time"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:gravity="center"
-                        android:text='@{viewmodel.totalWalkInfo.time / 60 + "분"}'
+                        android:text='@{viewModel.totalWalkStats.time / 60 + "분"}'
                         android:textColor="@color/black"
                         android:textSize="15sp"
+                        android:textStyle="bold"
                         app:layout_constraintHeight_percent="0.33"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/walk_distance"
-                        app:layout_constraintWidth_percent="1" />
+                        app:layout_constraintTop_toBottomOf="@id/walk_distance" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <View
-                android:id="@+id/menu_view4"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.03"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/menu_Walkinfo" />
-
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/menu_bottom2"
-                android:layout_width="0dp"
+                android:id="@+id/menu_options_layout"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginTop="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.215"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/menu_view4"
-                app:layout_constraintWidth_percent="0.925">
+                app:layout_constraintTop_toBottomOf="@+id/menu_walkInfo_layout">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/managedoginfo_Btn"
+                    android:id="@+id/btn_manage_dog"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginStart="10sp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_percent="0.325"
+                    app:layout_constraintHeight_percent="0.3"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
-                        android:id="@+id/managedogtext"
+                        android:id="@+id/introduction_manageDog"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
+                        android:layout_marginStart="10dp"
                         android:gravity="center|start"
                         android:text="반려견 정보 관리하기"
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintWidth_percent="0.9" />
 
-                    <TextView
+                    <ImageView
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center"
-                        android:text="  〉"
-                        android:textColor="@color/black"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
+                        android:src="@drawable/icon_arrow_right"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/managedogtext"
+                        app:layout_constraintStart_toEndOf="@+id/introduction_manageDog"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintWidth_percent="0.1" />
+                        app:layout_constraintWidth_percent="0.07" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <View
-                    android:id="@+id/menu_view7"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:background="@color/black"
+                    android:id="@+id/third_divide_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#e4e4e4"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_percent="0.0075"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/managedoginfo_Btn" />
+                    app:layout_constraintTop_toBottomOf="@+id/btn_manage_dog" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/modifyuserinfo_Btn"
+                    android:id="@+id/btn_manage_user"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginStart="10sp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_percent="0.325"
+                    app:layout_constraintHeight_percent="0.3"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/menu_view7">
+                    app:layout_constraintTop_toBottomOf="@+id/third_divide_line">
 
                     <TextView
-                        android:id="@+id/modifyusertext"
+                        android:id="@+id/introduction_manage_user"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
+                        android:layout_marginStart="10dp"
                         android:gravity="center|start"
                         android:text="내 정보 관리하기"
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintWidth_percent="0.9" />
 
-                    <TextView
+                    <ImageView
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center"
-                        android:text="  〉"
+                        android:src="@drawable/icon_arrow_right"
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/modifyusertext"
+                        app:layout_constraintStart_toEndOf="@+id/introduction_manage_user"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintWidth_percent="0.1" />
+                        app:layout_constraintWidth_percent="0.07" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <View
-                    android:id="@+id/menu_view8"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:background="@color/black"
+                    android:id="@+id/forth_divide_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#e4e4e4"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHeight_percent="0.0075"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/modifyuserinfo_Btn" />
+                    app:layout_constraintTop_toBottomOf="@+id/btn_manage_user" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/managepictures_Btn"
+                    android:id="@+id/btn_manage_gallery"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginStart="10sp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_percent="0.325"
+                    app:layout_constraintHeight_percent="0.3"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/menu_view8">
+                    app:layout_constraintTop_toBottomOf="@+id/forth_divide_line">
 
                     <TextView
-                        android:id="@+id/managepicturestext"
+                        android:id="@+id/introduction_manage_gallery"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center|start"
+                        android:layout_marginStart="10dp"
                         android:text="내 사진첩 관리하기"
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintWidth_percent="0.9" />
 
-                    <TextView
+                    <ImageView
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center"
-                        android:text="  〉"
+                        android:src="@drawable/icon_arrow_right"
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/managepicturestext"
+                        app:layout_constraintStart_toEndOf="@+id/introduction_manage_gallery"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintWidth_percent="0.1" />
+                        app:layout_constraintWidth_percent="0.07" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

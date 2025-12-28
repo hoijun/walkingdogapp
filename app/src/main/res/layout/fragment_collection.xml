@@ -5,7 +5,7 @@
     android:id="@+id/refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".collection.CollectionFragment">
+    tools:context=".presentation.ui.collection.CollectionFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -14,9 +14,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/collection_top"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="60dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.09"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -38,13 +37,13 @@
                 android:id="@+id/open_searching"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginEnd="20dp"
+                android:layout_marginEnd="25dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.095"
-                app:srcCompat="@drawable/search" />
+                app:layout_constraintWidth_percent="0.08"
+                app:srcCompat="@drawable/icon_search" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
@@ -70,7 +69,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
-                android:background="@drawable/roundstyle_rad15"
+                android:background="@drawable/round_style_rad15"
                 android:gravity="center"
                 android:textColor="@color/black"
                 android:textSize="20sp"

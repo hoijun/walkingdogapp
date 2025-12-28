@@ -3,7 +3,6 @@ package com.tulmunchi.walkingdogapp
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import com.kakao.sdk.common.KakaoSdk
-import com.naver.maps.map.NaverMap
 import com.naver.maps.map.NaverMapSdk
 import com.navercorp.nid.NaverIdLoginSDK
 import dagger.hilt.android.HiltAndroidApp

@@ -1,0 +1,44 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/custom_dialog_white_border_background"
+    android:paddingVertical="5dp">
+
+    <EditText
+        android:id="@+id/write"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/custom_edittext_border"
+        android:textSize="15sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="취소"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            style="?android:attr/buttonBarButtonStyle" />
+
+        <Button
+            android:id="@+id/finish_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="완료"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            style="?android:attr/buttonBarButtonStyle" />
+    </LinearLayout>
+</LinearLayout>

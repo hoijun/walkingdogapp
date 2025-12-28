@@ -6,7 +6,7 @@
     <data>
         <variable
             name="walkRecordInfo"
-            type="com.tulmunchi.walkingdogapp.datamodel.WalkDateInfo" />
+            type="com.tulmunchi.walkingdogapp.domain.model.WalkRecord" />
 
         <variable
             name="walkDay"
@@ -21,9 +21,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/detailInfo_Top"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="60dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.07"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -31,13 +30,13 @@
                 android:id="@+id/btn_goMypage"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="25dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.1"
+                app:layout_constraintWidth_percent="0.08"
                 app:layout_constraintDimensionRatio="1:1"
-                app:srcCompat="@drawable/undo" />
+                app:srcCompat="@drawable/icon_arrow_back" />
 
             <TextView
                 android:layout_width="0dp"
@@ -128,7 +127,7 @@
                     android:layout_height="225dp"
                     android:layout_marginStart="15dp"
                     android:layout_marginEnd="15dp"
-                    android:background="@drawable/roundstyle_rad20">
+                    android:background="@drawable/round_style_rad20">
 
                     <View
                         android:id="@+id/view29"
@@ -287,7 +286,7 @@
                     android:layout_marginStart="15dp"
                     android:layout_marginTop="40dp"
                     android:layout_marginEnd="15dp"
-                    android:background="@drawable/roundstyle_rad20">
+                    android:background="@drawable/round_style_rad20">
 
                     <TextView
                         android:id="@+id/text_getCollections"

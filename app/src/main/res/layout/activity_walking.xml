@@ -6,7 +6,7 @@
     <data>
         <variable
             name="WalkingService"
-            type="com.tulmunchi.walkingdogapp.walking.WalkingService" />
+            type="com.tulmunchi.walkingdogapp.presentation.ui.walking.WalkingService" />
 
         <variable
             name="isTrackingCameraMode"
@@ -16,7 +16,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".walking.WalkingActivity">
+        tools:context=".presentation.ui.walking.WalkingActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/walkingscreen"
@@ -39,7 +39,7 @@
                 android:layout_height="50dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginEnd="15dp"
-                android:src="@drawable/mylocation"
+                android:src="@drawable/icon_location_tracking"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:isTrackingCameraMode="@{isTrackingCameraMode}"/>
@@ -50,7 +50,7 @@
                 android:layout_height="50dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginEnd="15dp"
-                android:src="@drawable/collections"
+                android:src="@drawable/icon_collections"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/trackingCameraModeOnBtn"
                 app:tint="@color/black" />
@@ -161,7 +161,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/view1"
                         app:layout_constraintWidth_percent="1.0"
-                        app:srcCompat="@drawable/pencil" />
+                        app:srcCompat="@drawable/icon_save" />
 
                     <TextView
                         android:id="@+id/text_save"
@@ -207,7 +207,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/view2"
                         app:layout_constraintWidth_percent="1.0"
-                        app:isTracking="@{WalkingService.isTracking()}"/>
+                        app:isTracking="@{WalkingService.isTracking}"/>
 
                     <TextView
                         android:id="@+id/text_isTracking"
@@ -215,7 +215,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
                         android:gravity="center"
-                        android:text='@{WalkingService.isTracking() ? "산책중지" : "산책시작"}'
+                        android:text='@{WalkingService.isTracking ? "산책중지" : "산책시작"}'
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold"
@@ -251,7 +251,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/view5"
                         app:layout_constraintWidth_percent="1.0"
-                        app:srcCompat="@drawable/camera" />
+                        app:srcCompat="@drawable/icon_camera" />
 
                     <View
                         android:id="@+id/view6"

@@ -7,65 +7,67 @@
         <variable
             name="userEmail"
             type="String" />
+
+        <variable
+            name="tulmunchiVersion"
+            type="String" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".mypage.SettingFragment">
+        tools:context=".presentation.ui.mypage.settingPage.SettingFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/settingscreen"
+            android:id="@+id/setting_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/setting_top"
+                android:id="@+id/setting_appBar"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="60dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.07"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:id="@+id/btn_goMypage"
+                    android:id="@+id/btn_navigateToMyPage"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="25dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.1"
+                    app:layout_constraintWidth_percent="0.08"
                     app:layout_constraintDimensionRatio="1:1"
-                    app:srcCompat="@drawable/undo" />
+                    app:srcCompat="@drawable/icon_arrow_back" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#e4e4e4"
-                app:layout_constraintTop_toBottomOf="@+id/setting_top" />
+                app:layout_constraintTop_toBottomOf="@+id/setting_appBar" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/setting_middle1"
+                android:id="@+id/setting_Introduction"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.08"
+                app:layout_constraintHeight_percent="0.07"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/setting_top"
-                app:layout_constraintWidth_percent="0.95">
+                app:layout_constraintTop_toBottomOf="@+id/setting_appBar"
+                app:layout_constraintWidth_percent="0.875">
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="25dp"
+                    android:layout_height="wrap_content"
                     android:gravity="center|start"
                     android:text="설정"
                     android:textColor="@color/black"
-                    android:textSize="25sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -74,82 +76,66 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="25dp"
                     android:gravity="center|start"
-                    android:text="버전정보 v0.0.1"
+                    android:text="@{tulmunchiVersion}"
                     android:textColor="@color/black"
-                    android:textSize="15sp"
+                    android:textSize="11sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/setting_middle2"
+                android:id="@+id/setting_Email"
                 android:layout_width="0dp"
-                android:layout_height="120dp"
+                android:layout_height="100dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/roundstyle_rad20"
+                android:background="@drawable/round_style_rad15_border"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/setting_middle1"
+                app:layout_constraintTop_toBottomOf="@+id/setting_Introduction"
                 app:layout_constraintWidth_percent="0.875">
 
                 <TextView
-                    android:id="@+id/SingIn_Email"
+                    android:id="@+id/text_Introduction_Email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginTop="28dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
                     android:gravity="center|start"
                     android:text="이메일"
+                    android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="15sp"
+                    android:textSize="13sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/user_Email_Text"
+                    android:id="@+id/text_User_Email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginEnd="32dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="30dp"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:text='@{userEmail}'
                     android:textColor="@color/black"
-                    android:textSize="23sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/SingIn_Email" />
-
-                <TextView
-                    android:id="@+id/logoutBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="25dp"
-                    android:gravity="center"
-                    android:text="로그아웃"
-                    android:textColor="@color/black"
-                    android:textSize="19sp"
-                    android:layout_marginBottom="25dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
+                    app:layout_constraintTop_toBottomOf="@id/text_Introduction_Email" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/menu_bottom2"
+                android:id="@+id/setting_Menu"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="500dp"
                 android:layout_marginTop="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/setting_middle2"
-                app:layout_constraintWidth_percent="0.825">
+                app:layout_constraintTop_toBottomOf="@+id/setting_Email"
+                app:layout_constraintWidth_percent="0.875">
 
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -167,22 +153,18 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center|start"
-                        android:text="문의 하기"
+                        android:text="문의하기"
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintWidth_percent="0.9" />
 
-                    <TextView
+                    <ImageView
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text="  〉"
-                        android:textColor="@color/black"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
+                        android:src="@drawable/icon_arrow_right"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/inquiry"
                         app:layout_constraintTop_toTopOf="parent"
@@ -206,20 +188,16 @@
                         android:gravity="center|start"
                         android:text="개인정보처리방침"
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintWidth_percent="0.9" />
 
-                    <TextView
+                    <ImageView
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text="  〉"
-                        android:textColor="@color/black"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
+                        android:src="@drawable/icon_arrow_right"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/privacyPolicy"
                         app:layout_constraintTop_toTopOf="parent"
@@ -227,7 +205,7 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/setting_termsofservice"
+                    android:id="@+id/setting_termsOfService"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_marginStart="10sp"
@@ -237,103 +215,91 @@
                     app:layout_constraintTop_toBottomOf="@+id/setting_PrivacyPolicy">
 
                     <TextView
-                        android:id="@+id/termofservice"
+                        android:id="@+id/termsOfService"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center|start"
                         android:text="서비스 이용 약관"
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintVertical_bias="0.0"
                         app:layout_constraintWidth_percent="0.9" />
 
-                    <TextView
+                    <ImageView
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text="  〉"
-                        android:textColor="@color/black"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
+                        android:src="@drawable/icon_arrow_right"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/termofservice"
+                        app:layout_constraintStart_toEndOf="@+id/termsOfService"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintWidth_percent="0.1" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/setting_termofLocation"
+                    android:id="@+id/setting_termOfLocation"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_marginStart="10sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHeight_percent="0.16"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/setting_termsofservice">
+                    app:layout_constraintTop_toBottomOf="@+id/setting_termsOfService">
 
                     <TextView
-                        android:id="@+id/termofLocation"
+                        android:id="@+id/termOfLocation"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center|start"
                         android:text="위치기반 서비스 이용 약관"
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintWidth_percent="0.9" />
 
-                    <TextView
+                    <ImageView
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text="  〉"
-                        android:textColor="@color/black"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
+                        android:src="@drawable/icon_arrow_right"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/termofLocation"
+                        app:layout_constraintStart_toEndOf="@+id/termOfLocation"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintWidth_percent="0.1" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/setting_copyright"
+                    android:id="@+id/setting_logout"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_marginStart="10sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHeight_percent="0.16"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/setting_termofLocation">
+                    app:layout_constraintTop_toBottomOf="@+id/setting_termOfLocation">
 
                     <TextView
-                        android:id="@+id/copyright"
+                        android:id="@+id/logout"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center|start"
-                        android:text="저작권 출처"
+                        android:text="로그아웃"
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintWidth_percent="0.9" />
 
-                    <TextView
+                    <ImageView
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text="  〉"
-                        android:textColor="@color/black"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
+                        android:src="@drawable/icon_arrow_right"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/copyright"
+                        app:layout_constraintStart_toEndOf="@+id/logout"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintWidth_percent="0.1" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -346,7 +312,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHeight_percent="0.16"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/setting_copyright">
+                    app:layout_constraintTop_toBottomOf="@+id/setting_logout">
 
                     <TextView
                         android:id="@+id/withdrawal"
@@ -355,20 +321,16 @@
                         android:gravity="center|start"
                         android:text="회원 탈퇴"
                         android:textColor="@color/black"
-                        android:textSize="17sp"
+                        android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintWidth_percent="0.9" />
 
-                    <TextView
+                    <ImageView
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text="  〉"
-                        android:textColor="@color/black"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
+                        android:src="@drawable/icon_arrow_right"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/withdrawal"
                         app:layout_constraintTop_toTopOf="parent"
