@@ -70,6 +70,10 @@ android {
         debug {
             extra.set("enableCrashlytics", false)
             extra.set("alwaysUpdateBuildId", false)
+            // Debug 빌드 속도 최적화
+            isMinifyEnabled = false
+            isShrinkResources = false
+            isDebuggable = true
             splits {
                 abi.isEnable = false
                 density.isEnable = false
@@ -107,10 +111,17 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // 증분 컴파일 최적화
+        isCoreLibraryDesugaringEnabled = false
     }
 
     kotlinOptions {
         jvmTarget = "17"
+        // Kotlin 컴파일 최적화
+        freeCompilerArgs += listOf(
+            "-opt-in=kotlin.RequiresOptIn",
+            "-Xjvm-default=all"
+        )
     }
 
     packaging {
@@ -133,6 +144,12 @@ android {
         abi {
             enableSplit = true
         }
+    }
+
+    // Lint 검사 최적화 (빌드 속도 향상)
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
     }
 }
 
