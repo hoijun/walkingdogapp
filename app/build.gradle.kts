@@ -15,11 +15,11 @@ plugins {
 val properties = Properties().apply {
     load(FileInputStream("${rootDir}/local.properties"))
 }
-val navermapapiKey = properties["navermap_api_key"] ?: ""
-val kakaoapikey = properties["kakaologin_api_key"] ?: ""
-val kakaoredirecturi = properties["kakaologin_redirect_uri"] ?: ""
-val naverclientid = properties["naverlogin_clientid"] ?: ""
-val naverclientsecret = properties["naverlogin_clientsecret"] ?: ""
+val naverMapApiKey = properties["navermap_api_key"] ?: ""
+val kakaoApiKey = properties["kakaologin_api_key"] ?: ""
+val kakaoRedirectUri = properties["kakaologin_redirect_uri"] ?: ""
+val naverClientId = properties["naverlogin_clientid"] ?: ""
+val naverClientSecret = properties["naverlogin_clientsecret"] ?: ""
 val keystoreFile = properties["keystore.file"] as String?
 val keystorePassword = properties["keystore.password"] as String?
 val keystoreKeyAlias = properties["keystore.key.alias"] as String?
@@ -54,12 +54,12 @@ android {
             useSupportLibrary = true
         }
 
-        manifestPlaceholders["Kakao_Redirect_URI"] = kakaoredirecturi as String
-        manifestPlaceholders["Kakao_API_KEY"]  = kakaoapikey as String
-        buildConfigField("String", "NaverMap_API_KEY", navermapapiKey as String)
-        buildConfigField("String", "Kakao_API_KEY", kakaoapikey)
-        buildConfigField("String", "Naver_ClientId", naverclientid as String)
-        buildConfigField("String", "Naver_ClientSecret", naverclientsecret as String)
+        manifestPlaceholders["Kakao_Redirect_URI"] = kakaoRedirectUri as String
+        manifestPlaceholders["Kakao_API_KEY"]  = kakaoApiKey as String
+        buildConfigField("String", "NaverMap_API_KEY", naverMapApiKey as String)
+        buildConfigField("String", "Kakao_API_KEY", kakaoApiKey)
+        buildConfigField("String", "Naver_ClientId", naverClientId as String)
+        buildConfigField("String", "Naver_ClientSecret", naverClientSecret as String)
 
         if (keystoreFile != null) {
             signingConfig = signingConfigs.getByName("release")
@@ -191,7 +191,7 @@ dependencies {
     implementation("androidx.browser:browser:1.8.0")
     implementation("com.google.code.gson:gson:2.10.1")
 
-    implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.core:core-splashscreen:1.2.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
