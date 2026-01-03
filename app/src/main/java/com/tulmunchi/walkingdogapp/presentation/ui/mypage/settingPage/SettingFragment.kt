@@ -32,6 +32,7 @@ import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.ui.mypage.myPagePage.MyPageFragment
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -139,9 +140,9 @@ class SettingFragment : Fragment() {
                 navigateToWebView("https://hoitho.tistory.com/3")
             }
 
-            settingWithdrawal.setOnClickListener {
+            settingWithdrawal.setOnSingleClickListener {
                 if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
-                    return@setOnClickListener
+                    return@setOnSingleClickListener
                 }
 
                 val credential = EmailAuthProvider.getCredential(email, password)

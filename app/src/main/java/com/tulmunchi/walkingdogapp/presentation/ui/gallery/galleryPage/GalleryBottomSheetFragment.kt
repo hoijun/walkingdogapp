@@ -17,6 +17,7 @@ import androidx.core.graphics.drawable.toDrawable
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tulmunchi.walkingdogapp.databinding.FragmentGalleryBottomSheetBinding
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 
 class GalleryBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -52,7 +53,7 @@ class GalleryBottomSheetFragment : BottomSheetDialogFragment() {
 
         binding.apply {
             day = date
-            removeimg.setOnClickListener {
+            removeimg.setOnSingleClickListener {
                 imgUri?.also {
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         val intentSender = MediaStore.createDeleteRequest(requireActivity().contentResolver, mutableListOf(it)).intentSender

@@ -29,6 +29,7 @@ import com.tulmunchi.walkingdogapp.databinding.ActivityLoginBinding
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -141,19 +142,19 @@ class LoginActivity : AppCompatActivity() {
         setupViewModelObservers()
 
         binding.apply {
-            KakaoLoginBtn.setOnClickListener {
+            KakaoLoginBtn.setOnSingleClickListener {
                 if (!networkChecker.isNetworkAvailable()) {
                     Toast.makeText(this@LoginActivity, "네트워크 연결을 확인해주세요", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
+                    return@setOnSingleClickListener
                 }
                 setLoadingState(true)
                 loginKakao()
             }
 
-            NaverLoginBtn.setOnClickListener {
+            NaverLoginBtn.setOnSingleClickListener {
                 if (!networkChecker.isNetworkAvailable()) {
                     Toast.makeText(this@LoginActivity, "네트워크 연결을 확인해주세요", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
+                    return@setOnSingleClickListener
                 }
                 setLoadingState(true)
                 NaverIdLoginSDK.authenticate(this@LoginActivity, naverLoginCallback)

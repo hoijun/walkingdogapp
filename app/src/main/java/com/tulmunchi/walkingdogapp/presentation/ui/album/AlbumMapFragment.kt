@@ -41,6 +41,7 @@ import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.model.AlbumMapImgInfo
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -131,7 +132,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                 handlePermissionButtonClick()
             }
 
-            btnSelectDate.setOnClickListener {
+            btnSelectDate.setOnSingleClickListener {
                 handleDateSelectClick()
             }
         }

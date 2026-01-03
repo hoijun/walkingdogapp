@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -194,7 +195,11 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_mypage -> NavigationState.WithBottomNav.MyPage
                 else -> return@setOnItemSelectedListener false
             }
-            navigationManager.navigateTo(state)
+            
+            // 현재 상태와 같으면 navigateTo 호출하지 않음 (중복 호출 방지)
+            if (navigationManager.currentState.value != state) {
+                navigationManager.navigateTo(state)
+            }
             true
         }
 

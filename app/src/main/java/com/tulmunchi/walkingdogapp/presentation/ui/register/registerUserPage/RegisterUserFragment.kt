@@ -25,6 +25,7 @@ import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.RegisterUserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -95,7 +96,7 @@ class RegisterUserFragment : Fragment() {
                 user = currentUser
             }
 
-            editUserBirth.setOnClickListener {
+            editUserBirth.setOnSingleClickListener {
                 val cal = Calendar.getInstance()
                 val dateCallback = DatePickerDialog.OnDateSetListener { _, year, month, day ->
                     val birth = "${year}/${month + 1}/${day}"

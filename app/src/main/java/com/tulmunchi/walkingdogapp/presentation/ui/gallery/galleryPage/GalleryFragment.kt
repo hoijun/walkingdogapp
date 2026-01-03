@@ -33,6 +33,7 @@ import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.ui.mypage.myPagePage.MyPageFragment
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
 import com.tulmunchi.walkingdogapp.presentation.util.ImageUtils
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
@@ -125,7 +126,7 @@ class GalleryFragment : Fragment() {
                 goMyPage()
             }
 
-            imgRemoveBtn.setOnClickListener {
+            imgRemoveBtn.setOnSingleClickListener {
                 handleImageRemoval()
             }
         }

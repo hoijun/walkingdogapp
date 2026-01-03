@@ -16,6 +16,7 @@ import com.tulmunchi.walkingdogapp.presentation.ui.home.HomeFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -63,7 +64,7 @@ class SettingAlarmFragment : Fragment() {
         }
 
         binding.apply {
-            btnAddAlarm.setOnClickListener {
+            btnAddAlarm.setOnSingleClickListener {
                 val settingAlarmDialog = SettingAlarmDialog()
                 settingAlarmDialog.onAddAlarmListener =
                     object : SettingAlarmDialog.OnAddAlarmListener {
