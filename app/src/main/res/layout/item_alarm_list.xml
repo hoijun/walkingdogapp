@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
+
         <variable
             name="isSelectMode"
             type="Boolean" />
@@ -18,72 +21,92 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp">
+        android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.AppCompatCheckBox
-            android:id="@+id/checkBox"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginStart="15dp"
-            android:button="@drawable/custom_checkbox"
-            android:visibility="@{isSelectMode ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/ampm"
-            android:layout_width="wrap_content"
-            android:layout_height="25dp"
-            android:layout_marginStart="20dp"
-            android:gravity="center|bottom"
-            android:text="@{alarmAmPm}"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/checkBox"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:gravity="center"
-            android:text="@{alarmTime}"
-            android:textColor="@color/black"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/ampm"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/week"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_marginEnd="10dp"
-            android:gravity="center|start"
-            android:text="월화수목금토일"
-            android:textColor="@color/black"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/Onoff"
-            app:layout_constraintTop_toTopOf="parent" />
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginStart="15dp"
+                android:button="@drawable/custom_checkbox"
+                android:visibility="@{isSelectMode ? View.VISIBLE : View.GONE}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
+            <TextView
+                android:id="@+id/isAmOrPm"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_marginStart="20dp"
+                android:gravity="center|bottom"
+                android:text="@{alarmAmPm}"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/checkBox"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/Onoff"
-            android:layout_width="45dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="15dp"
-            android:checked="true"
-            android:visibility="@{isSelectMode ? View.GONE : View.VISIBLE}"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:gravity="center"
+                android:text="@{alarmTime}"
+                android:textColor="@color/black"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/isAmOrPm"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
+                android:gravity="center|start"
+                android:text="월화수목금토일"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/OnOff"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/OnOff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
+                android:checked="true"
+                android:thumb="@drawable/custom_switch_thumb_selector"
+                android:visibility="@{isSelectMode ? View.INVISIBLE : View.VISIBLE}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:track="@drawable/custom_switch_track_selector" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="#e4e4e4"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -53,4 +53,12 @@
         <item name="cornerSize">15dp</item>
     </style>
 
+    <!-- TimePicker 구분선 제거 스타일 -->
+    <style name="TimePickerTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorControlNormal">@android:color/transparent</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
 </resources>

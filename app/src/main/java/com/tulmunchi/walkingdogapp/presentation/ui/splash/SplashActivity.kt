@@ -1,7 +1,6 @@
 package com.tulmunchi.walkingdogapp.presentation.ui.splash
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -20,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.core.analytics.FirebaseAnalyticHelper
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.ui.login.LoginActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -76,17 +76,15 @@ class SplashActivity : AppCompatActivity() {
 
     private fun checkUpdate(context: Context) {
         if (!networkChecker.isNetworkAvailable()) {
-            AlertDialog.Builder(context)
-                .setTitle("네트워크 오류")
-                .setMessage("네트워크 연결을 확인해주세요.\n업데이트 확인을 위해 네트워크 연결이 필요합니다.")
-                .setPositiveButton("재시도") { _, _ ->
-                    checkUpdate(context)
-                }
-                .setNegativeButton("종료") { _, _ ->
-                    finish()
-                }
-                .setCancelable(false)
-                .show()
+            val dialog = SelectDialog.newInstance(title = "네트워크 연결을 확인해주세요.\n업데이트 확인을 위해 네트워크 연결이 필요합니다.", showNegativeButton = true)
+            dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+                checkUpdate(context)
+            }
+            dialog.onCancelListener = SelectDialog.OnCancelListener {
+                finish()
+            }
+            dialog.isCancelable = false
+            dialog.show(supportFragmentManager, "networkCheck")
             return
         }
 
@@ -97,13 +95,15 @@ class SplashActivity : AppCompatActivity() {
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
                 && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
             ) {
-                AlertDialog.Builder(context)
-                    .setTitle("업데이트")
-                    .setMessage("최신 버전으로 업데이트 해주세요!")
-                    .setPositiveButton("확인") { _, _ ->
-                        updateApp(context)
-                    }.setCancelable(false)
-                    .show()
+                val dialog = SelectDialog.newInstance(title = "최신 버전으로 업데이트 해주세요!", showNegativeButton = true)
+                dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+                    updateApp(context)
+                }
+                dialog.onCancelListener = SelectDialog.OnCancelListener {
+                    finish()
+                }
+                dialog.isCancelable = false
+                dialog.show(supportFragmentManager, "update")
             } else {
                 CoroutineScope(Dispatchers.Main).launch {
                     delay(1000)

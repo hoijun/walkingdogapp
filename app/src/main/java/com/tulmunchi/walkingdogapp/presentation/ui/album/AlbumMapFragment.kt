@@ -16,7 +16,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -37,6 +36,7 @@ import com.tulmunchi.walkingdogapp.common.HorizonSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentAlbumMapBinding
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.model.AlbumMapImgInfo
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
@@ -73,17 +73,19 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
     } else {
-        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
     }
 
-    private val requestStoragePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permission ->
-        when(permission) {
-            true -> {
-                setAlbumMap(selectedDay)
+    private val requestStoragePermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            Log.d("AlbumMapFragment", "Storage permission result: $isGranted")
+            when (isGranted) {
+                true -> {
+                    setAlbumMap(selectedDay)
+                }
+                false -> { }
             }
-            false -> return@registerForActivityResult
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,14 +96,10 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                 }
         mapFragment.getMapAsync(this)
 
-        context?.let { ctx ->
-            if (!networkChecker.isNetworkAvailable()) {
-                val builder = AlertDialog.Builder(ctx)
-                builder.setTitle("인터넷을 연결해주세요!")
-                builder.setPositiveButton("네", null)
-                builder.setCancelable(false)
-                builder.show()
-            }
+        if (!networkChecker.isNetworkAvailable()) {
+            val dialog = SelectDialog.newInstance(title = "인터넷을 연결해주세요!")
+            dialog.isCancelable = false
+            dialog.show(parentFragmentManager, "networkCheck")
         }
     }
 
@@ -137,12 +135,14 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                 handleDateSelectClick()
             }
         }
+
         return binding.root
     }
 
     override fun onStart() {
         super.onStart()
         context?.let {
+            // 권한 요청은 하지 않고, 권한이 있는 경우에만 데이터 로드
             if (checkPermission(storagePermission)) {
                 setAlbumMap(selectedDay)
                 if (markers.isNotEmpty()) {
@@ -352,11 +352,15 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun checkPermission(permissions : Array<String>) : Boolean{
-        return if (!permissionHandler.checkPermissions(requireActivity(), permissions)) {
+    private fun checkPermission(permissions : Array<String>) : Boolean {
+        val hasPermission = permissionHandler.checkPermissions(requireActivity(), permissions)
+        Log.d("AlbumMapFragment", "checkPermission: hasPermission=$hasPermission")
+        return if (!hasPermission) {
+            Log.d("AlbumMapFragment", "Requesting permission: ${permissions[0]}")
             requestStoragePermission.launch(permissions[0])
             false
         } else {
+            Log.d("AlbumMapFragment", "Permission already granted")
             true
         }
     }

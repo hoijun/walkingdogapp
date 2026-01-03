@@ -14,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
@@ -23,6 +22,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentHomeBinding
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.ui.alarm.SettingAlarmFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
@@ -53,14 +53,10 @@ class HomeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        context?.let { ctx ->
-            if (!networkChecker.isNetworkAvailable()) {
-                val builder = AlertDialog.Builder(ctx)
-                builder.setTitle("인터넷을 연결해주세요!")
-                builder.setPositiveButton("네", null)
-                builder.setCancelable(false)
-                builder.show()
-            }
+        if (!networkChecker.isNetworkAvailable()) {
+            val dialog = SelectDialog.newInstance(title = "인터넷을 연결해주세요!")
+            dialog.isCancelable = false
+            dialog.show(parentFragmentManager, "networkCheck")
         }
     }
 
@@ -179,46 +175,31 @@ class HomeFragment : Fragment() {
     }
 
     private fun showRegisterDogDialog(context: Context) {
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("산책을 하기 위해 \n강아지 정보를 입력 해주세요!")
-        val listener = DialogInterface.OnClickListener { _, ans ->
-            when (ans) {
-                DialogInterface.BUTTON_POSITIVE -> {
-                    if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
-                        return@OnClickListener
-                    }
-                    navigationManager.navigateTo(
-                        NavigationState.WithoutBottomNav.RegisterDog(
-                            dog = null,
-                            from = "home"
-                        )
-                    )
-                }
+        val dialog = SelectDialog.newInstance(title = "산책을 하기 위해 \n강아지 정보를 입력 해주세요!", showNegativeButton = true)
+        dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+            if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
+                return@OnConfirmListener
             }
+            navigationManager.navigateTo(
+                NavigationState.WithoutBottomNav.RegisterDog(
+                    dog = null,
+                    from = "home"
+                )
+            )
         }
-        builder.setPositiveButton("네", listener)
-        builder.setNegativeButton("아니오", null)
-        builder.show()
+        dialog.show(parentFragmentManager, "registerDog")
     }
 
     private fun showPermissionDialog(context: Context) {
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("산책을 위해 위치 권한을 \n항상 허용으로 해주세요!")
-        val listener = DialogInterface.OnClickListener { _, ans ->
-            when (ans) {
-                DialogInterface.BUTTON_POSITIVE -> {
-                    // 권한 창으로 이동
-                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.data =
-                        Uri.fromParts("package", context.packageName, null)
-                    startActivity(intent)
-                }
-            }
+        val dialog = SelectDialog.newInstance(title = "산책을 위해 위치 권한을 \n항상 허용으로 해주세요!", showNegativeButton = true)
+        dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+            // 권한 창으로 이동
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            intent.data = Uri.fromParts("package", context.packageName, null)
+            startActivity(intent)
         }
-        builder.setPositiveButton("네", listener)
-        builder.setNegativeButton("아니오", null)
-        builder.show()
+        dialog.show(parentFragmentManager, "permission")
     }
 
     private fun checkLocationPermissions(): Boolean {

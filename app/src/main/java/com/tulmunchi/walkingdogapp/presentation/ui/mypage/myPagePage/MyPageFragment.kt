@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -19,6 +18,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentMyPageBinding
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
@@ -47,10 +47,7 @@ class MyPageFragment : Fragment() {
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
     } else {
-        arrayOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
+        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
     }
 
     private val requestStoragePermission =
@@ -66,14 +63,10 @@ class MyPageFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        context?.let { ctx ->
-            if (!networkChecker.isNetworkAvailable()) {
-                val builder = AlertDialog.Builder(ctx)
-                builder.setTitle("인터넷을 연결해주세요!")
-                builder.setPositiveButton("네", null)
-                builder.setCancelable(false)
-                builder.show()
-            }
+        if (!networkChecker.isNetworkAvailable()) {
+            val dialog = SelectDialog.newInstance(title = "인터넷을 연결해주세요!")
+            dialog.isCancelable = false
+            dialog.show(parentFragmentManager, "networkCheck")
         }
     }
 

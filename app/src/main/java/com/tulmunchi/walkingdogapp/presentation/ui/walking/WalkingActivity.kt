@@ -26,7 +26,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -49,13 +48,12 @@ import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.ActivityWalkingBinding
-import com.tulmunchi.walkingdogapp.presentation.core.dialog.BackNavigationDialog
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionData
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
-import com.tulmunchi.walkingdogapp.presentation.ui.register.registerDogPage.RegisterDogFragment.ResultOfRegisterDog
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.WalkingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -552,10 +550,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
-        val dialog = BackNavigationDialog.newInstance(
-            title = "산책을 그만 할까요?\n(5분 또는 300m 이상 산책 시 기록 가능)"
-        )
-        dialog.onConfirmListener = BackNavigationDialog.OnConfirmListener {
+        val dialog = SelectDialog.newInstance(title = "산책을 그만 할까요?\n(5분 또는 300m 이상 산책 시 기록 가능)", showNegativeButton = true)
+        dialog.onConfirmListener = SelectDialog.OnConfirmListener {
             if (wService.walkDistance.value == null || wService.walkTime.value == null) {
                 return@OnConfirmListener
             }
@@ -612,20 +608,13 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun startCamera() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("지도 앨범에 사진을 추가하려면\n카메라 설정에서 위치 태그를 켜주세요!")
-
-        val listener = DialogInterface.OnClickListener { _, ans ->
-            when (ans) {
-                DialogInterface.BUTTON_POSITIVE -> {
-                    if(checkPermission(cameraPermission, cameraCode) && checkPermission(storagePermission, storageCode)) {
-                        takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
-                    }
-                }
+        val dialog = SelectDialog.newInstance(title = "지도 앨범에 사진을 추가하려면\n카메라 설정에서 위치 태그를 켜주세요!")
+        dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+            if(checkPermission(cameraPermission, cameraCode) && checkPermission(storagePermission, storageCode)) {
+                takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
             }
         }
-        builder.setPositiveButton("네", listener)
-        builder.show()
+        dialog.show(supportFragmentManager, "camera")
     }
 
     private fun takePhoto(intent: Intent) {
@@ -728,21 +717,14 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         when (requestCode) {
             storageCode -> {
                 if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    val builder = AlertDialog.Builder(this)
-                    builder.setTitle("사진 저장을 위해 권한을 \n허용으로 해주세요!")
-                    val listener = DialogInterface.OnClickListener { _, ans ->
-                        when (ans) {
-                            DialogInterface.BUTTON_POSITIVE -> {
-                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                                intent.flags = FLAG_ACTIVITY_NEW_TASK
-                                intent.data = Uri.fromParts("package", packageName, null)
-                                startActivity(intent)
-                            }
-                        }
+                    val dialog = SelectDialog.newInstance(title = "사진 저장을 위해 권한을 \n허용으로 해주세요!", showNegativeButton = true)
+                    dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        intent.flags = FLAG_ACTIVITY_NEW_TASK
+                        intent.data = Uri.fromParts("package", packageName, null)
+                        startActivity(intent)
                     }
-                    builder.setPositiveButton("네", listener)
-                    builder.setNegativeButton("아니오", null)
-                    builder.show()
+                    dialog.show(supportFragmentManager, "storagePermission")
                 } else {
                     if (permissionHandler.checkPermissions(this, cameraPermission)) {
                         takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
@@ -751,21 +733,14 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             cameraCode -> {
                 if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    val builder = AlertDialog.Builder(this)
-                    builder.setTitle("촬영을 위해 권한을 \n허용으로 해주세요!")
-                    val listener = DialogInterface.OnClickListener { _, ans ->
-                        when (ans) {
-                            DialogInterface.BUTTON_POSITIVE -> {
-                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                                intent.flags = FLAG_ACTIVITY_NEW_TASK
-                                intent.data = Uri.fromParts("package", packageName, null)
-                                startActivity(intent)
-                            }
-                        }
+                    val dialog = SelectDialog.newInstance(title = "촬영을 위해 권한을 \n허용으로 해주세요!", showNegativeButton = true)
+                    dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        intent.flags = FLAG_ACTIVITY_NEW_TASK
+                        intent.data = Uri.fromParts("package", packageName, null)
+                        startActivity(intent)
                     }
-                    builder.setPositiveButton("네", listener)
-                    builder.setNegativeButton("아니오", null)
-                    builder.show()
+                    dialog.show(supportFragmentManager, "cameraPermission")
                 } else {
                     if(checkPermission(storagePermission, storageCode)) {
                         takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))

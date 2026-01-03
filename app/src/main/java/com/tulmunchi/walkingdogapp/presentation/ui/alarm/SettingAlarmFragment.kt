@@ -6,12 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
 import com.tulmunchi.walkingdogapp.databinding.FragmentSettingAlarmBinding
 import com.tulmunchi.walkingdogapp.domain.model.Alarm
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.ui.home.HomeFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
@@ -42,7 +42,7 @@ class SettingAlarmFragment : Fragment() {
             if(!selectMode) {
                 navigateToHome()
             } else {
-                binding.btnAlarmremove.visibility = View.GONE
+                binding.btnAlarmRemove.visibility = View.GONE
                 binding.btnAddAlarm.visibility = View.VISIBLE
                 unSelectMode()
             }
@@ -174,7 +174,7 @@ class SettingAlarmFragment : Fragment() {
                         }
 
                         override fun onItemLongClick(alarm: Alarm) {
-                            btnAlarmremove.visibility = View.VISIBLE
+                            btnAlarmRemove.visibility = View.VISIBLE
                             btnAddAlarm.visibility = View.GONE
                             selectMode = true
                             if (removeAlarmList.contains(alarm)) {
@@ -227,7 +227,7 @@ class SettingAlarmFragment : Fragment() {
             }
 
 
-            btnAlarmremove.setOnClickListener {
+            btnAlarmRemove.setOnClickListener {
                 alarmFunctions?.let { functions ->
                     showAlarmRemoveDialog(functions)
                 }
@@ -251,29 +251,21 @@ class SettingAlarmFragment : Fragment() {
     }
 
     private fun showAlarmRemoveDialog(functions: AlarmFunctions) {
-        context?.let { ctx ->
-            val builder = AlertDialog.Builder(ctx)
-            builder.setTitle("알림을 삭제하시겠습니까?")
-            val listener = DialogInterface.OnClickListener { _, ans ->
-                when (ans) {
-                    DialogInterface.BUTTON_POSITIVE -> {
-                        coroutineScope.launch {
-                            for (alarm in removeAlarmList) {
-                                functions.cancelAlarm(alarm.alarmCode)
-                                mainViewModel.deleteAlarm(alarm.alarmCode)
-                            }
-                            removeItems()
-                            unSelectMode()
-                        }
-                        binding.btnAlarmremove.visibility = View.GONE
-                        binding.btnAddAlarm.visibility = View.VISIBLE
-                    }
+        val dialog = SelectDialog.newInstance(title = "알림을 삭제하시겠어요?", showNegativeButton = true)
+        dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+            coroutineScope.launch {
+                for (alarm in removeAlarmList) {
+                    functions.cancelAlarm(alarm.alarmCode)
+                    mainViewModel.deleteAlarm(alarm.alarmCode)
                 }
+                removeItems()
+                unSelectMode()
             }
-            builder.setPositiveButton("네", listener)
-            builder.setNegativeButton("아니오", null)
-            builder.show()
+            binding.btnAlarmRemove.visibility = View.GONE
+            binding.btnAddAlarm.visibility = View.VISIBLE
         }
+
+        dialog.show(parentFragmentManager, "removeAlarm")
     }
 
     private fun navigateToHome() {

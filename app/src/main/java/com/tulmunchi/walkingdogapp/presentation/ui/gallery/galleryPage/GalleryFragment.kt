@@ -15,7 +15,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
@@ -24,6 +23,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentGalleryBinding
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.model.GalleryImgInfo
 import com.tulmunchi.walkingdogapp.presentation.ui.gallery.detailOfPicturePage.DetailPictureFragment
@@ -190,24 +190,15 @@ class GalleryFragment : Fragment() {
 
     private fun showDeleteConfirmDialog() {
         val contentResolver = activity?.contentResolver ?: return
-        context?.let { ctx ->
-            val builder = AlertDialog.Builder(ctx)
-            builder.setTitle("사진을 삭제하시겠습니까?")
-            val listener = DialogInterface.OnClickListener { _, ans ->
-                when (ans) {
-                    DialogInterface.BUTTON_POSITIVE -> {
-                        for (uri in removeImgList) {
-                            contentResolver.delete(uri, null, null)
-                        }
-                        updateRecyclerView()
-                        unSelectMode()
-                    }
-                }
+        val dialog = SelectDialog.newInstance(title = "사진을 삭제하시겠습니까?", showNegativeButton = true)
+        dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+            for (uri in removeImgList) {
+                contentResolver.delete(uri, null, null)
             }
-            builder.setPositiveButton("네", listener)
-            builder.setNegativeButton("아니오", null)
-            builder.show()
+            updateRecyclerView()
+            unSelectMode()
         }
+        dialog.show(parentFragmentManager, "deleteConfirm")
     }
 
     private fun setGallery() {

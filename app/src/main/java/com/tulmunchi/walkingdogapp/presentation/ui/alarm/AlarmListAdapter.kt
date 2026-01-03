@@ -93,8 +93,8 @@ class AlarmListAdapter(private val alarmList: List<Alarm>) : RecyclerView.Adapte
                     toggleSelection(alarmList[bindingAdapterPosition])
                 }
 
-                Onoff.isChecked = alarm.isEnabled
-                Onoff.setOnCheckedChangeListener { _, isChecked ->
+                OnOff.isChecked = alarm.isEnabled
+                OnOff.setOnCheckedChangeListener { _, isChecked ->
                     onItemClickListener?.onSwitchCheckedChangeListener(
                         alarmList[bindingAdapterPosition],
                         isChecked

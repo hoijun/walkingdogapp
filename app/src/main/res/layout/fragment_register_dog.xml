@@ -83,7 +83,7 @@
                     android:layout_height="120dp"
                     android:layout_marginTop="20dp"
                     android:src="@drawable/collection_unobtained"
-                    app:civ_border_width="1.5dp"
+                    app:civ_border_width="0.5dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

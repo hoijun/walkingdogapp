@@ -193,11 +193,12 @@ class MainViewModel @Inject constructor(
      */
     fun addAlarm(alarm: Alarm) {
         viewModelScope.launch {
-            _isLoading.value = true
             addAlarmUseCase(alarm).handle(
                 onSuccess = {
-                    loadAlarms()
-                    _isLoading.value = false
+                    _alarms.value = _alarms.value?.toMutableList()?.apply { add(alarm) }
+                },
+                onError = {
+                    _error.postValue("알람 추가에 실패했습니다")
                 }
             )
         }
@@ -208,11 +209,12 @@ class MainViewModel @Inject constructor(
      */
     fun deleteAlarm(alarmCode: Int) {
         viewModelScope.launch {
-            _isLoading.value = true
             deleteAlarmUseCase(alarmCode).handle(
                 onSuccess = {
-                    loadAlarms()
-                    _isLoading.value = false
+                    _alarms.value = _alarms.value?.toMutableList()?.apply { removeAll { it.alarmCode == alarmCode } }
+                },
+                onError = {
+                    _error.postValue("알람 삭제에 실패했습니다")
                 }
             )
         }
@@ -223,17 +225,12 @@ class MainViewModel @Inject constructor(
      */
     fun updateAlarm(oldAlarmCode: Int, newAlarm: Alarm) {
         viewModelScope.launch {
-            _isLoading.value = true
-
             try {
                 // 순차적으로 실행: 삭제 → 추가
                 deleteAlarmUseCase(oldAlarmCode).getOrThrow()
                 addAlarmUseCase(newAlarm).getOrThrow()
-                loadAlarms()
             } catch (e: Exception) {
                 _error.postValue("알람 수정에 실패했습니다")
-            } finally {
-                _isLoading.value = false
             }
         }
     }
