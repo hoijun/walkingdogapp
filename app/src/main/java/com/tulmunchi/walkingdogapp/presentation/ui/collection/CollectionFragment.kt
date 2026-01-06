@@ -114,7 +114,7 @@ class CollectionFragment : Fragment() {
                 }
             }
 
-            searchview.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+            searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     return false
                 }

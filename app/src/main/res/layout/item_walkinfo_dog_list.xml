@@ -8,7 +8,8 @@
         android:id="@+id/WalkInfo_DogImg"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/collection_003"
+        app:civ_border_width="0.5dp"
+        android:src="@drawable/collection_unobtained"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 

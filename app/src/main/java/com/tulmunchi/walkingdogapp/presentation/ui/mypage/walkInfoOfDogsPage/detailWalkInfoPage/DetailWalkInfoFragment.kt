@@ -89,7 +89,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
 
 
         binding.apply {
-            btnGoMypage.setOnClickListener {
+            btnBack.setOnClickListener {
                 navigateToWalkInfo()
             }
 
@@ -97,9 +97,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             walkDay = day
             walkRecordInfo = walkRecord
 
-            val collectionAdapter = if (currentCollections.isEmpty()) CurrentCollectionItemListAdapter(
-                emptyCollections
-            ) else CurrentCollectionItemListAdapter(currentCollections)
+            val collectionAdapter = if (currentCollections.isEmpty()) CurrentCollectionItemListAdapter(emptyCollections) else CurrentCollectionItemListAdapter(currentCollections)
             context?.let { ctx ->
                 getCollectionRecyclerView.layoutManager = GridLayoutManager(ctx, 3)
             }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
@@ -15,8 +14,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".mypage.DetailWalkInfoFragment">
+        android:layout_height="match_parent" >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/detailInfo_Top"
@@ -27,10 +25,10 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/btn_goMypage"
+                android:id="@+id/btn_back"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginStart="25dp"
+                android:layout_marginStart="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -44,7 +42,7 @@
                 android:gravity="center"
                 android:text="산책 기록"
                 android:textColor="@color/black"
-                android:textSize="22sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -80,7 +78,7 @@
                     android:layout_height="450dp">
 
                     <TextView
-                        android:id="@+id/walkday"
+                        android:id="@+id/walk_date"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center"
@@ -98,12 +96,11 @@
                         android:id="@+id/Map_layout"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginEnd="15dp"
+                        android:layout_marginHorizontal="20dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHeight_percent="0.75"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/walkday">
+                        app:layout_constraintTop_toBottomOf="@+id/walk_date">
 
                         <FrameLayout
                             android:id="@+id/Map"
@@ -121,172 +118,189 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <LinearLayout
                     android:id="@+id/detailInfo_WalkInfo"
                     android:layout_width="match_parent"
-                    android:layout_height="225dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginEnd="15dp"
-                    android:background="@drawable/round_style_rad20">
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:paddingVertical="35dp"
+                    android:paddingHorizontal="15dp"
+                    android:background="@drawable/round_style_rad15_border"
+                    android:orientation="vertical">
 
-                    <View
-                        android:id="@+id/view29"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintWidth_percent="0.125" />
+                    <!-- 첫 번째 행 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="15dp">
 
-                    <View
-                        android:id="@+id/view31"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHeight_percent="0.07"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        <!-- 시작 시간 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/start"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text="시작 시간"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        app:layout_constraintHeight_percent="0.18"
-                        app:layout_constraintStart_toEndOf="@+id/view29"
-                        app:layout_constraintTop_toBottomOf="@+id/view31"
-                        app:layout_constraintWidth_percent="0.3" />
+                            <TextView
+                                android:id="@+id/introduction_start_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="시작 시간"
+                                android:textColor="@color/black"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/walkstart"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text="@{walkRecordInfo.startTime}"
-                        android:textColor="@color/black"
-                        android:textSize="23sp"
-                        android:textStyle="bold"
-                        app:layout_constraintHeight_percent="0.2"
-                        app:layout_constraintStart_toEndOf="@+id/view29"
-                        app:layout_constraintTop_toBottomOf="@id/start"
-                        app:layout_constraintWidth_percent="0.3" />
+                            <View
+                                android:id="@+id/line_start_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginHorizontal="40dp"
+                                android:background="#cccccc" />
 
-                    <View
-                        android:id="@+id/view30"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/start"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintWidth_percent="0.15" />
+                            <TextView
+                                android:id="@+id/start_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="@{walkRecordInfo.startTime}"
+                                android:textColor="@color/black"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:paddingTop="8dp" />
+                        </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/end"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text="종료 시간"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        app:layout_constraintHeight_percent="0.18"
-                        app:layout_constraintStart_toEndOf="@+id/view30"
-                        app:layout_constraintTop_toBottomOf="@+id/view31"
-                        app:layout_constraintWidth_percent="0.3" />
+                        <!-- 종료 시간 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                           >
 
-                    <TextView
-                        android:id="@+id/walkend"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text="@{walkRecordInfo.endTime}"
-                        android:textColor="@color/black"
-                        android:textSize="23sp"
-                        android:textStyle="bold"
-                        app:layout_constraintHeight_percent="0.2"
-                        app:layout_constraintStart_toEndOf="@+id/view30"
-                        app:layout_constraintTop_toBottomOf="@id/end"
-                        app:layout_constraintWidth_percent="0.3" />
+                            <TextView
+                                android:id="@+id/introduction_end_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="종료 시간"
+                                android:textColor="@color/black"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
 
-                    <View
-                        android:id="@+id/view32"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHeight_percent="0.05"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/walkstart" />
+                            <View
+                                android:id="@+id/line_end_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginHorizontal="40dp"
+                                android:background="#cccccc" />
 
-                    <TextView
-                        android:id="@+id/distance"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text="거리"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        app:layout_constraintHeight_percent="0.18"
-                        app:layout_constraintStart_toEndOf="@+id/view29"
-                        app:layout_constraintTop_toBottomOf="@id/view32"
-                        app:layout_constraintWidth_percent="0.3" />
+                            <TextView
+                                android:id="@+id/end_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="@{walkRecordInfo.endTime}"
+                                android:textColor="@color/black"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:paddingTop="8dp" />
+                        </LinearLayout>
+                    </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/walkdistance"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text="@{String.format(`%.1fkm`, walkRecordInfo.distance / 1000.0f)}"
-                        android:textColor="@color/black"
-                        android:textSize="23sp"
-                        android:textStyle="bold"
-                        app:layout_constraintHeight_percent="0.2"
-                        app:layout_constraintStart_toEndOf="@+id/view29"
-                        app:layout_constraintTop_toBottomOf="@id/distance"
-                        app:layout_constraintWidth_percent="0.3" />
+                    <!-- 두 번째 행 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/time"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text="산책 시간"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        app:layout_constraintHeight_percent="0.18"
-                        app:layout_constraintStart_toEndOf="@+id/view30"
-                        app:layout_constraintTop_toBottomOf="@+id/view32"
-                        app:layout_constraintWidth_percent="0.3" />
+                        <!-- 거리 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/walktime"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:gravity="center"
-                        android:text='@{walkRecordInfo.time / 60 + "분"}'
-                        android:textColor="@color/black"
-                        android:textSize="23sp"
-                        android:textStyle="bold"
-                        app:layout_constraintHeight_percent="0.2"
-                        app:layout_constraintStart_toEndOf="@+id/view30"
-                        app:layout_constraintTop_toBottomOf="@+id/time"
-                        app:layout_constraintWidth_percent="0.3" />
+                            <TextView
+                                android:id="@+id/introduction_distance"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="거리"
+                                android:textColor="@color/black"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                            <View
+                                android:id="@+id/line_distance"
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginHorizontal="40dp"
+                                android:background="#cccccc" />
+
+                            <TextView
+                                android:id="@+id/distance"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="@{String.format(`%.1fkm`, walkRecordInfo.distance / 1000.0f)}"
+                                android:textColor="@color/black"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:paddingTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- 산책 시간 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/introduction_duration"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="산책 시간"
+                                android:textColor="@color/black"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <View
+                                android:id="@+id/line_duration"
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginHorizontal="40dp"
+                                android:background="#cccccc" />
+
+                            <TextView
+                                android:id="@+id/duration"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text='@{walkRecordInfo.time / 60 + "분"}'
+                                android:textColor="@color/black"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:paddingTop="8dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/detail_Collections"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
+                    android:layout_marginHorizontal="20dp"
                     android:layout_marginTop="40dp"
-                    android:layout_marginEnd="15dp"
-                    android:background="@drawable/round_style_rad20">
+                    android:background="@drawable/round_style_rad15_border">
 
                     <TextView
                         android:id="@+id/text_getCollections"
@@ -294,18 +308,26 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="15dp"
                         android:text="함께한 동물들"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
                         android:textColor="@color/black"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
+                    <View
+                        android:id="@+id/divider"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="15dp"
+                        android:background="#cccccc"
+                        app:layout_constraintTop_toBottomOf="@+id/text_getCollections" />
+
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/getCollection_RecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:layout_constraintTop_toBottomOf="@+id/text_getCollections"/>
+                        app:layout_constraintTop_toBottomOf="@+id/divider"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <View

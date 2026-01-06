@@ -21,6 +21,7 @@ import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.common.HorizonSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.FragmentWalkInfoBinding
+import com.tulmunchi.walkingdogapp.domain.model.Coordinate
 import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
 import com.tulmunchi.walkingdogapp.domain.model.WalkStats
@@ -115,7 +116,7 @@ class WalkInfoFragment : Fragment() { // 수정
                 navigateToMyPage()
             }
 
-            walkinfoRecyclerviewLayout.setOnTouchListener { _, event -> // 리사이클러 뷰, 스크롤 뷰 스크롤 겹침 방지
+            walkInfoRecyclerviewLayout.setOnTouchListener { _, event -> // 리사이클러 뷰, 스크롤 뷰 스크롤 겹침 방지
                 when(event.action) {
                     MotionEvent.ACTION_UP -> {
                         WalkInfoScrollView.requestDisallowInterceptTouchEvent(false)
@@ -149,9 +150,9 @@ class WalkInfoFragment : Fragment() { // 수정
                     selectDogInfo = selectedDog
                     selectDogWalkStats = selectedDogInfo.dogWithStats
 
-                    walkcalendar.removeDecorator(walkDayDecorator)
+                    walkCalendar.removeDecorator(walkDayDecorator)
                     walkDayDecorator = WalkDayDecorator(dogsWalkRecordMap[selectedDogInfo.name]?.walkDateList ?: listOf()) // 산책한 날 표시
-                    walkcalendar.addDecorators(walkDayDecorator)
+                    walkCalendar.addDecorators(walkDayDecorator)
 
                     val selectedDayWalkRecords = mutableListOf<WalkRecord>()
 
@@ -165,7 +166,7 @@ class WalkInfoFragment : Fragment() { // 수정
                     adapter.itemClickListener = WalkDatesListAdapter.OnItemClickListener { selectDate ->
                         navigateToDetailWalkInfo(selectDate)
                     }
-                    binding.walkinfoRecyclerview.adapter = adapter
+                    binding.walkInfoRecyclerview.adapter = adapter
                 }
             }
 
@@ -183,23 +184,22 @@ class WalkInfoFragment : Fragment() { // 수정
 
 
             if (lateSelectedDay.isEmpty()) { // 마이 페이지에서 들어 왔을 때
-                walkcalendar.selectedDate = selectedDay // 현재 날짜 표시
+                walkCalendar.selectedDate = selectedDay // 현재 날짜 표시
             } else { // 상세정보 창에서 다시 되돌아 왔을 때
-                walkcalendar.selectedDate = selectedDay
+                walkCalendar.selectedDate = selectedDay
             }
 
-            walkcalendar.addDecorators(dayDecorator, saturdayDecorator, sundayDecorator, selectedMonthDecorator)
-            walkcalendar.setWeekDayFormatter(ArrayWeekDayFormatter(resources.getTextArray(R.array.custom_weekdays)))
-            walkcalendar.state().edit().setMaximumDate(CalendarDay.today()).setMinimumDate(CalendarDay.from(2024, 1, 1)).commit()
-            walkcalendar.setTitleFormatter { day -> // 년 월 표시 변경
+            walkCalendar.addDecorators(dayDecorator, saturdayDecorator, sundayDecorator, selectedMonthDecorator)
+            walkCalendar.setWeekDayFormatter(ArrayWeekDayFormatter(resources.getTextArray(R.array.custom_weekdays)))
+            walkCalendar.state().edit().setMaximumDate(CalendarDay.today()).setMinimumDate(CalendarDay.from(2024, 1, 1)).commit()
+            walkCalendar.setTitleFormatter { day -> // 년 월 표시 변경
                 val inputText = day.date
                 val calendarHeaderElements = inputText.toString().split("-").toMutableList()
                 val calendarHeaderBuilder = StringBuilder()
                 if (calendarHeaderElements[1][0] == '0') {
                     calendarHeaderElements[1] = calendarHeaderElements[1].replace("0","")
                 }
-                calendarHeaderBuilder.append(calendarHeaderElements[0]).append("년 ")
-                    .append(calendarHeaderElements[1]).append("월")
+                calendarHeaderBuilder.append(calendarHeaderElements[0]).append("년 ").append(calendarHeaderElements[1]).append("월")
                 calendarHeaderBuilder.toString()
             }
 
@@ -221,10 +221,10 @@ class WalkInfoFragment : Fragment() { // 수정
                 adapter.itemClickListener = WalkDatesListAdapter.OnItemClickListener { selectDate ->
                     navigateToDetailWalkInfo(selectDate)
                 }
-                walkinfoRecyclerview.adapter = adapter
-                walkcalendar.addDecorators(walkDayDecorator)
+                walkInfoRecyclerview.adapter = adapter
+                walkCalendar.addDecorators(walkDayDecorator)
 
-                walkcalendar.setOnDateChangedListener { _, date, _ -> // 날짜 킅릭시
+                walkCalendar.setOnDateChangedListener { _, date, _ -> // 날짜 킅릭시
                     selectedDay = date
                     val walkDateInfoOfDate = mutableListOf<WalkRecord>()
                     for (walkDay: WalkRecord in dogsWalkRecordMap[selectedDog?.name]?.walkDateInfoList ?: listOf()) { // 선택한 날짜의 산책 정보
@@ -237,38 +237,38 @@ class WalkInfoFragment : Fragment() { // 수정
                     adapter.itemClickListener = WalkDatesListAdapter.OnItemClickListener { selectDate ->
                         navigateToDetailWalkInfo(selectDate)
                     }
-                    walkinfoRecyclerview.adapter = adapter
+                    walkInfoRecyclerview.adapter = adapter
                 }
             }
 
 
-            walkcalendar.setOnMonthChangedListener { _, date -> // 달 바꿀때
-                walkcalendar.removeDecorators()
-                walkcalendar.invalidateDecorators() // 데코 초기화
+            walkCalendar.setOnMonthChangedListener { _, date -> // 달 바꿀때
+                walkCalendar.removeDecorators()
+                walkCalendar.invalidateDecorators() // 데코 초기화
                 if (date.month == CalendarDay.today().month) {
-                    walkcalendar.selectedDate = CalendarDay.today() // 현재 달로 바꿀 때 마다 현재 날짜 표시
-                    selectedDay = walkcalendar.selectedDate ?: CalendarDay.today()
+                    walkCalendar.selectedDate = CalendarDay.today() // 현재 달로 바꿀 때 마다 현재 날짜 표시
+                    selectedDay = walkCalendar.selectedDate ?: CalendarDay.today()
                     adapter = WalkDatesListAdapter(
                         dogsWalkRecordMap[selectedDog?.name]?.walkDateInfoToday ?: listOf()
                     )
                 } else {
                     adapter = WalkDatesListAdapter(listOf()) // 빈 리사이클러 뷰
-                    walkcalendar.selectedDate = null
+                    walkCalendar.selectedDate = null
                 }
 
                 selectedMonthDecorator = SelectedMonthDecorator(date.month)
                 adapter.itemClickListener = WalkDatesListAdapter.OnItemClickListener { selectDate ->
                     navigateToDetailWalkInfo(selectDate)
                 }
-                walkinfoRecyclerview.adapter = adapter
+                walkInfoRecyclerview.adapter = adapter
 
                 if (dogNames.isNotEmpty()) {
                     walkDayDecorator = WalkDayDecorator(dogsWalkRecordMap[selectedDog?.name]?.walkDateList ?: listOf()) // 산책한 날 표시
-                    walkcalendar.addDecorators(walkDayDecorator)
+                    walkCalendar.addDecorators(walkDayDecorator)
                 }
-                walkcalendar.addDecorators(dayDecorator, saturdayDecorator, sundayDecorator, selectedMonthDecorator) //데코 설정
+                walkCalendar.addDecorators(dayDecorator, saturdayDecorator, sundayDecorator, selectedMonthDecorator) //데코 설정
             }
-            walkinfoRecyclerview.layoutManager = LinearLayoutManager(context)
+            walkInfoRecyclerview.layoutManager = LinearLayoutManager(context)
         }
         return binding.root
     }
