@@ -13,7 +13,10 @@ object WalkRecordMapper {
         endTime = dto.endTime,
         distance = dto.distance,
         time = dto.time,
-        coords = CoordinateMapper.toDomainList(dto.coords),
+        calories = dto.calories,
+        poopCoordinates = CoordinateMapper.toDomainList(dto.poopCoordinates),
+        memoCoordinates = dto.memoCoordinates.mapValues { (_, value) -> CoordinateMapper.toDomain(value) },
+        walkCoordinates = CoordinateMapper.toDomainList(dto.walkCoordinates),
         collections = dto.collections
     )
 
@@ -23,11 +26,12 @@ object WalkRecordMapper {
         endTime = domain.endTime,
         distance = domain.distance,
         time = domain.time,
-        coords = CoordinateMapper.toDtoList(domain.coords),
+        calories = domain.calories,
+        poopCoordinates = CoordinateMapper.toDtoList(domain.poopCoordinates),
+        memoCoordinates = domain.memoCoordinates.mapValues { (_, value) -> CoordinateMapper.toDto(value) },
+        walkCoordinates = CoordinateMapper.toDtoList(domain.walkCoordinates),
         collections = domain.collections
     )
 
     fun toDomainList(dtos: List<WalkRecordDto>): List<WalkRecord> = dtos.map { toDomain(it) }
-
-    fun toDtoList(domains: List<WalkRecord>): List<WalkRecordDto> = domains.map { toDto(it) }
 }

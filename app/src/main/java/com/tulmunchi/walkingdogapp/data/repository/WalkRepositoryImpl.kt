@@ -34,35 +34,18 @@ class WalkRepositoryImpl @Inject constructor(
 
     override suspend fun saveWalkRecord(
         dogNames: List<String>,
-        startTime: String,
-        distance: Float,
-        time: Int,
-        coords: List<Coordinate>,
-        collections: List<String>
+        walkRecord: WalkRecord
     ): Result<Unit> {
         if (!networkChecker.isNetworkAvailable()) {
             return Result.failure(DomainError.NetworkError())
         }
         return try {
-            val currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
-            val day = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-
-            val recordDto = WalkRecordDto(
-                day = day,
-                startTime = startTime,
-                endTime = currentTime,
-                distance = distance,
-                time = time,
-                coords = CoordinateMapper.toDtoList(coords),
-                collections = collections
-            )
-
             // Save record for each dog
             for (dogName in dogNames) {
-                firebaseWalkDataSource.saveWalkRecord(uid, dogName, recordDto).getOrThrow()
+                firebaseWalkDataSource.saveWalkRecord(uid, dogName, WalkRecordMapper.toDto(walkRecord)).getOrThrow()
             }
 
-            firebaseCollectionDataSource.updateCollection(uid, collections).getOrThrow()
+            firebaseCollectionDataSource.updateCollection(uid, walkRecord.collections).getOrThrow()
 
             Result.success(Unit)
         } catch (e: Exception) {
@@ -86,6 +69,7 @@ class WalkRepositoryImpl @Inject constructor(
         if (!networkChecker.isNetworkAvailable()) {
             return Result.failure(DomainError.NetworkError())
         }
+
         return firebaseUserDataSource.getTotalWalkStats(uid)
             .map { WalkStatsMapper.toDomain(it) }
     }

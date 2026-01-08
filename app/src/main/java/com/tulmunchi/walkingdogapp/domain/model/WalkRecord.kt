@@ -13,6 +13,9 @@ data class WalkRecord(
     val endTime: String,
     val distance: Float,
     val time: Int,
-    val coords: List<Coordinate>,
+    val calories: Float,
+    val poopCoordinates: List<Coordinate>,
+    val memoCoordinates: Map<String, Coordinate>,
+    val walkCoordinates: List<Coordinate>,
     val collections: List<String>
 ) : Parcelable

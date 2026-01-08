@@ -19,26 +19,104 @@
         tools:context=".presentation.ui.walking.WalkingActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/walkingscreen"
+            android:id="@+id/walkingScreen"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <FrameLayout
                 android:id="@+id/Map"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.6"
+                app:layout_constraintHeight_percent="0.65"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- 상단 좌측: 날씨 + 강아지 정보 카드 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/info_card"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="40dp"
+                app:cardBackgroundColor="#CC000000"
+                app:cardCornerRadius="15dp"
+                app:cardElevation="0dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="1.0"/>
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- 날씨 정보 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/weather_icon"
+                            android:layout_width="25dp"
+                            android:layout_height="wrap_content"
+                            android:text="&#x1F324;&#xFE0F;"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/weather_temp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="18°C"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/weather_condition"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="맑음"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <!-- 강아지 이름 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/dog_icon"
+                            android:layout_width="25dp"
+                            android:layout_height="wrap_content"
+                            android:text="&#x1F415;"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/walking_dogs_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:layout_marginStart="6dp"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            app:dogsList="@{WalkingService.walkingDogs}" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/trackingCameraModeOnBtn"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="30dp"
-                android:layout_marginEnd="15dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="20dp"
                 android:src="@drawable/icon_location_tracking"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -46,121 +124,169 @@
 
             <ImageView
                 android:id="@+id/current_Collections"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginTop="30dp"
-                android:layout_marginEnd="15dp"
+                android:layout_marginEnd="20dp"
                 android:src="@drawable/icon_collections"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/trackingCameraModeOnBtn"
                 app:tint="@color/black" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.4"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/Map"
-                app:layout_constraintWidth_percent="1.0">
+                app:layout_constraintHeight_percent="0.35"
+                app:layout_constraintTop_toBottomOf="@id/Map"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1.5dp"
+                    android:background="#e4e4e4"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/info_walk"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_percent="0.4"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <View
-                        android:id="@+id/view8"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        app:layout_constraintHeight_percent="0.2"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintWidth_percent="0.05" />
-
+                    <!-- 거리 정보 (좌측) -->
                     <TextView
                         android:id="@+id/Info_distance"
                         android:layout_width="0dp"
-                        android:layout_height="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="18dp"
                         android:gravity="center"
                         android:text='@{@string/distance(WalkingService.walkDistance / 1000.0f)}'
                         android:textColor="@color/black"
-                        android:textSize="25sp"
+                        android:textSize="22sp"
                         android:textStyle="bold"
-                        app:layout_constraintHeight_percent="0.4"
-                        app:layout_constraintStart_toEndOf="@id/view8"
-                        app:layout_constraintTop_toBottomOf="@+id/view8"
-                        app:layout_constraintWidth_percent="0.4" />
+                        app:layout_constraintEnd_toStartOf="@id/btn_start_center"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
                         android:id="@+id/Info_unit"
                         android:layout_width="0dp"
-                        android:layout_height="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
                         android:gravity="center"
                         android:text="(Km)"
                         android:textColor="@color/black"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         android:textStyle="bold"
-                        app:layout_constraintHeight_percent="0.2"
-                        app:layout_constraintStart_toEndOf="@id/view8"
-                        app:layout_constraintTop_toBottomOf="@+id/Info_distance"
-                        app:layout_constraintWidth_percent="0.4" />
+                        app:layout_constraintEnd_toEndOf="@id/Info_distance"
+                        app:layout_constraintStart_toStartOf="@id/Info_distance"
+                        app:layout_constraintTop_toBottomOf="@id/Info_distance" />
 
-                    <View
-                        android:id="@+id/viewa"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        app:layout_constraintHeight_percent="0.4"
+                    <!-- 중앙 시작/중지 버튼 -->
+                    <ImageView
+                        android:id="@+id/btn_start_center"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginEnd="20dp"
+                        app:isTracking="@{WalkingService.isTracking}"
+                        app:layout_constraintEnd_toStartOf="@id/Info_time"
                         app:layout_constraintStart_toEndOf="@id/Info_distance"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintWidth_percent="0.1" />
+                        app:layout_constraintTop_toTopOf="parent"/>
 
+                    <TextView
+                        android:id="@+id/text_start_center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text='@{WalkingService.isTracking ? "중지" : "시작"}'
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="@id/btn_start_center"
+                        app:layout_constraintStart_toStartOf="@id/btn_start_center"
+                        app:layout_constraintTop_toBottomOf="@id/btn_start_center" />
+
+                    <!-- 시간 정보 (우측) -->
                     <TextView
                         android:id="@+id/Info_time"
                         android:layout_width="0dp"
-                        android:layout_height="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
                         android:gravity="center"
                         android:text='@{@string/time(WalkingService.walkTime / 60, WalkingService.walkTime % 60)}'
                         android:textColor="@color/black"
-                        android:textSize="25sp"
+                        android:textSize="22sp"
                         android:textStyle="bold"
-                        app:layout_constraintHeight_percent="0.4"
-                        app:layout_constraintStart_toEndOf="@id/viewa"
-                        app:layout_constraintTop_toBottomOf="@+id/view8"
-                        app:layout_constraintWidth_percent="0.4" />
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/btn_start_center"
+                        app:layout_constraintTop_toTopOf="@id/Info_distance" />
+
+                    <TextView
+                        android:id="@+id/Info_time_unit"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:text="(분 : 초)"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="@id/Info_time"
+                        app:layout_constraintStart_toStartOf="@id/Info_time"
+                        app:layout_constraintTop_toBottomOf="@id/Info_time" />
+
+                    <!-- 칼로리와 속도 정보 -->
+                    <TextView
+                        android:id="@+id/Info_calories"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="40dp"
+                        android:layout_marginTop="30dp"
+                        android:gravity="center"
+                        android:text='@{@string/calories_format((int)WalkingService.calories)}'
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toStartOf="@id/Info_speed"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/text_start_center" />
+
+                    <TextView
+                        android:id="@+id/Info_speed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="40dp"
+                        android:gravity="center"
+                        android:text='@{@string/speed_format(WalkingService.speed)}'
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/Info_calories"
+                        app:layout_constraintTop_toTopOf="@id/Info_calories" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintHeight_percent="0.4"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/info_walk"
-                    app:layout_constraintWidth_percent="0.3333">
+                    android:id="@+id/buttons_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    app:layout_constraintTop_toBottomOf="@+id/info_walk">
 
-                    <View
-                        android:id="@+id/view1"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHeight_percent="0.15"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
+                    <!-- 산책 저장 버튼 -->
                     <ImageView
                         android:id="@+id/btn_Save"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHeight_percent="0.5"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        app:layout_constraintEnd_toStartOf="@id/btn_poop"
+                        app:layout_constraintHorizontal_chainStyle="spread"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/view1"
-                        app:layout_constraintWidth_percent="1.0"
+                        app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/icon_save" />
 
                     <TextView
@@ -168,126 +294,84 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:gravity="center"
-                        android:text="산책 저장"
+                        android:text="저장"
                         android:textColor="@color/black"
-                        android:textSize="20sp"
+                        android:textSize="16sp"
                         android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/btn_Save" />
+                        app:layout_constraintEnd_toEndOf="@id/btn_Save"
+                        app:layout_constraintStart_toStartOf="@id/btn_Save"
+                        app:layout_constraintTop_toBottomOf="@id/btn_Save" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/stopLayout"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_percent="0.4"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/info_walk"
-                    app:layout_constraintWidth_percent="0.3333">
-
-                    <View
-                        android:id="@+id/view2"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHeight_percent="0.15"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
+                    <!-- 배변 체크 버튼 -->
                     <ImageView
-                        android:id="@+id/btn_start"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHeight_percent="0.5"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/view2"
-                        app:layout_constraintWidth_percent="1.0"
-                        app:isTracking="@{WalkingService.isTracking}"/>
+                        android:id="@+id/btn_poop"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        app:layout_constraintEnd_toStartOf="@id/btn_memo"
+                        app:layout_constraintStart_toEndOf="@id/btn_Save"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/icon_poo" />
 
                     <TextView
-                        android:id="@+id/text_isTracking"
+                        android:id="@+id/text_poop"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:gravity="center"
-                        android:text='@{WalkingService.isTracking ? "산책중지" : "산책시작"}'
+                        android:text="배변"
                         android:textColor="@color/black"
-                        android:textSize="20sp"
+                        android:textSize="16sp"
                         android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/btn_start" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        app:layout_constraintEnd_toEndOf="@id/btn_poop"
+                        app:layout_constraintStart_toStartOf="@id/btn_poop"
+                        app:layout_constraintTop_toBottomOf="@id/btn_poop" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_percent="0.4"
-                    app:layout_constraintTop_toBottomOf="@+id/info_walk"
-                    app:layout_constraintWidth_percent="0.3333">
+                    <!-- 메모 버튼 -->
+                    <ImageView
+                        android:id="@+id/btn_memo"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        app:layout_constraintEnd_toStartOf="@id/btn_camera"
+                        app:layout_constraintStart_toEndOf="@id/btn_poop"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/icon_note" />
 
-                    <View
-                        android:id="@+id/view5"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHeight_percent="0.15"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                    <TextView
+                        android:id="@+id/text_memo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="메모"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="@id/btn_memo"
+                        app:layout_constraintStart_toStartOf="@id/btn_memo"
+                        app:layout_constraintTop_toBottomOf="@id/btn_memo" />
 
+                    <!-- 사진 버튼 -->
                     <ImageView
                         android:id="@+id/btn_camera"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHeight_percent="0.5"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/view5"
-                        app:layout_constraintWidth_percent="1.0"
+                        app:layout_constraintStart_toEndOf="@id/btn_memo"
+                        app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/icon_camera" />
 
-                    <View
-                        android:id="@+id/view6"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHeight_percent="0.00"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/btn_camera" />
-
                     <TextView
+                        android:id="@+id/text_camera"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:gravity="center"
                         android:text="사진"
                         android:textColor="@color/black"
-                        android:textSize="20sp"
+                        android:textSize="16sp"
                         android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHeight_percent="0.3"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/view6" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        app:layout_constraintEnd_toEndOf="@id/btn_camera"
+                        app:layout_constraintStart_toStartOf="@id/btn_camera"
+                        app:layout_constraintTop_toBottomOf="@id/btn_camera" />
 
-                <TextView
-                    android:id="@+id/walkingDogs_Text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/stopLayout"
-                    app:dogsList="@{WalkingService.walkingDogs}"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

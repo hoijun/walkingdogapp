@@ -1,5 +1,6 @@
 package com.tulmunchi.walkingdogapp.data.source.remote
 
+import android.util.Log
 import com.google.firebase.database.FirebaseDatabase
 import com.tulmunchi.walkingdogapp.data.model.WalkRecordDto
 import kotlinx.coroutines.tasks.await
@@ -51,9 +52,7 @@ class FirebaseWalkDataSourceImpl @Inject constructor(
 
     override suspend fun getAllWalkHistory(uid: String): Result<Map<String, List<WalkRecordDto>>> {
         return try {
-            val snapshot = database.getReference("Users").child(uid).child("dog")
-                .get()
-                .await()
+            val snapshot = database.getReference("Users").child(uid).child("dog").get().await()
 
             val historyMap = mutableMapOf<String, List<WalkRecordDto>>()
 

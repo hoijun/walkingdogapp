@@ -15,8 +15,14 @@ data class WalkRecordDto(
     val distance: Float = 0f,
     @SerializedName("time")
     val time: Int = 0,
+    @SerializedName("calories")
+    val calories: Float = 0f,
+    @SerializedName("poop_coords")
+    val poopCoordinates: List<CoordinateDto> = emptyList(),
+    @SerializedName("memo_coords")
+    val memoCoordinates: Map<String, CoordinateDto> = emptyMap(),
     @SerializedName("coords")
-    val coords: List<CoordinateDto> = emptyList(),
+    val walkCoordinates: List<CoordinateDto> = emptyList(),
     @SerializedName("collections")
     val collections: List<String> = emptyList()
 )

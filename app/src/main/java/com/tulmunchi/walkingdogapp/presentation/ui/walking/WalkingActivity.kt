@@ -34,6 +34,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DecodeFormat
+import com.bumptech.glide.request.target.Target
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
@@ -51,9 +53,12 @@ import com.tulmunchi.walkingdogapp.databinding.ActivityWalkingBinding
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.WriteDialog
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionData
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
+import com.tulmunchi.walkingdogapp.presentation.ui.collection.DetailCollectionDialog
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.WalkingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -69,13 +74,15 @@ import java.util.Random
 import javax.inject.Inject
 import kotlin.math.cos
 import kotlin.math.sin
+import androidx.core.graphics.toColorInt
 
 @AndroidEntryPoint
 class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityWalkingBinding
-    private lateinit var mynavermap: NaverMap
+    private lateinit var naverMap: NaverMap
     private lateinit var wService: WalkingService
     private var isObserverSet = false
+    private var isMapReady = false
 
     private val walkingViewModel: WalkingViewModel by viewModels()
     private var randomMarkerJob: Job? = null
@@ -91,10 +98,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var loadingDialog: LoadingDialog? = null
 
-    private var coordList = mutableListOf<LatLng>()
+    private var walkCoordList = mutableListOf<LatLng>()
     private var trackingMarker = Marker()
     private var trackingPath = PathOverlay()
     private var trackingCameraMode = true // 지도의 화면이 자동으로 사용자에 위치에 따라 움직이는 지
+    private var isStartMarkerAdded = false // 시작 마커가 이미 추가되었는지 확인
 
     private var collectionImgViews = hashMapOf<String, ImageView>()
 
@@ -114,6 +122,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var startTime = ""
     private var selectedDogs = arrayListOf<String>()
+    private var selectedDogsWeights = arrayListOf<Int>()
     private var collectionsMap = mapOf<String, CollectionInfo>()
 
     private val connection = object : ServiceConnection {
@@ -123,7 +132,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             binding.walkingService = wService
 
             // 맵도 준비되었고 아직 설정 안했으면 setObserve 호출
-            if (::mynavermap.isInitialized && !isObserverSet) {
+            if (::naverMap.isInitialized && !isObserverSet) {
                 isObserverSet = true
                 setObserve()
             }
@@ -165,6 +174,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         walkingViewModel.getLastLocation()
 
         selectedDogs = intent.getStringArrayListExtra("selectedDogs") ?: arrayListOf()
+        selectedDogsWeights = intent.getIntegerArrayListExtra("selectedDogsWeights") ?: arrayListOf()
+
+        // 로딩 다이얼로그 초기화
 
         loadingDialog = loadingDialogFactory.create(supportFragmentManager)
 
@@ -203,7 +215,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 selectStopWalk()
             }
 
-            btnStart.setOnClickListener {
+            btnStartCenter.setOnClickListener {
                 if (!WalkingService.isWalkingServiceRunning()) {
                     return@setOnClickListener
                 }
@@ -215,7 +227,28 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
 
-            btnCamera.setOnClickListener {
+            btnPoop.setOnSingleClickListener {
+                if (!isMapReady) return@setOnSingleClickListener
+
+                val dialog = SelectDialog.newInstance("배변 마커를 설정하시겠어요?", showNegativeButton = true)
+                dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+                    addPoopMarker(walkCoordList.last())
+                }
+
+                dialog.show(supportFragmentManager, "addPoop")
+            }
+
+            btnMemo.setOnSingleClickListener {
+                if (!isMapReady) return@setOnSingleClickListener
+
+                val dialog = WriteDialog()
+                dialog.clickYesListener = WriteDialog.OnClickYesListener {
+                    addMemoMarker(walkCoordList.last(), it)
+                }
+                dialog.show(supportFragmentManager, "memo")
+            }
+
+            btnCamera.setOnSingleClickListener {
                 startCamera()
             }
 
@@ -223,9 +256,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (!trackingCameraMode) {
                     trackingCameraMode = true
                     isTrackingCameraMode = trackingCameraMode
-                    if (coordList.isNotEmpty()) {
-                        val trackingCamera = CameraUpdate.scrollAndZoomTo(coordList.last(), 16.0).animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
-                        mynavermap.moveCamera(trackingCamera)
+                    if (walkCoordList.isNotEmpty()) {
+                        val trackingCamera = CameraUpdate.scrollAndZoomTo(walkCoordList.last(), 16.0).animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
+                        naverMap.moveCamera(trackingCamera)
                     }
                     return@setOnClickListener
                 }
@@ -249,6 +282,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 collectionListDialog.show(supportFragmentManager, "collectionList")
             }
         }
+
+        // 날씨 정보 초기 설정 (나중에 실제 API로 교체 가능)
+        updateWeatherInfo("18°C", "맑음")
     }
 
     private fun setupViewModelObservers() {
@@ -294,10 +330,10 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onMapReady(map: NaverMap) {
-        this.mynavermap = map
-        mynavermap.uiSettings.isRotateGesturesEnabled = false
-        mynavermap.uiSettings.isCompassEnabled = false
-        mynavermap.uiSettings.isTiltGesturesEnabled = false
+        this.naverMap = map
+        naverMap.uiSettings.isRotateGesturesEnabled = false
+        naverMap.uiSettings.isCompassEnabled = false
+        naverMap.uiSettings.isTiltGesturesEnabled = false
 
         trackingMarker.icon = OverlayImage.fromResource(R.drawable.walk_icon)
         trackingMarker.width = 200
@@ -305,53 +341,71 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         trackingMarker.anchor = PointF(0.5f, 0.5f)
 
         trackingPath.width = 15
-        trackingPath.color = Color.YELLOW
+        trackingPath.color = "#b67e36".toColorInt()
+
 
         walkingViewModel.currentCoord.observe(this) {
             val firstCamera = CameraUpdate.scrollAndZoomTo(
                 LatLng(it.latitude, it.longitude),
                 16.0
             )
-            mynavermap.moveCamera(firstCamera)
+            naverMap.moveCamera(firstCamera)
             trackingMarker.position = LatLng(it.latitude, it.longitude)
-            trackingMarker.map = mynavermap
+            trackingMarker.map = naverMap
         } // 현재 위치로 맵 이동
 
         // Service도 연결되었고 아직 설정 안했으면 setObserve 호출
         if (::wService.isInitialized && !isObserverSet) {
             isObserverSet = true
             setObserve()
+            setPoopAndMemoMarker()
+            if (!walkCoordList.isNotEmpty()) addStartMarker(walkCoordList.first())
         }
+
+        isMapReady = true
     }
 
     private fun setObserve() {
         // 위치 업데이트 이벤트
-        wService.coordList.observe(this) {
-            coordList = it
-            if (coordList.isNotEmpty()) {
+        wService.walkCoordList.observe(this) {
+            walkCoordList = it
+            if (walkCoordList.isNotEmpty()) {
+                // 첫 번째 좌표가 들어왔을 때 시작 마커 추가 (한 번만)
+                if (!isStartMarkerAdded) {
+                    addStartMarker(walkCoordList.first())
+                    isStartMarkerAdded = true
+                }
+                
                 trackingMarker.map = null
-                trackingMarker.position = coordList.last()  // 현재 위치에 아이콘 설정
-                trackingMarker.map = mynavermap
+                trackingMarker.position = walkCoordList.last()  // 현재 위치에 아이콘 설정
+                trackingMarker.map = naverMap
 
                 if (trackingCameraMode) {
-                    val trackingCamera = CameraUpdate.scrollAndZoomTo(coordList.last(), 16.0).animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
-                    mynavermap.moveCamera(trackingCamera)
+                    val trackingCamera = CameraUpdate.scrollAndZoomTo(walkCoordList.last(), 16.0).animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
+                    naverMap.moveCamera(trackingCamera)
                 }
 
                 val markersToRemove = mutableListOf<InfoWindow>()
                 for (marker in wService.animalMarkers) { // 마커 특정 거리 이상일 경우 제거
-                    if (marker.position.distanceTo(coordList.last()) > 350) {
+                    if (marker.position.distanceTo(walkCoordList.last()) > 350) {
                         marker.map = null
                         markersToRemove.add(marker)
                     }
                 }
                 wService.animalMarkers.removeAll(markersToRemove)
 
-                if (coordList.size > 1) {
+                if (walkCoordList.size > 1) {
                     trackingPath.map = null
-                    trackingPath.coords = coordList // 이동 경로 그림
-                    trackingPath.map = mynavermap
+                    trackingPath.coords = walkCoordList // 이동 경로 그림
+                    trackingPath.map = naverMap
                 }
+            }
+        }
+
+        // bearing 실시간 업데이트
+        wService.bearing.observe(this) { bearingValue ->
+            if (walkCoordList.isNotEmpty()) {
+                trackingMarker.angle = bearingValue
             }
         }
 
@@ -382,16 +436,16 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
 
                     animalMarker.setOnClickListener {
-                        if (coordList.last().distanceTo(animalMarker.position) < 30) {
+                        if (walkCoordList.last().distanceTo(animalMarker.position) < 30) {
                             val tag = animalMarker.tag.toString()
                             wService.getCollectionItems.add(tag)
                             animalMarker.map = null
                             wService.animalMarkers.remove(animalMarker)
 
-                            val getCollectionDialog = GetCollectionDialog().apply {
+                            val getCollectionDialog = DetailCollectionDialog().apply {
                                 arguments = Bundle().apply {
                                     putParcelable(
-                                        "getCollection",
+                                        "collectionInfo",
                                         collectionsMap[tag] ?: CollectionInfo()
                                     )
                                 }
@@ -403,7 +457,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                         true
                     }
-                    animalMarker.map = mynavermap
+                    animalMarker.map = naverMap
                 }
                 delay(285000)
                 randomMarker()
@@ -411,6 +465,17 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun setPoopAndMemoMarker() {
+        wService.poopMarkers.forEach {
+            addPoopMarker(position = it, isReset = true)
+        }
+
+
+        wService.memoMarkers.forEach {
+            val memoContent = wService.memos[it] ?: ""
+            addMemoMarker(position = it, content = memoContent, isReset = true)
+        }
+    }
 
     private fun setCollectionImageView(collectionsMap: Map<String, CollectionInfo>) {
         collectionsMap.forEach { (key, value) ->
@@ -426,9 +491,9 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             delay(10000) // 10초 후에
             while (isActive && WalkingService.isWalkingServiceRunning()) {
                 repeat(2) {
-                    if (coordList.isNotEmpty()) {
+                    if (walkCoordList.isNotEmpty()) {
                         if (wService.animalMarkers.size < 6) { // 마커의 갯수 상한선
-                            val randomCoord = getRandomCoord(coordList.last(), 300)
+                            val randomCoord = getRandomCoord(walkCoordList.last(), 300)
                             val randomNumber = kotlin.random.Random.nextInt(1, 24)
                             val randomKey = String.format("%03d", randomNumber)
                             val animalMarker = InfoWindow()
@@ -452,16 +517,16 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
                             animalMarker.tag = randomKey
                             animalMarker.setOnClickListener {
-                                if (coordList.last().distanceTo(animalMarker.position) < 30) {
+                                if (walkCoordList.last().distanceTo(animalMarker.position) < 30) {
                                     val tag = animalMarker.tag.toString()
                                     wService.getCollectionItems.add(tag)
                                     animalMarker.map = null
                                     wService.animalMarkers.remove(animalMarker)
 
-                                    val getCollectionDialog = GetCollectionDialog().apply {
+                                    val getCollectionDialog = DetailCollectionDialog().apply {
                                         arguments = Bundle().apply {
                                             putParcelable(
-                                                "getCollection",
+                                                "collectionInfo",
                                                 collectionsMap[tag] ?: CollectionInfo()
                                             )
                                         }
@@ -475,7 +540,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                             }
 
                             animalMarker.position = randomCoord
-                            animalMarker.map = mynavermap
+                            animalMarker.map = naverMap
                             wService.animalMarkers.add(animalMarker)
                         }
                     }
@@ -503,6 +568,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             Log.d("WalkingService", "start")
             val serviceIntent = Intent(this, WalkingService::class.java)
             serviceIntent.putStringArrayListExtra("selectedDogs", ArrayList(selectedDogs))
+            serviceIntent.putIntegerArrayListExtra("selectedDogsWeights", ArrayList(selectedDogsWeights))
             serviceIntent.action = WalkingConstants.ACTION_START_WALKING_SERVICE
             ContextCompat.startForegroundService(this, serviceIntent)
         }
@@ -539,10 +605,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             putExtra("shouldRefreshData", shouldRefreshData)
         }
 
-        hideLoadingDialog()
         unbindService(connection)
         startActivity(backIntent)
         finish()
+
+        hideLoadingDialog()
     }
 
     private fun selectStopWalk() {
@@ -556,7 +623,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 return@OnConfirmListener
             }
 
-            if (wService.walkDistance.value!! < 300 && wService.walkTime.value!! < 300) {
+            if (wService.walkDistance.value!! > 300 && wService.walkTime.value!! > 300) {
                 Toast.makeText(this, "거리 또는 시간이 너무 부족해요!", Toast.LENGTH_SHORT).show()
                 stopWalkingService()
                 navigateToHome()
@@ -566,8 +633,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 saveWalkInfo(
                     wService.walkDistance.value ?: 0f,
                     wService.walkTime.value!!,
-                    wService.coordList.value!!,
-                    wService.walkingDogs.value ?: arrayListOf(),
+                    wService.calories.value ?: 0f,
+                    wService.poopMarkers,
+                    wService.memos,
+                    wService.walkCoordList.value!!,
+                    wService.walkingDogs,
                     wService.getCollectionItems.toMutableSet().toList()
                 )
             }
@@ -580,9 +650,12 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun saveWalkInfo(
         distance: Float,
         time: Int,
-        coords: List<LatLng>,
+        calories: Float,
+        poopLatLngs: List<LatLng>,
+        memoLatLngs: Map<LatLng, String>,
+        walkLatLngs: List<LatLng>,
         walkDogs: ArrayList<String>,
-        collections: List<String>
+        collections: List<String>,
     ) {
         // ViewModel의 saveWalkRecord 호출
         walkingViewModel.saveWalkRecord(
@@ -590,20 +663,23 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             startTime = startTime,
             distance = distance,
             time = time,
-            coords = coords,
+            calories = calories,
+            poopLatLngs = poopLatLngs,
+            memoLatLngs = memoLatLngs,
+            walkLatLngs = walkLatLngs,
             collections = collections
         )
     }
 
     private fun setSaveScreen() {
-        val coors = wService.coordList.value ?: listOf()
+        val coors = wService.walkCoordList.value ?: listOf()
         if (coors.isNotEmpty()) {
             val middleCoor = coors[coors.size / 2]
             val saveCamera = CameraUpdate.scrollAndZoomTo(
                 LatLng(middleCoor.latitude, middleCoor.longitude),
                 12.5
             )
-            mynavermap.moveCamera(saveCamera)
+            naverMap.moveCamera(saveCamera)
         }
     }
 
@@ -709,10 +785,74 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         loadingDialog?.dismiss()
     }
 
+    private fun updateWeatherInfo(temp: String, condition: String) {
+        binding.weatherTemp.text = temp
+        binding.weatherCondition.text = condition
+    }
+
+    private fun addStartMarker(position: LatLng) {
+        val startMarker = Marker()
+        startMarker.position = position
+        startMarker.icon = OverlayImage.fromResource(R.drawable.icon_flag_start)
+        startMarker.zIndex = 100
+        startMarker.width = 150
+        startMarker.height = 150
+        startMarker.map = naverMap
+    }
+
+    private fun addPoopMarker(position: LatLng, isReset: Boolean = false) {
+        if (walkCoordList.isEmpty()) {
+            Toast.makeText(this, "위치 정보를 가져오는 중입니다", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val marker = Marker()
+        marker.position = position
+        marker.icon = OverlayImage.fromResource(R.drawable.icon_poo)  // TODO: 배변 아이콘으로 교체
+        marker.width = 150
+        marker.height = 150
+        marker.map = naverMap
+
+        if (isReset) return
+
+        wService.poopMarkers.add(position)
+        Toast.makeText(this, "\uD83D\uDCA9 배변 위치가 기록되었습니다 (${wService.poopMarkers.size}회)", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun addMemoMarker(position: LatLng, content: String, isReset: Boolean = false) {
+        if (walkCoordList.isEmpty()) {
+            Toast.makeText(this, "위치 정보를 가져오는 중입니다", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val marker = Marker()
+        marker.position = position
+        marker.icon = OverlayImage.fromResource(R.drawable.icon_note)
+        marker.width = 150
+        marker.height = 150
+        marker.map = naverMap
+        marker.tag = content
+
+        wService.memoMarkers.add(position)
+        wService.memos[position] = content
+
+        marker.setOnClickListener {
+            // tag에서 메모 내용 가져오기
+            val memoContent = it.tag as? String ?: ""
+            val dialog = SelectDialog.newInstance(title = memoContent)
+            dialog.show(supportFragmentManager, "memo")
+            true
+        }
+
+        if (isReset) return
+
+        Toast.makeText(this, "메모가 기록되었습니다", Toast.LENGTH_SHORT).show()
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         when (requestCode) {
             storageCode -> {
@@ -757,9 +897,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         fun setStartBtnImg(iv: ImageView, isTracking: Boolean?) {
             if (iv.context == null) return
             if(isTracking == true) {
-                Glide.with(iv.context).load(R.drawable.icon_pause).into(iv)
+                Glide.with(iv.context).load(R.drawable.icon_pause).format(DecodeFormat.PREFER_ARGB_8888).override(
+                    Target.SIZE_ORIGINAL).into(iv)
             } else {
-                Glide.with(iv.context).load(R.drawable.icon_play).into(iv)
+                Glide.with(iv.context).load(R.drawable.icon_play).format(DecodeFormat.PREFER_ARGB_8888).override(
+                    Target.SIZE_ORIGINAL).into(iv)
             }
         }
 
@@ -767,7 +909,12 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         @JvmStatic
         fun setWalkDogsText(tv: TextView, dogsList: ArrayList<String>?) {
             if (dogsList != null) {
-                tv.text = dogsList.joinToString(", ") + " 산책 중.."
+                val dogsText = dogsList.joinToString(", ")
+                if (dogsText.length > 10) {
+                    tv.text = "${dogsList[0]} 외 ${dogsList.size - 1}마리"
+                } else {
+                    tv.text = dogsText
+                }
             }
         }
 
@@ -776,9 +923,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         fun setTrackingCameraModeOnBtn(iv: ImageView, isTrackingCameraMode: Boolean) {
             if (iv.context == null) return
             if (isTrackingCameraMode) {
-                Glide.with(iv.context).load(R.drawable.icon_location_tracking).into(iv)
+                Glide.with(iv.context).load(R.drawable.icon_location_tracking).format(DecodeFormat.PREFER_ARGB_8888).override(
+                    Target.SIZE_ORIGINAL).into(iv)
             } else {
-                Glide.with(iv.context).load(R.drawable.icon_location_untracking).into(iv)
+                Glide.with(iv.context).load(R.drawable.icon_location_untracking).format(DecodeFormat.PREFER_ARGB_8888).override(
+                    Target.SIZE_ORIGINAL).into(iv)
             }
         }
     }
