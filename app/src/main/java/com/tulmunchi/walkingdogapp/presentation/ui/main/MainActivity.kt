@@ -311,8 +311,10 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
+            .setTransition(androidx.fragment.app.FragmentTransaction.TRANSIT_NONE)
+            .setReorderingAllowed(true)  // 최적화: 한 프레임에 모든 작업 수행
             .replace(binding.screenFl.id, fragment)
-            .commitAllowingStateLoss()
+            .commitNowAllowingStateLoss()  // 즉시 실행
     }
 
     private fun showLoadingFragment() {

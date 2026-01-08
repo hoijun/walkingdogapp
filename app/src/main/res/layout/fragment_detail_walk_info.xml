@@ -332,7 +332,7 @@
 
                 <View
                     android:layout_width="0dp"
-                    android:layout_height="50dp" />
+                    android:layout_height="40dp" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>

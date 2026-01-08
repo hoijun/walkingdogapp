@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.map
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
@@ -38,6 +39,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
     private val selectedDogList = mutableListOf<String>()
+    private val selectedDogsWeightsMap = mutableMapOf<String, Int>()
     private var homeDogListAdapter: HomeDogListAdapter? = null
 
     @Inject
@@ -102,11 +104,13 @@ class HomeFragment : Fragment() {
             val dogImages = mainViewModel.dogImages.value ?: emptyMap()
             homeDogListAdapter = HomeDogListAdapter(dogsList, mainViewModel.isSuccessGetData(), networkChecker, dogImages)
             homeDogListAdapter?.onClickDogListener =
-                HomeDogListAdapter.OnClickDogListener { dogName ->
-                    if (selectedDogList.contains(dogName)) {
-                        selectedDogList.remove(dogName)
+                HomeDogListAdapter.OnClickDogListener { dog ->
+                    if (selectedDogList.contains(dog.name)) {
+                        selectedDogList.remove(dog.name)
+                        selectedDogsWeightsMap.remove(dog.name)
                     } else {
-                        selectedDogList.add(dogName)
+                        selectedDogList.add(dog.name)
+                        selectedDogsWeightsMap[dog.name] = dog.weight.toInt()
                     }
 
                     selectedDogs = selectedDogList.joinToString(", ")
@@ -161,12 +165,14 @@ class HomeFragment : Fragment() {
 
         val intent = Intent(ctx, WalkingActivity::class.java).apply {
             this.putStringArrayListExtra("selectedDogs", ArrayList(selectedDogList))
+            this.putIntegerArrayListExtra("selectedDogsWeights", ArrayList(selectedDogList.map { selectedDogsWeightsMap[it] ?: 0 }))
         }
         startActivity(intent)
 
         // 화면 전환 애니메이션 시작 후 체크 초기화 (안 보이게)
         binding.root.postDelayed({
             selectedDogList.clear()
+            selectedDogsWeightsMap.clear()
             if (_binding != null) {
                 binding.selectedDogs = selectedDogList.joinToString(", ")
             }

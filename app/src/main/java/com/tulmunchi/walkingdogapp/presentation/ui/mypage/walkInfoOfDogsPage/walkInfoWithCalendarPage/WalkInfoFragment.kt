@@ -112,7 +112,7 @@ class WalkInfoFragment : Fragment() { // 수정
         setDogsWalkDate()
 
         binding.apply {
-            btnGoMypage.setOnClickListener {
+            btnBack.setOnClickListener {
                 navigateToMyPage()
             }
 

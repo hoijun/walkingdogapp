@@ -20,7 +20,7 @@ class HomeDogListAdapter(
     lateinit var context: Context
 
     fun interface OnClickDogListener {
-        fun onClickDog(dogName: String)
+        fun onClickDog(dog: Dog)
     }
 
     fun interface OnAddDogClickListener {
@@ -61,13 +61,13 @@ class HomeDogListAdapter(
                 }
 
                 homeDogLayout.setOnClickListener {
-                    onClickDogListener?.onClickDog(dogsList[bindingAdapterPosition].name)
+                    onClickDogListener?.onClickDog(dogsList[bindingAdapterPosition])
                     toggleSelection(dogsList[bindingAdapterPosition].name)
                     walkDogCheckBox.isChecked = selectedItems.contains(dogsList[bindingAdapterPosition].name)
                 }
 
                 walkDogCheckBox.setOnClickListener {
-                    onClickDogListener?.onClickDog(dogsList[bindingAdapterPosition].name)
+                    onClickDogListener?.onClickDog(dogsList[bindingAdapterPosition])
                     toggleSelection(dogsList[bindingAdapterPosition].name)
                     walkDogCheckBox.isChecked = selectedItems.contains(dogsList[bindingAdapterPosition].name)
                 }

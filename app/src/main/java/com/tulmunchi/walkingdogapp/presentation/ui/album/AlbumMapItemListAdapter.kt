@@ -11,7 +11,7 @@ import com.naver.maps.geometry.LatLng
 import com.tulmunchi.walkingdogapp.databinding.ItemAlbumMapPictureListBinding
 import com.tulmunchi.walkingdogapp.presentation.model.AlbumMapImgInfo
 
-class AlbumMapItemListAdapter(private val imgInfoList: MutableList<AlbumMapImgInfo>): RecyclerView.Adapter<AlbumMapItemListAdapter.AlbumMapItemListViewHolder>() {
+class AlbumMapItemListAdapter(private val imgInfoList: List<AlbumMapImgInfo>): RecyclerView.Adapter<AlbumMapItemListAdapter.AlbumMapItemListViewHolder>() {
     private lateinit var context: Context
 
     fun interface OnItemClickListener {

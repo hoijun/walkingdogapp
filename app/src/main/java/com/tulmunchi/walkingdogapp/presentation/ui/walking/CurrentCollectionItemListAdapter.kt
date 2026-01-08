@@ -1,14 +1,16 @@
 package com.tulmunchi.walkingdogapp.presentation.ui.walking
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.tulmunchi.walkingdogapp.databinding.ItemCurrentCollectionBinding
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 
-class CurrentCollectionItemListAdapter(private val getCollectionItemInfos: MutableList<CollectionInfo>): RecyclerView.Adapter<CurrentCollectionItemListAdapter.GetCollectionItemListViewHolder>() {
+class CurrentCollectionItemListAdapter(private val getCollectionItemInfos: List<CollectionInfo>): RecyclerView.Adapter<CurrentCollectionItemListAdapter.GetCollectionItemListViewHolder>() {
     private lateinit var context: Context
 
     override fun onCreateViewHolder(
@@ -29,6 +31,7 @@ class CurrentCollectionItemListAdapter(private val getCollectionItemInfos: Mutab
     inner class GetCollectionItemListViewHolder(private val binding: ItemCurrentCollectionBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(collectionInfo: CollectionInfo) {
+            if (collectionInfo.collectionNum == "000") binding.collectionImgCard.visibility = View.INVISIBLE
             Glide.with(context).load(collectionInfo.collectionResId).into(binding.getCollectionImg)
         }
     }

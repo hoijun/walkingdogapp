@@ -57,7 +57,7 @@ class WalkDayDecorator(private val walkDays : List<CalendarDay>): DayViewDecorat
     }
 
     override fun decorate(view: DayViewFacade) {
-        view.addSpan(DotSpan(10F, Color.BLACK))
+        view.addSpan(DotSpan(6F, Color.BLACK))
     }
 }
 
