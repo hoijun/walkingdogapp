@@ -20,6 +20,7 @@ val kakaoApiKey = properties["kakaologin_api_key"] ?: ""
 val kakaoRedirectUri = properties["kakaologin_redirect_uri"] ?: ""
 val naverClientId = properties["naverlogin_clientid"] ?: ""
 val naverClientSecret = properties["naverlogin_clientsecret"] ?: ""
+val weatherApiKey = properties["weather_api_key"] ?: ""
 val keystoreFile = properties["keystore.file"] as String?
 val keystorePassword = properties["keystore.password"] as String?
 val keystoreKeyAlias = properties["keystore.key.alias"] as String?
@@ -60,6 +61,7 @@ android {
         buildConfigField("String", "Kakao_API_KEY", kakaoApiKey)
         buildConfigField("String", "Naver_ClientId", naverClientId as String)
         buildConfigField("String", "Naver_ClientSecret", naverClientSecret as String)
+        buildConfigField("String", "Weather_API_KEY", weatherApiKey as String)
 
         if (keystoreFile != null) {
             signingConfig = signingConfigs.getByName("release")
@@ -76,7 +78,6 @@ android {
             isDebuggable = true
             splits {
                 abi.isEnable = false
-                density.isEnable = false
             }
         }
 
@@ -185,6 +186,10 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage-ktx")
+
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // implementation("androidx.legacy:legacy-support-core-utils:1.0.0")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")

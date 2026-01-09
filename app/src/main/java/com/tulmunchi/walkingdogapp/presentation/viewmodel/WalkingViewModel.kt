@@ -8,16 +8,23 @@ import com.naver.maps.geometry.LatLng
 import com.tulmunchi.walkingdogapp.core.location.LocationProvider
 import com.tulmunchi.walkingdogapp.domain.model.Coordinate
 import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
+import com.tulmunchi.walkingdogapp.domain.model.WeatherResponse
 import com.tulmunchi.walkingdogapp.domain.usecase.walk.SaveWalkRecordUseCase
+import com.tulmunchi.walkingdogapp.domain.usecase.weather.GetWeatherForecastUseCase
+import com.tulmunchi.walkingdogapp.presentation.model.WeatherInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class WalkingViewModel @Inject constructor(
     private val saveWalkRecordUseCase: SaveWalkRecordUseCase,
+    private val getWeatherForecastUseCase: GetWeatherForecastUseCase,
     private val locationProvider: LocationProvider
 ) : BaseViewModel() {
 
@@ -26,6 +33,11 @@ class WalkingViewModel @Inject constructor(
 
     private val _walkSaved = MutableLiveData<Boolean>()
     val walkSaved: LiveData<Boolean> get() = _walkSaved
+
+    private val _weatherInfo = MutableLiveData<WeatherInfo>()
+    val weatherInfo: LiveData<WeatherInfo> get() = _weatherInfo
+
+
 
     /**
      * Save walk record
@@ -97,7 +109,51 @@ class WalkingViewModel @Inject constructor(
         viewModelScope.launch {
             locationProvider.getLastLocation()?.let { latLng ->
                 _currentCoord.value = latLng
+                getWeatherForecast(latLng)
             }
+        }
+    }
+
+    suspend fun getWeatherForecast(latLng: LatLng) {
+        val cal = Calendar.getInstance()
+        val cur = Locale.getDefault()
+
+        cal.add(Calendar.MINUTE, -45)
+
+        val baseDate = SimpleDateFormat("yyyyMMdd", cur).format(cal.time)
+        val hour = SimpleDateFormat("HH00", cur).format(cal.time)
+        getWeatherForecastUseCase(
+            baseDate = baseDate,
+            baseTime = hour,
+            lat = latLng.latitude,
+            lon = latLng.longitude
+        ).handle(
+            onSuccess = {
+                _weatherInfo.postValue(getWeatherIcon(it))
+            },
+            onError = {
+                _error.postValue(it.message)
+            }
+        )
+    }
+
+    private fun getWeatherIcon(weatherResponse: WeatherResponse): WeatherInfo {
+        val sky = weatherResponse.sky.toInt()
+        val pty = weatherResponse.pty.toInt()
+
+        return when (pty) {
+            0 -> when (sky) {
+                1 -> WeatherInfo("맑음", "☀️")
+                2 -> WeatherInfo("구름조금", "🌤️")
+                3 -> WeatherInfo("구름많음", "⛅")
+                4 -> WeatherInfo("흐림", "☁️")
+                else -> WeatherInfo("맑음", "☀️")
+            }
+            1 -> WeatherInfo("비", "🌧️")
+            2 -> WeatherInfo("비/눈", "🌨️")
+            3 -> WeatherInfo("눈/비", "🌨️")
+            4 -> WeatherInfo("눈", "❄️")
+            else -> WeatherInfo("맑음", "☀️")
         }
     }
 }

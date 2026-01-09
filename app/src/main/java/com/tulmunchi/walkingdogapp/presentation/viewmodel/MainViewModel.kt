@@ -4,6 +4,7 @@ import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,29 +16,35 @@ import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.domain.model.User
 import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
 import com.tulmunchi.walkingdogapp.domain.model.WalkStats
+import com.tulmunchi.walkingdogapp.domain.model.WeatherResponse
 import com.tulmunchi.walkingdogapp.domain.usecase.LoadInitialDataUseCase
 import com.tulmunchi.walkingdogapp.domain.usecase.alarm.AddAlarmUseCase
 import com.tulmunchi.walkingdogapp.domain.usecase.alarm.DeleteAlarmUseCase
 import com.tulmunchi.walkingdogapp.domain.usecase.alarm.GetAllAlarmsUseCase
 import com.tulmunchi.walkingdogapp.domain.usecase.alarm.ToggleAlarmUseCase
 import com.tulmunchi.walkingdogapp.domain.usecase.user.DeleteAccountUseCase
+import com.tulmunchi.walkingdogapp.domain.usecase.weather.GetWeatherForecastUseCase
 import com.tulmunchi.walkingdogapp.presentation.model.GalleryImgInfo
+import com.tulmunchi.walkingdogapp.presentation.model.WeatherInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val loadInitialDataUseCase: LoadInitialDataUseCase,
     private val getAllAlarmsUseCase: GetAllAlarmsUseCase,
     private val addAlarmUseCase: AddAlarmUseCase,
     private val deleteAlarmUseCase: DeleteAlarmUseCase,
     private val toggleAlarmUseCase: ToggleAlarmUseCase,
     private val deleteAccountUseCase: DeleteAccountUseCase,
+    private val getWeatherForecastUseCase: GetWeatherForecastUseCase,
     private val locationProvider: LocationProvider
 ) : BaseViewModel() {
 
@@ -86,6 +93,9 @@ class MainViewModel @Inject constructor(
     private val _albumImgs = MutableLiveData<List<GalleryImgInfo>>()
     val albumImgs: LiveData<List<GalleryImgInfo>> get() = _albumImgs
 
+    private val _weatherInfo = MutableLiveData<WeatherInfo>()
+    val weatherInfo: LiveData<WeatherInfo> get() = _weatherInfo
+
     /**
      * Load all initial user data
      */
@@ -111,9 +121,6 @@ class MainViewModel @Inject constructor(
                     _isLoading.value = false
                 }
             )
-
-            // Load location
-            getLastLocation()
         }
     }
 
@@ -267,7 +274,51 @@ class MainViewModel @Inject constructor(
             locationProvider.getLastLocation()?.let { latLng ->
                 _currentCoord.value = latLng
                 getCurrentAddress(latLng)
+                getWeatherForecast(latLng)
             }
+        }
+    }
+
+    suspend fun getWeatherForecast(latLng: LatLng) {
+        val cal = Calendar.getInstance()
+        val cur = Locale.getDefault()
+
+        cal.add(Calendar.MINUTE, -45)
+
+        val baseDate = SimpleDateFormat("yyyyMMdd", cur).format(cal.time)
+        val hour = SimpleDateFormat("HH00", cur).format(cal.time)
+        getWeatherForecastUseCase(
+            baseDate = baseDate,
+            baseTime = hour,
+            lat = latLng.latitude,
+            lon = latLng.longitude
+        ).handle(
+            onSuccess = {
+                _weatherInfo.postValue(getWeatherIcon(it))
+            },
+            onError = {
+                _error.postValue(it.message)
+            }
+        )
+    }
+
+    private fun getWeatherIcon(weatherResponse: WeatherResponse): WeatherInfo {
+        val sky = weatherResponse.sky.toInt()
+        val pty = weatherResponse.pty.toInt()
+
+        return when (pty) {
+            0 -> when (sky) {
+                1 -> WeatherInfo("맑음", "☀️")
+                2 -> WeatherInfo("구름조금", "🌤️")
+                3 -> WeatherInfo("구름많음", "⛅")
+                4 -> WeatherInfo("흐림", "☁️")
+                else -> WeatherInfo("맑음", "☀️")
+            }
+            1 -> WeatherInfo("비", "🌧️")
+            2 -> WeatherInfo("비/눈", "🌨️")
+            3 -> WeatherInfo("눈/비", "🌨️")
+            4 -> WeatherInfo("눈", "❄️")
+            else -> WeatherInfo("맑음", "☀️")
         }
     }
 

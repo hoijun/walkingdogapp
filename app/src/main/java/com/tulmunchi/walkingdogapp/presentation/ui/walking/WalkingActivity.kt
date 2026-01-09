@@ -210,6 +210,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.apply {
             lifecycleOwner = this@WalkingActivity
             isTrackingCameraMode = trackingCameraMode
+            viewmodel = walkingViewModel
 
             btnSave.setOnClickListener {
                 selectStopWalk()
@@ -282,9 +283,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 collectionListDialog.show(supportFragmentManager, "collectionList")
             }
         }
-
-        // 날씨 정보 초기 설정 (나중에 실제 API로 교체 가능)
-        updateWeatherInfo("18°C", "맑음")
     }
 
     private fun setupViewModelObservers() {
@@ -623,7 +621,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                 return@OnConfirmListener
             }
 
-            if (wService.walkDistance.value!! > 300 && wService.walkTime.value!! > 300) {
+            if (wService.walkDistance.value!! < 300 && wService.walkTime.value!! < 300) {
                 Toast.makeText(this, "거리 또는 시간이 너무 부족해요!", Toast.LENGTH_SHORT).show()
                 stopWalkingService()
                 navigateToHome()
@@ -785,16 +783,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         loadingDialog?.dismiss()
     }
 
-    private fun updateWeatherInfo(temp: String, condition: String) {
-        binding.weatherTemp.text = temp
-        binding.weatherCondition.text = condition
-    }
-
     private fun addStartMarker(position: LatLng) {
         val startMarker = Marker()
         startMarker.position = position
         startMarker.icon = OverlayImage.fromResource(R.drawable.icon_flag_start)
-        startMarker.zIndex = 100
+        startMarker.zIndex = 1000
         startMarker.width = 150
         startMarker.height = 150
         startMarker.map = naverMap

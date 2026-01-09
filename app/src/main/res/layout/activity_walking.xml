@@ -5,6 +5,10 @@
 
     <data>
         <variable
+            name="viewmodel"
+            type="com.tulmunchi.walkingdogapp.presentation.viewmodel.WalkingViewModel" />
+
+        <variable
             name="WalkingService"
             type="com.tulmunchi.walkingdogapp.presentation.ui.walking.WalkingService" />
 
@@ -60,25 +64,15 @@
                             android:id="@+id/weather_icon"
                             android:layout_width="25dp"
                             android:layout_height="wrap_content"
-                            android:text="&#x1F324;&#xFE0F;"
+                            android:text="@{viewmodel.weatherInfo.emoji}"
                             android:textSize="20sp" />
-
-                        <TextView
-                            android:id="@+id/weather_temp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:text="18°C"
-                            android:textColor="@android:color/white"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/weather_condition"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:text="맑음"
+                            android:text="@{viewmodel.weatherInfo.content}"
                             android:textColor="@android:color/white"
                             android:textSize="14sp" />
                     </LinearLayout>
