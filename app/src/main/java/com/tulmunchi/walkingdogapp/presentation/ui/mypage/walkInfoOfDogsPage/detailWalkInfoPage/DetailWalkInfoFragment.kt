@@ -2,6 +2,7 @@ package com.tulmunchi.walkingdogapp.presentation.ui.mypage.walkInfoOfDogsPage.de
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.graphics.PointF
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,7 +17,6 @@ import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
-import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
@@ -30,6 +30,7 @@ import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.ui.walking.CurrentCollectionItemListAdapter
+import com.tulmunchi.walkingdogapp.presentation.util.setIconCompat
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -154,39 +155,45 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
 
     private fun addStartMarker(start: LatLng) {
         val startMarker = Marker()
-        startMarker.position = start
-        startMarker.icon = OverlayImage.fromResource(R.drawable.icon_flag_start)
-        startMarker.width = 150
-        startMarker.height = 150
-        startMarker.map = naverMap
+        startMarker.apply {
+            this.position = start
+            setIconCompat(requireContext(), R.drawable.icon_flag_start, 150)
+            zIndex = 200
+            anchor = PointF(0.5f, 0.8f)
+            map = naverMap
+        }
     }
 
     private fun addEndMarker(end: LatLng) {
         val endMarker = Marker()
-        endMarker.position = end
-        endMarker.icon = OverlayImage.fromResource(R.drawable.icon_flag_end)
-        endMarker.width = 150
-        endMarker.height = 150
-        endMarker.map = naverMap
+        endMarker.apply {
+            this.position = end
+            setIconCompat(requireContext(), R.drawable.icon_flag_end, 150)
+            zIndex = 200
+            anchor = PointF(0.5f, 0.8f)
+            map = naverMap
+        }
     }
 
     private fun addPoopMarker(position: LatLng) {
         val marker = Marker()
-        marker.position = position
-        marker.icon = OverlayImage.fromResource(R.drawable.icon_poo)
-        marker.width = 150
-        marker.height = 150
-        marker.map = naverMap
+        marker.apply {
+            this.position = position
+            setIconCompat(requireContext(), R.drawable.icon_poo, 100)
+            anchor = PointF(0.5f, 0.5f)
+            map = naverMap
+        }
     }
 
     private fun addMemoMarker(position: LatLng, content: String) {
         val marker = Marker()
-        marker.position = position
-        marker.icon = OverlayImage.fromResource(R.drawable.icon_note)
-        marker.width = 150
-        marker.height = 150
-        marker.map = naverMap
-        marker.tag = content
+        marker.apply {
+            this.position = position
+            setIconCompat(requireContext(), R.drawable.icon_note, 100)
+            anchor = PointF(0.5f, 0.5f)
+            tag = content
+            map = naverMap
+        }
 
         marker.setOnClickListener {
             // tag에서 메모 내용 가져오기
@@ -196,6 +203,7 @@ class DetailWalkInfoFragment : Fragment(), OnMapReadyCallback { // 수정
             true
         }
     }
+
 
     private fun navigateToWalkInfo() {
         val selectDog = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

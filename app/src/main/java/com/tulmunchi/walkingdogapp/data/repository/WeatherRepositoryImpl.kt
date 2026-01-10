@@ -25,7 +25,7 @@ class WeatherRepositoryImpl @Inject constructor(
             val walkResponse = WeatherResponseMapper.toDomain(walkResponseDto) ?: return Result.failure(DomainError.WeatherError())
             Result.success(walkResponse)
         } catch (e: Exception) {
-            Result.failure(DomainError.UnknownError(e.message ?: "Unknown error"))
+            Result.failure(DomainError.WeatherError())
         }
     }
 }

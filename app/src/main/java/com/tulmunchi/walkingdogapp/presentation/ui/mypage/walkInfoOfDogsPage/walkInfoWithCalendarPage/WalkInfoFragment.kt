@@ -79,7 +79,7 @@ class WalkInfoFragment : Fragment() { // 수정
         previouslySelectedDog = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getSerializable("selectDog", Dog::class.java)
         } else {
-            (arguments?.getSerializable("selectDog")) as Dog
+            (arguments?.getSerializable("selectDog")) as? Dog
         }
 
         lateSelectedDay = arguments?.getStringArrayList("selectDateRecord") ?: listOf()
