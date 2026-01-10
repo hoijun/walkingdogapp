@@ -47,17 +47,17 @@ class MyPageFragment : Fragment() {
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
     } else {
-        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
     }
 
     private val requestStoragePermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { storagePermission ->
-            when (storagePermission) {
-                true -> {
-                    binding.countImg = getAlbumImageCount()
-                }
-
-                false -> return@registerForActivityResult
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val allGranted = permissions.values.all { it }
+            if (allGranted) {
+                binding.countImg = getAlbumImageCount()
             }
         }
 
@@ -196,7 +196,7 @@ class MyPageFragment : Fragment() {
 
     private fun checkPermission(permissions: Array<String>): Boolean {
         return if (!permissionHandler.checkPermissions(requireActivity(), permissions)) {
-            requestStoragePermission.launch(permissions[0])
+            requestStoragePermission.launch(permissions)
             false
         } else {
             true

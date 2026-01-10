@@ -103,14 +103,6 @@ class RegisterDogFragment : Fragment() {
         }
     }
 
-    private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
-    } else {
-        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    }
-
-    private val storageCode = 99
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -215,9 +207,8 @@ class RegisterDogFragment : Fragment() {
             }
 
             btnRegisterProfileImg.setOnSingleClickListener {
-                if (checkPermission(storagePermission, storageCode)) {
-                    pickMedia.launch("image/jpeg")
-                }
+                // GetContent는 System Picker 사용 - 권한 불필요
+                pickMedia.launch("image/jpeg")
             }
 
             btnRegisterDog.setOnClickListener {
@@ -297,6 +288,11 @@ class RegisterDogFragment : Fragment() {
                 selectNavigateToMain()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressCallback)
     }
 
     override fun onDestroyView() {
@@ -447,41 +443,6 @@ class RegisterDogFragment : Fragment() {
             return
         }
         loadingDialog?.dismiss()
-    }
-
-    private fun checkPermission(permissions : Array<String>, code: Int) : Boolean{
-        return if (!permissionHandler.checkPermissions(requireActivity(), permissions)) {
-            permissionHandler.requestPermissions(requireActivity(), permissions, code)
-            false
-        } else {
-            true
-        }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray,
-    ) {
-        when (requestCode) {
-            storageCode -> {
-                if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    val dialog = SelectDialog.newInstance(title = "사진 설정을 위해 권한을 \n허용으로 해주세요!", showNegativeButton = true)
-                    dialog.onConfirmListener = SelectDialog.OnConfirmListener {
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        intent.data = Uri.fromParts("package", requireActivity().packageName, null)
-                        startActivity(intent)
-                    }
-                    dialog.show(parentFragmentManager, "permission")
-                } else {
-                    pickMedia.launch("image/jpeg")
-                }
-            }
-        }
-        @Suppress("DEPRECATION")
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     object RegisterDogBindingAdapter {

@@ -74,17 +74,17 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
     } else {
-        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
     }
 
     private val requestStoragePermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            Log.d("AlbumMapFragment", "Storage permission result: $isGranted")
-            when (isGranted) {
-                true -> {
-                    setAlbumMap(selectedDay)
-                }
-                false -> { }
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val allGranted = permissions.values.all { it }
+            if (allGranted) {
+                setAlbumMap(selectedDay)
             }
         }
 
@@ -355,13 +355,10 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
 
     private fun checkPermission(permissions : Array<String>) : Boolean {
         val hasPermission = permissionHandler.checkPermissions(requireActivity(), permissions)
-        Log.d("AlbumMapFragment", "checkPermission: hasPermission=$hasPermission")
         return if (!hasPermission) {
-            Log.d("AlbumMapFragment", "Requesting permission: ${permissions[0]}")
-            requestStoragePermission.launch(permissions[0])
+            requestStoragePermission.launch(permissions)
             false
         } else {
-            Log.d("AlbumMapFragment", "Permission already granted")
             true
         }
     }

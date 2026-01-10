@@ -149,6 +149,11 @@ class RegisterUserFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressCallback)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

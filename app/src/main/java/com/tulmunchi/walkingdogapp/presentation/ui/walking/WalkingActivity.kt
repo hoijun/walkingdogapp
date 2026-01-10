@@ -2,12 +2,9 @@ package com.tulmunchi.walkingdogapp.presentation.ui.walking
 
 import android.Manifest
 import android.content.ComponentName
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.ServiceConnection
-import android.content.pm.PackageManager
-import android.graphics.Color
 import android.graphics.PointF
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -29,6 +26,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.BindingAdapter
@@ -44,20 +42,20 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
-import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.ActivityWalkingBinding
-import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.WriteDialog
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionData
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
 import com.tulmunchi.walkingdogapp.presentation.ui.collection.DetailCollectionDialog
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
+import com.tulmunchi.walkingdogapp.presentation.util.setIconCompat
 import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.WalkingViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -74,7 +72,6 @@ import java.util.Random
 import javax.inject.Inject
 import kotlin.math.cos
 import kotlin.math.sin
-import androidx.core.graphics.toColorInt
 
 @AndroidEntryPoint
 class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -105,18 +102,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private var isStartMarkerAdded = false // 시작 마커가 이미 추가되었는지 확인
 
     private var collectionImgViews = hashMapOf<String, ImageView>()
-
-    private val cameraPermission = arrayOf(Manifest.permission.CAMERA)
-    private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
-    } else {
-        arrayOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
-    }
-    private val cameraCode = 98
-    private val storageCode = 99
 
     private var currentPhotoPath = ""
 
@@ -157,6 +142,40 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    // 카메라 권한 요청
+    private val requestCameraPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                // 카메라 권한 승인됨
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+                } else {
+                    requestStoragePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                }
+            } else {
+                // 카메라 권한 거부됨
+                showPermissionDeniedDialog(
+                    title = "촬영을 위해 권한을\n허용으로 해주세요!",
+                    tag = "cameraPermission"
+                )
+            }
+        }
+
+    // 스토리지 권한 요청 (Android 9 이하만)
+    private val requestStoragePermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                // 스토리지 권한 승인됨
+                takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+            } else {
+                // 스토리지 권한 거부됨
+                showPermissionDeniedDialog(
+                    title = "사진 저장을 위해\n저장소 권한이 필요합니다!",
+                    tag = "storagePermission"
+                )
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -177,7 +196,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         selectedDogsWeights = intent.getIntegerArrayListExtra("selectedDogsWeights") ?: arrayListOf()
 
         // 로딩 다이얼로그 초기화
-
         loadingDialog = loadingDialogFactory.create(supportFragmentManager)
 
         setupViewModelObservers()
@@ -190,7 +208,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             navigateToHome()
         }
 
-        // Service와 즉시 bind (UI 깜빡임 방지)
         Intent(this, WalkingService::class.java).also { intent ->
             bindService(intent, connection, BIND_AUTO_CREATE)
         }
@@ -206,7 +223,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mapFragment.getMapAsync(this)
 
-        // 버튼 이벤트 설정
         binding.apply {
             lifecycleOwner = this@WalkingActivity
             isTrackingCameraMode = trackingCameraMode
@@ -229,7 +245,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             btnPoop.setOnSingleClickListener {
-                if (!isMapReady) return@setOnSingleClickListener
+                if (!isMapReady || walkCoordList.isEmpty()) return@setOnSingleClickListener
 
                 val dialog = SelectDialog.newInstance("배변 마커를 설정하시겠어요?", showNegativeButton = true)
                 dialog.onConfirmListener = SelectDialog.OnConfirmListener {
@@ -240,7 +256,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             btnMemo.setOnSingleClickListener {
-                if (!isMapReady) return@setOnSingleClickListener
+                if (!isMapReady || walkCoordList.isEmpty()) return@setOnSingleClickListener
 
                 val dialog = WriteDialog()
                 dialog.clickYesListener = WriteDialog.OnClickYesListener {
@@ -333,14 +349,14 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         naverMap.uiSettings.isCompassEnabled = false
         naverMap.uiSettings.isTiltGesturesEnabled = false
 
-        trackingMarker.icon = OverlayImage.fromResource(R.drawable.walk_icon)
-        trackingMarker.width = 200
-        trackingMarker.height = 200
+        trackingMarker.setIconCompat(this, R.drawable.walk_icon, 200)
         trackingMarker.anchor = PointF(0.5f, 0.5f)
+        trackingMarker.zIndex = 1
 
         trackingPath.width = 15
         trackingPath.color = "#b67e36".toColorInt()
 
+        isMapReady = true
 
         walkingViewModel.currentCoord.observe(this) {
             val firstCamera = CameraUpdate.scrollAndZoomTo(
@@ -349,6 +365,7 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
             )
             naverMap.moveCamera(firstCamera)
             trackingMarker.position = LatLng(it.latitude, it.longitude)
+            trackingMarker.zIndex = 1
             trackingMarker.map = naverMap
         } // 현재 위치로 맵 이동
 
@@ -356,11 +373,11 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         if (::wService.isInitialized && !isObserverSet) {
             isObserverSet = true
             setObserve()
-            setPoopAndMemoMarker()
-            if (!walkCoordList.isNotEmpty()) addStartMarker(walkCoordList.first())
+            if (walkCoordList.isNotEmpty() && isStartMarkerAdded) {
+                setPoopAndMemoMarker()
+                addStartMarker(walkCoordList.first())
+            }
         }
-
-        isMapReady = true
     }
 
     private fun setObserve() {
@@ -373,10 +390,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
                     addStartMarker(walkCoordList.first())
                     isStartMarkerAdded = true
                 }
-                
-                trackingMarker.map = null
+
                 trackingMarker.position = walkCoordList.last()  // 현재 위치에 아이콘 설정
-                trackingMarker.map = naverMap
 
                 if (trackingCameraMode) {
                     val trackingCamera = CameraUpdate.scrollAndZoomTo(walkCoordList.last(), 16.0).animate(CameraAnimation.Easing)  // 현재 위치로 카메라 이동
@@ -467,7 +482,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         wService.poopMarkers.forEach {
             addPoopMarker(position = it, isReset = true)
         }
-
 
         wService.memoMarkers.forEach {
             val memoContent = wService.memos[it] ?: ""
@@ -684,9 +698,8 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun startCamera() {
         val dialog = SelectDialog.newInstance(title = "지도 앨범에 사진을 추가하려면\n카메라 설정에서 위치 태그를 켜주세요!")
         dialog.onConfirmListener = SelectDialog.OnConfirmListener {
-            if(checkPermission(cameraPermission, cameraCode) && checkPermission(storagePermission, storageCode)) {
-                takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
-            }
+            // 카메라 권한 요청
+            requestCameraPermission.launch(Manifest.permission.CAMERA)
         }
         dialog.show(supportFragmentManager, "camera")
     }
@@ -760,15 +773,6 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun checkPermission(permissions : Array<String>, code: Int) : Boolean{
-        return if (!permissionHandler.checkPermissions(this, permissions)) {
-            permissionHandler.requestPermissions(this, permissions, code)
-            false
-        } else {
-            true
-        }
-    }
-
     private fun showLoadingFragment() {
         if (isFinishing || isDestroyed) {
             return
@@ -785,12 +789,13 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun addStartMarker(position: LatLng) {
         val startMarker = Marker()
-        startMarker.position = position
-        startMarker.icon = OverlayImage.fromResource(R.drawable.icon_flag_start)
-        startMarker.zIndex = 1000
-        startMarker.width = 150
-        startMarker.height = 150
-        startMarker.map = naverMap
+        startMarker.apply {
+            this.position = position
+            setIconCompat(this@WalkingActivity, R.drawable.icon_flag_start, 150)
+            zIndex = 200
+            anchor = PointF(0.5f, 0.8f)
+            map = naverMap
+        }
     }
 
     private fun addPoopMarker(position: LatLng, isReset: Boolean = false) {
@@ -800,11 +805,13 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         val marker = Marker()
-        marker.position = position
-        marker.icon = OverlayImage.fromResource(R.drawable.icon_poo)  // TODO: 배변 아이콘으로 교체
-        marker.width = 150
-        marker.height = 150
-        marker.map = naverMap
+        marker.apply {
+            this.position = position
+            setIconCompat(this@WalkingActivity, R.drawable.icon_poo, 100)
+            zIndex = 99
+            anchor = PointF(0.5f, 0.5f)
+            map = naverMap
+        }
 
         if (isReset) return
 
@@ -819,12 +826,14 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         val marker = Marker()
-        marker.position = position
-        marker.icon = OverlayImage.fromResource(R.drawable.icon_note)
-        marker.width = 150
-        marker.height = 150
-        marker.map = naverMap
-        marker.tag = content
+        marker.apply {
+            this.position = position
+            setIconCompat(this@WalkingActivity, R.drawable.icon_note, 100)
+            zIndex = 99
+            anchor = PointF(0.5f, 0.5f)
+            tag = content
+            map = naverMap
+        }
 
         wService.memoMarkers.add(position)
         wService.memos[position] = content
@@ -842,46 +851,16 @@ class WalkingActivity : AppCompatActivity(), OnMapReadyCallback {
         Toast.makeText(this, "메모가 기록되었습니다", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray,
-    ) {
-        when (requestCode) {
-            storageCode -> {
-                if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    val dialog = SelectDialog.newInstance(title = "사진 저장을 위해 권한을 \n허용으로 해주세요!", showNegativeButton = true)
-                    dialog.onConfirmListener = SelectDialog.OnConfirmListener {
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                        intent.flags = FLAG_ACTIVITY_NEW_TASK
-                        intent.data = Uri.fromParts("package", packageName, null)
-                        startActivity(intent)
-                    }
-                    dialog.show(supportFragmentManager, "storagePermission")
-                } else {
-                    if (permissionHandler.checkPermissions(this, cameraPermission)) {
-                        takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
-                    }
-                }
+    private fun showPermissionDeniedDialog(title: String, tag: String) {
+        val dialog = SelectDialog.newInstance(title = title, showNegativeButton = true)
+        dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                flags = FLAG_ACTIVITY_NEW_TASK
+                data = Uri.fromParts("package", packageName, null)
             }
-            cameraCode -> {
-                if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    val dialog = SelectDialog.newInstance(title = "촬영을 위해 권한을 \n허용으로 해주세요!", showNegativeButton = true)
-                    dialog.onConfirmListener = SelectDialog.OnConfirmListener {
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                        intent.flags = FLAG_ACTIVITY_NEW_TASK
-                        intent.data = Uri.fromParts("package", packageName, null)
-                        startActivity(intent)
-                    }
-                    dialog.show(supportFragmentManager, "cameraPermission")
-                } else {
-                    if(checkPermission(storagePermission, storageCode)) {
-                        takePhoto(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
-                    }
-                }
-            }
+            startActivity(intent)
         }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        dialog.show(supportFragmentManager, tag)
     }
 
     object WalkingBindingAdapter {

@@ -3,7 +3,6 @@ package com.tulmunchi.walkingdogapp.presentation.ui.gallery.galleryPage
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.DialogInterface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -23,14 +22,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentGalleryBinding
-import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.model.GalleryImgInfo
-import com.tulmunchi.walkingdogapp.presentation.ui.gallery.detailOfPicturePage.DetailPictureFragment
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
-import com.tulmunchi.walkingdogapp.presentation.ui.mypage.myPagePage.MyPageFragment
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
 import com.tulmunchi.walkingdogapp.presentation.util.ImageUtils
 import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
@@ -65,16 +61,10 @@ class GalleryFragment : Fragment() {
     }
 
     private val requestStoragePermission =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { storagePermission ->
-            when (storagePermission) {
-                true -> {
-                    setGallery()
-                    itemDecoration?.let { decoration ->
-                        binding.galleryRecyclerview.addItemDecoration(decoration)
-                    }
-                }
-
-                false -> return@registerForActivityResult
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val allGranted = permissions.values.all { it }
+            if (allGranted) {
+                setGallery()
             }
         }
 
@@ -135,10 +125,9 @@ class GalleryFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        context?.let {
-            if (checkPermission(storagePermission)) {
-                updateRecyclerView()
-            }
+        // onStart에서는 권한 요청 없이 체크만 수행 (API 27에서 중복 호출 방지)
+        if (permissionHandler.checkPermissions(requireActivity(), storagePermission)) {
+            updateRecyclerView()
         }
         itemDecoration?.let { decoration ->
             binding.galleryRecyclerview.addItemDecoration(decoration)
@@ -333,7 +322,7 @@ class GalleryFragment : Fragment() {
 
     private fun checkPermission(permissions: Array<String>): Boolean {
         return if (!permissionHandler.checkPermissions(requireActivity(), permissions)) {
-            requestStoragePermission.launch(permissions[0])
+            requestStoragePermission.launch(permissions)
             false
         } else {
             true

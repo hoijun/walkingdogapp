@@ -55,12 +55,19 @@ class MainActivity : AppCompatActivity() {
 
     private var loadingDialog: LoadingDialog? = null
 
-    private val locationPermissionRequestCode = 1000
-    private val permissions = arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.POST_NOTIFICATIONS
-    )
+    // 여러 권한을 동시에 요청
+    private val requestMultiplePermissions =
+        registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val locationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+            
+            if (locationGranted) {
+                // 위치 권한이 승인되면 현재 위치 가져오기
+                mainViewModel.getLastLocation()
+            }
+            
+            // POST_NOTIFICATIONS는 선택적이므로 결과와 상관없이 진행
+        }
 
     private var backPressedTime: Long = 0
 
@@ -228,7 +235,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestPermissions() {
-        permissionHandler.requestPermissions(this, permissions, locationPermissionRequestCode)
+        // 필요한 모든 권한 요청
+        val permissions = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.POST_NOTIFICATIONS
+        )
+        requestMultiplePermissions.launch(permissions)
     }
 
     private fun checkWalkingService() {
@@ -270,22 +283,6 @@ class MainActivity : AppCompatActivity() {
                 navigationManager.navigateTo(navigationManager.currentState.value ?: NavigationState.WithBottomNav.Home)
             }
         }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        when (requestCode) {
-            locationPermissionRequestCode -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mainViewModel.getLastLocation()
-                }
-                return
-            }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -330,6 +327,4 @@ class MainActivity : AppCompatActivity() {
         }
         loadingDialog?.dismiss()
     }
-
-    // companion object 완전 제거 ✅
 }
