@@ -45,7 +45,7 @@ android {
     defaultConfig {
         manifestPlaceholders += mapOf()
         applicationId = "com.tulmunchi.walkingdogapp"
-        minSdk = 26
+        minSdk = 27
         targetSdk = 35
         versionCode = 11
         versionName = "2.0"
