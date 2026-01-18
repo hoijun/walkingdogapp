@@ -132,8 +132,9 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:baselineAligned="false"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="15dp">
+                        android:layout_marginBottom="25dp">
 
                         <!-- 시작 시간 -->
                         <LinearLayout
@@ -177,8 +178,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:orientation="vertical"
-                           >
+                            android:orientation="vertical">
 
                             <TextView
                                 android:id="@+id/introduction_end_time"
@@ -204,50 +204,6 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="center"
                                 android:text="@{walkRecordInfo.endTime}"
-                                android:textColor="@color/black"
-                                android:textSize="20sp"
-                                android:textStyle="bold"
-                                android:paddingTop="8dp" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- 두 번째 행 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <!-- 거리 -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/introduction_distance"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="거리"
-                                android:textColor="@color/black"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
-
-                            <View
-                                android:id="@+id/line_distance"
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:layout_marginTop="10dp"
-                                android:layout_marginHorizontal="40dp"
-                                android:background="#cccccc" />
-
-                            <TextView
-                                android:id="@+id/distance"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="@{String.format(`%.1fkm`, walkRecordInfo.distance / 1000.0f)}"
                                 android:textColor="@color/black"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
@@ -290,6 +246,102 @@
                                 android:textStyle="bold"
                                 android:paddingTop="8dp" />
                         </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- 두 번째 행 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <!-- 왼쪽 빈 공간 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:orientation="vertical" />
+
+                        <!-- 거리 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/introduction_distance"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="거리"
+                                android:textColor="@color/black"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <View
+                                android:id="@+id/line_distance"
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginHorizontal="40dp"
+                                android:background="#cccccc" />
+
+                            <TextView
+                                android:id="@+id/distance"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="@{String.format(`%.1fkm`, walkRecordInfo.distance / 1000.0f)}"
+                                android:textColor="@color/black"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:paddingTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- 칼로리 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/introduction_calories"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="칼로리"
+                                android:textColor="@color/black"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <View
+                                android:id="@+id/line_calories"
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginHorizontal="40dp"
+                                android:background="#cccccc" />
+
+                            <TextView
+                                android:id="@+id/calories"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text='@{String.format("%.1f", walkRecordInfo.calories) + "kcal"}'
+                                android:textColor="@color/black"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:paddingTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- 오른쪽 빈 공간 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:orientation="vertical" />
                     </LinearLayout>
 
                 </LinearLayout>

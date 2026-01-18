@@ -90,13 +90,12 @@ class WalkingViewModel @Inject constructor(
                 walkRecord = walkRecord
             ).handle(
                 onSuccess = {
-                    _walkSaved.value = true
                     _isLoading.value = false
+                    _walkSaved.value = true
                 },
                 onError = {
-                    Log.e("WalkingViewModel", "saveWalkRecord: ${it.message}")
-                    _walkSaved.value = false
                     _isLoading.value = false
+                    _walkSaved.value = false
                 }
             )
         }

@@ -26,12 +26,12 @@ class RegisterUserViewModel @Inject constructor(
 
             updateUserInfoUseCase(user).handle(
                 onSuccess = {
-                    _userUpdated.value = true
                     _isLoading.value = false
+                    _userUpdated.value = true
                 },
                 onError = {
-                    _userUpdated.value = false
                     _isLoading.value = false
+                    _userUpdated.value = false
                 }
             )
         }
