@@ -13,8 +13,6 @@ import com.tulmunchi.walkingdogapp.domain.model.Dog
 
 class HomeDogListAdapter(
     private val dogsList: List<Dog>,
-    private val successGetData: Boolean,
-    private val networkChecker: NetworkChecker,
     private val dogImages: Map<String, String>
 ): RecyclerView.Adapter<HomeDogListAdapter.HomeDogListViewHolder>() {
     lateinit var context: Context
@@ -78,9 +76,6 @@ class HomeDogListAdapter(
             binding.apply {
                 homeDogLayout.visibility = View.GONE
                 homeAddDogBtn.setOnClickListener {
-                    if(!networkChecker.isNetworkAvailable() || !successGetData) {
-                        return@setOnClickListener
-                    }
                     onAddDogClickListener?.onAddDogClick()
                 }
             }

@@ -1,4 +1,4 @@
-package com.tulmunchi.walkingdogapp.presentation.ui.album
+package com.tulmunchi.walkingdogapp.presentation.ui.albummap
 
 import android.content.res.Resources
 import android.graphics.Color

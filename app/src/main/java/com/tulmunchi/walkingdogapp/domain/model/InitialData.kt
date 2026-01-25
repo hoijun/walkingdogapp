@@ -9,6 +9,5 @@ data class InitialData(
     val dogImages: Map<String, String>, // Map of dog name to image URI string
     val totalWalkStats: WalkStats,
     val walkHistory: Map<String, List<WalkRecord>>,
-    val collections: Map<String, Boolean>,
-    val alarms: List<Alarm>
+    val collections: Map<String, Boolean>
 )

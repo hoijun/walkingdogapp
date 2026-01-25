@@ -2,12 +2,13 @@ package com.tulmunchi.walkingdogapp.presentation.ui.alarm
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.tulmunchi.walkingdogapp.databinding.ItemAlarmListBinding
 import com.tulmunchi.walkingdogapp.domain.model.Alarm
 import java.util.Calendar
 
-class AlarmListAdapter(private val alarmList: List<Alarm>) : RecyclerView.Adapter<AlarmListAdapter.AlarmItemListViewHolder>() {
+class AlarmListAdapter(private var alarmList: List<Alarm>) : RecyclerView.Adapter<AlarmListAdapter.AlarmItemListViewHolder>() {
 
     interface OnItemClickListener {
         fun onItemClick(alarm: Alarm)
@@ -33,6 +34,17 @@ class AlarmListAdapter(private val alarmList: List<Alarm>) : RecyclerView.Adapte
 
     override fun onBindViewHolder(holder: AlarmItemListViewHolder, position: Int) {
         holder.bind(alarmList[position])
+    }
+
+    override fun onBindViewHolder(
+        holder: AlarmItemListViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.isEmpty()) {
+            // No payload: full bind (for add, delete, modify operations)
+            onBindViewHolder(holder, position)
+        }
     }
 
     inner class AlarmItemListViewHolder(private val binding: ItemAlarmListBinding) :
@@ -95,10 +107,7 @@ class AlarmListAdapter(private val alarmList: List<Alarm>) : RecyclerView.Adapte
 
                 OnOff.isChecked = alarm.isEnabled
                 OnOff.setOnCheckedChangeListener { _, isChecked ->
-                    onItemClickListener?.onSwitchCheckedChangeListener(
-                        alarmList[bindingAdapterPosition],
-                        isChecked
-                    )
+                    onItemClickListener?.onSwitchCheckedChangeListener(alarmList[bindingAdapterPosition], isChecked)
                 }
             }
         }
@@ -136,5 +145,64 @@ class AlarmListAdapter(private val alarmList: List<Alarm>) : RecyclerView.Adapte
         selectMode = false
         selectedItems.clear()
         notifyItemRangeChanged(0, itemCount, null)
+    }
+
+    fun updateList(newList: List<Alarm>) {
+        val diffCallback = AlarmDiffCallback(alarmList, newList)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+        alarmList = newList
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    /**
+     * DiffUtil.Callback for efficient list updates
+     * Detects changes and provides payloads for partial updates
+     */
+    private class AlarmDiffCallback(
+        private val oldList: List<Alarm>,
+        private val newList: List<Alarm>
+    ) : DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            // Same item if alarmCode matches
+            return oldList[oldItemPosition].alarmCode == newList[newItemPosition].alarmCode
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            // Same content if all fields are equal
+            return oldList[oldItemPosition] == newList[newItemPosition]
+        }
+
+        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+            val oldAlarm = oldList[oldItemPosition]
+            val newAlarm = newList[newItemPosition]
+
+            // Check what changed and return appropriate payload
+            val timeChanged = oldAlarm.time != newAlarm.time
+            val weeksChanged = oldAlarm.weeks != newAlarm.weeks
+            val enabledChanged = oldAlarm.isEnabled != newAlarm.isEnabled
+
+            // If only isEnabled changed, return TOGGLE payload
+            if (enabledChanged && !timeChanged && !weeksChanged) {
+                return PAYLOAD_TOGGLE
+            }
+
+            // If time or weeks changed (modify operation), return null for full rebind
+            if (timeChanged || weeksChanged) {
+                return null
+            }
+
+            // Default: full rebind
+            return null
+        }
+
+        companion object {
+            const val PAYLOAD_TOGGLE = "TOGGLE"
+        }
     }
 }

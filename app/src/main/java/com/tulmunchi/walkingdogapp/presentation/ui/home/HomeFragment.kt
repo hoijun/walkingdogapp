@@ -3,12 +3,12 @@ package com.tulmunchi.walkingdogapp.presentation.ui.home
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,20 +16,20 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.map
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentHomeBinding
+import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
-import com.tulmunchi.walkingdogapp.presentation.ui.alarm.SettingAlarmFragment
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.ui.walking.WalkingActivity
+import com.tulmunchi.walkingdogapp.presentation.viewmodel.HomeViewModel
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
+import com.tulmunchi.walkingdogapp.presentation.viewmodel.WalkValidationResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -38,8 +38,7 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val selectedDogList = mutableListOf<String>()
-    private val selectedDogsWeightsMap = mutableMapOf<String, Int>()
+    private val homeViewModel: HomeViewModel by activityViewModels()
     private var homeDogListAdapter: HomeDogListAdapter? = null
 
     @Inject
@@ -72,7 +71,11 @@ class HomeFragment : Fragment() {
         binding.apply {
             viewmodel = mainViewModel
             lifecycleOwner = viewLifecycleOwner
-            selectedDogs = selectedDogList.joinToString(", ")
+
+            // Observe selected dogs text
+            homeViewModel.selectedDogsText.observe(viewLifecycleOwner) { text ->
+                selectedDogs = text
+            }
 
             refresh.apply {
                 this.setOnRefreshListener {
@@ -91,48 +94,45 @@ class HomeFragment : Fragment() {
             })
 
             btnAlarm.setOnClickListener {
-                context?.let { ctx ->
-                    if (!networkChecker.isNetworkAvailable()) {
-                        return@setOnClickListener
-                    }
+                if (!networkChecker.isNetworkAvailable()) {
+                    return@setOnClickListener
                 }
-
                 navigateToSettingAlarm()
             }
 
             val dogsList = mainViewModel.dogs.value ?: listOf()
             val dogImages = mainViewModel.dogImages.value ?: emptyMap()
-            homeDogListAdapter = HomeDogListAdapter(dogsList, mainViewModel.isSuccessGetData(), networkChecker, dogImages)
-            homeDogListAdapter?.onClickDogListener =
-                HomeDogListAdapter.OnClickDogListener { dog ->
-                    if (selectedDogList.contains(dog.name)) {
-                        selectedDogList.remove(dog.name)
-                        selectedDogsWeightsMap.remove(dog.name)
-                    } else {
-                        selectedDogList.add(dog.name)
-                        selectedDogsWeightsMap[dog.name] = dog.weight.toInt()
-                    }
 
-                    selectedDogs = selectedDogList.joinToString(", ")
-                }
-            homeDogListAdapter?.onAddDogClickListener =
-                HomeDogListAdapter.OnAddDogClickListener {
-                    navigationManager.navigateTo(
-                        NavigationState.WithoutBottomNav.RegisterDog(
-                            dog = null,
-                            from = "home"
-                        )
+            homeDogListAdapter = HomeDogListAdapter(dogsList, dogImages)
+
+            homeDogListAdapter?.onClickDogListener = HomeDogListAdapter.OnClickDogListener { dog ->
+                homeViewModel.toggleDogSelection(
+                    dog.name,
+                    dog.weight.toInt()
+                )
+            }
+
+            homeDogListAdapter?.onAddDogClickListener = HomeDogListAdapter.OnAddDogClickListener {
+                navigationManager.navigateTo(
+                    NavigationState.WithoutBottomNav.RegisterDog(
+                        dog = null,
+                        from = "home"
                     )
-                }
+                )
+            }
 
             homeDogsViewPager.adapter = homeDogListAdapter
             TabLayoutMediator(homeDogsIndicator, homeDogsViewPager) { _, _ -> }.attach()
 
-            btnWalk.setOnClickListener {
-                handleWalkButtonClick(dogsList)
-            }
+            btnWalk.setOnClickListener { handleWalkButtonClick(dogsList) }
         }
         return binding.root
+    }
+
+    override fun onStop() {
+        super.onStop()
+        homeViewModel.clearSelection()
+        homeDogListAdapter?.clearSelection()
     }
 
     override fun onDestroyView() {
@@ -141,46 +141,57 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
-    private fun handleWalkButtonClick(dogsList: List<Any>) {
+    private fun handleWalkButtonClick(dogsList: List<Dog>) {
         val ctx = context ?: return
 
-        if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
+        // Check network first
+        if (!networkChecker.isNetworkAvailable()) {
             return
         }
 
-        if (dogsList.isEmpty()) {
-            showRegisterDogDialog(ctx)
-            return
-        }
+        // Validate walk start using HomeViewModel
+        val validationResult = homeViewModel.validateWalkStart(
+            dogsList = dogsList,
+            isDataLoaded = mainViewModel.isSuccessGetData(),
+            hasLocationPermission = checkLocationPermissions()
+        )
 
-        if (selectedDogList.isEmpty()) {
-            Toast.makeText(ctx, "함께 산책할 강아지를 선택해주세요!", Toast.LENGTH_SHORT).show()
-            return
-        }
+        when (validationResult) {
+            is WalkValidationResult.Success -> {
+                // Start walking activity
+                val intent = Intent(ctx, WalkingActivity::class.java).apply {
+                    putStringArrayListExtra("selectedDogs", homeViewModel.getSelectedDogNames())
+                    putIntegerArrayListExtra("selectedDogsWeights", homeViewModel.getSelectedDogWeights())
+                }
+                startActivity(intent)
 
-        if (checkLocationPermissions()) {
-            showPermissionDialog(ctx)
-            return
-        }
-
-        val intent = Intent(ctx, WalkingActivity::class.java).apply {
-            this.putStringArrayListExtra("selectedDogs", ArrayList(selectedDogList))
-            this.putIntegerArrayListExtra("selectedDogsWeights", ArrayList(selectedDogList.map { selectedDogsWeightsMap[it] ?: 0 }))
-        }
-        startActivity(intent)
-
-        // 화면 전환 애니메이션 시작 후 체크 초기화 (안 보이게)
-        binding.root.postDelayed({
-            selectedDogList.clear()
-            selectedDogsWeightsMap.clear()
-            if (_binding != null) {
-                binding.selectedDogs = selectedDogList.joinToString(", ")
+                binding.root.postDelayed({
+                    binding.homeDogsViewPager.setCurrentItem(0, false)
+                }, 200)
             }
-            homeDogListAdapter?.clearSelection()
-        }, 200)
+            is WalkValidationResult.DataNotLoaded -> { }
+            is WalkValidationResult.NoDogRegistered -> {
+                showRegisterDogDialog()
+            }
+            is WalkValidationResult.NoDogSelected -> {
+                Toast.makeText(ctx, "함께 산책할 강아지를 선택해주세요!", Toast.LENGTH_SHORT).show()
+            }
+            is WalkValidationResult.LocationPermissionDenied -> {
+                showPermissionDialog(ctx)
+            }
+            is WalkValidationResult.NetworkUnavailable -> { }
+        }
     }
 
-    private fun showRegisterDogDialog(context: Context) {
+    private fun checkLocationPermissions(): Boolean {
+        val locationPermissions = arrayOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+        return permissionHandler.checkPermissions(requireActivity(), locationPermissions)
+    }
+
+    private fun showRegisterDogDialog() {
         val dialog = SelectDialog.newInstance(title = "산책을 하기 위해 \n강아지 정보를 입력 해주세요!", showNegativeButton = true)
         dialog.onConfirmListener = SelectDialog.OnConfirmListener {
             if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
@@ -206,14 +217,6 @@ class HomeFragment : Fragment() {
             startActivity(intent)
         }
         dialog.show(parentFragmentManager, "permission")
-    }
-
-    private fun checkLocationPermissions(): Boolean {
-        val locationPermissions = arrayOf(
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
-        return !permissionHandler.checkPermissions(requireActivity(), locationPermissions)
     }
 
     private fun navigateToSettingAlarm() {

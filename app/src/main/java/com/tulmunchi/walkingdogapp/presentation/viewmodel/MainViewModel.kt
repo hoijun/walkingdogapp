@@ -11,20 +11,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.naver.maps.geometry.LatLng
 import com.tulmunchi.walkingdogapp.core.location.LocationProvider
-import com.tulmunchi.walkingdogapp.domain.model.Alarm
 import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.domain.model.User
 import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
 import com.tulmunchi.walkingdogapp.domain.model.WalkStats
 import com.tulmunchi.walkingdogapp.domain.model.WeatherResponse
 import com.tulmunchi.walkingdogapp.domain.usecase.LoadInitialDataUseCase
-import com.tulmunchi.walkingdogapp.domain.usecase.alarm.AddAlarmUseCase
-import com.tulmunchi.walkingdogapp.domain.usecase.alarm.DeleteAlarmUseCase
-import com.tulmunchi.walkingdogapp.domain.usecase.alarm.GetAllAlarmsUseCase
-import com.tulmunchi.walkingdogapp.domain.usecase.alarm.ToggleAlarmUseCase
-import com.tulmunchi.walkingdogapp.domain.usecase.user.DeleteAccountUseCase
 import com.tulmunchi.walkingdogapp.domain.usecase.weather.GetWeatherForecastUseCase
-import com.tulmunchi.walkingdogapp.presentation.model.GalleryImgInfo
 import com.tulmunchi.walkingdogapp.presentation.model.WeatherInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -39,11 +32,6 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val loadInitialDataUseCase: LoadInitialDataUseCase,
-    private val getAllAlarmsUseCase: GetAllAlarmsUseCase,
-    private val addAlarmUseCase: AddAlarmUseCase,
-    private val deleteAlarmUseCase: DeleteAlarmUseCase,
-    private val toggleAlarmUseCase: ToggleAlarmUseCase,
-    private val deleteAccountUseCase: DeleteAccountUseCase,
     private val getWeatherForecastUseCase: GetWeatherForecastUseCase,
     private val locationProvider: LocationProvider
 ) : BaseViewModel() {
@@ -55,7 +43,6 @@ class MainViewModel @Inject constructor(
     // Dogs data
     private val _dogs = MutableLiveData<List<Dog>>()
     val dogs: LiveData<List<Dog>> get() = _dogs
-
 
     private val _dogNames = MutableLiveData<List<String>>()
     val dogNames: LiveData<List<String>> get() = _dogNames
@@ -74,10 +61,6 @@ class MainViewModel @Inject constructor(
     private val _collections = MutableLiveData<Map<String, Boolean>>()
     val collections: LiveData<Map<String, Boolean>> get() = _collections
 
-    // Alarms
-    private val _alarms = MutableLiveData<List<Alarm>>()
-    val alarms: LiveData<List<Alarm>> get() = _alarms
-
     // Location
     private val _currentCoord = MutableLiveData<LatLng>()
     val currentCoord: LiveData<LatLng> get() = _currentCoord
@@ -88,10 +71,6 @@ class MainViewModel @Inject constructor(
     // Success flags
     private val _dataLoadSuccess = MutableLiveData<Boolean>()
     val dataLoadSuccess: LiveData<Boolean> get() = _dataLoadSuccess
-
-    // Album images
-    private val _albumImgs = MutableLiveData<List<GalleryImgInfo>>()
-    val albumImgs: LiveData<List<GalleryImgInfo>> get() = _albumImgs
 
     private val _weatherInfo = MutableLiveData<WeatherInfo>()
     val weatherInfo: LiveData<WeatherInfo> get() = _weatherInfo
@@ -112,7 +91,6 @@ class MainViewModel @Inject constructor(
                     _totalWalkStats.value = initialData.totalWalkStats
                     _walkHistory.value = initialData.walkHistory
                     _collections.value = initialData.collections
-                    _alarms.value = initialData.alarms
                     _dataLoadSuccess.value = true
                     _isLoading.value = false
                 },
@@ -122,13 +100,6 @@ class MainViewModel @Inject constructor(
                 }
             )
         }
-    }
-
-    /**
-     * Refresh only dog images
-     */
-    fun refreshDogImages() {
-        loadUserData(loadImages = true)
     }
 
     fun updateUser(updatedUser: User) {
@@ -179,90 +150,6 @@ class MainViewModel @Inject constructor(
             _dogNames.value = _dogNames.value?.filter { it != name }
             _dogs.value = _dogs.value?.filter { it.name != name }
             _dogImages.value = _dogImages.value?.toMutableMap()?.apply { this.remove(name) }
-        }
-    }
-
-    /**
-     * Get all alarms
-     */
-    fun loadAlarms() {
-        viewModelScope.launch {
-            getAllAlarmsUseCase().handle(
-                onSuccess = { alarms ->
-                    _alarms.value = alarms
-                }
-            )
-        }
-    }
-
-    /**
-     * Add new alarm
-     */
-    fun addAlarm(alarm: Alarm) {
-        viewModelScope.launch {
-            addAlarmUseCase(alarm).handle(
-                onSuccess = {
-                    _alarms.value = _alarms.value?.toMutableList()?.apply { add(alarm) }
-                },
-                onError = {
-                    _error.postValue("알람 추가에 실패했습니다")
-                }
-            )
-        }
-    }
-
-    /**
-     * Delete alarm
-     */
-    fun deleteAlarm(alarmCode: Int) {
-        viewModelScope.launch {
-            deleteAlarmUseCase(alarmCode).handle(
-                onSuccess = {
-                    _alarms.value = _alarms.value?.toMutableList()?.apply { removeAll { it.alarmCode == alarmCode } }
-                },
-                onError = {
-                    _error.postValue("알람 삭제에 실패했습니다")
-                }
-            )
-        }
-    }
-
-    /**
-     * Update alarm (delete old and add new)
-     */
-    fun updateAlarm(oldAlarmCode: Int, newAlarm: Alarm) {
-        viewModelScope.launch {
-            try {
-                // 순차적으로 실행: 삭제 → 추가
-                deleteAlarmUseCase(oldAlarmCode).getOrThrow()
-                addAlarmUseCase(newAlarm).getOrThrow()
-            } catch (e: Exception) {
-                _error.postValue("알람 수정에 실패했습니다")
-            }
-        }
-    }
-
-    /**
-     * Toggle alarm on/off
-     */
-    fun toggleAlarm(alarmCode: Int, isEnabled: Boolean) {
-        viewModelScope.launch {
-            toggleAlarmUseCase(alarmCode, isEnabled).handle(
-                onSuccess = {
-                    loadAlarms()
-                }
-            )
-        }
-    }
-
-    /**
-     * Delete user account
-     */
-    suspend fun deleteAccount(): Boolean {
-        return try {
-            deleteAccountUseCase().isSuccess
-        } catch (e: Exception) {
-            false
         }
     }
 
@@ -327,13 +214,6 @@ class MainViewModel @Inject constructor(
      */
     fun isSuccessGetData(): Boolean {
         return _dataLoadSuccess.value == true
-    }
-
-    /**
-     * Save album images
-     */
-    fun saveAlbumImgs(images: List<GalleryImgInfo>) {
-        _albumImgs.value = images
     }
 
     /**
