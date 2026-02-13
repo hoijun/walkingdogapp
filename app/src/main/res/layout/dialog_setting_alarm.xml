@@ -2,14 +2,15 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-    
+
     <data>
+
         <variable
             name="weeks"
             type="java.util.List&lt;Boolean>" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout 
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".presentation.ui.alarm.SettingAlarmDialog">
@@ -17,9 +18,9 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/round_style_rad15"
+            android:background="@drawable/custom_dialog_white_border_background"
+            android:paddingVertical="15dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -27,7 +28,6 @@
                 android:id="@+id/text"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="20dp"
                 android:gravity="center"
                 android:text="시간과 요일을 선택해주세요."
                 android:textColor="@color/black"
@@ -37,21 +37,32 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <View
+                android:id="@+id/first_divider_line"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="15dp"
+                android:background="#e4e4e4"
+                app:layout_constraintTop_toBottomOf="@+id/text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
             <TimePicker
                 android:id="@+id/timepicker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:theme="@style/TimePickerTheme"
                 android:timePickerMode="spinner"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/text" />
+                app:layout_constraintTop_toBottomOf="@+id/first_divider_line" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/week"
-                android:layout_width="300dp"
-                android:layout_height="60dp"
-                android:layout_marginTop="20dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:layout_marginHorizontal="25dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/timepicker">
@@ -60,159 +71,185 @@
                     android:id="@+id/sunday"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:textColor="@android:color/holo_red_dark"
+                    android:layout_marginEnd="2.5dp"
+                    android:background="@drawable/toggle_button_background"
+                    android:checked="@{weeks.get(0) ? true : false}"
+                    android:elevation="0dp"
+                    android:stateListAnimator="@null"
+                    android:textColor="#F44336"
                     android:textOff="일"
                     android:textOn="일"
+                    android:textSize="12sp"
                     android:textStyle="bold"
-                    android:checked="@{weeks.get(0) ? true : false}"
                     app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.2" />
+                    app:layout_constraintEnd_toStartOf="@+id/monday"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ToggleButton
                     android:id="@+id/monday"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:layout_marginStart="2.5dp"
+                    android:layout_marginEnd="2.5dp"
+                    android:background="@drawable/toggle_button_background"
+                    android:checked="@{weeks.get(1) ? true : false}"
+                    android:elevation="0dp"
+                    android:stateListAnimator="@null"
+                    android:textColor="@color/black"
                     android:textOff="월"
                     android:textOn="월"
+                    android:textSize="12sp"
                     android:textStyle="bold"
-                    android:checked="@{weeks.get(1) ? true : false}"
                     app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintStart_toEndOf="@+id/sunday"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.2" />
+                    app:layout_constraintEnd_toStartOf="@+id/tuesday"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ToggleButton
                     android:id="@+id/tuesday"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:layout_marginStart="2.5dp"
+                    android:layout_marginEnd="2.5dp"
+                    android:background="@drawable/toggle_button_background"
+                    android:checked="@{weeks.get(2) ? true : false}"
+                    android:elevation="0dp"
+                    android:stateListAnimator="@null"
+                    android:textColor="@color/black"
                     android:textOff="화"
                     android:textOn="화"
+                    android:textSize="12sp"
                     android:textStyle="bold"
-                    android:checked="@{weeks.get(2) ? true : false}"
                     app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintStart_toEndOf="@+id/monday"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.2" />
+                    app:layout_constraintEnd_toStartOf="@+id/wednesday"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ToggleButton
                     android:id="@+id/wednesday"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:layout_marginStart="2.5dp"
+                    android:layout_marginEnd="2.5dp"
+                    android:background="@drawable/toggle_button_background"
+                    android:checked="@{weeks.get(3) ? true : false}"
+                    android:elevation="0dp"
+                    android:stateListAnimator="@null"
+                    android:textColor="@color/black"
                     android:textOff="수"
                     android:textOn="수"
+                    android:textSize="12sp"
                     android:textStyle="bold"
-                    android:checked="@{weeks.get(3) ? true : false}"
                     app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintStart_toEndOf="@+id/tuesday"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.2" />
+                    app:layout_constraintEnd_toStartOf="@+id/thursday"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ToggleButton
                     android:id="@+id/thursday"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:layout_marginStart="2.5dp"
+                    android:layout_marginEnd="2.5dp"
+                    android:background="@drawable/toggle_button_background"
+                    android:checked="@{weeks.get(4) ? true : false}"
+                    android:elevation="0dp"
+                    android:stateListAnimator="@null"
+                    android:textColor="@color/black"
                     android:textOff="목"
                     android:textOn="목"
+                    android:textSize="12sp"
                     android:textStyle="bold"
-                    android:checked="@{weeks.get(4) ? true : false}"
                     app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintStart_toEndOf="@+id/wednesday"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.2" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/week2"
-                android:layout_width="120dp"
-                android:layout_height="60dp"
-                android:layout_marginTop="5dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/week">
+                    app:layout_constraintEnd_toStartOf="@+id/friday"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ToggleButton
                     android:id="@+id/friday"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:layout_marginStart="2.5dp"
+                    android:layout_marginEnd="2.5dp"
+                    android:background="@drawable/toggle_button_background"
+                    android:checked="@{weeks.get(5) ? true : false}"
+                    android:elevation="0dp"
+                    android:stateListAnimator="@null"
+                    android:textColor="@color/black"
                     android:textOff="금"
                     android:textOn="금"
+                    android:textSize="12sp"
                     android:textStyle="bold"
-                    android:checked="@{weeks.get(5) ? true : false}"
                     app:layout_constraintDimensionRatio="1:1"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.5" />
+                    app:layout_constraintStart_toEndOf="@+id/thursday"
+                    app:layout_constraintEnd_toStartOf="@+id/saturday"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ToggleButton
                     android:id="@+id/saturday"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:textColor="@android:color/holo_blue_dark"
+                    android:layout_marginStart="2.5dp"
+                    android:background="@drawable/toggle_button_background"
+                    android:checked="@{weeks.get(6) ? true : false}"
+                    android:elevation="0dp"
+                    android:stateListAnimator="@null"
+                    android:textColor="#2196F3"
                     android:textOff="토"
                     android:textOn="토"
+                    android:textSize="12sp"
                     android:textStyle="bold"
-                    android:checked="@{weeks.get(6) ? true : false}"
                     app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintStart_toEndOf="@+id/friday"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.5" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/bottom"
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_marginTop="20dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:layout_marginHorizontal="20dp"
+                android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/week2">
-
-                <Button
-                    android:id="@+id/saveAlarm"
-                    android:layout_width="100dp"
-                    android:layout_height="50dp"
-                    android:text="저장"
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:background="@drawable/round_style_rad15_line"
-                    android:backgroundTint="#C5C5C5"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/view01"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <View
-                    android:id="@+id/view01"
-                    android:layout_width="30dp"
-                    android:layout_height="match_parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/week">
 
                 <Button
                     android:id="@+id/exist"
-                    android:layout_width="100dp"
+                    android:layout_width="0dp"
                     android:layout_height="50dp"
+                    android:layout_marginEnd="2.5dp"
+                    android:background="@android:color/transparent"
+                    android:elevation="0dp"
+                    android:stateListAnimator="@null"
                     android:text="취소"
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:background="@drawable/round_style_rad15_line"
-                    android:backgroundTint="#C5C5C5"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/view01"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/saveAlarm"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/saveAlarm"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="2.5dp"
+                    android:background="@android:color/transparent"
+                    android:elevation="0dp"
+                    android:stateListAnimator="@null"
+                    android:text="저장"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/exist"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="18dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/bottom" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

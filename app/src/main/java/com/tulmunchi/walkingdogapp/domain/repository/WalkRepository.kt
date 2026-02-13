@@ -13,11 +13,7 @@ interface WalkRepository {
      */
     suspend fun saveWalkRecord(
         dogNames: List<String>,
-        startTime: String,
-        distance: Float,
-        time: Int,
-        coords: List<Coordinate>,
-        collections: List<String>
+        walkRecord: WalkRecord
     ): Result<Unit>
 
     /**

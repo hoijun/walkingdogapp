@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
@@ -16,8 +15,10 @@ import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.FragmentCollectionBinding
 import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionData
 import com.tulmunchi.walkingdogapp.presentation.model.CollectionInfo
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -38,14 +39,10 @@ class CollectionFragment : Fragment() {
         collectionWhether = mainViewModel.collections.value ?: mapOf()
         collections = CollectionData.collectionMap.values.toList().sortedBy { it.collectionNum }
 
-        context?.let { ctx ->
-            if (!networkChecker.isNetworkAvailable()) {
-                val builder = AlertDialog.Builder(ctx)
-                builder.setTitle("인터넷을 연결해주세요!")
-                builder.setPositiveButton("네", null)
-                builder.setCancelable(false)
-                builder.show()
-            }
+        if (!networkChecker.isNetworkAvailable()) {
+            val dialog = SelectDialog.newInstance(title = "인터넷을 연결해주세요!")
+            dialog.isCancelable = false
+            dialog.show(parentFragmentManager, "networkCheck")
         }
     }
 
@@ -106,7 +103,7 @@ class CollectionFragment : Fragment() {
             collectionRecyclerview.adapter = adapter
             collectionRecyclerview.itemAnimator = null
 
-            openSearching.setOnClickListener {
+            openSearching.setOnSingleClickListener {
                 // 입력창이 보이는 지 안보이는 지에 따라
                 if(collectionSearch.isGone) {
                     collectionSearch.visibility = View.VISIBLE
@@ -117,7 +114,7 @@ class CollectionFragment : Fragment() {
                 }
             }
 
-            searchview.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+            searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     return false
                 }

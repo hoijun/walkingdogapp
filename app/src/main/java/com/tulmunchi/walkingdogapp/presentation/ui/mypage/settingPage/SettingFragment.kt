@@ -12,6 +12,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
@@ -20,7 +21,6 @@ import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.tulmunchi.walkingdogapp.core.analytics.FirebaseAnalyticHelper
-import com.tulmunchi.walkingdogapp.core.datastore.UserPreferencesDataStore
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.FragmentSettingBinding
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
@@ -28,15 +28,12 @@ import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.WriteDialog
 import com.tulmunchi.walkingdogapp.presentation.ui.alarm.AlarmFunctions
 import com.tulmunchi.walkingdogapp.presentation.ui.login.LoginActivity
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
-import com.tulmunchi.walkingdogapp.presentation.ui.mypage.myPagePage.MyPageFragment
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
+import com.tulmunchi.walkingdogapp.presentation.viewmodel.SettingViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -45,10 +42,8 @@ class SettingFragment : Fragment() {
     private var _binding: FragmentSettingBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
+    private val settingViewModel: SettingViewModel by viewModels()
     private val auth = FirebaseAuth.getInstance()
-    private var email = ""
-    private var password = ""
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -58,9 +53,6 @@ class SettingFragment : Fragment() {
 
     @Inject
     lateinit var firebaseHelper: FirebaseAnalyticHelper
-
-    @Inject
-    lateinit var userPreferencesDataStore: UserPreferencesDataStore
 
     @Inject
     lateinit var networkChecker: NetworkChecker
@@ -79,6 +71,36 @@ class SettingFragment : Fragment() {
     ): View {
         _binding = FragmentSettingBinding.inflate(inflater, container, false)
         loadingDialog = loadingDialogFactory.create(parentFragmentManager)
+
+        setupObservers()
+        setupViews()
+
+        return binding.root
+    }
+
+    private fun setupObservers() {
+        settingViewModel.email.observe(viewLifecycleOwner) { email ->
+            binding.userEmail = email
+        }
+
+        settingViewModel.logoutSuccess.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                settingViewModel.clearLogoutSuccess()
+                navigateToLogin()
+                removeAlarms()
+            }
+        }
+
+        settingViewModel.deleteAccountSuccess.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                settingViewModel.clearDeleteAccountSuccess()
+                removeAlarms()
+                navigateToLogin()
+            }
+        }
+    }
+
+    private fun setupViews() {
         binding.apply {
             btnNavigateToMyPage.setOnClickListener {
                 navigateToMyPage()
@@ -90,35 +112,8 @@ class SettingFragment : Fragment() {
                 0
             )?.versionName ?: "Unknown"}"
 
-            lifecycleScope.launch {
-                email = userPreferencesDataStore.getEmail().first() ?: ""
-                password = userPreferencesDataStore.getPassword().first() ?: ""
-                userEmail = email
-            }
-
             settingLogout.setOnClickListener {
-                if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
-                    return@setOnClickListener
-                }
-
-                if (email.contains("@naver.com")) { // 네이버로 로그인 했을 경우
-                    try {
-                        NaverIdLoginSDK.logout()
-                        auth.signOut()
-                        successLogout()
-                    } catch (e: Exception) {
-                        failLogout(e.message.toString(), "Naver")
-                    }
-                } else { // 카카오로 로그인 했을 경우
-                    UserApiClient.instance.logout { error ->
-                        if (error != null) {
-                            failLogout(error.message.toString(), "Kakao")
-                        } else {
-                            auth.signOut()
-                            successLogout()
-                        }
-                    }
-                }
+                handleLogout()
             }
 
             settingInquiry.setOnClickListener {
@@ -139,90 +134,127 @@ class SettingFragment : Fragment() {
                 navigateToWebView("https://hoitho.tistory.com/3")
             }
 
-            settingWithdrawal.setOnClickListener {
-                if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
-                    return@setOnClickListener
-                }
+            settingWithdrawal.setOnSingleClickListener {
+                handleWithdrawal()
+            }
+        }
+    }
 
-                val credential = EmailAuthProvider.getCredential(email, password)
-                auth.currentUser?.reauthenticate(credential)?.addOnSuccessListener {
-                    val writeDialog = WriteDialog()
-                    writeDialog.clickYesListener = WriteDialog.OnClickYesListener { writeText ->
-                        if (userEmail != writeText) {
-                            toastMsg("이메일이 일치하지 않습니다.")
-                            return@OnClickYesListener
-                        } // 이메일 올바르게 입력x
+    private fun handleLogout() {
+        if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
+            return
+        }
 
-                        showLoadingFragment()
-
-                        lifecycleScope.launch {
-                            if (email.contains("@naver.com")) { // 네이버로 로그인 했을 경우
-                                if (!mainViewModel.deleteAccount()) {
-                                    toastMsg("탈퇴가 재대로 안됐어요..")
-                                    hideLoadingDialog()
-                                    return@launch
-                                }
-
-                                auth.currentUser?.delete()?.addOnSuccessListener {
-                                    NidOAuthLogin().callDeleteTokenApi(object :
-                                        OAuthLoginCallback {
-                                        override fun onError(errorCode: Int, message: String) {
-                                            onFailure(errorCode, message)
-                                        }
-
-                                        override fun onFailure(
-                                            httpStatus: Int,
-                                            message: String,
-                                        ) {
-                                            completeDeleteAccount()
-                                            hideLoadingDialog()
-                                        }
-
-                                        override fun onSuccess() {
-                                            completeDeleteAccount()
-                                            hideLoadingDialog()
-                                        }
-                                    })
-                                }?.addOnFailureListener {
-                                    toastMsg("탈퇴가 재대로 안됐어요..")
-                                    hideLoadingDialog()
-                                }
-                            } else { // 카카오로 로그인 했을 경우
-                                if (!mainViewModel.deleteAccount()) {
-                                    toastMsg("탈퇴가 재대로 안됐어요..")
-                                    hideLoadingDialog()
-                                    return@launch
-                                }
-
-                                auth.currentUser?.delete()?.addOnSuccessListener {
-                                    UserApiClient.instance.unlink {
-                                        completeDeleteAccount()
-                                        hideLoadingDialog()
-                                    }
-                                }?.addOnFailureListener {
-                                    toastMsg("탈퇴가 재대로 안됐어요..")
-                                    hideLoadingDialog()
-                                }
-                            }
-                        }
-                    }
-                    val bundle = Bundle()
-                    bundle.putString("text", "이메일을 입력해주세요.")
-                    writeDialog.arguments = bundle
-
-                    parentFragmentManager.let {
-                        try {
-                            writeDialog.show(it, "writeEmail")
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-                }?.addOnFailureListener {
-                    toastMsg("앱을 껏다 켜주세요!")
+        if (settingViewModel.isNaverUser()) {
+            try {
+                NaverIdLoginSDK.logout()
+                auth.signOut()
+                settingViewModel.onLogoutSuccess()
+            } catch (e: Exception) {
+                failLogout(e.message.toString(), "Naver")
+            }
+        } else {
+            UserApiClient.instance.logout { error ->
+                if (error != null) {
+                    failLogout(error.message.toString(), "Kakao")
+                } else {
+                    auth.signOut()
+                    settingViewModel.onLogoutSuccess()
                 }
             }
         }
-        return binding.root
+    }
+
+    private fun handleWithdrawal() {
+        if (!networkChecker.isNetworkAvailable() || !mainViewModel.isSuccessGetData()) {
+            return
+        }
+
+        val email = settingViewModel.getEmail()
+        val password = settingViewModel.getPassword()
+
+        val credential = EmailAuthProvider.getCredential(email, password)
+        auth.currentUser?.reauthenticate(credential)?.addOnSuccessListener {
+            showWithdrawalDialog(email)
+        }?.addOnFailureListener {
+            toastMsg("앱을 껏다 켜주세요!")
+        }
+    }
+
+    private fun showWithdrawalDialog(email: String) {
+        val writeDialog = WriteDialog()
+        writeDialog.clickYesListener = WriteDialog.OnClickYesListener { writeText ->
+            if (email != writeText) {
+                toastMsg("이메일이 일치하지 않습니다.")
+                return@OnClickYesListener
+            }
+
+            showLoadingFragment()
+            processWithdrawal()
+        }
+
+        val bundle = Bundle()
+        bundle.putString("text", "이메일을 입력해주세요.")
+        writeDialog.arguments = bundle
+
+        parentFragmentManager.let {
+            try {
+                writeDialog.show(it, "writeEmail")
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun processWithdrawal() {
+        lifecycleScope.launch {
+            if (!settingViewModel.deleteAccount()) {
+                toastMsg("탈퇴가 재대로 안됐어요..")
+                hideLoadingDialog()
+                return@launch
+            }
+
+            if (settingViewModel.isNaverUser()) {
+                deleteNaverAccount()
+            } else {
+                deleteKakaoAccount()
+            }
+        }
+    }
+
+    private fun deleteNaverAccount() {
+        auth.currentUser?.delete()?.addOnSuccessListener {
+            NidOAuthLogin().callDeleteTokenApi(object : OAuthLoginCallback {
+                override fun onError(errorCode: Int, message: String) {
+                    onFailure(errorCode, message)
+                }
+
+                override fun onFailure(httpStatus: Int, message: String) {
+                    settingViewModel.onDeleteAccountSuccess()
+                    hideLoadingDialog()
+                }
+
+                override fun onSuccess() {
+                    settingViewModel.onDeleteAccountSuccess()
+                    hideLoadingDialog()
+                }
+            })
+        }?.addOnFailureListener {
+            toastMsg("탈퇴가 재대로 안됐어요..")
+            hideLoadingDialog()
+        }
+    }
+
+    private fun deleteKakaoAccount() {
+        auth.currentUser?.delete()?.addOnSuccessListener {
+            UserApiClient.instance.unlink {
+                settingViewModel.onDeleteAccountSuccess()
+                hideLoadingDialog()
+            }
+        }?.addOnFailureListener {
+            toastMsg("탈퇴가 재대로 안됐어요..")
+            hideLoadingDialog()
+        }
     }
 
 
@@ -238,23 +270,6 @@ class SettingFragment : Fragment() {
 
     private fun navigateToMyPage() {
         navigationManager.navigateTo(NavigationState.WithBottomNav.MyPage)
-    }
-
-    private fun completeDeleteAccount() {
-        lifecycleScope.launch {
-            userPreferencesDataStore.clearAll()
-        }
-        removeAlarms()
-        navigateToLogin()
-    }
-
-    private fun successLogout() {
-        lifecycleScope.launch {
-            userPreferencesDataStore.clearAll()
-        }
-        navigateToLogin()
-        removeAlarms()
-        toastMsg("로그아웃 성공")
     }
 
     private fun navigateToLogin() {
@@ -278,13 +293,15 @@ class SettingFragment : Fragment() {
 
     private fun removeAlarms() {
         context?.let { ctx ->
-            val alarmFunctions = AlarmFunctions(ctx)
-            coroutineScope.launch {
-                val alarms = mainViewModel.alarms.value ?: emptyList()
+            lifecycleScope.launch {
+                val alarmFunctions = AlarmFunctions(ctx)
+                val alarms = settingViewModel.getAllAlarms()
+
                 for (alarm in alarms) {
                     alarmFunctions.cancelAlarm(alarm.alarmCode)
-                    mainViewModel.deleteAlarm(alarm.alarmCode)
                 }
+
+                settingViewModel.deleteAlarms(alarms)
             }
         }
     }

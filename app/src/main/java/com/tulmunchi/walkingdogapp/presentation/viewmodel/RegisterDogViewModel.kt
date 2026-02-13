@@ -1,5 +1,6 @@
 package com.tulmunchi.walkingdogapp.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -33,12 +34,12 @@ class RegisterDogViewModel @Inject constructor(
 
             addDogUseCase(dog, imageUriString).handle(
                 onSuccess = {
-                    _dogUpdated.value = true
                     _isLoading.value = false
+                    _dogUpdated.value = true
                 },
                 onError = {
-                    _dogUpdated.value = false
                     _isLoading.value = false
+                    _dogUpdated.value = false
                 }
             )
         }
@@ -59,12 +60,12 @@ class RegisterDogViewModel @Inject constructor(
 
             updateDogUseCase(oldName, dog, imageUriString, walkRecords, existingDogNames).handle(
                 onSuccess = {
-                    _dogUpdated.value = true
                     _isLoading.value = false
+                    _dogUpdated.value = true
                 },
                 onError = {
-                    _dogUpdated.value = false
                     _isLoading.value = false
+                    _dogUpdated.value = false
                 }
             )
         }
@@ -79,12 +80,12 @@ class RegisterDogViewModel @Inject constructor(
 
             deleteDogUseCase(dogName).handle(
                 onSuccess = {
-                    _dogDeleted.value = true
                     _isLoading.value = false
+                    _dogDeleted.value = true
                 },
                 onError = {
-                    _dogDeleted.value = false
                     _isLoading.value = false
+                    _dogDeleted.value = false
                 }
             )
         }

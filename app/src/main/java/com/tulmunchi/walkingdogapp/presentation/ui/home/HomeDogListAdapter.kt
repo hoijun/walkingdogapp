@@ -13,14 +13,12 @@ import com.tulmunchi.walkingdogapp.domain.model.Dog
 
 class HomeDogListAdapter(
     private val dogsList: List<Dog>,
-    private val successGetData: Boolean,
-    private val networkChecker: NetworkChecker,
     private val dogImages: Map<String, String>
 ): RecyclerView.Adapter<HomeDogListAdapter.HomeDogListViewHolder>() {
     lateinit var context: Context
 
     fun interface OnClickDogListener {
-        fun onClickDog(dogName: String)
+        fun onClickDog(dog: Dog)
     }
 
     fun interface OnAddDogClickListener {
@@ -61,13 +59,13 @@ class HomeDogListAdapter(
                 }
 
                 homeDogLayout.setOnClickListener {
-                    onClickDogListener?.onClickDog(dogsList[bindingAdapterPosition].name)
+                    onClickDogListener?.onClickDog(dogsList[bindingAdapterPosition])
                     toggleSelection(dogsList[bindingAdapterPosition].name)
                     walkDogCheckBox.isChecked = selectedItems.contains(dogsList[bindingAdapterPosition].name)
                 }
 
                 walkDogCheckBox.setOnClickListener {
-                    onClickDogListener?.onClickDog(dogsList[bindingAdapterPosition].name)
+                    onClickDogListener?.onClickDog(dogsList[bindingAdapterPosition])
                     toggleSelection(dogsList[bindingAdapterPosition].name)
                     walkDogCheckBox.isChecked = selectedItems.contains(dogsList[bindingAdapterPosition].name)
                 }
@@ -78,9 +76,6 @@ class HomeDogListAdapter(
             binding.apply {
                 homeDogLayout.visibility = View.GONE
                 homeAddDogBtn.setOnClickListener {
-                    if(!networkChecker.isNetworkAvailable() || !successGetData) {
-                        return@setOnClickListener
-                    }
                     onAddDogClickListener?.onAddDogClick()
                 }
             }

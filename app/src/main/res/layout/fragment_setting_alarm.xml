@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".presentation.ui.alarm.SettingAlarmFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,7 +18,7 @@
             android:id="@+id/btn_back"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="25dp"
+            android:layout_marginStart="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
@@ -32,7 +32,7 @@
             android:gravity="center"
             android:text="산책 알람"
             android:textColor="@color/black"
-            android:textSize="22sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -44,7 +44,7 @@
             android:id="@+id/btn_addAlarm"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginEnd="25dp"
+            android:layout_marginEnd="20dp"
             android:src="@drawable/icon_add"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
@@ -52,20 +52,17 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_percent="0.08" />
 
-        <TextView
-            android:id="@+id/btn_alarmremove"
+        <ImageView
+            android:id="@+id/btn_alarmRemove"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:gravity="center"
-            android:text="알람 삭제"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
+            android:layout_marginEnd="25dp"
+            android:src="@drawable/icon_delete"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.25" />
+            app:layout_constraintWidth_percent="0.08" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
@@ -78,9 +75,9 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.92"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Alarm_top" >
+        app:layout_constraintTop_toBottomOf="@+id/Alarm_top">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/Alarm_RecyclerView"

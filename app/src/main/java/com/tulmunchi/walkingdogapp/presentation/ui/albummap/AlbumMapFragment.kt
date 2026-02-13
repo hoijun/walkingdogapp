@@ -1,26 +1,18 @@
-package com.tulmunchi.walkingdogapp.presentation.ui.album
+package com.tulmunchi.walkingdogapp.presentation.ui.albummap
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
-import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -37,17 +29,18 @@ import com.tulmunchi.walkingdogapp.common.HorizonSpacingItemDecoration
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentAlbumMapBinding
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.model.AlbumMapImgInfo
-import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
-import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
+import com.tulmunchi.walkingdogapp.presentation.viewmodel.AlbumMapViewModel
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 @AndroidEntryPoint
 class AlbumMapFragment : Fragment(), OnMapReadyCallback {
@@ -55,6 +48,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
     private val binding get() = _binding!!
     private val imgInfos = mutableListOf<AlbumMapImgInfo>()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val albumMapViewModel: AlbumMapViewModel by activityViewModels()
 
     @Inject
     lateinit var networkChecker: NetworkChecker
@@ -68,22 +62,27 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
 
     private var itemDecoration: HorizonSpacingItemDecoration? = null
 
-    private var selectedDay = ""
-
     private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
     } else {
-        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
     }
 
-    private val requestStoragePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permission ->
-        when(permission) {
-            true -> {
-                setAlbumMap(selectedDay)
+    private val requestStoragePermission =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val allGranted = permissions.values.all { it }
+            if (allGranted) {
+                albumMapViewModel.setStoragePermissionGranted(true)
+                albumMapViewModel.selectedDay.value?.let { date ->
+                    if (date.isNotEmpty()) {
+                        albumMapViewModel.loadAlbumImages(date)
+                    }
+                }
             }
-            false -> return@registerForActivityResult
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,20 +93,16 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                 }
         mapFragment.getMapAsync(this)
 
-        context?.let { ctx ->
-            if (!networkChecker.isNetworkAvailable()) {
-                val builder = AlertDialog.Builder(ctx)
-                builder.setTitle("인터넷을 연결해주세요!")
-                builder.setPositiveButton("네", null)
-                builder.setCancelable(false)
-                builder.show()
-            }
+        if (!networkChecker.isNetworkAvailable()) {
+            val dialog = SelectDialog.newInstance(title = "인터넷을 연결해주세요!")
+            dialog.isCancelable = false
+            dialog.show(parentFragmentManager, "networkCheck")
         }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentAlbumMapBinding.inflate(inflater, container, false)
         context?.let { ctx ->
@@ -115,9 +110,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         }
 
         binding.apply {
-            isStoragePermitted = false
-            isImgExisted = false
-            selectDay = selectedDay
+            albumViewModel = albumMapViewModel
             lifecycleOwner = viewLifecycleOwner
 
             refresh.apply {
@@ -133,22 +126,67 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                 handlePermissionButtonClick()
             }
 
-            btnSelectDate.setOnClickListener {
+            btnSelectDate.setOnSingleClickListener {
                 handleDateSelectClick()
             }
         }
+
+        // ViewModel 데이터 관찰
+        albumMapViewModel.albumImages.observe(viewLifecycleOwner) { images ->
+            imgInfos.clear()
+
+            // AlbumImageData를 AlbumMapImgInfo로 변환
+            val imgInfosWithView = images.map { data ->
+                AlbumMapImgInfo(
+                    uri = data.uriString.toUri(),
+                    latLng = LatLng(data.latitude, data.longitude),
+                    imgView = getMarkerImageView(data.uriString.toUri())
+                )
+            }
+
+            imgInfos.addAll(imgInfosWithView)
+
+            // RecyclerView 설정
+            if (imgInfos.isNotEmpty()) {
+                setRecyclerView()
+
+                // 마커 업데이트
+                if (::myNaverMap.isInitialized) {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        removeMarker()
+                        setMarker()
+                        moveCamera(imgInfos[0].latLng, CameraAnimation.Easing)
+                    }
+                }
+            } else {
+                binding.isImgExisted = false
+            }
+        }
+
+        albumMapViewModel.storagePermissionGranted.observe(viewLifecycleOwner) { granted ->
+            binding.isStoragePermitted = granted
+        }
+
+        albumMapViewModel.selectedDay.observe(viewLifecycleOwner) { day ->
+            binding.selectDay = day
+        }
+
+        albumMapViewModel.hasImages.observe(viewLifecycleOwner) { hasImages ->
+            binding.isImgExisted = hasImages
+        }
+
         return binding.root
     }
 
     override fun onStart() {
         super.onStart()
         context?.let {
+            // 권한 요청은 하지 않고, 권한이 있는 경우에만 데이터 로드
             if (checkPermission(storagePermission)) {
-                setAlbumMap(selectedDay)
-                if (markers.isNotEmpty()) {
-                    lifecycleScope.launch(Dispatchers.Main) {
-                        removeMarker()
-                        setMarker()
+                albumMapViewModel.setStoragePermissionGranted(true)
+                albumMapViewModel.selectedDay.value?.let { date ->
+                    if (date.isNotEmpty()) {
+                        albumMapViewModel.loadAlbumImages(date)
                     }
                 }
             }
@@ -185,21 +223,11 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
 
             val dialog = DateDialog()
             dialog.dateClickListener = DateDialog.OnDateClickListener { date ->
-                lifecycleScope.launch(Dispatchers.Main) {
-                    itemDecoration?.let { decoration ->
-                        binding.imgRecyclerView.removeItemDecoration(decoration)
-                    }
-                    imgInfos.clear()
-                    binding.isImgExisted = false  // 초기화
-                    selectedDay = date
-                    binding.selectDay = date  // 데이터 바인딩 변수 업데이트
-                    setAlbumMap(selectedDay)
-                    removeMarker()
-                    setMarker()
-                    if (imgInfos.isNotEmpty()) {
-                        moveCamera(imgInfos[0].latLng, CameraAnimation.Easing)
-                    }
+                itemDecoration?.let { decoration ->
+                    binding.imgRecyclerView.removeItemDecoration(decoration)
                 }
+                albumMapViewModel.clearImages()
+                albumMapViewModel.selectDate(date)
             }
 
             parentFragmentManager.let {
@@ -213,96 +241,20 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setAlbumMap(selectDate: String) {
-        getAlbumImage(selectDate)
-        setRecyclerView(selectDate)
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    private fun getAlbumImage(selectDate: String) {
-        binding.isStoragePermitted = true
-
-        if (selectDate.isEmpty()) {
-            return
-        }
-
-        try {
-            val contentResolver = activity?.contentResolver ?: return
-
-            val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            val projection =
-                arrayOf(MediaStore.Images.Media._ID, MediaStore.Images.Media.DATE_TAKEN)
-
-            val selection: String
-            val selectionArgs: Array<String>
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ? AND ${MediaStore.Images.Media.IS_PENDING} = 0"
-                selectionArgs = arrayOf("털뭉치", "%munchi_%")
-            } else {
-                selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ?"
-                selectionArgs = arrayOf("털뭉치", "%munchi_%")
-            }
-
-            val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} ASC"
-            val cursor = contentResolver.query(
-                uri,
-                projection,
-                selection,
-                selectionArgs,
-                sortOrder
-            )
-
-            cursor?.use { it ->
-                val columnIndexId: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-                val columnIndexDate: Int =
-                    it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
-                while (it.moveToNext()) {
-                    val imageDate = DateUtils.convertLongToTime(
-                        SimpleDateFormat("yyyy-MM-dd"),
-                        it.getLong(columnIndexDate) / 1000L
-                    )
-                    val imagePath: String = it.getString(columnIndexId)
-                    val contentUri = Uri.withAppendedPath(uri, imagePath)
-                    val imgView = getMarkerImageView(contentUri)
-                    if (imageDate == selectDate) {
-                        context?.let { ctx ->
-                            getImgLatLng(contentUri, ctx)?.let { latLng ->
-                                imgInfos.add(AlbumMapImgInfo(contentUri, latLng, imgView))
-                            }
-                        }
-
-                        if (imgInfos.size == 20) {
-                            return
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            context?.let { ctx ->
-                Toast.makeText(ctx, "이미지를 불러오는 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun setRecyclerView(selectDate: String) {
-        if (selectDate == "") {
-            return
-        }
+    private fun setRecyclerView() {
         binding.apply {
             if (imgInfos.isNotEmpty()) {
-                isImgExisted = true
                 val adapter = AlbumMapItemListAdapter(imgInfos)
                 adapter.itemClickListener = AlbumMapItemListAdapter.OnItemClickListener { latLng, num ->
-                        for (marker in markers) {
-                            if (marker.tag as Int == num) {
-                                marker.zIndex = 10
-                                continue
-                            }
-                            marker.zIndex = 0
+                    for (marker in markers) {
+                        if (marker.tag as Int == num) {
+                            marker.zIndex = 10
+                            continue
                         }
-                        moveCamera(latLng, CameraAnimation.Easing)
+                        marker.zIndex = 0
                     }
+                    moveCamera(latLng, CameraAnimation.Easing)
+                }
 
                 context?.let { ctx ->
                     imgRecyclerView.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
@@ -311,8 +263,6 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
                     imgRecyclerView.addItemDecoration(decoration)
                 }
                 imgRecyclerView.adapter = adapter
-            } else {
-                isImgExisted = false  // 이미지가 없을 때도 업데이트
             }
         }
     }
@@ -336,25 +286,10 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun getImgLatLng(uri: Uri, context: Context): LatLng? {
-        try {
-            val inputStream = context.contentResolver.openInputStream(uri)
-            val exifInterface = inputStream?.let { ExifInterface(it) }
-            val latLng = exifInterface?.getLatLong()
-
-            if(latLng != null)  {
-                return LatLng(latLng[0], latLng[1])
-            }
-
-            return null
-        } catch (e: Exception) {
-            return null
-        }
-    }
-
-    private fun checkPermission(permissions : Array<String>) : Boolean{
-        return if (!permissionHandler.checkPermissions(requireActivity(), permissions)) {
-            requestStoragePermission.launch(permissions[0])
+    private fun checkPermission(permissions : Array<String>) : Boolean {
+        val hasPermission = permissionHandler.checkPermissions(requireActivity(), permissions)
+        return if (!hasPermission) {
+            requestStoragePermission.launch(permissions)
             false
         } else {
             true

@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="selectDogInfo"
             type="com.tulmunchi.walkingdogapp.domain.model.Dog" />
@@ -15,14 +16,14 @@
             name="viewmodel"
             type="com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel" />
     </data>
-    <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:tools="http://schemas.android.com/tools"
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".presentation.ui.mypage.walkInfoOfDogsPage.walkInfoWithCalendarPage.WalkInfoFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/walkinfo_top"
+            android:id="@+id/walkInfo_top"
             android:layout_width="0dp"
             android:layout_height="60dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -30,15 +31,15 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/btn_goMypage"
+                android:id="@+id/btn_back"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginStart="25dp"
+                android:layout_marginStart="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.08"
-                app:layout_constraintDimensionRatio="1:1"
                 app:srcCompat="@drawable/icon_arrow_back" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -46,21 +47,23 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#e4e4e4"
-            app:layout_constraintTop_toBottomOf="@+id/walkinfo_top" />
+            app:layout_constraintTop_toBottomOf="@+id/walkInfo_top" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/dogInfo_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:background="#f1f1f1"
+            android:paddingVertical="10dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/walkinfo_top">
+            app:layout_constraintTop_toBottomOf="@+id/walkInfo_top">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/selectDogs_RecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:orientation="vertical" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -87,17 +90,14 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:clipToPadding="false"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="20dp">
+                    android:clipToPadding="false">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="250dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:background="@drawable/round_style_rad15"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="30dp"
+                        android:background="@drawable/round_style_rad15_border"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
@@ -105,27 +105,37 @@
                             android:id="@+id/dogInfo_DogName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="20dp"
+                            android:layout_marginTop="15dp"
                             android:text='@{selectDogInfo.name + "의 산책 기록"}'
                             android:textColor="@color/black"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
+
+                        <View
+                            android:id="@+id/divider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="15dp"
+                            android:background="#cccccc"
+                            app:layout_constraintTop_toBottomOf="@+id/dogInfo_DogName" />
 
                         <de.hdodenhof.circleimageview.CircleImageView
                             android:id="@+id/dogsInfo_Img"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
                             android:layout_marginStart="40dp"
-                            android:src="@drawable/collection_003"
+                            android:src="@drawable/collection_unobtained"
+                            app:civ_border_width="1dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintDimensionRatio="1:1"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/dogInfo_DogName"
-                            app:layout_constraintWidth_percent="0.37"
+                            app:layout_constraintTop_toBottomOf="@+id/divider"
+                            app:layout_constraintWidth_percent="0.35"
                             app:selectedDog="@{selectDogInfo}"
-                            app:viewModel="@{viewmodel}"/>
+                            app:viewModel="@{viewmodel}" />
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="wrap_content"
@@ -133,7 +143,7 @@
                             android:layout_marginStart="45dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toEndOf="@id/dogsInfo_Img"
-                            app:layout_constraintTop_toBottomOf="@+id/dogInfo_DogName">
+                            app:layout_constraintTop_toBottomOf="@+id/divider">
 
                             <TextView
                                 android:id="@+id/dogInfo_WalkCount"
@@ -141,7 +151,8 @@
                                 android:layout_height="wrap_content"
                                 android:text='@{"산책 횟수: " + viewmodel.walkHistory.get(selectDogInfo.name).size + "회"}'
                                 android:textColor="@color/black"
-                                android:textSize="18sp"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -152,7 +163,8 @@
                                 android:layout_marginTop="25dp"
                                 android:text="@{String.format(`산책 거리: %.1fkm`, selectDogWalkStats.distance / 1000.0f)}"
                                 android:textColor="@color/black"
-                                android:textSize="18sp"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@id/dogInfo_WalkCount" />
 
@@ -163,7 +175,8 @@
                                 android:layout_marginTop="25dp"
                                 android:text='@{"산책 시간: " + selectDogWalkStats.time / 60 + "분"}'
                                 android:textColor="@color/black"
-                                android:textSize="18sp"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@id/dogInfo_WalkDistance" />
                         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -172,18 +185,18 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="450dp"
-                    android:clipToPadding="false"
-                    android:paddingTop="15dp">
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="20dp"
+                    android:clipToPadding="false">
 
                     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-                        android:id="@+id/walkcalendar"
+                        android:id="@+id/walkCalendar"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:layout_marginBottom="20dp"
-                        android:background="@drawable/round_style_rad15"
+                        android:background="@drawable/round_style_rad15_border"
+                        android:padding="15dp"
                         app:mcv_dateTextAppearance="@style/CalenderViewDateCustomText"
                         app:mcv_firstDayOfWeek="sunday"
                         app:mcv_headerTextAppearance="@style/CalendarWidgetHeader"
@@ -195,16 +208,17 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/walkinfo_recyclerviewLayout"
+                    android:id="@+id/walkInfo_recyclerviewLayout"
                     android:layout_width="match_parent"
                     android:layout_height="200dp">
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/walkinfo_recyclerview"
+                        android:id="@+id/walkInfo_recyclerview"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/round_style_top_rad30"
-                        android:overScrollMode="never" />
+                        android:background="@drawable/round_style_top_rad15"
+                        android:overScrollMode="never"
+                        android:paddingTop="10dp" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

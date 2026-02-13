@@ -8,6 +8,10 @@
         <import type="android.view.View" />
 
         <variable
+            name="albumViewModel"
+            type="com.tulmunchi.walkingdogapp.presentation.viewmodel.AlbumMapViewModel" />
+
+        <variable
             name="isStoragePermitted"
             type="Boolean" />
 
@@ -23,7 +27,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.ui.album.AlbumMapFragment">
+        tools:context=".presentation.ui.albummap.AlbumMapFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/album_appBar"
@@ -51,7 +55,7 @@
                 android:id="@+id/btn_selectDate"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginEnd="25dp"
+                android:layout_marginEnd="20dp"
                 android:background="@drawable/icon_calendar"
                 android:visibility="@{isStoragePermitted ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -121,6 +125,13 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:id="@+id/second_divider_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#e4e4e4"
+                    app:layout_constraintTop_toBottomOf="@+id/Map_layout" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"

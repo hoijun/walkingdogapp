@@ -25,12 +25,12 @@ class LoginViewModel @Inject constructor(
 
             signUpUseCase(email).handle(
                 onSuccess = {
-                    _signUpSuccess.value = true
                     _isLoading.value = false
+                    _signUpSuccess.value = true
                 },
                 onError = {
-                    _signUpSuccess.value = false
                     _isLoading.value = false
+                    _signUpSuccess.value = false
                 }
             )
         }

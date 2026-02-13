@@ -15,20 +15,21 @@
 
     <!-- 달력 안의 숫자들에 적용되는 스타일 -->
     <style name="CalenderViewDateCustomText" parent="android:TextAppearance.DeviceDefault.Medium">
-        <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
     <!-- 달력 안의 요일들에 적용되는 스타일 -->
     <style name="CalenderViewWeekCustomText" parent="android:TextAppearance.DeviceDefault.Medium">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/black</item>
     </style>
 
     <!-- 연, 월을 표시하는 헤더에 적용되는 스타일 -->
     <style name="CalendarWidgetHeader">
         <item name="android:textSize">20sp</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
 
@@ -37,7 +38,7 @@
     </style>
 
     <style name="RoundCornerModalStyle" parent="Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@drawable/round_style_top_rad20</item>
+        <item name="android:background">@drawable/round_style_top_rad15</item>
     </style>
 
     <style name="FilterFullScreenDialog" parent="Theme.AppCompat.Dialog">
@@ -51,6 +52,14 @@
     <style name="RoundedImageView">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">15dp</item>
+    </style>
+
+    <!-- TimePicker 구분선 제거 스타일 -->
+    <style name="TimePickerTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorControlNormal">@android:color/transparent</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
 </resources>

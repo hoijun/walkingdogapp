@@ -9,14 +9,10 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
-import com.tulmunchi.walkingdogapp.databinding.DialogBackNavigationBinding
+import com.tulmunchi.walkingdogapp.databinding.DialogSelectBinding
 
-/**
- * 뒤로가기 전용 다이얼로그
- * 사용자가 뒤로가기 버튼을 눌렀을 때 나가기를 확인하는 다이얼로그
- */
-class BackNavigationDialog : DialogFragment() {
-    private var _binding: DialogBackNavigationBinding? = null
+class SelectDialog : DialogFragment() {
+    private var _binding: DialogSelectBinding? = null
     private val binding get() = _binding!!
 
     /**
@@ -38,17 +34,20 @@ class BackNavigationDialog : DialogFragment() {
 
     companion object {
         private const val ARG_TITLE = "title"
+        private const val ARG_SHOW_NEGATIVE_BUTTON = "show_negative_button"
 
         /**
-         * BackNavigationDialog 인스턴스 생성
          * @param title 다이얼로그 제목 (기본값: "나가시겠어요?")
+         * @param showNegativeButton "아니요" 버튼 표시 여부 (기본값: false)
          */
         fun newInstance(
-            title: String = "나가시겠어요?"
-        ): BackNavigationDialog {
-            return BackNavigationDialog().apply {
+            title: String = "나가시겠어요?",
+            showNegativeButton: Boolean = false
+        ): SelectDialog {
+            return SelectDialog().apply {
                 arguments = Bundle().apply {
                     putString(ARG_TITLE, title)
+                    putBoolean(ARG_SHOW_NEGATIVE_BUTTON, showNegativeButton)
                 }
             }
         }
@@ -59,12 +58,15 @@ class BackNavigationDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = DialogBackNavigationBinding.inflate(inflater, container, false)
+        _binding = DialogSelectBinding.inflate(inflater, container, false)
 
         val title = arguments?.getString(ARG_TITLE) ?: "나가시겠어요?"
+        val showNegativeButton = arguments?.getBoolean(ARG_SHOW_NEGATIVE_BUTTON) ?: false
 
         binding.apply {
             dialogTitle.text = title
+
+            negativeBtn.visibility = if (showNegativeButton) View.VISIBLE else View.GONE
 
             positiveBtn.setOnClickListener {
                 onConfirmListener?.onConfirm()

@@ -13,10 +13,11 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.drawable.toDrawable
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.tulmunchi.walkingdogapp.databinding.FragmentGalleryBottomSheetBinding
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 
 class GalleryBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -52,26 +53,19 @@ class GalleryBottomSheetFragment : BottomSheetDialogFragment() {
 
         binding.apply {
             day = date
-            removeimg.setOnClickListener {
+            removeimg.setOnSingleClickListener {
                 imgUri?.also {
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         val intentSender = MediaStore.createDeleteRequest(requireActivity().contentResolver, mutableListOf(it)).intentSender
                         launcher.launch(IntentSenderRequest.Builder(intentSender).build())
                     } else {
-                        val builder = AlertDialog.Builder(requireContext())
-                        builder.setTitle("사진을 삭제하시겠습니까?")
-                        val listener = DialogInterface.OnClickListener { _, ans ->
-                            when (ans) {
-                                DialogInterface.BUTTON_POSITIVE -> {
-                                    requireActivity().contentResolver.delete(imgUri, null, null)
-                                    dismiss()
-                                    onDeleteImgListener?.onDeleteImg()
-                                }
-                            }
+                        val dialog = SelectDialog.newInstance(title = "사진을 삭제하시겠습니까?", showNegativeButton = true)
+                        dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+                            requireActivity().contentResolver.delete(imgUri, null, null)
+                            dismiss()
+                            onDeleteImgListener?.onDeleteImg()
                         }
-                        builder.setPositiveButton("네", listener)
-                        builder.setNegativeButton("아니오", null)
-                        builder.show()
+                        dialog.show(parentFragmentManager, "deleteConfirm")
                     }
                 }
             }

@@ -2,7 +2,6 @@ package com.tulmunchi.walkingdogapp.presentation.ui.main
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -17,7 +16,7 @@ import com.tulmunchi.walkingdogapp.databinding.ActivityMainBinding
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.presentation.ui.alarm.SettingAlarmFragment
-import com.tulmunchi.walkingdogapp.presentation.ui.album.AlbumMapFragment
+import com.tulmunchi.walkingdogapp.presentation.ui.albummap.AlbumMapFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.collection.CollectionFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.gallery.detailOfPicturePage.DetailPictureFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.gallery.galleryPage.GalleryFragment
@@ -54,12 +53,19 @@ class MainActivity : AppCompatActivity() {
 
     private var loadingDialog: LoadingDialog? = null
 
-    private val locationPermissionRequestCode = 1000
-    private val permissions = arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.POST_NOTIFICATIONS
-    )
+    // 여러 권한을 동시에 요청
+    private val requestMultiplePermissions =
+        registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val locationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+            
+            if (locationGranted) {
+                // 위치 권한이 승인되면 현재 위치 가져오기
+                mainViewModel.getLastLocation()
+            }
+            
+            // POST_NOTIFICATIONS는 선택적이므로 결과와 상관없이 진행
+        }
 
     private var backPressedTime: Long = 0
 
@@ -194,7 +200,11 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_mypage -> NavigationState.WithBottomNav.MyPage
                 else -> return@setOnItemSelectedListener false
             }
-            navigationManager.navigateTo(state)
+            
+            // 현재 상태와 같으면 navigateTo 호출하지 않음 (중복 호출 방지)
+            if (navigationManager.currentState.value != state) {
+                navigationManager.navigateTo(state)
+            }
             true
         }
 
@@ -223,7 +233,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestPermissions() {
-        permissionHandler.requestPermissions(this, permissions, locationPermissionRequestCode)
+        // 필요한 모든 권한 요청
+        val permissions = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.POST_NOTIFICATIONS
+        )
+        requestMultiplePermissions.launch(permissions)
     }
 
     private fun checkWalkingService() {
@@ -267,22 +283,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        when (requestCode) {
-            locationPermissionRequestCode -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mainViewModel.getLastLocation()
-                }
-                return
-            }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -306,8 +306,10 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
+            .setTransition(androidx.fragment.app.FragmentTransaction.TRANSIT_NONE)
+            .setReorderingAllowed(true)  // 최적화: 한 프레임에 모든 작업 수행
             .replace(binding.screenFl.id, fragment)
-            .commitAllowingStateLoss()
+            .commitNowAllowingStateLoss()  // 즉시 실행
     }
 
     private fun showLoadingFragment() {
@@ -323,6 +325,4 @@ class MainActivity : AppCompatActivity() {
         }
         loadingDialog?.dismiss()
     }
-
-    // companion object 완전 제거 ✅
 }

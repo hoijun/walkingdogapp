@@ -24,7 +24,6 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.scale
 import androidx.core.graphics.toColorInt
 import androidx.databinding.BindingAdapter
@@ -37,12 +36,13 @@ import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentRegisterDogBinding
 import com.tulmunchi.walkingdogapp.domain.model.Dog
-import com.tulmunchi.walkingdogapp.presentation.core.dialog.BackNavigationDialog
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.RegisterDogViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -102,14 +102,6 @@ class RegisterDogFragment : Fragment() {
             return@registerForActivityResult
         }
     }
-
-    private val storagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
-    } else {
-        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    }
-
-    private val storageCode = 99
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -183,11 +175,11 @@ class RegisterDogFragment : Fragment() {
                 binding.dogInfo = dog
             }
 
-            editBreed.setOnClickListener {
+            editBreed.setOnSingleClickListener {
                 showDogList()
             }
 
-            editBirth.setOnClickListener {
+            editBirth.setOnSingleClickListener {
                 val cal = Calendar.getInstance()
                 val dateCallback = DatePickerDialog.OnDateSetListener { _, year, month, day ->
                     val birth = "${year}/${month + 1}/${day}"
@@ -214,10 +206,9 @@ class RegisterDogFragment : Fragment() {
                 datePicker.show()
             }
 
-            btnRegisterProfileImg.setOnClickListener {
-                if (checkPermission(storagePermission, storageCode)) {
-                    pickMedia.launch("image/jpeg")
-                }
+            btnRegisterProfileImg.setOnSingleClickListener {
+                // GetContent는 System Picker 사용 - 권한 불필요
+                pickMedia.launch("image/jpeg")
             }
 
             btnRegisterDog.setOnClickListener {
@@ -236,10 +227,8 @@ class RegisterDogFragment : Fragment() {
                     dog.weight.isEmpty() || dog.gender.isEmpty() || dog.neutering.isEmpty() ||
                     dog.vaccination.isEmpty()
                 ) {
-                    val builder = AlertDialog.Builder(requireContext())
-                    builder.setTitle("빈칸이 남아있어요.")
-                    builder.setPositiveButton("확인", null)
-                    builder.show()
+                    val dialog = SelectDialog.newInstance(title = "빈칸이 남아있어요.")
+                    dialog.show(parentFragmentManager, "emptyField")
                     return@setOnClickListener
                 }
 
@@ -265,28 +254,21 @@ class RegisterDogFragment : Fragment() {
                     return@setOnClickListener
                 }
 
-                val builder = AlertDialog.Builder(requireContext())
-                builder.setTitle("등록 할까요?")
-                val listener = DialogInterface.OnClickListener { _, ans ->
-                    when (ans) {
-                        DialogInterface.BUTTON_POSITIVE -> {
-                            if (beforeName == "") {
-                                registerDogViewModel.addDog(dog, imgUri?.toString())
-                            } else {
-                                registerDogViewModel.updateDog(
-                                    oldName = beforeName,
-                                    dog = dog,
-                                    imageUriString = imgUri?.toString(),
-                                    walkRecords = walkRecords,
-                                    existingDogNames = dogNames
-                                )
-                            }
-                        }
+                val dialog = SelectDialog.newInstance(title = "등록 할까요?", showNegativeButton = true)
+                dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+                    if (beforeName == "") {
+                        registerDogViewModel.addDog(dog, imgUri?.toString())
+                    } else {
+                        registerDogViewModel.updateDog(
+                            oldName = beforeName,
+                            dog = dog,
+                            imageUriString = imgUri?.toString(),
+                            walkRecords = walkRecords,
+                            existingDogNames = dogNames
+                        )
                     }
                 }
-                builder.setPositiveButton("네", listener)
-                builder.setNegativeButton("아니요", null)
-                builder.show()
+                dialog.show(parentFragmentManager, "register")
                 return@setOnClickListener
             }
 
@@ -295,24 +277,22 @@ class RegisterDogFragment : Fragment() {
                 if(!networkChecker.isNetworkAvailable()) {
                     return@setOnClickListener
                 }
-                val builder = AlertDialog.Builder(requireContext())
-                builder.setTitle("정보를 삭제 하시겠어요?")
-                val listener = DialogInterface.OnClickListener { _, ans ->
-                    when (ans) {
-                        DialogInterface.BUTTON_POSITIVE -> {
-                            registerDogViewModel.deleteDog(beforeName)
-                        }
-                    }
+                val dialog = SelectDialog.newInstance(title = "정보를 삭제 하시겠어요?", showNegativeButton = true)
+                dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+                    registerDogViewModel.deleteDog(beforeName)
                 }
-                builder.setPositiveButton("네", listener)
-                builder.setNegativeButton("아니요", null)
-                builder.show()
+                dialog.show(parentFragmentManager, "delete")
             }
 
             btnBack.setOnClickListener {
                 selectNavigateToMain()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressCallback)
     }
 
     override fun onDestroyView() {
@@ -394,10 +374,8 @@ class RegisterDogFragment : Fragment() {
     }
 
     private fun selectNavigateToMain() {
-        val dialog = BackNavigationDialog.newInstance(
-            title = "등록을 취소할까요?"
-        )
-        dialog.onConfirmListener = BackNavigationDialog.OnConfirmListener {
+        val dialog = SelectDialog.newInstance(title = "등록을 취소할까요?", showNegativeButton = true)
+        dialog.onConfirmListener = SelectDialog.OnConfirmListener {
             navigateToMain(ResultOfRegisterDog.IsNotUpdatedDog)
         }
         dialog.show(parentFragmentManager, "back_navigation_dialog")
@@ -465,48 +443,6 @@ class RegisterDogFragment : Fragment() {
             return
         }
         loadingDialog?.dismiss()
-    }
-
-    private fun checkPermission(permissions : Array<String>, code: Int) : Boolean{
-        return if (!permissionHandler.checkPermissions(requireActivity(), permissions)) {
-            permissionHandler.requestPermissions(requireActivity(), permissions, code)
-            false
-        } else {
-            true
-        }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray,
-    ) {
-        when (requestCode) {
-            storageCode -> {
-                if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    val builder = AlertDialog.Builder(requireContext())
-                    builder.setTitle("사진 설정을 위해 권한을 \n허용으로 해주세요!")
-                    val listener = DialogInterface.OnClickListener { _, ans ->
-                        when (ans) {
-                            DialogInterface.BUTTON_POSITIVE -> {
-                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                intent.data = Uri.fromParts("package", requireActivity().packageName, null)
-                                startActivity(intent)
-                            }
-                        }
-                    }
-                    builder.setPositiveButton("네", listener)
-                    builder.setNegativeButton("아니오", null)
-                    builder.show()
-                } else {
-                    pickMedia.launch("image/jpeg")
-                }
-            }
-        }
-        @Suppress("DEPRECATION")
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     object RegisterDogBindingAdapter {

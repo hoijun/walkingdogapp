@@ -6,8 +6,13 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
@@ -23,6 +28,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.overlay.InfoWindow
+import com.naver.maps.map.overlay.Marker
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
@@ -36,13 +42,14 @@ import kotlin.math.abs
 import kotlin.math.atan2
 
 @AndroidEntryPoint
-class WalkingService : Service() {
+class WalkingService : Service(), SensorEventListener {
     companion object {
         private var isWalkingServiceRunning = false
         fun isWalkingServiceRunning(): Boolean {
             return isWalkingServiceRunning
         }
     }
+
     private var binder = LocalBinder()
     private lateinit var locationRequest: LocationRequest
     private var fusedLocationProviderClient: FusedLocationProviderClient? = null
@@ -50,32 +57,58 @@ class WalkingService : Service() {
     private var totalTime = 0
     private var angleThreshold = 30
 
+    // 센서 관련
+    private lateinit var sensorManager: SensorManager
+    private var rotationSensor: Sensor? = null
+    private val rotationMatrix = FloatArray(9)
+    private val orientation = FloatArray(3)
+
     @Inject
     lateinit var permissionHandler: PermissionHandler
 
-    val coordList = MutableLiveData<MutableList<LatLng>>()
+    val walkCoordList = MutableLiveData<MutableList<LatLng>>()
     val isTracking = MutableLiveData(true)
     val walkTime = MutableLiveData<Int>()
-    var getCollectionItems = mutableListOf<String>()
-    var walkingDogs = MutableLiveData<ArrayList<String>>()
-    var animalMarkers = mutableListOf<InfoWindow>()
     var walkDistance = MutableLiveData<Float>()
+    var calories = MutableLiveData<Float>()
+    var speed = MutableLiveData<Float>()
+    var bearing = MutableLiveData(0f)
+    var poopMarkers = mutableListOf<LatLng>()
+    var memoMarkers = mutableListOf<LatLng>()
+    var memos = hashMapOf<LatLng, String>()
+    var getCollectionItems = mutableListOf<String>()
+    var walkingDogs = ArrayList<String>()
+    var walkingDogsWeights = ArrayList<Int>()
+    var animalMarkers = mutableListOf<InfoWindow>()
     var startTime = ""
 
     inner class LocalBinder: Binder() {
         fun getService(): WalkingService = this@WalkingService
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        // 센서 매니저 초기화
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+    }
+
     private fun postInitialValue() {
+        walkCoordList.postValue(mutableListOf())
         isTracking.postValue(true)
         walkTime.postValue(0)
-        coordList.postValue(mutableListOf())
-        totalTime = 0
-        walkingDogs.postValue(arrayListOf())
-        getCollectionItems = mutableListOf()
-        animalMarkers = mutableListOf()
         walkDistance.postValue(0f)
+        calories.postValue(0f)
+        speed.postValue(0f)
+        poopMarkers = mutableListOf()
+        memoMarkers = mutableListOf()
+        memos = hashMapOf()
+        getCollectionItems = mutableListOf()
+        walkingDogs = arrayListOf()
+        walkingDogsWeights = arrayListOf()
+        animalMarkers = mutableListOf()
         startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
+        totalTime = 0
     }
 
     // 위치 업데이트
@@ -85,36 +118,38 @@ class WalkingService : Service() {
                 for (location in locationResult.locations) {
                     if (location != null) {
                         val pos = LatLng(location.latitude, location.longitude)
-                        if (coordList.value == null) {
+                        if (walkCoordList.value == null) {
                             return
                         }
 
-                        if (coordList.value!!.isNotEmpty() && coordList.value!!.last().distanceTo(pos) < 3f) {
+                        speed.postValue(location.speed)
+
+                        if (walkCoordList.value!!.isNotEmpty() && walkCoordList.value!!.last().distanceTo(pos) < 3f) {
                             return
                         }
 
-                        coordList.value!!.apply {
+                        walkCoordList.value!!.apply {
                             add(pos)
-                            coordList.postValue(this)
+                            walkCoordList.postValue(this)
                         }
 
                         val previousDistance = walkDistance.value ?: 0f
 
-                        if (coordList.value!!.size > 1) { // 거리 증가
+                        if (walkCoordList.value!!.size > 1) { // 거리 증가
                             walkDistance.postValue(
                                 walkDistance.value?.plus(
-                                    coordList.value!!.last()
-                                        .distanceTo(coordList.value!![coordList.value!!.size - 2])
+                                    walkCoordList.value!!.last()
+                                        .distanceTo(walkCoordList.value!![walkCoordList.value!!.size - 2])
                                         .toFloat()
                                 )
                             )
                         }
 
-                        if (coordList.value!!.size > 2) {
-                            val lastThree = coordList.value!!.takeLast(3)
+                        if (walkCoordList.value!!.size > 2) {
+                            val lastThree = walkCoordList.value!!.takeLast(3)
                             if (needToFlat(lastThree[0], lastThree[1], lastThree[2])) {
-                                coordList.value!!.removeAt(coordList.value!!.size - 2)
-                                coordList.postValue(coordList.value!!)
+                                walkCoordList.value!!.removeAt(walkCoordList.value!!.size - 2)
+                                walkCoordList.postValue(walkCoordList.value!!)
                             }
                         }
 
@@ -124,6 +159,8 @@ class WalkingService : Service() {
                                 angleThreshold = 20
                             }
                         }
+
+                        calories.postValue(calculateCalories(walkDistance.value ?: 0f))
                     }
                 }
             }
@@ -143,7 +180,8 @@ class WalkingService : Service() {
                     WalkingConstants.ACTION_START_WALKING_SERVICE -> {
                         postInitialValue()
                         isWalkingServiceRunning = true
-                        walkingDogs.postValue(intent.getStringArrayListExtra("selectedDogs")?: arrayListOf())
+                        walkingDogs = intent.getStringArrayListExtra("selectedDogs")?: arrayListOf()
+                        walkingDogsWeights = intent.getIntegerArrayListExtra("selectedDogsWeights")?: arrayListOf()
                         startLocationService()
                     }
 
@@ -212,6 +250,14 @@ class WalkingService : Service() {
             Looper.getMainLooper()
         )
 
+        // 센서 리스너 등록 (NORMAL = ~5Hz, 배터리 절약)
+        rotationSensor?.let {
+            sensorManager.registerListener(
+                this,
+                it,
+                SensorManager.SENSOR_DELAY_NORMAL
+            )
+        }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             startForeground(WalkingConstants.WALKING_SERVICE_ID, builder.build())
@@ -246,6 +292,8 @@ class WalkingService : Service() {
         isWalkingServiceRunning = false
         stopTimer()
         fusedLocationProviderClient?.removeLocationUpdates(locationCallback)
+        // 센서 리스너 해제
+        sensorManager.unregisterListener(this)
         postInitialValue()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
@@ -280,7 +328,6 @@ class WalkingService : Service() {
 
         var angle = Math.toDegrees(atan2(dx, dy)).toFloat()
 
-        // 각도를 0에서 360도 사이의 값으로 조정
         if (angle < 0) {
             angle += 360f
         }
@@ -288,9 +335,39 @@ class WalkingService : Service() {
         return angle
     }
 
+    private fun calculateCalories(totalDistance: Float): Float {
+        val sumOfWeights = walkingDogsWeights.sum()
+        return (sumOfWeights * totalDistance / 1000 * 0.8).toFloat()
+    }
+
+
     fun hasPassedKm(previousDistance: Int, currentDistance: Int): Boolean {
         val previousThousand = previousDistance / 1000
         val currentThousand = currentDistance / 1000
         return currentThousand > previousThousand
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (event?.sensor?.type == Sensor.TYPE_ROTATION_VECTOR) {
+            SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
+
+            SensorManager.getOrientation(rotationMatrix, orientation)
+
+            val azimuth = Math.toDegrees(orientation[0].toDouble()).toFloat()
+            val normalizedBearing = if (azimuth < 0) azimuth + 360f else azimuth
+
+            val smoothedBearing = smoothBearing(bearing.value ?: 0f, normalizedBearing, 0.2f)
+            bearing.postValue(smoothedBearing)
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) { }
+
+    private fun smoothBearing(oldBearing: Float, newBearing: Float, alpha: Float): Float {
+        var diff = newBearing - oldBearing
+        if (diff > 180f) diff -= 360f
+        if (diff < -180f) diff += 360f
+
+        return (oldBearing + diff * alpha + 360f) % 360f
     }
 }

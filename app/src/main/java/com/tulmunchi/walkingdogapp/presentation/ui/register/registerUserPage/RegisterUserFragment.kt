@@ -11,7 +11,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.toColorInt
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
@@ -20,12 +19,13 @@ import androidx.fragment.app.viewModels
 import com.tulmunchi.walkingdogapp.core.network.NetworkChecker
 import com.tulmunchi.walkingdogapp.databinding.FragmentRegisterUserBinding
 import com.tulmunchi.walkingdogapp.domain.model.User
-import com.tulmunchi.walkingdogapp.presentation.core.dialog.BackNavigationDialog
+import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.RegisterUserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -96,7 +96,7 @@ class RegisterUserFragment : Fragment() {
                 user = currentUser
             }
 
-            editUserBirth.setOnClickListener {
+            editUserBirth.setOnSingleClickListener {
                 val cal = Calendar.getInstance()
                 val dateCallback = DatePickerDialog.OnDateSetListener { _, year, month, day ->
                     val birth = "${year}/${month + 1}/${day}"
@@ -129,28 +129,17 @@ class RegisterUserFragment : Fragment() {
                 }
                 currentUser.apply {
                     if (editName.text.toString() == "" || birth == "" || gender == "") {
-                        val builder = AlertDialog.Builder(requireContext())
-                        builder.setTitle("빈칸이 남아있어요.")
-                        builder.setPositiveButton("확인", null)
-                        builder.show()
+                        val dialog = SelectDialog.newInstance(title = "빈칸이 남아있어요.")
+                        dialog.show(parentFragmentManager, "emptyField")
                         return@setOnClickListener
                     }
                 }
 
-                val builder = AlertDialog.Builder(requireContext())
-                builder.setTitle("등록 할까요?")
-
-                val listener = DialogInterface.OnClickListener { _, ans ->
-                    when (ans) {
-                        DialogInterface.BUTTON_POSITIVE -> {
-                            registerUserViewModel.updateUserInfo(currentUser)
-                        }
-                    }
+                val dialog = SelectDialog.newInstance(title = "등록 할까요?", showNegativeButton = true)
+                dialog.onConfirmListener = SelectDialog.OnConfirmListener {
+                    registerUserViewModel.updateUserInfo(currentUser)
                 }
-
-                builder.setPositiveButton("네", listener)
-                builder.setNegativeButton("아니요", null)
-                builder.show()
+                dialog.show(parentFragmentManager, "register")
                 return@setOnClickListener
             }
 
@@ -158,6 +147,11 @@ class RegisterUserFragment : Fragment() {
                 selectGoMain()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressCallback)
     }
 
     override fun onDestroyView() {
@@ -182,10 +176,8 @@ class RegisterUserFragment : Fragment() {
     }
 
     private fun selectGoMain() {
-        val dialog = BackNavigationDialog.newInstance(
-            title = "등록을 취소할까요?"
-        )
-        dialog.onConfirmListener = BackNavigationDialog.OnConfirmListener {
+        val dialog = SelectDialog.newInstance(title = "등록을 취소할까요?", showNegativeButton = true)
+        dialog.onConfirmListener = SelectDialog.OnConfirmListener {
             navigateToMyPage()
         }
         dialog.show(parentFragmentManager, "back_navigation_dialog")

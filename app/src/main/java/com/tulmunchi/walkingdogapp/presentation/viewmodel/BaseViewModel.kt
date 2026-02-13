@@ -38,6 +38,7 @@ abstract class BaseViewModel : ViewModel() {
                     is DomainError.NetworkError -> "네트워크 연결을 확인해주세요"
                     is DomainError.ValidationError -> throwable.message
                     is DomainError.UnknownError -> throwable.message
+                    is DomainError.WeatherError -> throwable.message
                     else -> "오류가 발생했습니다"
                 }
                 _error.postValue(message)

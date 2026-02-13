@@ -1,4 +1,4 @@
-package com.tulmunchi.walkingdogapp.presentation.ui.album
+package com.tulmunchi.walkingdogapp.presentation.ui.albummap
 
 import android.content.res.Resources
 import android.graphics.Color
@@ -15,7 +15,10 @@ import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.format.ArrayWeekDayFormatter
 import com.tulmunchi.walkingdogapp.R
 import com.tulmunchi.walkingdogapp.databinding.DialogCalendarBinding
+import com.tulmunchi.walkingdogapp.presentation.core.components.DayDecorator
+import com.tulmunchi.walkingdogapp.presentation.core.components.SaturdayDecorator
 import com.tulmunchi.walkingdogapp.presentation.core.components.SelectedMonthDecorator
+import com.tulmunchi.walkingdogapp.presentation.core.components.SundayDecorator
 import com.tulmunchi.walkingdogapp.presentation.core.components.ToDayDecorator
 import com.tulmunchi.walkingdogapp.presentation.core.components.WalkDayDecorator
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
@@ -60,45 +63,57 @@ class DateDialog : DialogFragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = DialogCalendarBinding.inflate(inflater, container, false)
+        val dayDecorator = context?.let { DayDecorator(it) } ?: return binding.root
+        val sundayDecorator = SundayDecorator()
+        val saturdayDecorator = SaturdayDecorator()
         val todayDecorator = ToDayDecorator(requireContext(), CalendarDay.today())
         var selectedMonthDecorator = SelectedMonthDecorator(CalendarDay.today().month)
         val walkDayDecorator = WalkDayDecorator(walkDates) // 산책한 날 표시
 
         binding.apply {
-            walkcalendar.addDecorators(walkDayDecorator, selectedMonthDecorator, todayDecorator)
-            walkcalendar.setTitleFormatter { day -> // 년 월 표시 변경
+            calendar.addDecorators(walkDayDecorator, selectedMonthDecorator, todayDecorator, dayDecorator, saturdayDecorator, sundayDecorator)
+            calendar.setTitleFormatter { day -> // 년 월 표시 변경
                 val inputText = day.date
                 val calendarHeaderElements = inputText.toString().split("-").toMutableList()
                 val calendarHeaderBuilder = StringBuilder()
                 if (calendarHeaderElements[1][0] == '0') {
-                    calendarHeaderElements[1] = calendarHeaderElements[1].replace("0","")
+                    calendarHeaderElements[1] = calendarHeaderElements[1].replace("0", "")
                 }
                 calendarHeaderBuilder.append(calendarHeaderElements[0]).append("년 ")
                     .append(calendarHeaderElements[1]).append("월")
                 calendarHeaderBuilder.toString()
             }
 
-            walkcalendar.setWeekDayFormatter(ArrayWeekDayFormatter(requireContext().resources.getTextArray(R.array.custom_weekdays)))
-            walkcalendar.state().edit().setMaximumDate(CalendarDay.today()).setMinimumDate(CalendarDay.from(2024, 1, 1)).commit()
+            calendar.setWeekDayFormatter(
+                ArrayWeekDayFormatter(
+                    requireContext().resources.getTextArray(
+                        R.array.custom_weekdays
+                    )
+                )
+            )
+            calendar.state().edit().setMaximumDate(CalendarDay.today())
+                .setMinimumDate(CalendarDay.from(2024, 1, 1)).commit()
 
-            walkcalendar.selectedDate = CalendarDay.today() // 오늘 날짜
+            calendar.selectedDate = CalendarDay.today() // 오늘 날짜
 
-            walkcalendar.setOnDateChangedListener { _, date, _ ->
+            calendar.setOnDateChangedListener { _, date, _ ->
                 dateClickListener?.onDateClick(date.date.toString())
                 dismiss()
                 return@setOnDateChangedListener
             }
 
-            walkcalendar.setOnMonthChangedListener { _, date -> // 달 바꿀때
-                walkcalendar.removeDecorators()
-                walkcalendar.invalidateDecorators() // 데코 초기화
+            calendar.setOnMonthChangedListener { _, date -> // 달 바꿀때
+                calendar.removeDecorators()
+                calendar.invalidateDecorators() // 데코 초기화
                 if (date.month == CalendarDay.today().month) {
-                    walkcalendar.selectedDate = CalendarDay.today() // 현재 달로 바꿀 때 마다 현재 날짜 표시
+                    calendar.selectedDate = CalendarDay.today() // 현재 달로 바꿀 때 마다 현재 날짜 표시
                 } else {
-                    walkcalendar.selectedDate = null
+                    calendar.selectedDate = null
                 }
                 selectedMonthDecorator = SelectedMonthDecorator(date.month)
-                walkcalendar.addDecorators(walkDayDecorator, selectedMonthDecorator, todayDecorator) //데코 설정
+                calendar
+
+                calendar.addDecorators(walkDayDecorator, selectedMonthDecorator, todayDecorator, dayDecorator, saturdayDecorator, sundayDecorator)
             }
         }
 
@@ -120,7 +135,7 @@ class DateDialog : DialogFragment() {
     private fun resizeDialog() {
         val params: ViewGroup.LayoutParams? = this.dialog?.window?.attributes
         val deviceWidth = Resources.getSystem().displayMetrics.widthPixels
-        params?.width = (deviceWidth * 0.8).toInt()
+        params?.width = (deviceWidth * 0.95).toInt()
         this.dialog?.window?.attributes = params as WindowManager.LayoutParams
         this.dialog?.window?.setGravity(Gravity.BOTTOM)
         

@@ -18,5 +18,13 @@ dependencyResolutionManagement {
     }
 }
 
+// 빌드 캐시 활성화 (빌드 속도 향상)
+buildCache {
+    local {
+        isEnabled = true
+        directory = file("${rootDir}/.gradle/build-cache")
+    }
+}
+
 rootProject.name = "WalkingDogApp"
 include(":app")

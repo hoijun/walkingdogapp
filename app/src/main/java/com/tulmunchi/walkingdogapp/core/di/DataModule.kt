@@ -4,11 +4,19 @@ import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import com.tulmunchi.walkingdogapp.BuildConfig
 import com.tulmunchi.walkingdogapp.data.repository.AlarmRepositoryImpl
+import com.tulmunchi.walkingdogapp.data.service.WeatherApiService
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import com.tulmunchi.walkingdogapp.data.repository.CollectionRepositoryImpl
 import com.tulmunchi.walkingdogapp.data.repository.DogRepositoryImpl
 import com.tulmunchi.walkingdogapp.data.repository.UserRepositoryImpl
 import com.tulmunchi.walkingdogapp.data.repository.WalkRepositoryImpl
+import com.tulmunchi.walkingdogapp.data.repository.WeatherRepositoryImpl
 import com.tulmunchi.walkingdogapp.data.source.local.AlarmLocalDataSource
 import com.tulmunchi.walkingdogapp.data.source.local.AlarmLocalDataSourceImpl
 import com.tulmunchi.walkingdogapp.data.source.local.LocalUserDatabase
@@ -23,11 +31,14 @@ import com.tulmunchi.walkingdogapp.data.source.remote.FirebaseUserDataSource
 import com.tulmunchi.walkingdogapp.data.source.remote.FirebaseUserDataSourceImpl
 import com.tulmunchi.walkingdogapp.data.source.remote.FirebaseWalkDataSource
 import com.tulmunchi.walkingdogapp.data.source.remote.FirebaseWalkDataSourceImpl
+import com.tulmunchi.walkingdogapp.data.source.remote.WeatherDataSource
+import com.tulmunchi.walkingdogapp.data.source.remote.WeatherDataSourceImpl
 import com.tulmunchi.walkingdogapp.domain.repository.AlarmRepository
 import com.tulmunchi.walkingdogapp.domain.repository.CollectionRepository
 import com.tulmunchi.walkingdogapp.domain.repository.DogRepository
 import com.tulmunchi.walkingdogapp.domain.repository.UserRepository
 import com.tulmunchi.walkingdogapp.domain.repository.WalkRepository
+import com.tulmunchi.walkingdogapp.domain.repository.WeatherRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -81,6 +92,12 @@ abstract class DataModule {
         impl: AlarmLocalDataSourceImpl
     ): AlarmLocalDataSource
 
+    @Binds
+    @Singleton
+    abstract fun bindWeatherDataSource(
+        impl: WeatherDataSourceImpl
+    ): WeatherDataSource
+
     // ========== Repositories ==========
 
     @Binds
@@ -112,6 +129,12 @@ abstract class DataModule {
     abstract fun bindCollectionRepository(
         impl: CollectionRepositoryImpl
     ): CollectionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindWeatherRepository(
+        impl: WeatherRepositoryImpl
+    ): WeatherRepository
 
     companion object {
         // ========== External Libraries ==========
@@ -145,6 +168,53 @@ abstract class DataModule {
         @Singleton
         fun provideAlarmDao(@ApplicationContext context: Context): AlarmDao {
             return LocalUserDatabase.getInstance(context)!!.alarmDao()
+        }
+        
+        /**
+         * OkHttpClient 제공
+         * 타임아웃 설정 및 로깅 인터셉터를 포함한 HTTP 클라이언트
+         */
+        @Provides
+        @Singleton
+        fun provideOkHttpClient(): OkHttpClient {
+            val loggingInterceptor = HttpLoggingInterceptor().apply {
+                level = if (BuildConfig.DEBUG) {
+                    HttpLoggingInterceptor.Level.BODY
+                } else {
+                    HttpLoggingInterceptor.Level.NONE
+                }
+            }
+
+            return OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .addInterceptor(loggingInterceptor)
+                .build()
+        }
+
+        /**
+         * Retrofit 인스턴스 제공
+         * 날씨 API 통신을 위한 Retrofit 설정
+         */
+        @Provides
+        @Singleton
+        fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+            return Retrofit.Builder()
+                .baseUrl("https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/")
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+        }
+
+        /**
+         * WeatherApiService 제공
+         * Retrofit을 사용하여 날씨 API 서비스 생성
+         */
+        @Provides
+        @Singleton
+        fun provideWeatherApiService(retrofit: Retrofit): WeatherApiService {
+            return retrofit.create(WeatherApiService::class.java)
         }
     }
 }

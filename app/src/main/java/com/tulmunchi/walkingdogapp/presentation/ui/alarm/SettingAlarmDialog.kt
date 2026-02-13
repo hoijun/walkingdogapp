@@ -5,16 +5,21 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.WindowManager
+import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import com.tulmunchi.walkingdogapp.databinding.DialogSettingAlarmBinding
 import com.tulmunchi.walkingdogapp.domain.model.Alarm
+import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
 import java.util.Calendar
+
 
 class SettingAlarmDialog : DialogFragment() {
     private var _binding: DialogSettingAlarmBinding? = null
@@ -55,7 +60,7 @@ class SettingAlarmDialog : DialogFragment() {
                 dialog?.dismiss()
             }
 
-            saveAlarm.setOnClickListener {
+            saveAlarm.setOnSingleClickListener {
                 val calendar = Calendar.getInstance()
 
                 val weeksList = listOf(
@@ -89,7 +94,7 @@ class SettingAlarmDialog : DialogFragment() {
 
                 code += if (weeksToCode(weeksList) == "") {
                     Toast.makeText(requireContext(), "요일을 선택 해주세요!", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
+                    return@setOnSingleClickListener
                 } else {
                     weeksToCode(weeksList)
                 }
@@ -136,8 +141,14 @@ class SettingAlarmDialog : DialogFragment() {
     private fun resizeDialog() {
         val params: ViewGroup.LayoutParams? = this.dialog?.window?.attributes
         val deviceWidth = Resources.getSystem().displayMetrics.widthPixels
-        params?.width = (deviceWidth * 0.8).toInt()
+        params?.width = (deviceWidth * 0.95).toInt()
         this.dialog?.window?.attributes = params as WindowManager.LayoutParams
+        this.dialog?.window?.setGravity(Gravity.BOTTOM)
+
+        // 하단 여백 추가
+        val layoutParams = this.dialog?.window?.attributes as WindowManager.LayoutParams
+        layoutParams.y = (Resources.getSystem().displayMetrics.density * 20).toInt()
+        this.dialog?.window?.attributes = layoutParams
     }
 
     private fun weeksToCode(weeks: List<Boolean>): String {
@@ -164,5 +175,4 @@ class SettingAlarmDialog : DialogFragment() {
 
         return code
     }
-
 }

@@ -4,40 +4,35 @@ import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.naver.maps.geometry.LatLng
 import com.tulmunchi.walkingdogapp.core.location.LocationProvider
-import com.tulmunchi.walkingdogapp.domain.model.Alarm
 import com.tulmunchi.walkingdogapp.domain.model.Dog
 import com.tulmunchi.walkingdogapp.domain.model.User
 import com.tulmunchi.walkingdogapp.domain.model.WalkRecord
 import com.tulmunchi.walkingdogapp.domain.model.WalkStats
+import com.tulmunchi.walkingdogapp.domain.model.WeatherResponse
 import com.tulmunchi.walkingdogapp.domain.usecase.LoadInitialDataUseCase
-import com.tulmunchi.walkingdogapp.domain.usecase.alarm.AddAlarmUseCase
-import com.tulmunchi.walkingdogapp.domain.usecase.alarm.DeleteAlarmUseCase
-import com.tulmunchi.walkingdogapp.domain.usecase.alarm.GetAllAlarmsUseCase
-import com.tulmunchi.walkingdogapp.domain.usecase.alarm.ToggleAlarmUseCase
-import com.tulmunchi.walkingdogapp.domain.usecase.user.DeleteAccountUseCase
-import com.tulmunchi.walkingdogapp.presentation.model.GalleryImgInfo
+import com.tulmunchi.walkingdogapp.domain.usecase.weather.GetWeatherForecastUseCase
+import com.tulmunchi.walkingdogapp.presentation.model.WeatherInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val loadInitialDataUseCase: LoadInitialDataUseCase,
-    private val getAllAlarmsUseCase: GetAllAlarmsUseCase,
-    private val addAlarmUseCase: AddAlarmUseCase,
-    private val deleteAlarmUseCase: DeleteAlarmUseCase,
-    private val toggleAlarmUseCase: ToggleAlarmUseCase,
-    private val deleteAccountUseCase: DeleteAccountUseCase,
+    private val getWeatherForecastUseCase: GetWeatherForecastUseCase,
     private val locationProvider: LocationProvider
 ) : BaseViewModel() {
 
@@ -48,7 +43,6 @@ class MainViewModel @Inject constructor(
     // Dogs data
     private val _dogs = MutableLiveData<List<Dog>>()
     val dogs: LiveData<List<Dog>> get() = _dogs
-
 
     private val _dogNames = MutableLiveData<List<String>>()
     val dogNames: LiveData<List<String>> get() = _dogNames
@@ -67,10 +61,6 @@ class MainViewModel @Inject constructor(
     private val _collections = MutableLiveData<Map<String, Boolean>>()
     val collections: LiveData<Map<String, Boolean>> get() = _collections
 
-    // Alarms
-    private val _alarms = MutableLiveData<List<Alarm>>()
-    val alarms: LiveData<List<Alarm>> get() = _alarms
-
     // Location
     private val _currentCoord = MutableLiveData<LatLng>()
     val currentCoord: LiveData<LatLng> get() = _currentCoord
@@ -82,9 +72,8 @@ class MainViewModel @Inject constructor(
     private val _dataLoadSuccess = MutableLiveData<Boolean>()
     val dataLoadSuccess: LiveData<Boolean> get() = _dataLoadSuccess
 
-    // Album images
-    private val _albumImgs = MutableLiveData<List<GalleryImgInfo>>()
-    val albumImgs: LiveData<List<GalleryImgInfo>> get() = _albumImgs
+    private val _weatherInfo = MutableLiveData<WeatherInfo>()
+    val weatherInfo: LiveData<WeatherInfo> get() = _weatherInfo
 
     /**
      * Load all initial user data
@@ -102,7 +91,6 @@ class MainViewModel @Inject constructor(
                     _totalWalkStats.value = initialData.totalWalkStats
                     _walkHistory.value = initialData.walkHistory
                     _collections.value = initialData.collections
-                    _alarms.value = initialData.alarms
                     _dataLoadSuccess.value = true
                     _isLoading.value = false
                 },
@@ -111,17 +99,7 @@ class MainViewModel @Inject constructor(
                     _isLoading.value = false
                 }
             )
-
-            // Load location
-            getLastLocation()
         }
-    }
-
-    /**
-     * Refresh only dog images
-     */
-    fun refreshDogImages() {
-        loadUserData(loadImages = true)
     }
 
     fun updateUser(updatedUser: User) {
@@ -176,93 +154,6 @@ class MainViewModel @Inject constructor(
     }
 
     /**
-     * Get all alarms
-     */
-    fun loadAlarms() {
-        viewModelScope.launch {
-            getAllAlarmsUseCase().handle(
-                onSuccess = { alarms ->
-                    _alarms.value = alarms
-                }
-            )
-        }
-    }
-
-    /**
-     * Add new alarm
-     */
-    fun addAlarm(alarm: Alarm) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            addAlarmUseCase(alarm).handle(
-                onSuccess = {
-                    loadAlarms()
-                    _isLoading.value = false
-                }
-            )
-        }
-    }
-
-    /**
-     * Delete alarm
-     */
-    fun deleteAlarm(alarmCode: Int) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            deleteAlarmUseCase(alarmCode).handle(
-                onSuccess = {
-                    loadAlarms()
-                    _isLoading.value = false
-                }
-            )
-        }
-    }
-
-    /**
-     * Update alarm (delete old and add new)
-     */
-    fun updateAlarm(oldAlarmCode: Int, newAlarm: Alarm) {
-        viewModelScope.launch {
-            _isLoading.value = true
-
-            try {
-                // 순차적으로 실행: 삭제 → 추가
-                deleteAlarmUseCase(oldAlarmCode).getOrThrow()
-                addAlarmUseCase(newAlarm).getOrThrow()
-                loadAlarms()
-            } catch (e: Exception) {
-                _error.postValue("알람 수정에 실패했습니다")
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
-
-    /**
-     * Toggle alarm on/off
-     */
-    fun toggleAlarm(alarmCode: Int, isEnabled: Boolean) {
-        viewModelScope.launch {
-            toggleAlarmUseCase(alarmCode, isEnabled).handle(
-                onSuccess = {
-                    loadAlarms()
-                }
-            )
-        }
-    }
-
-    /**
-     * Delete user account
-     */
-    suspend fun deleteAccount(): Boolean {
-        return try {
-            deleteAccountUseCase().isSuccess
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    /**
      * Get current location
      */
     fun getLastLocation() {
@@ -270,7 +161,51 @@ class MainViewModel @Inject constructor(
             locationProvider.getLastLocation()?.let { latLng ->
                 _currentCoord.value = latLng
                 getCurrentAddress(latLng)
+                getWeatherForecast(latLng)
             }
+        }
+    }
+
+    suspend fun getWeatherForecast(latLng: LatLng) {
+        val cal = Calendar.getInstance()
+        val cur = Locale.getDefault()
+
+        cal.add(Calendar.MINUTE, -45)
+
+        val baseDate = SimpleDateFormat("yyyyMMdd", cur).format(cal.time)
+        val hour = SimpleDateFormat("HH00", cur).format(cal.time)
+        getWeatherForecastUseCase(
+            baseDate = baseDate,
+            baseTime = hour,
+            lat = latLng.latitude,
+            lon = latLng.longitude
+        ).handle(
+            onSuccess = {
+                _weatherInfo.postValue(getWeatherIcon(it))
+            },
+            onError = {
+                _error.postValue(it.message)
+            }
+        )
+    }
+
+    private fun getWeatherIcon(weatherResponse: WeatherResponse): WeatherInfo {
+        val sky = weatherResponse.sky.toInt()
+        val pty = weatherResponse.pty.toInt()
+
+        return when (pty) {
+            0 -> when (sky) {
+                1 -> WeatherInfo("맑음", "☀️")
+                2 -> WeatherInfo("구름조금", "🌤️")
+                3 -> WeatherInfo("구름많음", "⛅")
+                4 -> WeatherInfo("흐림", "☁️")
+                else -> WeatherInfo("맑음", "☀️")
+            }
+            1 -> WeatherInfo("비", "🌧️")
+            2 -> WeatherInfo("비/눈", "🌨️")
+            3 -> WeatherInfo("눈/비", "🌨️")
+            4 -> WeatherInfo("눈", "❄️")
+            else -> WeatherInfo("맑음", "☀️")
         }
     }
 
@@ -279,13 +214,6 @@ class MainViewModel @Inject constructor(
      */
     fun isSuccessGetData(): Boolean {
         return _dataLoadSuccess.value == true
-    }
-
-    /**
-     * Save album images
-     */
-    fun saveAlbumImgs(images: List<GalleryImgInfo>) {
-        _albumImgs.value = images
     }
 
     /**

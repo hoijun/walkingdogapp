@@ -15,11 +15,12 @@ plugins {
 val properties = Properties().apply {
     load(FileInputStream("${rootDir}/local.properties"))
 }
-val navermapapiKey = properties["navermap_api_key"] ?: ""
-val kakaoapikey = properties["kakaologin_api_key"] ?: ""
-val kakaoredirecturi = properties["kakaologin_redirect_uri"] ?: ""
-val naverclientid = properties["naverlogin_clientid"] ?: ""
-val naverclientsecret = properties["naverlogin_clientsecret"] ?: ""
+val naverMapApiKey = properties["navermap_api_key"] ?: ""
+val kakaoApiKey = properties["kakaologin_api_key"] ?: ""
+val kakaoRedirectUri = properties["kakaologin_redirect_uri"] ?: ""
+val naverClientId = properties["naverlogin_clientid"] ?: ""
+val naverClientSecret = properties["naverlogin_clientsecret"] ?: ""
+val weatherApiKey = properties["weather_api_key"] ?: ""
 val keystoreFile = properties["keystore.file"] as String?
 val keystorePassword = properties["keystore.password"] as String?
 val keystoreKeyAlias = properties["keystore.key.alias"] as String?
@@ -44,22 +45,23 @@ android {
     defaultConfig {
         manifestPlaceholders += mapOf()
         applicationId = "com.tulmunchi.walkingdogapp"
-        minSdk = 26
+        minSdk = 27
         targetSdk = 35
-        versionCode = 11
-        versionName = "2.0"
+        versionCode = 12
+        versionName = "2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
 
-        manifestPlaceholders["Kakao_Redirect_URI"] = kakaoredirecturi as String
-        manifestPlaceholders["Kakao_API_KEY"]  = kakaoapikey as String
-        buildConfigField("String", "NaverMap_API_KEY", navermapapiKey as String)
-        buildConfigField("String", "Kakao_API_KEY", kakaoapikey)
-        buildConfigField("String", "Naver_ClientId", naverclientid as String)
-        buildConfigField("String", "Naver_ClientSecret", naverclientsecret as String)
+        manifestPlaceholders["Kakao_Redirect_URI"] = kakaoRedirectUri as String
+        manifestPlaceholders["Kakao_API_KEY"]  = kakaoApiKey as String
+        buildConfigField("String", "NaverMap_API_KEY", naverMapApiKey as String)
+        buildConfigField("String", "Kakao_API_KEY", kakaoApiKey)
+        buildConfigField("String", "Naver_ClientId", naverClientId as String)
+        buildConfigField("String", "Naver_ClientSecret", naverClientSecret as String)
+        buildConfigField("String", "Weather_API_KEY", weatherApiKey as String)
 
         if (keystoreFile != null) {
             signingConfig = signingConfigs.getByName("release")
@@ -70,9 +72,12 @@ android {
         debug {
             extra.set("enableCrashlytics", false)
             extra.set("alwaysUpdateBuildId", false)
+            // Debug 빌드 속도 최적화
+            isMinifyEnabled = false
+            isShrinkResources = false
+            isDebuggable = true
             splits {
                 abi.isEnable = false
-                density.isEnable = false
             }
         }
 
@@ -107,10 +112,17 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // 증분 컴파일 최적화
+        isCoreLibraryDesugaringEnabled = false
     }
 
     kotlinOptions {
         jvmTarget = "17"
+        // Kotlin 컴파일 최적화
+        freeCompilerArgs += listOf(
+            "-opt-in=kotlin.RequiresOptIn",
+            "-Xjvm-default=all"
+        )
     }
 
     packaging {
@@ -133,6 +145,12 @@ android {
         abi {
             enableSplit = true
         }
+    }
+
+    // Lint 검사 최적화 (빌드 속도 향상)
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
     }
 }
 
@@ -169,12 +187,16 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage-ktx")
 
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
     // implementation("androidx.legacy:legacy-support-core-utils:1.0.0")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.browser:browser:1.8.0")
     implementation("com.google.code.gson:gson:2.10.1")
 
-    implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.core:core-splashscreen:1.2.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
