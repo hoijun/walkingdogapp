@@ -40,6 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 @AndroidEntryPoint
 class AlbumMapFragment : Fragment(), OnMapReadyCallback {
@@ -101,7 +102,7 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentAlbumMapBinding.inflate(inflater, container, false)
         context?.let { ctx ->
@@ -137,9 +138,9 @@ class AlbumMapFragment : Fragment(), OnMapReadyCallback {
             // AlbumImageData를 AlbumMapImgInfo로 변환
             val imgInfosWithView = images.map { data ->
                 AlbumMapImgInfo(
-                    uri = Uri.parse(data.uriString),
+                    uri = data.uriString.toUri(),
                     latLng = LatLng(data.latitude, data.longitude),
-                    imgView = getMarkerImageView(Uri.parse(data.uriString))
+                    imgView = getMarkerImageView(data.uriString.toUri())
                 )
             }
 

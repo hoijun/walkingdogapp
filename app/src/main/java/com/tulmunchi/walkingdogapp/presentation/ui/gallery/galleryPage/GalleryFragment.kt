@@ -1,7 +1,6 @@
 package com.tulmunchi.walkingdogapp.presentation.ui.gallery.galleryPage
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.net.Uri
 import android.os.Build
@@ -16,7 +15,7 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import com.tulmunchi.walkingdogapp.common.GridSpacingItemDecoration
@@ -24,26 +23,20 @@ import com.tulmunchi.walkingdogapp.core.permission.PermissionHandler
 import com.tulmunchi.walkingdogapp.databinding.FragmentGalleryBinding
 import com.tulmunchi.walkingdogapp.presentation.core.UiUtils
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.SelectDialog
-import com.tulmunchi.walkingdogapp.presentation.model.GalleryImgInfo
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
-import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
 import com.tulmunchi.walkingdogapp.presentation.util.ImageUtils
 import com.tulmunchi.walkingdogapp.presentation.util.setOnSingleClickListener
-import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
+import com.tulmunchi.walkingdogapp.presentation.viewmodel.GalleryViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.text.SimpleDateFormat
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class GalleryFragment : Fragment() {
     private var _binding: FragmentGalleryBinding? = null
     private val binding get() = _binding!!
-    private val mainViewModel: MainViewModel by activityViewModels()
-    private val imgInfos = mutableListOf<GalleryImgInfo>()
-    private val removeImgList = mutableListOf<Uri>()
+    private val galleryViewModel: GalleryViewModel by activityViewModels()
     private var itemDecoration: GridSpacingItemDecoration? = null
-    private var selectMode = MutableLiveData(false)
 
     @Inject
     lateinit var permissionHandler: PermissionHandler
@@ -70,7 +63,7 @@ class GalleryFragment : Fragment() {
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if(selectMode.value == true) {
+            if (galleryViewModel.isSelectMode()) {
                 unSelectMode()
             } else {
                 goMyPage()
@@ -109,8 +102,11 @@ class GalleryFragment : Fragment() {
         }
 
         binding.apply {
-            isSelectMode = selectMode
             lifecycleOwner = viewLifecycleOwner
+
+            galleryViewModel.selectMode.observe(viewLifecycleOwner) { isSelect ->
+                isSelectMode = isSelect
+            }
 
             btnBack.setOnClickListener {
                 goMyPage()
@@ -120,6 +116,14 @@ class GalleryFragment : Fragment() {
                 handleImageRemoval()
             }
         }
+
+        // 이미지 로드 완료 시 RecyclerView 설정
+        galleryViewModel.imgInfos.observe(viewLifecycleOwner) { images ->
+            if (images.isNotEmpty()) {
+                setRecyclerView()
+            }
+        }
+
         return binding.root
     }
 
@@ -154,17 +158,18 @@ class GalleryFragment : Fragment() {
 
     private fun handleImageRemoval() {
         try {
-            if (removeImgList.isEmpty()) {
+            if (galleryViewModel.isRemoveListEmpty()) {
                 unSelectMode()
                 return
             }
 
             val contentResolver = activity?.contentResolver ?: return
+            val removeList = galleryViewModel.getRemoveList()
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 val intentSender = MediaStore.createDeleteRequest(
                     contentResolver,
-                    removeImgList
+                    removeList
                 ).intentSender
                 launcher.launch(IntentSenderRequest.Builder(intentSender).build())
             } else {
@@ -180,9 +185,10 @@ class GalleryFragment : Fragment() {
 
     private fun showDeleteConfirmDialog() {
         val contentResolver = activity?.contentResolver ?: return
+        val removeList = galleryViewModel.getRemoveList()
         val dialog = SelectDialog.newInstance(title = "사진을 삭제하시겠습니까?", showNegativeButton = true)
         dialog.onConfirmListener = SelectDialog.OnConfirmListener {
-            for (uri in removeImgList) {
+            for (uri in removeList) {
                 contentResolver.delete(uri, null, null)
             }
             updateRecyclerView()
@@ -192,8 +198,7 @@ class GalleryFragment : Fragment() {
     }
 
     private fun setGallery() {
-        getAlbumImage()
-        setRecyclerView()
+        galleryViewModel.loadImages()
     }
 
     private fun setRecyclerView() {
@@ -203,120 +208,29 @@ class GalleryFragment : Fragment() {
             galleryRecyclerview.itemAnimator = itemAnimator
 
             val imgNum = arguments?.getInt("currentImgIndex", 0) ?: 0
-            val adapter = GalleryItemListAdapter(imgInfos)
+            val imgInfos = galleryViewModel.getImages()
+            val adapter = GalleryItemListAdapter(imgInfos.toMutableList())
             adapter.itemClickListener = object : GalleryItemListAdapter.OnItemClickListener {
                 override fun onItemClick(imgNum: Int) {
-                    if (selectMode.value == false) {
+                    if (!galleryViewModel.isSelectMode()) {
                         navigationManager.navigateTo(NavigationState.WithoutBottomNav.DetailPicture(imgNum))
                     }
                 }
 
                 override fun onItemLongClick(imgUri: Uri) {
-                    selectMode.value = true
-                    if (removeImgList.contains(imgUri)) {
-                        removeImgList.remove(imgUri)
-                    } else {
-                        removeImgList.add(imgUri)
-                    }
+                    galleryViewModel.enterSelectMode()
+                    galleryViewModel.toggleImageSelection(imgUri)
                 }
 
                 override fun onItemClickInSelectMode(imgUri: Uri) {
-                    if (removeImgList.contains(imgUri)) {
-                        removeImgList.remove(imgUri)
-                    } else {
-                        removeImgList.add(imgUri)
-                    }
+                    galleryViewModel.toggleImageSelection(imgUri)
                 }
-
             }
             context?.let { ctx ->
                 galleryRecyclerview.layoutManager = GridLayoutManager(ctx, 3)
             }
             galleryRecyclerview.scrollToPosition(imgNum)
             galleryRecyclerview.adapter = adapter
-        }
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    private fun getAlbumImage() {
-        try {
-            val contentResolver = activity?.contentResolver ?: return
-
-            val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            val projection = arrayOf(
-                MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.TITLE,
-                MediaStore.Images.Media.DATE_TAKEN,
-                MediaStore.Images.Media.WIDTH,
-                MediaStore.Images.Media.HEIGHT,
-                MediaStore.Images.Media.ORIENTATION
-            )
-
-            val selection: String
-            val selectionArgs: Array<String>
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ? AND ${MediaStore.Images.Media.IS_PENDING} = 0"
-                selectionArgs = arrayOf("털뭉치", "%munchi_%")
-            } else {
-                selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ?"
-                selectionArgs = arrayOf("털뭉치", "%munchi_%")
-            }
-
-            val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} ASC"
-            val cursor = contentResolver.query(
-                uri,
-                projection,
-                selection,
-                selectionArgs,
-                sortOrder
-            )
-            cursor?.use {
-                val columnIndexId: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-                val columnIndexTitle: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE)
-                val columnIndexDate: Int =
-                    it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_TAKEN)
-                val columnIndexWidth: Int = it.getColumnIndexOrThrow(MediaStore.Images.Media.WIDTH)
-                val columnIndexHeight: Int =
-                    it.getColumnIndexOrThrow(MediaStore.Images.Media.HEIGHT)
-                val columnIndexOrientation: Int =
-                    it.getColumnIndexOrThrow(MediaStore.Images.Media.ORIENTATION)
-
-                while (it.moveToNext()) {
-                    val imagePath: String = it.getString(columnIndexId)
-                    val imageTitle: String = it.getString(columnIndexTitle)
-                    val imageDate: Long = it.getLong(columnIndexDate)
-                    val imageWidth: Int = it.getInt(columnIndexWidth)
-                    val imageHeight: Int = it.getInt(columnIndexHeight)
-                    val contentUri = Uri.withAppendedPath(uri, imagePath)
-                    val orientation = it.getInt(columnIndexOrientation)
-
-                    val (finalWidth, finalHeight) = when (orientation) {
-                        90, 270 -> Pair(imageHeight, imageWidth)
-                        else -> Pair(imageWidth, imageHeight)
-                    }
-
-                    imgInfos.add(
-                        GalleryImgInfo(
-                            contentUri,
-                            imageTitle,
-                            DateUtils.convertLongToTime(
-                                SimpleDateFormat("yyyy년 MM월 dd일 HH:mm"),
-                                imageDate / 1000L
-                            ),
-                            finalWidth,
-                            finalHeight
-                        )
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            context?.let { ctx ->
-                Toast.makeText(ctx, "이미지를 불러오는 중 오류가 발생했습니다", Toast.LENGTH_SHORT)
-                    .show()
-            }
-        } finally {
-            mainViewModel.saveAlbumImgs(imgInfos)
         }
     }
 
@@ -330,9 +244,8 @@ class GalleryFragment : Fragment() {
     }
 
     private fun unSelectMode() {
-        selectMode.value = false
-        removeImgList.clear()
-        (binding.galleryRecyclerview.adapter as GalleryItemListAdapter).unselectMode()
+        galleryViewModel.exitSelectMode()
+        (binding.galleryRecyclerview.adapter as? GalleryItemListAdapter)?.unselectMode()
     }
 
     private fun goMyPage() {
@@ -340,16 +253,20 @@ class GalleryFragment : Fragment() {
     }
 
     private fun updateRecyclerView() {
-        val iterator = imgInfos.iterator()
-        while (iterator.hasNext()) {
-            val img = iterator.next()
+        val imgInfos = galleryViewModel.getImages().toMutableList()
+        val indicesToRemove = mutableListOf<Int>()
+
+        imgInfos.forEachIndexed { index, img ->
             activity?.let { act ->
                 if (!ImageUtils.isImageExists(img.uri, act)) {
-                    val index = imgInfos.indexOf(img)
-                    iterator.remove()
-                    (binding.galleryRecyclerview.adapter as? GalleryItemListAdapter)?.notifyItemRemoved(index)
+                    indicesToRemove.add(index)
                 }
             }
+        }
+
+        indicesToRemove.sortedDescending().forEach { index ->
+            galleryViewModel.removeImageAt(index)
+            (binding.galleryRecyclerview.adapter as? GalleryItemListAdapter)?.notifyItemRemoved(index)
         }
     }
 }

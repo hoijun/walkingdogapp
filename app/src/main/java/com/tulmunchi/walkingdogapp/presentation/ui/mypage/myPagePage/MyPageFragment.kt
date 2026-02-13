@@ -3,7 +3,6 @@ package com.tulmunchi.walkingdogapp.presentation.ui.mypage.myPagePage
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +24,7 @@ import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
+import com.tulmunchi.walkingdogapp.presentation.viewmodel.MyPageViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -34,6 +34,7 @@ class MyPageFragment : Fragment() {
     private var _binding: FragmentMyPageBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val myPageViewModel: MyPageViewModel by activityViewModels()
 
     @Inject
     lateinit var networkChecker: NetworkChecker
@@ -57,7 +58,7 @@ class MyPageFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val allGranted = permissions.values.all { it }
             if (allGranted) {
-                binding.countImg = getAlbumImageCount()
+                myPageViewModel.loadImageCount()
             }
         }
 
@@ -177,6 +178,12 @@ class MyPageFragment : Fragment() {
                 )
             }
         }
+
+        // ViewModel 데이터 관찰
+        myPageViewModel.imageCount.observe(viewLifecycleOwner) { count ->
+            binding.countImg = count
+        }
+
         return binding.root
     }
 
@@ -184,7 +191,7 @@ class MyPageFragment : Fragment() {
         super.onStart()
         context?.let {
             if (checkPermission(storagePermission)) {
-                binding.countImg = getAlbumImageCount()
+                myPageViewModel.loadImageCount()
             }
         }
     }
@@ -200,47 +207,6 @@ class MyPageFragment : Fragment() {
             false
         } else {
             true
-        }
-    }
-
-    private fun getAlbumImageCount(): Int {
-        val contentResolver = activity?.contentResolver ?: return 0
-
-        try {
-            var count = 0
-            val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            val projection = arrayOf(MediaStore.Images.Media._ID)
-            val selection: String
-            val selectionArgs: Array<String>
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ? AND ${MediaStore.Images.Media.IS_PENDING} = 0"
-                selectionArgs = arrayOf("털뭉치", "%munchi_%")
-            } else {
-                selection = "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ? AND ${MediaStore.Images.Media.DISPLAY_NAME} LIKE ?"
-                selectionArgs = arrayOf("털뭉치", "%munchi_%")
-            }
-
-            val sortOrder = "${MediaStore.Images.Media.DATE_TAKEN} DESC"
-            val cursor = contentResolver.query(
-                uri,
-                projection,
-                selection,
-                selectionArgs,
-                sortOrder
-            )
-            cursor?.use {
-                while (it.moveToNext()) {
-                    count++
-                }
-            }
-            return count
-        } catch (e: Exception) {
-            context?.let { ctx ->
-                Toast.makeText(ctx, "이미지를 불러오는 중 오류가 발생했습니다", Toast.LENGTH_SHORT)
-                    .show()
-            }
-            return 0
         }
     }
 

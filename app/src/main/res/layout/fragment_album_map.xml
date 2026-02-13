@@ -8,6 +8,10 @@
         <import type="android.view.View" />
 
         <variable
+            name="albumViewModel"
+            type="com.tulmunchi.walkingdogapp.presentation.viewmodel.AlbumMapViewModel" />
+
+        <variable
             name="isStoragePermitted"
             type="Boolean" />
 
@@ -23,7 +27,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".presentation.ui.album.AlbumMapFragment">
+        tools:context=".presentation.ui.albummap.AlbumMapFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/album_appBar"

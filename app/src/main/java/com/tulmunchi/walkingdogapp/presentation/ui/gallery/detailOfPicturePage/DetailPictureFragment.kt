@@ -1,6 +1,7 @@
 package com.tulmunchi.walkingdogapp.presentation.ui.gallery.detailOfPicturePage
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ import com.tulmunchi.walkingdogapp.presentation.ui.main.MainActivity
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationManager
 import com.tulmunchi.walkingdogapp.presentation.ui.main.NavigationState
 import com.tulmunchi.walkingdogapp.presentation.util.ImageUtils
+import com.tulmunchi.walkingdogapp.presentation.viewmodel.GalleryViewModel
 import com.tulmunchi.walkingdogapp.presentation.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +33,7 @@ import javax.inject.Inject
 class DetailPictureFragment : Fragment() {
     private var _binding: FragmentDetailPictureBinding? = null
     private val binding get() = _binding!!
-    private val mainViewModel: MainViewModel by activityViewModels()
+    private val galleryViewModel: GalleryViewModel by activityViewModels()
     private var imgList = mutableListOf<GalleryImgInfo>()
     private var bottomSheetFragment: BottomSheetDialogFragment? = null
 
@@ -51,7 +53,7 @@ class DetailPictureFragment : Fragment() {
         _binding = FragmentDetailPictureBinding.inflate(inflater, container, false)
         val imgNum = arguments?.getInt("select", 0) ?: 0
         binding.apply {
-            imgList = (mainViewModel.albumImgs.value?: mutableListOf()).toMutableList()
+            imgList = (galleryViewModel.albumImgs.value?: mutableListOf()).toMutableList()
             val adapter = DetailPictureItemListAdapter(imgList)
             adapter.onClickItemListener = DetailPictureItemListAdapter.OnClickItemListener { imgInfo ->
                 bottomSheetFragment = GalleryBottomSheetFragment().apply {

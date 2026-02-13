@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
             name="isSelectMode"
-            type="androidx.lifecycle.MutableLiveData&lt;Boolean>" />
+            type="Boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -2,9 +2,7 @@ package com.tulmunchi.walkingdogapp.presentation.ui.main
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -18,7 +16,7 @@ import com.tulmunchi.walkingdogapp.databinding.ActivityMainBinding
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialog
 import com.tulmunchi.walkingdogapp.presentation.core.dialog.LoadingDialogFactory
 import com.tulmunchi.walkingdogapp.presentation.ui.alarm.SettingAlarmFragment
-import com.tulmunchi.walkingdogapp.presentation.ui.album.AlbumMapFragment
+import com.tulmunchi.walkingdogapp.presentation.ui.albummap.AlbumMapFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.collection.CollectionFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.gallery.detailOfPicturePage.DetailPictureFragment
 import com.tulmunchi.walkingdogapp.presentation.ui.gallery.galleryPage.GalleryFragment
