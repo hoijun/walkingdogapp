@@ -3,15 +3,15 @@ package com.tulmunchi.walkingdogapp.presentation.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.tulmunchi.walkingdogapp.data.repository.AlbumRepositoryImpl
 import com.tulmunchi.walkingdogapp.domain.model.AlbumImageData
+import com.tulmunchi.walkingdogapp.domain.repository.AlbumRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AlbumMapViewModel @Inject constructor(
-    private val albumRepository: AlbumRepositoryImpl
+    private val albumRepository: AlbumRepository
 ) : BaseViewModel() {
 
     /**

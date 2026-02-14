@@ -1,21 +1,21 @@
 package com.tulmunchi.walkingdogapp.presentation.viewmodel
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.tulmunchi.walkingdogapp.data.repository.AlbumRepositoryImpl
+import com.tulmunchi.walkingdogapp.domain.repository.AlbumRepository
 import com.tulmunchi.walkingdogapp.presentation.model.GalleryImgInfo
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import javax.inject.Inject
-import androidx.core.net.toUri
 
 @HiltViewModel
 class GalleryViewModel @Inject constructor(
-    private val albumRepository: AlbumRepositoryImpl,
+    private val albumRepository: AlbumRepository,
 ) : BaseViewModel() {
 
     private val _imgInfos = MutableLiveData<MutableList<GalleryImgInfo>>(mutableListOf())

@@ -20,7 +20,16 @@ val kakaoApiKey = properties["kakaologin_api_key"] ?: ""
 val kakaoRedirectUri = properties["kakaologin_redirect_uri"] ?: ""
 val naverClientId = properties["naverlogin_clientid"] ?: ""
 val naverClientSecret = properties["naverlogin_clientsecret"] ?: ""
-val weatherApiKey = properties["weather_api_key"] ?: ""
+val weatherApiKey = properties["weather_api_key"]?.toString()
+    ?.takeIf { it.isNotBlank() }
+    ?.let { value ->
+        if (value.startsWith("\"") && value.endsWith("\"")) {
+            value
+        } else {
+            "\"$value\""
+        }
+    }
+    ?: "\"\""
 val keystoreFile = properties["keystore.file"] as String?
 val keystorePassword = properties["keystore.password"] as String?
 val keystoreKeyAlias = properties["keystore.key.alias"] as String?
@@ -214,5 +223,10 @@ dependencies {
     androidTestImplementation("androidx.test:monitor:1.7.2")
     androidTestImplementation("androidx.test.ext:junit-ktx:1.2.1")
     androidTestImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.0")
+    testImplementation("org.mockito:mockito-core:5.14.2")
+    testImplementation("org.mockito:mockito-inline:5.2.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
     testImplementation(kotlin("test"))
 }

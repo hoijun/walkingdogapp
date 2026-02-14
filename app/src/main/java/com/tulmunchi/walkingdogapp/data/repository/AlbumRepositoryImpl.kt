@@ -9,6 +9,7 @@ import androidx.exifinterface.media.ExifInterface
 import com.naver.maps.geometry.LatLng
 import com.tulmunchi.walkingdogapp.domain.model.AlbumImageData
 import com.tulmunchi.walkingdogapp.domain.model.GalleryImageData
+import com.tulmunchi.walkingdogapp.domain.repository.AlbumRepository
 import com.tulmunchi.walkingdogapp.presentation.util.DateUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -20,13 +21,13 @@ import javax.inject.Singleton
 @Singleton
 class AlbumRepositoryImpl @Inject constructor(
     @param:ApplicationContext private val context: Context
-) {
+) : AlbumRepository {
 
     /**
      * 모든 갤러리 이미지를 조회합니다.
      * @return 모든 이미지 정보 리스트
      */
-    suspend fun getAllImages(): Result<List<GalleryImageData>> = withContext(Dispatchers.IO) {
+    override suspend fun getAllImages(): Result<List<GalleryImageData>> = withContext(Dispatchers.IO) {
         try {
             val images = mutableListOf<GalleryImageData>()
             val contentResolver = context.contentResolver
@@ -92,7 +93,7 @@ class AlbumRepositoryImpl @Inject constructor(
      * @param date 조회할 날짜 (yyyy-MM-dd 형식)
      * @return GPS 좌표가 포함된 이미지 리스트 (최대 20개)
      */
-    suspend fun getImagesByDate(date: String): Result<List<AlbumImageData>> = withContext(Dispatchers.IO) {
+    override suspend fun getImagesByDate(date: String): Result<List<AlbumImageData>> = withContext(Dispatchers.IO) {
         try {
             val images = mutableListOf<AlbumImageData>()
             val contentResolver = context.contentResolver
@@ -151,7 +152,7 @@ class AlbumRepositoryImpl @Inject constructor(
      * 앨범 이미지 개수를 조회합니다.
      * @return 이미지 개수
      */
-    suspend fun getImageCount(): Result<Int> = withContext(Dispatchers.IO) {
+    override suspend fun getImageCount(): Result<Int> = withContext(Dispatchers.IO) {
         try {
             var count = 0
             val contentResolver = context.contentResolver

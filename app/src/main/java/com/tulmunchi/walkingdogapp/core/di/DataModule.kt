@@ -6,6 +6,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.tulmunchi.walkingdogapp.BuildConfig
 import com.tulmunchi.walkingdogapp.data.repository.AlarmRepositoryImpl
+import com.tulmunchi.walkingdogapp.data.repository.AlbumRepositoryImpl
 import com.tulmunchi.walkingdogapp.data.service.WeatherApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -34,6 +35,7 @@ import com.tulmunchi.walkingdogapp.data.source.remote.FirebaseWalkDataSourceImpl
 import com.tulmunchi.walkingdogapp.data.source.remote.WeatherDataSource
 import com.tulmunchi.walkingdogapp.data.source.remote.WeatherDataSourceImpl
 import com.tulmunchi.walkingdogapp.domain.repository.AlarmRepository
+import com.tulmunchi.walkingdogapp.domain.repository.AlbumRepository
 import com.tulmunchi.walkingdogapp.domain.repository.CollectionRepository
 import com.tulmunchi.walkingdogapp.domain.repository.DogRepository
 import com.tulmunchi.walkingdogapp.domain.repository.UserRepository
@@ -123,6 +125,12 @@ abstract class DataModule {
     abstract fun bindAlarmRepository(
         impl: AlarmRepositoryImpl
     ): AlarmRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAlbumRepository(
+        impl: AlbumRepositoryImpl
+    ): AlbumRepository
 
     @Binds
     @Singleton
