@@ -141,3 +141,5 @@ PROJECT_INFO.md
 /.idea
 /app/.idea
 /.kotlin/sessions
+docs/branch-protection.md
+docs/playstore-auto-deploy.md

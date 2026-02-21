@@ -1,0 +1,14 @@
+# Default owner
+* @hoijun
+
+# CI/CD
+/.github/workflows/* @hoijun
+
+# Build scripts
+/build.gradle.kts @hoijun
+/settings.gradle.kts @hoijun
+/gradle.properties @hoijun
+/app/build.gradle.kts @hoijun
+
+# Application code
+/app/** @hoijun

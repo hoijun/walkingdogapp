@@ -1,0 +1,33 @@
+default_platform(:android)
+
+platform :android do
+  desc "Upload prebuilt release bundle to Google Play Internal track"
+  lane :upload_internal do
+    aab_path = ENV.fetch("AAB_PATH", "app/build/outputs/bundle/release/app-release.aab")
+    mapping_path = ENV.fetch("MAPPING_PATH", "app/build/outputs/mapping/release/mapping.txt")
+    json_key_path = ENV.fetch("PLAY_SERVICE_ACCOUNT_JSON_PATH")
+
+    upload_to_play_store(
+      json_key: json_key_path,
+      package_name: "com.tulmunchi.walkingdogapp",
+      track: "internal",
+      aab: aab_path,
+      mapping: mapping_path
+    )
+  end
+
+  desc "Upload prebuilt release bundle to Google Play Production track"
+  lane :upload_production do
+    aab_path = ENV.fetch("AAB_PATH", "app/build/outputs/bundle/release/app-release.aab")
+    mapping_path = ENV.fetch("MAPPING_PATH", "app/build/outputs/mapping/release/mapping.txt")
+    json_key_path = ENV.fetch("PLAY_SERVICE_ACCOUNT_JSON_PATH")
+
+    upload_to_play_store(
+      json_key: json_key_path,
+      package_name: "com.tulmunchi.walkingdogapp",
+      track: "production",
+      aab: aab_path,
+      mapping: mapping_path
+    )
+  end
+end

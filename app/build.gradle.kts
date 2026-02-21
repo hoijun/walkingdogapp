@@ -1,9 +1,10 @@
-import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlinx.kover")
+    id("io.gitlab.arturbosch.detekt")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("kotlin-parcelize")
@@ -12,38 +13,56 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
-val properties = Properties().apply {
-    load(FileInputStream("${rootDir}/local.properties"))
+fun Properties.readConfig(propertyKey: String, envKey: String): String? {
+    return getProperty(propertyKey)
+        ?.trim()
+        ?.takeIf { it.isNotBlank() }
+        ?.removeSurrounding("\"")
+        ?: System.getenv(envKey)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
 }
-val naverMapApiKey = properties["navermap_api_key"] ?: ""
-val kakaoApiKey = properties["kakaologin_api_key"] ?: ""
-val kakaoRedirectUri = properties["kakaologin_redirect_uri"] ?: ""
-val naverClientId = properties["naverlogin_clientid"] ?: ""
-val naverClientSecret = properties["naverlogin_clientsecret"] ?: ""
-val weatherApiKey = properties["weather_api_key"]?.toString()
-    ?.takeIf { it.isNotBlank() }
-    ?.let { value ->
-        if (value.startsWith("\"") && value.endsWith("\"")) {
-            value
-        } else {
-            "\"$value\""
-        }
+
+fun String.toBuildConfigStringLiteral(): String {
+    val escaped = replace("\\", "\\\\").replace("\"", "\\\"")
+    return "\"$escaped\""
+}
+
+val properties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use(::load)
     }
-    ?: "\"\""
-val keystoreFile = properties["keystore.file"] as String?
-val keystorePassword = properties["keystore.password"] as String?
-val keystoreKeyAlias = properties["keystore.key.alias"] as String?
-val keystoreKeyPassword = properties["keystore.key.password"] as String?
+}
+
+val naverMapApiKey = properties.readConfig("navermap_api_key", "NAVERMAP_API_KEY").orEmpty()
+val kakaoApiKey = properties.readConfig("kakaologin_api_key", "KAKAOLOGIN_API_KEY").orEmpty()
+val kakaoRedirectUri = properties.readConfig("kakaologin_redirect_uri", "KAKAOLOGIN_REDIRECT_URI").orEmpty()
+val naverClientId = properties.readConfig("naverlogin_clientid", "NAVERLOGIN_CLIENTID").orEmpty()
+val naverClientSecret = properties.readConfig("naverlogin_clientsecret", "NAVERLOGIN_CLIENTSECRET").orEmpty()
+val weatherApiKey = properties.readConfig("weather_api_key", "WEATHER_API_KEY").orEmpty()
+
+val keystoreFile = properties.readConfig("keystore.file", "ANDROID_KEYSTORE_FILE")
+val keystorePassword = properties.readConfig("keystore.password", "ANDROID_KEYSTORE_PASSWORD")
+val keystoreKeyAlias = properties.readConfig("keystore.key.alias", "ANDROID_KEY_ALIAS")
+val keystoreKeyPassword = properties.readConfig("keystore.key.password", "ANDROID_KEY_PASSWORD")
+val hasReleaseSigning = keystoreFile != null &&
+    keystorePassword != null &&
+    keystoreKeyAlias != null &&
+    keystoreKeyPassword != null
 
 android {
     signingConfigs {
-        if (keystoreFile != null && keystorePassword != null &&
-            keystoreKeyAlias != null && keystoreKeyPassword != null) {
+        if (hasReleaseSigning) {
+            val releaseKeystoreFile = requireNotNull(keystoreFile)
+            val releaseKeystorePassword = requireNotNull(keystorePassword)
+            val releaseKeyAlias = requireNotNull(keystoreKeyAlias)
+            val releaseKeyPassword = requireNotNull(keystoreKeyPassword)
             create("release") {
-                storeFile = file(keystoreFile)
-                storePassword = keystorePassword
-                keyAlias = keystoreKeyAlias
-                keyPassword = keystoreKeyPassword
+                storeFile = file(releaseKeystoreFile)
+                storePassword = releaseKeystorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
             }
         }
     }
@@ -64,15 +83,15 @@ android {
             useSupportLibrary = true
         }
 
-        manifestPlaceholders["Kakao_Redirect_URI"] = kakaoRedirectUri as String
-        manifestPlaceholders["Kakao_API_KEY"]  = kakaoApiKey as String
-        buildConfigField("String", "NaverMap_API_KEY", naverMapApiKey as String)
-        buildConfigField("String", "Kakao_API_KEY", kakaoApiKey)
-        buildConfigField("String", "Naver_ClientId", naverClientId as String)
-        buildConfigField("String", "Naver_ClientSecret", naverClientSecret as String)
-        buildConfigField("String", "Weather_API_KEY", weatherApiKey as String)
+        manifestPlaceholders["Kakao_Redirect_URI"] = kakaoRedirectUri
+        manifestPlaceholders["Kakao_API_KEY"] = kakaoApiKey
+        buildConfigField("String", "NaverMap_API_KEY", naverMapApiKey.toBuildConfigStringLiteral())
+        buildConfigField("String", "Kakao_API_KEY", kakaoApiKey.toBuildConfigStringLiteral())
+        buildConfigField("String", "Naver_ClientId", naverClientId.toBuildConfigStringLiteral())
+        buildConfigField("String", "Naver_ClientSecret", naverClientSecret.toBuildConfigStringLiteral())
+        buildConfigField("String", "Weather_API_KEY", weatherApiKey.toBuildConfigStringLiteral())
 
-        if (keystoreFile != null) {
+        if (hasReleaseSigning) {
             signingConfig = signingConfigs.getByName("release")
         }
     }
@@ -99,7 +118,7 @@ android {
             )
 
             // signing 정보가 없으면 debug signing 사용
-            if (keystoreFile == null) {
+            if (!hasReleaseSigning) {
                 signingConfig = signingConfigs.getByName("debug")
             }
         }
@@ -229,4 +248,69 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
     testImplementation(kotlin("test"))
+}
+
+kover {
+    reports {
+        filters {
+            excludes {
+                classes(
+                    "*.BuildConfig",
+                    "*.R",
+                    "*.R$*",
+                    "*_Factory*",
+                    "*_MembersInjector*",
+                    "*Hilt*",
+                    "*Dagger*",
+                    "*Binding",
+                    "*BindingImpl",
+                    "*DataBinderMapperImpl",
+                    "*Directions",
+                    "*Args"
+                )
+                packages(
+                    "dagger.hilt.internal",
+                    "hilt_aggregated_deps"
+                )
+            }
+        }
+        verify {
+            rule {
+                minBound(8)
+            }
+        }
+    }
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    ignoreFailures = true
+    config.setFrom(rootProject.file("detekt.yml"))
+    basePath = rootDir.absolutePath
+    source.setFrom(
+        files(
+            "src/main/java",
+            "src/main/kotlin",
+            "src/debug/java",
+            "src/debug/kotlin"
+        )
+    )
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "17"
+    exclude(
+        "**/build/**",
+        "**/generated/**",
+        "**/resources/**",
+        "**/tmp/**",
+        "**/test/**",
+        "**/androidTest/**"
+    )
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        sarif.required.set(true)
+        txt.required.set(false)
+    }
 }

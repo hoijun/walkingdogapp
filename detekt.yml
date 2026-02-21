@@ -1,0 +1,41 @@
+build:
+  maxIssues: 9999
+  weights:
+    complexity: 2
+    formatting: 1
+    LongParameterList: 1
+    comments: 0
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+style:
+  WildcardImport:
+    active: false
+  MagicNumber:
+    active: true
+    ignoreNumbers:
+      - '-1'
+      - '0'
+      - '1'
+      - '2'
+    ignoreHashCodeFunction: true
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+
+complexity:
+  LongMethod:
+    threshold: 80
+  LongParameterList:
+    functionThreshold: 8
+    constructorThreshold: 9
+  NestedBlockDepth:
+    threshold: 5
+
+comments:
+  active: true
+  UndocumentedPublicClass:
+    active: false
+  UndocumentedPublicFunction:
+    active: false
