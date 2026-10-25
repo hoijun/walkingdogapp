@@ -68,13 +68,13 @@ android {
     }
 
     namespace = "com.tulmunchi.walkingdogapp"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         manifestPlaceholders += mapOf()
         applicationId = "com.tulmunchi.walkingdogapp"
         minSdk = 27
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 12
         versionName = "2.1"
 
@@ -249,7 +249,6 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
     testImplementation(kotlin("test"))
 }
-
 kover {
     reports {
         filters {
